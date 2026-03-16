@@ -65,7 +65,7 @@ export default function Navbar() {
         <div className="px-4 sm:px-12 lg:px-26">
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
-            <a href="/#home">
+            <a href="/#home" className="flex items-center gap-2">
               <div className="w-25 h-10 md:w-34 md:h-14 flex items-center justify-center">
                 <img
                   src={"/logo2.png"}
@@ -73,6 +73,9 @@ export default function Navbar() {
                   className="w-full h-full object-cover"
                 />
               </div>
+              <span className="text-sm px-2 py-1 bg-none border-2 border-secondary text-secondary rounded-sm">
+                Beta
+              </span>
             </a>
 
             {/* Desktop Navigation */}
