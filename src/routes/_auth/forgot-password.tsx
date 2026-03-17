@@ -7,7 +7,7 @@ import type { JSX } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, ArrowLeft, Mail } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { requestPasswordReset } from "@/lib/user/password";
 
@@ -62,7 +62,7 @@ function ForgotPasswordPage(): JSX.Element {
 			{toast && <Toast {...toast} />}
 
 			<motion.div
-				className="rounded-2xl py-6 px-10 md:py-8 md:px-12 lg:py-6 lg:px-10 sm:py-5 sm:px-6 shadow-[1px_1px_4px_1px_rgba(96,126,242,0.5)] bg-[#F0F7FF] w-full max-w-md mx-auto"
+				className="rounded-xl py-6 px-10 md:py-8 md:px-12 lg:py-6 lg:px-10 sm:py-5 sm:px-6 shadow-[1px_1px_4px_1px_rgba(96,126,242,0.5)] bg-[#F0F7FF] w-full max-w-md mx-auto"
 				initial={{ opacity: 0, x: -20 }}
 				animate={{ opacity: 1, x: 0 }}
 				exit={{ opacity: 0, x: 20 }}
@@ -79,10 +79,6 @@ function ForgotPasswordPage(): JSX.Element {
 					</Link>
 
 					<div className="text-center mb-8 sm:mb-6">
-						{/* Icon */}
-						<div className="mx-auto mb-4 w-12 h-12 sm:w-10 sm:h-10 xl:w-14 xl:h-14 rounded-full bg-[#E8EDFF] flex items-center justify-center">
-							<Mail className="w-5 h-5 sm:w-4 sm:h-4 xl:w-6 xl:h-6 text-[#3A52A6]" />
-						</div>
 						<h1 className="text-lg sm:text-xl xl:text-2xl 2xl:text-3xl mb-1 text-[#3F58B2]">
 							Forgot Password?
 						</h1>

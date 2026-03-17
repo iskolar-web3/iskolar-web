@@ -114,7 +114,7 @@ function ResetPasswordPage(): JSX.Element {
 				animate={{ opacity: 1, scale: 1 }}
 				transition={{ duration: 0.3, ease: "easeInOut" }}
 			>
-				<div className="mx-auto mb-5 w-16 h-16 sm:w-14 sm:h-14 xl:w-20 xl:h-20 rounded-full bg-[#E8EDFF] flex items-center justify-center">
+				<div className="mx-auto w-16 h-16 sm:w-14 sm:h-14 xl:w-20 xl:h-20 rounded-full flex items-center justify-center">
 					<ShieldCheck className="w-7 h-7 sm:w-6 sm:h-6 xl:w-9 xl:h-9 text-[#3A52A6]" />
 				</div>
 				<h1 className="text-lg sm:text-xl xl:text-2xl 2xl:text-3xl mb-2 text-[#3F58B2]">
@@ -288,7 +288,7 @@ function InvalidTokenView(): JSX.Element {
 			animate={{ opacity: 1, scale: 1 }}
 			transition={{ duration: 0.3, ease: "easeInOut" }}
 		>
-			<div className="mx-auto mb-5 w-16 h-16 sm:w-14 sm:h-14 xl:w-20 xl:h-20 rounded-full bg-[#FEE2E2] flex items-center justify-center">
+			<div className="mx-auto w-16 h-16 sm:w-14 sm:h-14 xl:w-20 xl:h-20 rounded-full flex items-center justify-center">
 				<AlertCircle className="w-7 h-7 sm:w-6 sm:h-6 xl:w-9 xl:h-9 text-[#EF4444]" />
 			</div>
 			<h1 className="text-lg sm:text-xl xl:text-2xl 2xl:text-3xl mb-2 text-[#3F58B2]">

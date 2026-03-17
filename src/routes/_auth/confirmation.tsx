@@ -30,7 +30,7 @@ function maskEmail(email: string): string {
 }
 
 function ConfirmationPage(): JSX.Element {
-	usePageTitle("Check Your Email");
+	usePageTitle("Confirmation");
 
 	const navigate = useNavigate();
 	const { email } = Route.useSearch();
@@ -72,14 +72,14 @@ function ConfirmationPage(): JSX.Element {
 			{toast && <Toast {...toast} />}
 
 			<motion.div
-				className="rounded-2xl py-8 px-10 md:py-10 md:px-12 lg:py-8 lg:px-10 sm:py-6 sm:px-6 shadow-[1px_1px_4px_1px_rgba(96,126,242,0.5)] bg-[#F0F7FF] w-full max-w-md mx-auto text-center"
+				className="rounded-xl py-8 px-10 md:py-10 md:px-12 lg:py-8 lg:px-10 sm:py-6 sm:px-6 shadow-[1px_1px_4px_1px_rgba(96,126,242,0.5)] bg-[#F0F7FF] w-full max-w-md mx-auto text-center"
 				initial={{ opacity: 0, scale: 0.97 }}
 				animate={{ opacity: 1, scale: 1 }}
 				exit={{ opacity: 0, scale: 0.97 }}
 				transition={{ duration: 0.3, ease: "easeInOut" }}
 			>
 				{/* Icon */}
-				<div className="mx-auto mb-5 w-16 h-16 sm:w-14 sm:h-14 xl:w-20 xl:h-20 rounded-full bg-[#E8EDFF] flex items-center justify-center">
+				<div className="mx-auto w-16 h-16 sm:w-14 sm:h-14 xl:w-20 xl:h-20 rounded-full flex items-center justify-center">
 					<MailCheck className="w-7 h-7 sm:w-6 sm:h-6 xl:w-9 xl:h-9 text-[#3A52A6]" />
 				</div>
 
@@ -87,7 +87,7 @@ function ConfirmationPage(): JSX.Element {
 					Check Your Email
 				</h1>
 
-				<p className="text-[11px] sm:text-xs xl:text-sm text-[#8C8C8C] mb-1">
+				<p className="text-[11px] sm:text-xs xl:text-sm text-[#8C8C8C]">
 					We've sent a password reset link to
 				</p>
 				{email ? (
@@ -100,9 +100,9 @@ function ConfirmationPage(): JSX.Element {
 					</p>
 				)}
 
-				<p className="text-[10px] sm:text-[9px] xl:text-xs text-[#8C8C8C] mb-6 max-w-xs mx-auto">
-					The link expires in <span className="font-medium text-primary">15 minutes</span>.
-					Check your spam folder if you don't see it.
+				<p className="text-[9px] sm:text-[11px] xl:text-[13px] text-[#8C8C8C] mb-6 max-w-xs mx-auto">
+					<p>The link expires in <span className="font-medium text-primary">15 minutes</span>.</p>
+					<p>Check your spam folder if you don't see it.</p>
 				</p>
 
 				{/* Resend */}
@@ -114,7 +114,7 @@ function ConfirmationPage(): JSX.Element {
 						type="button"
 						onClick={() => resendMutation.mutate()}
 						disabled={resendMutation.isPending || resendCooldown > 0}
-						className={`inline-flex items-center gap-1.5 text-xs sm:text-[11px] xl:text-sm text-secondary hover:underline transition-colors ${
+						className={`inline-flex items-center gap-1.5 cursor-pointer text-xs sm:text-[11px] xl:text-sm text-secondary hover:underline transition-colors ${
 							(resendMutation.isPending || resendCooldown > 0) &&
 							"opacity-50 cursor-not-allowed no-underline"
 						}`}
@@ -134,7 +134,7 @@ function ConfirmationPage(): JSX.Element {
 				<button
 					type="button"
 					onClick={handleBackToLogin}
-					className="inline-flex items-center gap-1.5 text-[#8C8C8C] hover:text-secondary text-[11px] sm:text-xs xl:text-sm transition-colors"
+					className="inline-flex items-center cursor-pointer gap-1.5 text-[#8C8C8C] hover:text-secondary text-[11px] sm:text-xs xl:text-sm transition-colors"
 				>
 					<ArrowLeft className="w-3.5 h-3.5" />
 					Back to Login
