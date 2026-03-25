@@ -1,5 +1,5 @@
 import { Calendar, Users, Coins, Images, UserIcon } from 'lucide-react';
-import { calculateAmountPerScholar, formatCurrency, formatDeadline } from '@/utils/formatting.utils';
+import { formatCurrency, formatDeadline } from '@/utils/formatting.utils';
 import { ScholarshipType, type ScholarshipFormData } from '@/lib/scholarship/model';
 import { useAuth } from '@/auth';
 import type { AnySponsor } from '@/lib/sponsor/model';
@@ -11,6 +11,10 @@ import { getSponsorName } from '@/lib/sponsor/api';
 interface ScholarshipPreviewCardProps {
   /** Partial scholarship data to display in preview */
   scholarship: Partial<ScholarshipFormData>;
+  /** Amount mode selected in the form */
+  amountType?: 'fixed' | 'range' | 'varies';
+  /** Whether slots are set to unlimited */
+  unlimitedSlots?: boolean;
   /** Optional callback when card is clicked */
   onClick?: () => void;
 }
@@ -21,9 +25,12 @@ interface ScholarshipPreviewCardProps {
  * @param props - Component props
  * @returns Preview card component with scholarship details
  */
-export default function ScholarshipPreviewCard({ scholarship, onClick }: ScholarshipPreviewCardProps) {
-  const amountPerScholar = calculateAmountPerScholar(scholarship.totalAmount, scholarship.totalSlots);
-  const auth = useAuth<AnySponsor>()
+export default function ScholarshipPreviewCard({ scholarship, amountType = 'fixed', unlimitedSlots = false, onClick }: ScholarshipPreviewCardProps) {
+  const auth = useAuth<AnySponsor>();
+
+  const isFixed = amountType === 'fixed';
+  const isRange = amountType === 'range';
+  const isVaries = amountType === 'varies';
 
   return (
     <div
@@ -101,21 +108,30 @@ export default function ScholarshipPreviewCard({ scholarship, onClick }: Scholar
               <Coins size={16} />
               <span>Amount</span>
             </div>
-            <p className="text-base text-primary">
-              {amountPerScholar !== null
-                ? formatCurrency(amountPerScholar, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                    showSpace: true,
-                  })
-                : scholarship.totalAmount
-                ? formatCurrency(scholarship.totalAmount, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })
-                : '₱0.00'}
-            </p>
-            <p className="text-xs text-[#6B7280]">per scholar</p>
+            {isFixed && (
+              <>
+                <p className="text-base text-primary">
+                  {formatCurrency(scholarship.totalAmount ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                </p>
+                <p className="text-xs text-[#6B7280]">per scholar</p>
+              </>
+            )}
+            {isRange && (
+              <>
+                <p className="text-base text-primary">
+                  {formatCurrency(scholarship.totalAmountMin ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                  {' – '}
+                  {formatCurrency(scholarship.totalAmountMax ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                </p>
+                <p className="text-xs text-[#6B7280]">per scholar</p>
+              </>
+            )}
+            {isVaries && (
+              <>
+                <p className="text-base text-primary">Varies</p>
+                <p className="text-xs text-[#6B7280]">see details</p>
+              </>
+            )}
           </div>
 
           <div className="bg-[#F9FAFB] border border-border rounded-lg p-3">
@@ -123,7 +139,7 @@ export default function ScholarshipPreviewCard({ scholarship, onClick }: Scholar
               <Users size={16} />
               <span>Slots</span>
             </div>
-            <p className="text-base text-primary">{scholarship.totalSlots || '0'}</p>
+            <p className="text-base text-primary">{unlimitedSlots ? 'No limit' : (scholarship.totalSlots ?? 0)}</p>
             <p className="text-xs text-[#6B7280]">scholars</p>
           </div>
         </div>

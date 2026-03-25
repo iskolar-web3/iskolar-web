@@ -95,6 +95,8 @@ function CreateScholarship() {
   const description = watch('description');
   const title = watch('name');
   const totalAmount = watch('totalAmount');
+  const totalAmountMin = watch('totalAmountMin');
+  const totalAmountMax = watch('totalAmountMax');
   const totalSlot = watch('totalSlots');
   const applicationDeadline = watch('applicationDeadline');
   const scholarshipType = watch('scholarshipType');
@@ -106,6 +108,8 @@ function CreateScholarship() {
     description,
     imageUrl,
     totalAmount,
+    totalAmountMin,
+    totalAmountMax,
     totalSlots: totalSlot,
     applicationDeadline,
     criterias: criteria,
@@ -207,7 +211,7 @@ function CreateScholarship() {
               value={scholarshipType}
               onValueChange={(value) => setValue('scholarshipType', value as ScholarshipType, { shouldValidate: true })}
             >
-              <SelectTrigger disabled={loading} className={`w-full px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-[placeholder]:text-gray-400 ${
+              <SelectTrigger disabled={loading} className={`w-full px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
                 errors.scholarshipType
                   ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary'
                   : 'border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary'
@@ -293,7 +297,7 @@ function CreateScholarship() {
                 <div className="grid grid-cols-10 gap-3">
                   <div className="flex flex-col col-span-6">
                     {/* Amount type toggle — scoped to this column */}
-                    <div className="flex rounded-sm overflow-hidden border border-[#C4CBD5] text-xs mb-1.5 h-[28px]">
+                    <div className="flex rounded-sm overflow-hidden border border-[#C4CBD5] text-xs mb-1.5 h-7">
                       {(['fixed', 'range', 'varies'] as const).map((t) => (
                         <button
                           key={t}
@@ -382,7 +386,7 @@ function CreateScholarship() {
                   </div>
 
                   <div className="flex flex-col col-span-4">
-                    <label className="flex items-center justify-end gap-1 mb-1.5 cursor-pointer h-[28px]">
+                    <label className="flex items-center justify-end gap-1 mb-1.5 cursor-pointer h-7">
                       <input
                         type="checkbox"
                         checked={unlimitedSlots}
@@ -595,8 +599,10 @@ function CreateScholarship() {
             <h2 className="text-sm text-primary">Live Preview</h2>
           </div>
           
-          <ScholarshipPreviewCard 
+          <ScholarshipPreviewCard
             scholarship={previewScholarship}
+            amountType={amountType}
+            unlimitedSlots={unlimitedSlots}
             onClick={() => setShowFullPreview(true)}
           />
         </div>
