@@ -111,7 +111,7 @@ export const createScholarshipRequestSchema = z.object({
 	totalAmount: z.coerce.number().positive().optional(),
 	totalAmountMin: z.coerce.number().positive().optional(),
 	totalAmountMax: z.coerce.number().positive().optional(),
-	totalSlots: z.coerce.number().positive(),
+	totalSlots: z.coerce.number().positive().optional(),
 	applicationDeadline: z.date(),
 	imageUrl: z.string().nonempty("Please upload a scholarship image"),
 	criterias: z

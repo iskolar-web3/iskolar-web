@@ -150,6 +150,7 @@ function EditScholarshipPage() {
 		if (scholarship.totalAmount && scholarship.totalAmount > 0) return 'fixed';
 		return 'varies';
 	});
+	const [unlimitedSlots, setUnlimitedSlots] = useState(!scholarship.totalSlots);
 	const { toast, showSuccess, showError } = useToast();
 
 	const criterias = form.watch("criterias") || [];
@@ -302,14 +303,19 @@ function EditScholarshipPage() {
 				return;
 			}
 		}
+		if (!unlimitedSlots && !data.totalSlots) {
+			form.setError("totalSlots", { message: "Please enter the number of slots" });
+			return;
+		}
 		setSaving(true);
-		const payload: EditScholarshipFormData =
+		const amountPayload: Partial<EditScholarshipFormData> =
 			amountType === 'fixed'
-				? { ...data, totalAmountMin: undefined, totalAmountMax: undefined }
+				? { totalAmountMin: undefined, totalAmountMax: undefined }
 				: amountType === 'range'
-				? { ...data, totalAmount: undefined }
-				: { ...data, totalAmount: undefined, totalAmountMin: undefined, totalAmountMax: undefined };
-		mutation.mutate(payload);
+				? { totalAmount: undefined }
+				: { totalAmount: undefined, totalAmountMin: undefined, totalAmountMax: undefined };
+		const slotsPayload = unlimitedSlots ? { totalSlots: undefined } : {};
+		mutation.mutate({ ...data, ...amountPayload, ...slotsPayload });
 	};
 
 	if (loading) {
@@ -666,23 +672,46 @@ function EditScholarshipPage() {
 									</div>
 
 									<div>
-										<Controller
-											control={form.control}
-											name="totalSlots"
-											render={({ field }) => (
-												<input
-													{...field}
-													type="number"
-													disabled={saving}
-													placeholder="Total slots"
-													className={`w-full px-4 py-3 rounded-lg border ${
-														form.formState.errors.totalSlots
-															? "border-[#EF4444]"
-															: "border-[#C4CBD5]"
-													} bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
-												/>
-											)}
-										/>
+										{!unlimitedSlots && (
+											<Controller
+												control={form.control}
+												name="totalSlots"
+												render={({ field }) => (
+													<input
+														{...field}
+														type="number"
+														disabled={saving}
+														placeholder="Total slots"
+														className={`w-full px-4 py-3 rounded-lg border ${
+															form.formState.errors.totalSlots
+																? "border-[#EF4444]"
+																: "border-[#C4CBD5]"
+														} bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
+													/>
+												)}
+											/>
+										)}
+										{unlimitedSlots && (
+											<div className="w-full px-4 py-3 rounded-lg border border-[#C4CBD5] bg-[#F8F9FC] text-sm text-[#6B7280]">
+												Unlimited
+											</div>
+										)}
+										<label className="flex items-center gap-2 mt-1.5 cursor-pointer">
+											<input
+												type="checkbox"
+												checked={unlimitedSlots}
+												disabled={saving}
+												onChange={(e) => {
+													setUnlimitedSlots(e.target.checked);
+													if (e.target.checked) {
+														form.setValue("totalSlots", undefined);
+														form.clearErrors("totalSlots");
+													}
+												}}
+												className="w-3.5 h-3.5 accent-[#3A52A6]"
+											/>
+											<span className="text-xs text-[#6B7280]">Unlimited</span>
+										</label>
 										{form.formState.errors.totalSlots && (
 											<p className="text-xs text-[#EF4444] mt-1">
 												{form.formState.errors.totalSlots.message}

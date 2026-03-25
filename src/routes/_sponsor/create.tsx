@@ -87,6 +87,7 @@ function CreateScholarship() {
   const [showFullPreview, setShowFullPreview] = useState(false);
   const [loading, setLoading] = useState(false);
   const [amountType, setAmountType] = useState<'fixed' | 'varies' | 'range'>('fixed');
+  const [unlimitedSlots, setUnlimitedSlots] = useState(false);
 
   const criteria = watch('criterias');
   const requiredDocuments = watch('requirements');
@@ -178,14 +179,19 @@ function CreateScholarship() {
         return;
       }
     }
+    if (!unlimitedSlots && !data.totalSlots) {
+      form.setError('totalSlots', { message: 'Please enter the number of slots' });
+      return;
+    }
     setLoading(true);
-    const payload: ScholarshipFormData =
+    const amountPayload: Partial<ScholarshipFormData> =
       amountType === 'fixed'
-        ? { ...data, totalAmountMin: undefined, totalAmountMax: undefined }
+        ? { totalAmountMin: undefined, totalAmountMax: undefined }
         : amountType === 'range'
-        ? { ...data, totalAmount: undefined }
-        : { ...data, totalAmount: undefined, totalAmountMin: undefined, totalAmountMax: undefined };
-    mutation.mutate(payload);
+        ? { totalAmount: undefined }
+        : { totalAmount: undefined, totalAmountMin: undefined, totalAmountMax: undefined };
+    const slotsPayload = unlimitedSlots ? { totalSlots: undefined } : {};
+    mutation.mutate({ ...data, ...amountPayload, ...slotsPayload } as ScholarshipFormData);
   };
 
   return (
@@ -378,21 +384,44 @@ function CreateScholarship() {
                   </div>
 
                   <div>
-                    <Controller
-                      control={control}
-                      name="totalSlots"
-                      render={({ field }) => (
-                        <input
-                          {...field}
-                          type="number"
-                          disabled={loading}
-                          placeholder="Total slots"
-                          className={`w-full px-4 py-3 rounded-lg border ${
-                            errors.totalSlots ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
-                          } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
-                        />
-                      )}
-                    />
+                    {!unlimitedSlots && (
+                      <Controller
+                        control={control}
+                        name="totalSlots"
+                        render={({ field }) => (
+                          <input
+                            {...field}
+                            type="number"
+                            disabled={loading}
+                            placeholder="Total slots"
+                            className={`w-full px-4 py-3 rounded-lg border ${
+                              errors.totalSlots ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
+                            } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
+                          />
+                        )}
+                      />
+                    )}
+                    {unlimitedSlots && (
+                      <div className="w-full px-4 py-3 rounded-lg border border-[#C4CBD5] bg-[#F8F9FC] text-sm text-[#6B7280]">
+                        Unlimited
+                      </div>
+                    )}
+                    <label className="flex items-center gap-2 mt-1.5 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={unlimitedSlots}
+                        disabled={loading}
+                        onChange={(e) => {
+                          setUnlimitedSlots(e.target.checked);
+                          if (e.target.checked) {
+                            setValue('totalSlots', undefined);
+                            form.clearErrors('totalSlots');
+                          }
+                        }}
+                        className="w-3.5 h-3.5 accent-[#3A52A6]"
+                      />
+                      <span className="text-xs text-[#6B7280]">Unlimited</span>
+                    </label>
                     {errors.totalSlots && <p className="text-xs text-[#EF4444] mt-1">{errors.totalSlots.message}</p>}
                   </div>
                 </div>
