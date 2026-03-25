@@ -1,6 +1,6 @@
 import { Calendar, Users, Coins, Images, UserIcon } from 'lucide-react';
 import { calculateAmountPerScholar, formatCurrency, formatDeadline } from '@/utils/formatting.utils';
-import { ScholarshipPurpose, ScholarshipType, type ScholarshipFormData } from '@/lib/scholarship/model';
+import { ScholarshipType, type ScholarshipFormData } from '@/lib/scholarship/model';
 import { useAuth } from '@/auth';
 import type { AnySponsor } from '@/lib/sponsor/model';
 import { getSponsorName } from '@/lib/sponsor/api';
@@ -53,18 +53,15 @@ export default function ScholarshipPreviewCard({ scholarship, onClick }: Scholar
               {scholarship.name || 'Scholarship Title'}
             </h3>
 
-            {(scholarship.scholarshipType || scholarship.purpose) && (
+            {scholarship.scholarshipType && (
               <div className="flex flex-wrap items-center gap-2 mb-4">
-                {scholarship.scholarshipType && (
-                  <span className="px-2 py-0.5 bg-white/90 text-secondary text-[11px] rounded">
-                    {scholarship.scholarshipType === ScholarshipType.MeritBased ? 'Merit-Based' : 'Skill-Based'}
-                  </span>
-                )}
-                {scholarship.purpose && (
-                  <span className="px-2 py-0.5 bg-white/90 text-secondary text-[11px] rounded">
-                    {scholarship.purpose === ScholarshipPurpose.Allowance ? 'Allowance' : 'Tuition'}
-                  </span>
-                )}
+                <span className="px-2 py-0.5 bg-white/90 text-secondary text-[11px] rounded">
+                  {scholarship.scholarshipType === ScholarshipType.NeedBased
+                    ? 'Need-Based'
+                    : scholarship.scholarshipType === ScholarshipType.MeritBased
+                    ? 'Merit-Based'
+                    : 'Combined'}
+                </span>
               </div>
             )}
 

@@ -14,7 +14,6 @@ import {
 	formatDeadline,
 } from "@/utils/formatting.utils";
 import {
-	ScholarshipPurpose,
 	ScholarshipType,
 	type ScholarshipFormData,
 } from "@/lib/scholarship/model";
@@ -120,16 +119,11 @@ export default function ScholarshipFullPreviewModal({
 						<div className="flex gap-2 mb-4">
 							{scholarship.scholarshipType && (
 								<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">
-									{scholarship.scholarshipType === ScholarshipType.MeritBased
+									{scholarship.scholarshipType === ScholarshipType.NeedBased
+										? "Need-Based"
+										: scholarship.scholarshipType === ScholarshipType.MeritBased
 										? "Merit-Based"
-										: "Skill-Based"}
-								</span>
-							)}
-							{scholarship.purpose && (
-								<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">
-									{scholarship.purpose === ScholarshipPurpose.Allowance
-										? "Allowance"
-										: "Tuition"}
+										: "Combined"}
 								</span>
 							)}
 						</div>

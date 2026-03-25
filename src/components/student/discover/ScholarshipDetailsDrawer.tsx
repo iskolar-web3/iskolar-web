@@ -119,9 +119,6 @@ export default function ScholarshipDetailsModal({ scholarship, onClose }: { scho
               <span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">
                 {scholarship.scholarshipType.name}
               </span>
-              <span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">
-                {scholarship.purpose.name}
-              </span>
             </div>
 
             {/* Sponsor and Deadline */}

@@ -180,9 +180,6 @@ export default function ApplicationDetailsModal({
 							<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">
 								{application.scholarship.scholarshipType.name}
 							</span>
-							<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">
-								{application.scholarship.purpose.name}
-							</span>
 						</div>
 
 						{/* Sponsor and Deadline */}

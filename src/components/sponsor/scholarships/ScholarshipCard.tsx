@@ -200,14 +200,6 @@ export default function ScholarshipCard({
               >
                 {scholarship.scholarshipType.name}
               </motion.span>
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: index * 0.05 + 0.15 }}
-                className="px-2 py-0.5 bg-white/90 text-secondary text-[10px] md:text-[11px] rounded"
-              >
-                {scholarship.purpose.name}
-              </motion.span>
             </div>
 
             {/* Sponsor and Deadline */}

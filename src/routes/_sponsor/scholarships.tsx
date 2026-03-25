@@ -47,7 +47,6 @@ function Scholarships() {
 
 	const [sortBy, setSortBy] = useState("Newest");
 	const [scholarshipType, setScholarshipType] = useState("All");
-	const [purpose, setPurpose] = useState("All");
 	const [applicationsRange, setApplicationsRange] = useState({
 		min: "",
 		max: "",
@@ -117,10 +116,6 @@ function Scholarships() {
 				scholarshipType === "All" ||
 				scholarship.scholarshipType.code === scholarshipType.toLowerCase();
 
-			const matchesPurpose =
-				purpose === "All" ||
-				scholarship.purpose.code.toLowerCase() === purpose.toLowerCase();
-
 			const amountPerScholar =
 				scholarship.totalAmount && scholarship.totalSlots
 					? scholarship.totalAmount / scholarship.totalSlots
@@ -144,7 +139,6 @@ function Scholarships() {
 
 			return (
 				matchesType &&
-				matchesPurpose &&
 				matchesApplications &&
 				matchesAmount &&
 				matchesSlots
@@ -153,7 +147,6 @@ function Scholarships() {
 	}, [
 		scholarships,
 		scholarshipType,
-		purpose,
 		applicationsRange,
 		amountRange,
 		slotRange,
@@ -254,12 +247,6 @@ function Scholarships() {
 									onChange={setScholarshipType}
 								/>
 
-								<FilterSelect
-									title="Scholarship Purpose"
-									options={["All", "Allowance", "Tuition"]}
-									value={purpose}
-									onChange={setPurpose}
-								/>
 
 								<div className="mb-4">
 									<label className="block text-xs text-primary mb-2">
@@ -412,12 +399,6 @@ function Scholarships() {
 										onChange={setScholarshipType}
 									/>
 
-									<FilterSelect
-										title="Scholarship Purpose"
-										options={["All", "Allowance", "Tuition"]}
-										value={purpose}
-										onChange={setPurpose}
-									/>
 
 									<div className="mb-6">
 										<label className="block text-sm text-primary mb-2">

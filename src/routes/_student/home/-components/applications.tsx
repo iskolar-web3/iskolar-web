@@ -113,9 +113,6 @@ export function HomeApplications(props: Props): JSX.Element {
 													<span className="px-2 py-0.5 bg-white/90 text-secondary text-[10px] md:text-[11px] rounded whitespace-nowrap">
 														{item.scholarship.scholarshipType.name}
 													</span>
-													<span className="px-2 py-0.5 bg-white/90 text-secondary text-[10px] md:text-[11px] rounded whitespace-nowrap">
-														{item.scholarship.purpose.name}
-													</span>
 												</div>
 
 												<div className="space-y-1.5 text-xs">
