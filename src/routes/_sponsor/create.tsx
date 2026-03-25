@@ -86,6 +86,7 @@ function CreateScholarship() {
   const [editingFieldIndex, setEditingFieldIndex] = useState<number | null>(null);
   const [showFullPreview, setShowFullPreview] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [amountType, setAmountType] = useState<'fixed' | 'varies' | 'range'>('fixed');
 
   const criteria = watch('criterias');
   const requiredDocuments = watch('requirements');
@@ -159,8 +160,32 @@ function CreateScholarship() {
 	});
 
   const onSubmit = async (data: ScholarshipFormData) => {
+    if (amountType === 'fixed' && !data.totalAmount) {
+      form.setError('totalAmount', { message: 'Please enter a valid amount' });
+      return;
+    }
+    if (amountType === 'range') {
+      if (!data.totalAmountMin) {
+        form.setError('totalAmountMin', { message: 'Please enter a minimum amount' });
+        return;
+      }
+      if (!data.totalAmountMax) {
+        form.setError('totalAmountMax', { message: 'Please enter a maximum amount' });
+        return;
+      }
+      if (data.totalAmountMin >= data.totalAmountMax) {
+        form.setError('totalAmountMax', { message: 'Max must be greater than min' });
+        return;
+      }
+    }
     setLoading(true);
-    mutation.mutate(data)
+    const payload: ScholarshipFormData =
+      amountType === 'fixed'
+        ? { ...data, totalAmountMin: undefined, totalAmountMax: undefined }
+        : amountType === 'range'
+        ? { ...data, totalAmount: undefined }
+        : { ...data, totalAmount: undefined, totalAmountMin: undefined, totalAmountMax: undefined };
+    mutation.mutate(payload);
   };
 
   return (
@@ -264,22 +289,92 @@ function CreateScholarship() {
                 {/* Total Amount & Slot */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Controller
-                      control={control}
-                      name="totalAmount"
-                      render={({ field }) => (
-                        <input
-                          {...field}
-                          type="number"
+                    <div className="flex rounded-lg overflow-hidden border border-[#C4CBD5] mb-1.5 text-xs">
+                      {(['fixed', 'range', 'varies'] as const).map((t) => (
+                        <button
+                          key={t}
+                          type="button"
                           disabled={loading}
-                          placeholder="Total amount"
-                          className={`w-full px-4 py-3 rounded-lg border ${
-                            errors.totalAmount ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
-                          } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
+                          onClick={() => {
+                            setAmountType(t);
+                            setValue('totalAmount', undefined);
+                            setValue('totalAmountMin', undefined);
+                            setValue('totalAmountMax', undefined);
+                            form.clearErrors(['totalAmount', 'totalAmountMin', 'totalAmountMax']);
+                          }}
+                          className={`flex-1 py-1.5 capitalize transition-colors ${amountType === t ? 'bg-[#3A52A6] text-white' : 'bg-[#F8F9FC] text-[#6B7280] hover:bg-gray-100'}`}
+                        >
+                          {t}
+                        </button>
+                      ))}
+                    </div>
+                    {amountType === 'fixed' && (
+                      <Controller
+                        control={control}
+                        name="totalAmount"
+                        render={({ field }) => (
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#6B7280]">₱</span>
+                            <input
+                              {...field}
+                              type="number"
+                              disabled={loading}
+                              placeholder="0.00"
+                              className={`w-full pl-7 pr-4 py-3 rounded-lg border ${
+                                errors.totalAmount ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
+                              } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
+                            />
+                          </div>
+                        )}
+                      />
+                    )}
+                    {amountType === 'varies' && (
+                      <p className="text-xs text-[#6B7280] px-1 py-2">Amount varies — describe it in the description field.</p>
+                    )}
+                    {amountType === 'range' && (
+                      <div className="flex items-center gap-2">
+                        <Controller
+                          control={control}
+                          name="totalAmountMin"
+                          render={({ field }) => (
+                            <div className="relative flex-1">
+                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#6B7280]">₱</span>
+                              <input
+                                {...field}
+                                type="number"
+                                disabled={loading}
+                                placeholder="Min"
+                                className={`w-full pl-7 pr-3 py-3 rounded-lg border ${
+                                  errors.totalAmountMin ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
+                                } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
+                              />
+                            </div>
+                          )}
                         />
-                      )}
-                    />
+                        <span className="text-xs text-[#6B7280] shrink-0">to</span>
+                        <Controller
+                          control={control}
+                          name="totalAmountMax"
+                          render={({ field }) => (
+                            <div className="relative flex-1">
+                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#6B7280]">₱</span>
+                              <input
+                                {...field}
+                                type="number"
+                                disabled={loading}
+                                placeholder="Max"
+                                className={`w-full pl-7 pr-3 py-3 rounded-lg border ${
+                                  errors.totalAmountMax ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
+                                } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
+                              />
+                            </div>
+                          )}
+                        />
+                      </div>
+                    )}
                     {errors.totalAmount && <p className="text-xs text-[#EF4444] mt-1">{errors.totalAmount.message}</p>}
+                    {errors.totalAmountMin && <p className="text-xs text-[#EF4444] mt-1">{errors.totalAmountMin.message}</p>}
+                    {errors.totalAmountMax && <p className="text-xs text-[#EF4444] mt-1">{errors.totalAmountMax.message}</p>}
                   </div>
 
                   <div>
