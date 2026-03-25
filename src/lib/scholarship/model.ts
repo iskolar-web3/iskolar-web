@@ -5,8 +5,9 @@ import { validateFormField } from "./helper";
 import { studentSchema } from "../student/model";
 
 export enum ScholarshipType {
+	NeedBased = "need-based",
 	MeritBased = "merit-based",
-	SkillBased = "skill-based",
+	Combined = "combined",
 }
 
 export enum ScholarshipStatus {
@@ -18,10 +19,6 @@ export enum ScholarshipStatus {
 	Archived = "archived",
 }
 
-export enum ScholarshipPurpose {
-	Allowance = "allowance",
-	Tuition = "tuition",
-}
 
 export enum FormFieldType {
 	ShortAnswer = "short_answer",
@@ -65,7 +62,6 @@ export const scholarshipSchema = <T extends z.ZodType>(sponsor: T) =>
 		totalSlots: z.number().positive(),
 		applicationDeadline: z.coerce.date(),
 		imageUrl: z.string().nullable(),
-		purpose: enumDetailSchema(ScholarshipPurpose),
 		criterias: z.string().array().default([]),
 		requirements: z.string().array().default([]),
 		sponsor: sponsor,
@@ -116,7 +112,6 @@ export const createScholarshipRequestSchema = z.object({
 	totalSlots: z.coerce.number().positive(),
 	applicationDeadline: z.date(),
 	imageUrl: z.string().nonempty("Please upload a scholarship image"),
-	purpose: z.enum(ScholarshipPurpose, { message: "Please select a purpose" }),
 	criterias: z
 		.string()
 		.array()
