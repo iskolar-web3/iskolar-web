@@ -201,29 +201,26 @@ function CreateScholarship() {
       <div className="grid grid-cols-1 lg:grid-cols-2">
         {/* Scholarship Details */}
         <div className="space-y-4">
-          {/* Type and Purpose */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Select 
-                value={scholarshipType} 
-                onValueChange={(value) => setValue('scholarshipType', value as ScholarshipType, { shouldValidate: true })}
-              >
-                <SelectTrigger disabled={loading} className={`w-full px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-[placeholder]:text-gray-400 ${
-                  errors.scholarshipType
-                    ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary'
-                    : 'border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary'
-                }`}>
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={ScholarshipType.NeedBased}>Need-Based</SelectItem>
-                  <SelectItem value={ScholarshipType.MeritBased}>Merit-Based</SelectItem>
-                  <SelectItem value={ScholarshipType.Combined}>Combined</SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.scholarshipType && <p className="text-xs text-[#EF4444] mt-1">{errors.scholarshipType.message}</p>}
-            </div>
-
+          {/* Type */}
+          <div>
+            <Select
+              value={scholarshipType}
+              onValueChange={(value) => setValue('scholarshipType', value as ScholarshipType, { shouldValidate: true })}
+            >
+              <SelectTrigger disabled={loading} className={`w-full px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-[placeholder]:text-gray-400 ${
+                errors.scholarshipType
+                  ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary'
+                  : 'border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary'
+              }`}>
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ScholarshipType.NeedBased}>Need-Based</SelectItem>
+                <SelectItem value={ScholarshipType.MeritBased}>Merit-Based</SelectItem>
+                <SelectItem value={ScholarshipType.Combined}>Combined</SelectItem>
+              </SelectContent>
+            </Select>
+            {errors.scholarshipType && <p className="text-xs text-[#EF4444] mt-1">{errors.scholarshipType.message}</p>}
           </div>
 
           <div className="bg-[#F8F9FC] rounded-xl p-3 shadow-sm">
@@ -294,8 +291,9 @@ function CreateScholarship() {
 
                 {/* Total Amount & Slot */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <div className="flex rounded-lg overflow-hidden border border-[#C4CBD5] mb-1.5 text-xs">
+                  <div className="flex flex-col">
+                    {/* Amount type toggle — scoped to this column */}
+                    <div className="flex rounded-lg overflow-hidden border border-[#C4CBD5] text-xs mb-1.5 h-[28px]">
                       {(['fixed', 'range', 'varies'] as const).map((t) => (
                         <button
                           key={t}
@@ -383,7 +381,23 @@ function CreateScholarship() {
                     {errors.totalAmountMax && <p className="text-xs text-[#EF4444] mt-1">{errors.totalAmountMax.message}</p>}
                   </div>
 
-                  <div>
+                  <div className="flex flex-col">
+                    <label className="flex items-center justify-end gap-2 mb-1.5 cursor-pointer h-[28px]">
+                      <input
+                        type="checkbox"
+                        checked={unlimitedSlots}
+                        disabled={loading}
+                        onChange={(e) => {
+                          setUnlimitedSlots(e.target.checked);
+                          if (e.target.checked) {
+                            setValue('totalSlots', undefined);
+                            form.clearErrors('totalSlots');
+                          }
+                        }}
+                        className="w-3.5 h-3.5 accent-[#3A52A6]"
+                      />
+                      <span className="text-xs  text-[#6B7280]">No limit</span>
+                    </label>
                     {!unlimitedSlots && (
                       <Controller
                         control={control}
@@ -401,27 +415,6 @@ function CreateScholarship() {
                         )}
                       />
                     )}
-                    {unlimitedSlots && (
-                      <div className="w-full px-4 py-3 rounded-lg border border-[#C4CBD5] bg-[#F8F9FC] text-sm text-[#6B7280]">
-                        Unlimited
-                      </div>
-                    )}
-                    <label className="flex items-center gap-2 mt-1.5 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={unlimitedSlots}
-                        disabled={loading}
-                        onChange={(e) => {
-                          setUnlimitedSlots(e.target.checked);
-                          if (e.target.checked) {
-                            setValue('totalSlots', undefined);
-                            form.clearErrors('totalSlots');
-                          }
-                        }}
-                        className="w-3.5 h-3.5 accent-[#3A52A6]"
-                      />
-                      <span className="text-xs text-[#6B7280]">Unlimited</span>
-                    </label>
                     {errors.totalSlots && <p className="text-xs text-[#EF4444] mt-1">{errors.totalSlots.message}</p>}
                   </div>
                 </div>
