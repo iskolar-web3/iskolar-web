@@ -1,6 +1,6 @@
 import { Calendar, Users, Coins, UserIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { calculateAmountPerScholar, formatCurrency, formatDate } from '@/utils/formatting.utils';
+import { formatCurrency, formatDate } from '@/utils/formatting.utils';
 import type { Scholarship } from '@/lib/scholarship/model';
 import { getSponsorName } from '@/lib/sponsor/api';
 
@@ -23,7 +23,9 @@ export interface ScholarshipCardProps {
  * @returns Animated scholarship card component
  */
 export default function ScholarshipCard({ scholarship, index, onClick }: ScholarshipCardProps) {
-  const amountPerScholar = calculateAmountPerScholar(scholarship.totalAmount, scholarship.totalSlots);
+  const isRange = scholarship.totalAmountMin != null || scholarship.totalAmountMax != null;
+  const isFixed = !isRange && scholarship.totalAmount != null;
+  const isVaries = !isRange && !isFixed;
   
   return (
     <motion.div
@@ -47,7 +49,7 @@ export default function ScholarshipCard({ scholarship, index, onClick }: Scholar
           {/* Image */}
           <motion.div 
             transition={{ duration: 0.3 }}
-            className="w-32 h-32 bg-white/10 flex-shrink-0 overflow-hidden"
+            className="w-32 h-32 bg-white/10 shrink-0 overflow-hidden"
           >
             <img
               src={scholarship.imageUrl || "/logo.jpg"}
@@ -75,7 +77,7 @@ export default function ScholarshipCard({ scholarship, index, onClick }: Scholar
             {/* Sponsor and Deadline */}
             <div className="space-y-1.5 text-xs">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-card flex items-center justify-center flex-shrink-0">
+                <div className="w-4 h-4 rounded-full bg-card flex items-center justify-center shrink-0">
                   {scholarship?.sponsor?.avatarUrl ? (
                     <img
                       src={scholarship?.sponsor?.avatarUrl}
@@ -109,12 +111,9 @@ export default function ScholarshipCard({ scholarship, index, onClick }: Scholar
               <Coins size={16} />
               <span>Amount</span>
             </div>
-            <p className="text-sm md:text-base text-primary">
-              {amountPerScholar !== null
-                ? formatCurrency(amountPerScholar, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                : '₱0.00'}
-            </p>
-            <p className="text-xs text-[#6B7280]">per scholar</p>
+            {isFixed && (<><p className="text-sm md:text-base text-primary">{formatCurrency(scholarship.totalAmount!, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p><p className="text-xs text-[#6B7280]">per scholar</p></>)}
+            {isRange && (<><p className="text-sm md:text-base text-primary">{formatCurrency(scholarship.totalAmountMin ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}{" – "}{formatCurrency(scholarship.totalAmountMax ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p><p className="text-xs text-[#6B7280]">per scholar</p></>)}
+            {isVaries && (<><p className="text-sm md:text-base text-primary">Varies</p><p className="text-xs text-[#6B7280]">see details</p></>)}
           </motion.div>
 
           <motion.div
@@ -125,7 +124,7 @@ export default function ScholarshipCard({ scholarship, index, onClick }: Scholar
               <Users size={16} />
               <span>Slots</span>
             </div>
-            <p className="text-sm md:text-base text-primary">{scholarship.totalSlots}</p>
+            <p className="text-sm md:text-base text-primary">{scholarship.totalSlots ?? "No limit"}</p>
             <p className="text-xs text-[#6B7280]">scholars</p>
           </motion.div>
         </div>

@@ -127,8 +127,10 @@ function EditScholarshipPage() {
 			name: scholarship.name,
 			requirements: scholarship.requirements,
 			status: scholarship.status.code,
-			totalAmount: scholarship.totalAmount,
-			totalSlots: scholarship.totalSlots,
+			totalAmount: scholarship.totalAmount ?? undefined,
+			totalAmountMin: scholarship.totalAmountMin ?? undefined,
+			totalAmountMax: scholarship.totalAmountMax ?? undefined,
+			totalSlots: scholarship.totalSlots ?? undefined,
 			scholarshipType: scholarship.scholarshipType.code,
 			applicationDeadline: scholarship.applicationDeadline,
 		},
@@ -147,10 +149,11 @@ function EditScholarshipPage() {
 	const [loading, setLoading] = useState(false);
 	const [saving, setSaving] = useState(false);
 	const [amountType, setAmountType] = useState<'fixed' | 'varies' | 'range'>(() => {
-		if (scholarship.totalAmount && scholarship.totalAmount > 0) return 'fixed';
+		if (scholarship.totalAmountMin != null || scholarship.totalAmountMax != null) return 'range';
+		if (scholarship.totalAmount != null) return 'fixed';
 		return 'varies';
 	});
-	const [unlimitedSlots, setUnlimitedSlots] = useState(!scholarship.totalSlots);
+	const [unlimitedSlots, setUnlimitedSlots] = useState(scholarship.totalSlots == null);
 	const { toast, showSuccess, showError } = useToast();
 
 	const criterias = form.watch("criterias") || [];

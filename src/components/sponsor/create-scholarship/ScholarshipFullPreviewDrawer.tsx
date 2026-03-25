@@ -9,7 +9,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import {
-	calculateAmountPerScholar,
 	formatCurrency,
 	formatDeadline,
 } from "@/utils/formatting.utils";
@@ -47,10 +46,9 @@ export default function ScholarshipFullPreviewModal({
 	const [isExiting, setIsExiting] = useState(false);
 
 	const auth = useAuth<AnySponsor>();
-	const amountPerScholar = calculateAmountPerScholar(
-		scholarship.totalAmount,
-		scholarship.totalSlots,
-	);
+	const isRange = scholarship.totalAmountMin != null || scholarship.totalAmountMax != null;
+	const isFixed = !isRange && scholarship.totalAmount != null;
+	const isVaries = !isRange && !isFixed;
 
 	/**
 	 * Handles modal close with exit animation
@@ -162,15 +160,9 @@ export default function ScholarshipFullPreviewModal({
 									<Coins size={16} />
 									<span className="text-xs">Amount</span>
 								</div>
-								<p className="text-base text-primary mb-0.5">
-									{amountPerScholar !== null
-										? formatCurrency(amountPerScholar, {
-												minimumFractionDigits: 2,
-												maximumFractionDigits: 2,
-											})
-										: "₱0.00"}
-								</p>
-								<p className="text-xs text-[#6B7280]">per scholar</p>
+								{isFixed && (<><p className="text-base text-primary mb-0.5">{formatCurrency(scholarship.totalAmount!, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p><p className="text-xs text-[#6B7280]">per scholar</p></>)}
+								{isRange && (<><p className="text-base text-primary mb-0.5">{formatCurrency(scholarship.totalAmountMin ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}{" – "}{formatCurrency(scholarship.totalAmountMax ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p><p className="text-xs text-[#6B7280]">per scholar</p></>)}
+								{isVaries && (<><p className="text-base text-primary mb-0.5">Varies</p><p className="text-xs text-[#6B7280]">see details</p></>)}
 							</div>
 
 							<div className="bg-[#F9FAFB] border border-border rounded-lg p-3">
@@ -178,9 +170,7 @@ export default function ScholarshipFullPreviewModal({
 									<Users size={16} />
 									<span className="text-xs">Slots</span>
 								</div>
-								<p className="text-base text-primary mb-0.5">
-									{scholarship.totalSlots || 0}
-								</p>
+								<p className="text-base text-primary mb-0.5">{scholarship.totalSlots ?? "No limit"}</p>
 								<p className="text-xs text-[#6B7280]">scholars</p>
 							</div>
 						</div>

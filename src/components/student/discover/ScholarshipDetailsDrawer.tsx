@@ -4,8 +4,8 @@ import { useNavigate } from "@tanstack/react-router";
 import { Calendar, Users, Coins, ChevronsRight, LockKeyhole, UserIcon } from 'lucide-react';
 import Toast from '@/components/Toast';
 import { useToast } from '@/hooks/useToast';
-import { calculateAmountPerScholar, formatCurrency, formatDate } from '@/utils/formatting.utils';
-import { ScholarshipStatus, type Scholarship } from '@/lib/scholarship/model';
+import { formatCurrency, formatDate } from '@/utils/formatting.utils';
+import { ScholarshipStatus, ScholarshipType, type Scholarship } from '@/lib/scholarship/model';
 import { getSponsorName } from '@/lib/sponsor/api';
 
 /**
@@ -22,7 +22,9 @@ export default function ScholarshipDetailsModal({ scholarship, onClose }: { scho
   const [isExiting, setIsExiting] = useState(false);
   const { toast } = useToast();
 
-  const amountPerScholar = calculateAmountPerScholar(scholarship.totalAmount, scholarship.totalSlots);
+  const isRange = scholarship.totalAmountMin != null || scholarship.totalAmountMax != null;
+  const isFixed = !isRange && scholarship.totalAmount != null;
+  const isVaries = !isRange && !isFixed;
 
   /**
    * Checks if the scholarship is closed
@@ -72,7 +74,7 @@ export default function ScholarshipDetailsModal({ scholarship, onClose }: { scho
             stiffness: 300,
             duration: 0.1
           }}
-          className="relative w-full max-w-[30rem] h-full bg-card shadow-2xl rounded-lg overflow-y-auto custom-scrollbar"
+          className="relative w-full max-w-120 h-full bg-card shadow-2xl rounded-lg overflow-y-auto custom-scrollbar"
         >
           {/* Header */}
           <div className="sticky top-0 bg-card border-b border-border px-5 py-3 flex items-center justify-between z-10">
@@ -116,15 +118,22 @@ export default function ScholarshipDetailsModal({ scholarship, onClose }: { scho
             {/* Title and Badges */}
             <h1 className="text-[26px] text-primary mb-2">{scholarship.name}</h1>
             <div className="flex gap-2 mb-4">
-              <span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">
-                {scholarship.scholarshipType.name}
-              </span>
+              {scholarship.scholarshipType.code === ScholarshipType.Combined ? (
+                <>
+                  <span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">Merit-Based</span>
+                  <span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">Need-Based</span>
+                </>
+              ) : (
+                <span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">
+                  {scholarship.scholarshipType.name}
+                </span>
+              )}
             </div>
 
             {/* Sponsor and Deadline */}
             <div className="space-y-3 mb-4 text-[#6B7280]">
               <div className="flex items-center gap-2">
-                <div className="w-5.5 h-5.5 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-5.5 h-5.5 rounded-full flex items-center justify-center shrink-0">
                   {scholarship?.sponsor?.avatarUrl ? (
                     <img
                       src={scholarship?.sponsor?.avatarUrl}
@@ -150,12 +159,9 @@ export default function ScholarshipDetailsModal({ scholarship, onClose }: { scho
                   <Coins size={16} />
                   <span className="text-xs ">Amount</span>
                 </div>
-                <p className="text-base text-primary mb-0.5">
-                  {amountPerScholar !== null
-                    ? formatCurrency(amountPerScholar, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                    : '₱0.00'}
-                </p>
-                <p className="text-xs text-[#6B7280]">per scholar</p>
+                {isFixed && (<><p className="text-base text-primary mb-0.5">{formatCurrency(scholarship.totalAmount!, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p><p className="text-xs text-[#6B7280]">per scholar</p></>)}
+                {isRange && (<><p className="text-base text-primary mb-0.5">{formatCurrency(scholarship.totalAmountMin ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}{" – "}{formatCurrency(scholarship.totalAmountMax ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p><p className="text-xs text-[#6B7280]">per scholar</p></>)}
+                {isVaries && (<><p className="text-base text-primary mb-0.5">Varies</p><p className="text-xs text-[#6B7280]">see details</p></>)}
               </div>
 
               <div className="bg-[#F9FAFB] border border-border rounded-lg p-3">
@@ -163,7 +169,7 @@ export default function ScholarshipDetailsModal({ scholarship, onClose }: { scho
                   <Users size={16} />
                   <span className="text-xs ">Slots</span>
                 </div>
-                <p className="text-base text-primary mb-0.5">{scholarship.totalSlots}</p>
+                <p className="text-base text-primary mb-0.5">{scholarship.totalSlots ?? "No limit"}</p>
                 <p className="text-xs text-[#6B7280]">scholars</p>
               </div>
             </div>
@@ -209,7 +215,7 @@ export default function ScholarshipDetailsModal({ scholarship, onClose }: { scho
             {/* Apply Button */}
             {isClosed() ? (
               <div className="flex items-center gap-2.5 bg-[#FEE2E2] border border-[#FECACA] rounded-md p-3 mt-1.5 mb-2">
-                <LockKeyhole size={16} className="text-[#DC2626] flex-shrink-0" />
+                <LockKeyhole size={16} className="text-[#DC2626] shrink-0" />
                 <p className="text-[11px] md:text-xs text-[#DC2626] leading-relaxed flex-1">
                   This scholarship program is no longer accepting applications.
                 </p>

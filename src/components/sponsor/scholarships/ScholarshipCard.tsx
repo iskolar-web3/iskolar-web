@@ -1,7 +1,7 @@
 import { Calendar, Users, Coins, Edit2, Trash2, UserIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
-import { calculateAmountPerScholar, formatCurrency } from '@/utils/formatting.utils';
+import { formatCurrency } from '@/utils/formatting.utils';
 import type { Scholarship } from '@/lib/scholarship/model';
 import { getSponsorName } from '@/lib/sponsor/api';
 import { format } from 'date-fns';
@@ -43,7 +43,9 @@ export default function ScholarshipCard({
   const contextMenuRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const amountPerScholar = calculateAmountPerScholar(scholarship.totalAmount, scholarship.totalSlots);
+  const isRange = scholarship.totalAmountMin != null || scholarship.totalAmountMax != null;
+  const isFixed = !isRange && scholarship.totalAmount != null;
+  const isVaries = !isRange && !isFixed;
 
   /**
    * Handles right-click context menu
@@ -143,7 +145,7 @@ export default function ScholarshipCard({
               top: `${contextMenuPosition.y}px`,
               zIndex: 100,
             }}
-            className="bg-white rounded-lg shadow-xl border border-border py-1 min-w-[160px]"
+            className="bg-white rounded-lg shadow-xl border border-border py-1 min-w-40"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -177,7 +179,7 @@ export default function ScholarshipCard({
           {/* Image */}
           <motion.div 
             transition={{ duration: 0.3 }}
-            className="w-32 h-32 bg-white/10 flex-shrink-0 overflow-hidden rounded-tl-lg"
+            className="w-32 h-32 bg-white/10 shrink-0 overflow-hidden rounded-tl-lg"
           >
             <img
               src={scholarship.imageUrl || "/logo.jpg"}
@@ -205,7 +207,7 @@ export default function ScholarshipCard({
             {/* Sponsor and Deadline */}
             <div className="space-y-1.5 text-xs opacity-90">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-card flex items-center justify-center flex-shrink-0">
+                <div className="w-4 h-4 rounded-full bg-card flex items-center justify-center shrink-0">
                   {scholarship?.sponsor?.avatarUrl ? (
                     <img
                       src={scholarship?.sponsor?.avatarUrl}
@@ -251,12 +253,9 @@ export default function ScholarshipCard({
               <Coins size={14} />
               <span>Amount</span>
             </div>
-            <p className="text-primary text-sm md:text-base">
-              {amountPerScholar !== null
-                ? formatCurrency(amountPerScholar, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-                : '₱0.00'}
-            </p>
-            <p className="text-xs text-[#6B7280]">per scholar</p>
+            {isFixed && (<><p className="text-primary text-sm md:text-base">{formatCurrency(scholarship.totalAmount!, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p><p className="text-xs text-[#6B7280]">per scholar</p></>)}
+            {isRange && (<><p className="text-primary text-sm md:text-base">{formatCurrency(scholarship.totalAmountMin ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}{" – "}{formatCurrency(scholarship.totalAmountMax ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p><p className="text-xs text-[#6B7280]">per scholar</p></>)}
+            {isVaries && (<><p className="text-primary text-sm md:text-base">Varies</p><p className="text-xs text-[#6B7280]">see details</p></>)}
           </motion.div>
 
           <motion.div
@@ -267,7 +266,7 @@ export default function ScholarshipCard({
               <Users size={14} />
               <span>Slots</span>
             </div>
-            <p className="text-primary text-sm md:text-base">{scholarship.totalSlots}</p>
+            <p className="text-primary text-sm md:text-base">{scholarship.totalSlots ?? "No limit"}</p>
             <p className="text-xs text-[#6B7280]">scholars</p>
           </motion.div>
         </div>

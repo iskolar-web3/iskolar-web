@@ -134,8 +134,8 @@ function Scholarships() {
 				(!amountRange.max || amountPerScholar <= Number(amountRange.max));
 
 			const matchesSlots =
-				(!slotRange.min || scholarship.totalSlots >= Number(slotRange.min)) &&
-				(!slotRange.max || scholarship.totalSlots <= Number(slotRange.max));
+				(!slotRange.min || (scholarship.totalSlots ?? 0) >= Number(slotRange.min)) &&
+				(!slotRange.max || (scholarship.totalSlots ?? 0) <= Number(slotRange.max));
 
 			return (
 				matchesType &&
