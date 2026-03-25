@@ -215,9 +215,9 @@ function CreateScholarship() {
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={ScholarshipType.NeedBased}>Need-Based</SelectItem>
                 <SelectItem value={ScholarshipType.MeritBased}>Merit-Based</SelectItem>
-                <SelectItem value={ScholarshipType.Combined}>Combined</SelectItem>
+                <SelectItem value={ScholarshipType.NeedBased}>Need-Based</SelectItem>
+                <SelectItem value={ScholarshipType.Combined}>Combined (Merit-Based + Need-Based)</SelectItem>
               </SelectContent>
             </Select>
             {errors.scholarshipType && <p className="text-xs text-[#EF4444] mt-1">{errors.scholarshipType.message}</p>}
@@ -290,10 +290,10 @@ function CreateScholarship() {
                 </button>
 
                 {/* Total Amount & Slot */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex flex-col">
+                <div className="grid grid-cols-10 gap-3">
+                  <div className="flex flex-col col-span-6">
                     {/* Amount type toggle — scoped to this column */}
-                    <div className="flex rounded-lg overflow-hidden border border-[#C4CBD5] text-xs mb-1.5 h-[28px]">
+                    <div className="flex rounded-sm overflow-hidden border border-[#C4CBD5] text-xs mb-1.5 h-[28px]">
                       {(['fixed', 'range', 'varies'] as const).map((t) => (
                         <button
                           key={t}
@@ -306,7 +306,7 @@ function CreateScholarship() {
                             setValue('totalAmountMax', undefined);
                             form.clearErrors(['totalAmount', 'totalAmountMin', 'totalAmountMax']);
                           }}
-                          className={`flex-1 py-1.5 capitalize transition-colors ${amountType === t ? 'bg-[#3A52A6] text-white' : 'bg-[#F8F9FC] text-[#6B7280] hover:bg-gray-100'}`}
+                          className={`flex-1 py-1.5 capitalize cursor-pointer transition-colors ${amountType === t ? 'bg-[#3A52A6] text-white' : 'bg-[#F8F9FC] text-[#6B7280] hover:bg-gray-100'}`}
                         >
                           {t}
                         </button>
@@ -323,7 +323,7 @@ function CreateScholarship() {
                               {...field}
                               type="number"
                               disabled={loading}
-                              placeholder="0.00"
+                              placeholder="Amount per scholar"
                               className={`w-full pl-7 pr-4 py-3 rounded-lg border ${
                                 errors.totalAmount ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
                               } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
@@ -381,8 +381,8 @@ function CreateScholarship() {
                     {errors.totalAmountMax && <p className="text-xs text-[#EF4444] mt-1">{errors.totalAmountMax.message}</p>}
                   </div>
 
-                  <div className="flex flex-col">
-                    <label className="flex items-center justify-end gap-2 mb-1.5 cursor-pointer h-[28px]">
+                  <div className="flex flex-col col-span-4">
+                    <label className="flex items-center justify-end gap-1 mb-1.5 cursor-pointer h-[28px]">
                       <input
                         type="checkbox"
                         checked={unlimitedSlots}
@@ -394,9 +394,9 @@ function CreateScholarship() {
                             form.clearErrors('totalSlots');
                           }
                         }}
-                        className="w-3.5 h-3.5 accent-[#3A52A6]"
+                        className="w-3.5 h-3.5 cursor-pointer accent-[#3A52A6]"
                       />
-                      <span className="text-xs  text-[#6B7280]">No limit</span>
+                      <span className="text-xs text-[#6B7280]">No limit</span>
                     </label>
                     {!unlimitedSlots && (
                       <Controller

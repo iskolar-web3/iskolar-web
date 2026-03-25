@@ -118,13 +118,16 @@ export default function ScholarshipFullPreviewModal({
 						</h1>
 						<div className="flex gap-2 mb-4">
 							{scholarship.scholarshipType && (
-								<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">
-									{scholarship.scholarshipType === ScholarshipType.NeedBased
-										? "Need-Based"
-										: scholarship.scholarshipType === ScholarshipType.MeritBased
-										? "Merit-Based"
-										: "Combined"}
-								</span>
+								scholarship.scholarshipType === ScholarshipType.Combined ? (
+									<>
+										<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">Merit-Based</span>
+										<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">Need-Based</span>
+									</>
+								) : (
+									<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">
+										{scholarship.scholarshipType === ScholarshipType.NeedBased ? "Need-Based" : "Merit-Based"}
+									</span>
+								)
 							)}
 						</div>
 

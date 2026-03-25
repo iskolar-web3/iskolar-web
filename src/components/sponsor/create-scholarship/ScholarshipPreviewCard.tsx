@@ -55,13 +55,16 @@ export default function ScholarshipPreviewCard({ scholarship, onClick }: Scholar
 
             {scholarship.scholarshipType && (
               <div className="flex flex-wrap items-center gap-2 mb-4">
-                <span className="px-2 py-0.5 bg-white/90 text-secondary text-[11px] rounded">
-                  {scholarship.scholarshipType === ScholarshipType.NeedBased
-                    ? 'Need-Based'
-                    : scholarship.scholarshipType === ScholarshipType.MeritBased
-                    ? 'Merit-Based'
-                    : 'Combined'}
-                </span>
+                {scholarship.scholarshipType === ScholarshipType.Combined ? (
+                  <>
+                    <span className="px-2 py-0.5 bg-white/90 text-secondary text-[11px] rounded">Merit-Based</span>
+                    <span className="px-2 py-0.5 bg-white/90 text-secondary text-[11px] rounded">Need-Based</span>
+                  </>
+                ) : (
+                  <span className="px-2 py-0.5 bg-white/90 text-secondary text-[11px] rounded">
+                    {scholarship.scholarshipType === ScholarshipType.NeedBased ? 'Need-Based' : 'Merit-Based'}
+                  </span>
+                )}
               </div>
             )}
 
