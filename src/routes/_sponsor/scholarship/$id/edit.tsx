@@ -34,7 +34,6 @@ import { handleError } from "@/lib/errorHandler";
 import { logger } from "@/lib/logger";
 import {
 	FormFieldType,
-	ScholarshipPurpose,
 	ScholarshipStatus,
 	ScholarshipType,
 	updateScholarshipRequestSchema,
@@ -132,7 +131,6 @@ function EditScholarshipPage() {
 			totalSlots: scholarship.totalSlots,
 			scholarshipType: scholarship.scholarshipType.code,
 			applicationDeadline: scholarship.applicationDeadline,
-			purpose: scholarship.purpose.code,
 		},
 	});
 
@@ -155,7 +153,6 @@ function EditScholarshipPage() {
 	const formFields = form.watch("formFields") || [];
 	const description = form.watch("description");
 	const type = form.watch("scholarshipType");
-	const purpose = form.watch("purpose");
 	const status = form.watch("status");
 
 	const hydrateForm = useCallback(
@@ -428,11 +425,14 @@ function EditScholarshipPage() {
 									<SelectValue placeholder="Select type" />
 								</SelectTrigger>
 								<SelectContent>
+									<SelectItem value={ScholarshipType.NeedBased}>
+										Need-Based
+									</SelectItem>
 									<SelectItem value={ScholarshipType.MeritBased}>
 										Merit-Based
 									</SelectItem>
-									<SelectItem value={ScholarshipType.SkillBased}>
-										Skill-Based
+									<SelectItem value={ScholarshipType.Combined}>
+										Combined
 									</SelectItem>
 								</SelectContent>
 							</Select>
@@ -443,36 +443,6 @@ function EditScholarshipPage() {
 							)}
 						</div>
 
-						<div>
-							<Select
-								value={purpose}
-								onValueChange={(value) =>
-									form.setValue("purpose", value as ScholarshipPurpose, {
-										shouldValidate: true,
-									})
-								}
-							>
-								<SelectTrigger
-									disabled={saving}
-									className={`w-full px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-[placeholder]:text-gray-400 ${
-										form.formState.errors.purpose
-											? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444]"
-											: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
-									}`}
-								>
-									<SelectValue placeholder="Select purpose" />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="allowance">Allowance</SelectItem>
-									<SelectItem value="tuition">Tuition</SelectItem>
-								</SelectContent>
-							</Select>
-							{form.formState.errors.purpose && (
-								<p className="text-xs text-[#EF4444] mt-1">
-									{form.formState.errors.purpose.message}
-								</p>
-							)}
-						</div>
 					</div>
 
 					<div className="bg-[#F8F9FC] rounded-xl p-4 shadow-sm">

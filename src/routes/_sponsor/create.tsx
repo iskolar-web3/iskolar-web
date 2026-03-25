@@ -29,7 +29,7 @@ import { useToast } from '@/hooks/useToast';
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { useAuth } from '@/auth';
 import type { AnySponsor } from '@/lib/sponsor/model';
-import { ScholarshipPurpose, ScholarshipStatus, ScholarshipType, type CreateFormFieldRequest, type Scholarship, type ScholarshipFormData } from '@/lib/scholarship/model';
+import { ScholarshipStatus, ScholarshipType, type CreateFormFieldRequest, type Scholarship, type ScholarshipFormData } from '@/lib/scholarship/model';
 import { BACKEND_URL, type ApiResponse } from '@/lib/api';
 import { ACCESS_TOKEN_KEY } from '@/lib/user/auth';
 import { getCookie } from '@/lib/cookie';
@@ -96,12 +96,10 @@ function CreateScholarship() {
   const totalSlot = watch('totalSlots');
   const applicationDeadline = watch('applicationDeadline');
   const scholarshipType = watch('scholarshipType');
-  const purpose = watch('purpose');
   const imageUrl = watch('imageUrl');
 
   const { previewScholarship } = useScholarshipPreview({
     scholarshipType,
-    purpose,
     name: title,
     description,
     imageUrl,
@@ -187,32 +185,14 @@ function CreateScholarship() {
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value={ScholarshipType.NeedBased}>Need-Based</SelectItem>
                   <SelectItem value={ScholarshipType.MeritBased}>Merit-Based</SelectItem>
-                  <SelectItem value={ScholarshipType.SkillBased}>Skill-Based</SelectItem>
+                  <SelectItem value={ScholarshipType.Combined}>Combined</SelectItem>
                 </SelectContent>
               </Select>
               {errors.scholarshipType && <p className="text-xs text-[#EF4444] mt-1">{errors.scholarshipType.message}</p>}
             </div>
 
-            <div>
-              <Select 
-                value={purpose} 
-                onValueChange={(value) => setValue('purpose', value as ScholarshipPurpose, { shouldValidate: true })}
-              >
-                <SelectTrigger disabled={loading} className={`w-full px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-[placeholder]:text-gray-400 ${
-                  errors.purpose
-                    ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary'
-                    : 'border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary'
-                }`}>
-                  <SelectValue placeholder="Select purpose" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={ScholarshipPurpose.Allowance}>Allowance</SelectItem>
-                  <SelectItem value={ScholarshipPurpose.Tuition}>Tuition</SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.purpose && <p className="text-xs text-[#EF4444] mt-1">{errors.purpose.message}</p>}
-            </div>
           </div>
 
           <div className="bg-[#F8F9FC] rounded-xl p-3 shadow-sm">
