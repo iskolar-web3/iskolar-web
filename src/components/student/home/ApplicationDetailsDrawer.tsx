@@ -163,7 +163,7 @@ export default function ApplicationDetailsModal({
 					{/* Scholarship Image */}
 					<div className="relative w-full aspect-square rounded-lg overflow-hidden shadow-[0_0_20px_2px_rgba(0,0,0,0.2)]">
 						<img
-							src={application.scholarship.imageUrl || ""}
+							src={application.scholarship.imageUrl || "/scholarship-banner-placeholder.png"}
 							alt={application.scholarship.name}
 							className="w-full h-full object-cover"
 						/>

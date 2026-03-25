@@ -182,7 +182,7 @@ export default function ScholarshipCard({
             className="w-32 h-32 bg-white/10 shrink-0 overflow-hidden rounded-tl-lg"
           >
             <img
-              src={scholarship.imageUrl || "/logo.jpg"}
+              src={scholarship.imageUrl || "/scholarship-banner-placeholder.png"}
               alt="Preview"
               className="w-full h-full object-cover"
             />

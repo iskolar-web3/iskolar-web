@@ -4,7 +4,6 @@ import {
 	Users,
 	Coins,
 	ChevronsRight,
-	Images,
 	UserIcon,
 } from "lucide-react";
 import { useState } from "react";
@@ -97,17 +96,11 @@ export default function ScholarshipFullPreviewModal({
 					<div className="p-5">
 						{/* Image Banner */}
 						<div className="relative w-full aspect-square mb-5 rounded-lg overflow-hidden shadow-[0_0_20px_2px_rgba(0,0,0,0.2)]">
-							{scholarship.imageUrl ? (
-								<img
-									src={scholarship.imageUrl}
-									alt={scholarship.name || "Scholarship"}
-									className="w-full h-full object-cover"
-								/>
-							) : (
-								<div className="w-full h-full bg-gray-100 flex items-center justify-center">
-									<Images className="text-gray-400" size={80} />
-								</div>
-							)}
+							<img
+								src={scholarship.imageUrl || "/scholarship-banner-placeholder.png"}
+								alt={scholarship.name || "Scholarship"}
+								className="w-full h-full object-cover"
+							/>
 						</div>
 
 						{/* Title and Badges */}

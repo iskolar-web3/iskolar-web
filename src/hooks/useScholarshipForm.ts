@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { normalizeText } from "@/utils/normalize.utils";
@@ -7,7 +7,6 @@ import {
 	ScholarshipStatus,
 	type ScholarshipFormData,
 } from "@/lib/scholarship/model";
-import { generateScholarshipPlaceholder } from "@/utils/scholarshipPlaceholder.utils";
 // import { useAuth } from "@/auth";
 // import type { AnySponsor } from "@/lib/sponsor/model";
 import { uploadFile } from "@/lib/api";
@@ -60,19 +59,8 @@ export function useScholarshipForm(sponsorId: string) {
 
 	const criteria = form.watch("criterias");
 	const requirements = form.watch("requirements");
-	const watchedName = form.watch("name");
-	const watchedType = form.watch("scholarshipType");
 
-	// Auto-set a themed placeholder whenever title or type changes and no real
-	// image has been uploaded yet (imagePreview is null).
-	useEffect(() => {
-		if (!imagePreview) {
-			const placeholder = generateScholarshipPlaceholder(watchedName, watchedType);
-			form.setValue("imageUrl", placeholder, { shouldValidate: true });
-		}
-	}, [watchedName, watchedType, imagePreview, form]);
-
-	const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) {
 			const reader = new FileReader();

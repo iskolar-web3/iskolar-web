@@ -202,9 +202,9 @@ function CreateScholarship() {
     <div className="max-w-7xl mx-auto">
       {toast && <Toast {...toast} />}
       
-      <div className="grid grid-cols-1 lg:grid-cols-2">
+      <div className="grid grid-cols-1 lg:grid-cols-15">
         {/* Scholarship Details */}
-        <div className="space-y-4">
+        <div className="space-y-4 lg:col-span-8">
           {/* Type */}
           <div>
             <Select
@@ -598,7 +598,7 @@ function CreateScholarship() {
         </div>
 
         {/* Live Preview */}
-        <div className="lg:sticky lg:top-6 h-fit md:ml-24">
+        <div className="lg:sticky lg:col-span-7 lg:top-6 h-fit md:ml-24">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-sm text-primary">Live Preview</h2>
           </div>

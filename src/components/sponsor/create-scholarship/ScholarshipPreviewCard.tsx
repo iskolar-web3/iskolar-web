@@ -1,4 +1,4 @@
-import { Calendar, Users, Coins, Images, UserIcon } from 'lucide-react';
+import { Calendar, Users, Coins, UserIcon } from 'lucide-react';
 import { formatCurrency, formatDeadline } from '@/utils/formatting.utils';
 import { ScholarshipType, type ScholarshipFormData } from '@/lib/scholarship/model';
 import { useAuth } from '@/auth';
@@ -41,17 +41,11 @@ export default function ScholarshipPreviewCard({ scholarship, amountType = 'fixe
         <div className="flex">
           {/* Image Section */}
           <div className="relative w-32 h-32 shrink-0">
-            {scholarship.imageUrl ? (
-              <img
-                src={scholarship.imageUrl}
-                alt="Preview"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-white/20 flex items-center justify-center">
-                <Images className="text-tertiary/60" size={32} />
-              </div>
-            )}
+            <img
+              src={scholarship.imageUrl || "/scholarship-banner-placeholder.png"}
+              alt="Preview"
+              className="w-full h-full object-cover"
+            />
           </div>
 
           {/* Info */}
