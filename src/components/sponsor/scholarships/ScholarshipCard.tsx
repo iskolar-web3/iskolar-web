@@ -126,7 +126,7 @@ export default function ScholarshipCard({
       }}
       onClick={onClick}
       onContextMenu={handleContextMenu}
-      className="bg-white cursor-pointer rounded-lg border border-border hover:border-[#3A52A6] transition-colors relative shadow-sm"
+      className="bg-white cursor-pointer rounded-md border border-border hover:border-[#3A52A6] transition-colors relative shadow-sm"
     >
       {/* Context Menu */}
       <AnimatePresence>
@@ -270,51 +270,6 @@ export default function ScholarshipCard({
             <p className="text-primary text-sm md:text-base">{scholarship.totalSlots}</p>
             <p className="text-xs text-[#6B7280]">scholars</p>
           </motion.div>
-        </div>
-
-        {/* Criteria and Documents */}
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <h4 className="text-[#6B7280] text-xs tracking-wide mb-2">
-              Criteria
-            </h4>
-            <div className="flex flex-wrap gap-1.5">
-              {scholarship.criterias.slice(0, 2).map((item, i) => (
-                <span
-                  key={i}
-                  className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[10px] md:text-[11px] rounded border border-border"
-                >
-                  {item}
-                </span>
-              ))}
-              {scholarship.criterias.length > 2 && (
-                <span className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[10px] md:text-[11px] rounded border border-border">
-                  +{scholarship.criterias.length - 2}
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <h4 className="text-[#6B7280] text-[11px] tracking-wide mb-2">
-              Required Documents
-            </h4>
-            <div className="flex flex-wrap gap-1.5">
-              {scholarship.requirements.slice(0, 2).map((item, i) => (
-                <span
-                  key={i}
-                  className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[10px] md:text-[11px] rounded border border-border"
-                >
-                  {item}
-                </span>
-              ))}
-              {scholarship.requirements.length > 2 && (
-                <span className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[10px] md:text-[11px]] rounded border border-border">
-                  +{scholarship.requirements.length - 2}
-                </span>
-              )}
-            </div>
-          </div>
         </div>
       </div>
     </motion.div>

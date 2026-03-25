@@ -39,7 +39,7 @@ export default function ScholarshipCard({ scholarship, index, onClick }: Scholar
         transition: { duration: 0.2 }
       }}
       onClick={onClick}
-      className="bg-card cursor-pointer rounded-lg overflow-hidden border border-[#D3DCF6] hover:border-[#3A52A6] transition-colors"
+      className="bg-card cursor-pointer rounded-md overflow-hidden border border-[#D3DCF6] hover:border-[#3A52A6] transition-colors"
     >
       {/* Header */}
       <div className="bg-[#3A52A6]">
@@ -128,51 +128,6 @@ export default function ScholarshipCard({ scholarship, index, onClick }: Scholar
             <p className="text-sm md:text-base text-primary">{scholarship.totalSlots}</p>
             <p className="text-xs text-[#6B7280]">scholars</p>
           </motion.div>
-        </div>
-
-        {/* Criteria and Documents */}
-        <div className="grid grid-cols-2 gap-6 text-sm">
-          <div>
-            <h4 className="text-[#6B7280] text-xs tracking-wide mb-2">
-              Criteria
-            </h4>
-            <div className="flex flex-wrap gap-2">
-              {scholarship.criterias.slice(0, 2).map((item, i) => (
-                <span
-                  key={i}
-                  className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[10px] md:text-[11px] rounded border border-border"
-                >
-                  {item}
-                </span>
-              ))}
-              {scholarship.criterias.length > 2 && (
-                <span className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[10px] md:text-[11px] rounded border border-border">
-                  + {scholarship.criterias.length - 2} more
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <h4 className="text-[#6B7280] text-xs tracking-wider mb-2">
-              Required Documents
-            </h4>
-            <div className="flex flex-wrap gap-2">
-              {scholarship.requirements.slice(0, 2).map((item, i) => (
-                <span
-                  key={i}
-                  className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[10px] md:text-[11px] rounded border border-border"
-                >
-                  {item}
-                </span>
-              ))}
-              {scholarship.requirements.length > 2 && (
-                <span className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[10px] md:text-[11px] rounded border border-border">
-                  + {scholarship.requirements.length - 2} more
-                </span>
-              )}
-            </div>
-          </div>
         </div>
       </div>
     </motion.div>

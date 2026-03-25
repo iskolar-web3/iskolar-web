@@ -28,7 +28,7 @@ export default function ScholarshipPreviewCard({ scholarship, onClick }: Scholar
   return (
     <div
       onClick={onClick}
-      className="bg-card rounded-xl overflow-hidden border border-[#D3DCF6] cursor-pointer transition-transform duration-200 hover:scale-98"
+      className="bg-card rounded-md overflow-hidden border border-[#D3DCF6] cursor-pointer transition-transform duration-200 hover:scale-98"
     >
       <div className="bg-[#3A52A6]">
         <div className="flex">
@@ -122,55 +122,6 @@ export default function ScholarshipPreviewCard({ scholarship, onClick }: Scholar
             </div>
             <p className="text-base text-primary">{scholarship.totalSlots || '0'}</p>
             <p className="text-xs text-[#6B7280]">scholars</p>
-          </div>
-        </div>
-
-        {/* Criteria and Required Documents */}
-        <div className="mt-2 grid grid-cols-2 gap-8 text-sm">
-          <div>
-            <h4 className="text-[#4B5563] text-xs tracking-wider mb-2">Criteria</h4>
-            {scholarship.criterias && scholarship.criterias.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {scholarship.criterias.slice(0, 2).map((c, i) => (
-                  <span
-                    key={i}
-                    className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[11px] rounded border border-border"
-                  >
-                    {c}
-                  </span>
-                ))}
-                {scholarship.criterias.length > 2 && (
-                  <span className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[11px] rounded border border-border">
-                    +{scholarship.criterias.length - 2} more
-                  </span>
-                )}
-              </div>
-            ) : (
-              <p className="text-[#9CA3AF] text-xs">No criteria added</p>
-            )}
-          </div>
-
-          <div>
-            <h4 className="text-[#4B5563] text-xs tracking-wider mb-2">Required Documents</h4>
-            {scholarship.requirements && scholarship.requirements.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {scholarship.requirements.slice(0, 2).map((d, i) => (
-                  <span
-                    key={i}
-                    className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[11px] rounded border border-border"
-                  >
-                    {d}
-                  </span>
-                ))}
-                {scholarship.requirements.length > 2 && (
-                  <span className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[11px] rounded border border-border">
-                    +{scholarship.requirements.length - 2} more
-                  </span>
-                )}
-              </div>
-            ) : (
-              <p className="text-[#9CA3AF] text-xs">No documents added</p>
-            )}
           </div>
         </div>
       </div>
