@@ -352,7 +352,7 @@ function ApplicantsListPage() {
 								<Skeleton className="w-5 h-5 rounded-full bg-muted-foreground absolute top-4 right-4" />
 
 								<div className="flex items-center gap-4">
-									<Skeleton className="w-14 h-14 rounded-full bg-muted-foreground flex-shrink-0" />
+									<Skeleton className="w-14 h-14 rounded-full bg-muted-foreground shrink-0" />
 
 									<div className="flex-1">
 										<Skeleton className="h-5 w-32 mb-2 bg-muted-foreground" />
@@ -461,7 +461,7 @@ function ApplicantsListPage() {
 							</button>
 
 							{showDropdown && (
-								<div className="absolute top-full right-0 mt-2 bg-white border bg-card rounded-md shadow-lg z-10 min-w-[140px]">
+								<div className="absolute top-full right-0 mt-2 border bg-card rounded-md shadow-lg z-10 min-w-[140px]">
 									{Object.values([
 										"all",
 										...Object.values(ScholarshipApplicationStatus),
@@ -607,7 +607,7 @@ function ApplicantsListPage() {
 											)}
 
 											{/* Avatar */}
-											<div className="flex-shrink-0">
+											<div className="shrink-0">
 												{applicant.student.avatarUrl ? (
 													<img
 														src={applicant.student.avatarUrl}
@@ -665,7 +665,7 @@ function ApplicantsListPage() {
 								stiffness: 300,
 								duration: 0.1,
 							}}
-							className="relative w-full max-w-[30rem] h-full bg-white shadow-2xl rounded-lg overflow-y-auto custom-scrollbar"
+							className="relative w-full max-w-120 h-full bg-white shadow-2xl rounded-lg overflow-y-auto custom-scrollbar"
 						>
 							{/* Header */}
 							<div className="sticky top-0 bg-white border-b border-[#E5E7EB] px-5 py-3 flex items-center justify-between z-10">
@@ -727,7 +727,7 @@ function ApplicantsListPage() {
 									{/* Contact Info */}
 									<div className="space-y-2 text-[#6B7280]">
 										<div className="flex items-center gap-2">
-											<Mail size={17} className="flex-shrink-0" />
+											<Mail size={17} className="shrink-0" />
 											<span className="text-xs md:text-sm truncate">
 												{selectedApplicant.student.email}
 											</span>
@@ -735,7 +735,7 @@ function ApplicantsListPage() {
 
 										{selectedApplicant.student.gender && (
 											<div className="flex items-center gap-2">
-												<User size={17} className="flex-shrink-0" />
+												<User size={17} className="shrink-0" />
 												<div className="col-span-1 flex items-start gap-2">
 													<span className="text-xs md:text-sm capitalize">
 														{selectedApplicant.student.gender.name}
@@ -745,14 +745,14 @@ function ApplicantsListPage() {
 										)}
 
 										<div className="flex items-center gap-2">
-											<Phone size={17} className="flex-shrink-0" />
+											<Phone size={17} className="shrink-0" />
 											<span className="text-xs md:text-sm">
 												{selectedApplicant.student.contact.value}
 											</span>
 										</div>
 
 										<div className="flex items-center gap-2">
-											<Calendar size={17} className="flex-shrink-0" />
+											<Calendar size={17} className="shrink-0" />
 											<span className="text-xs md:text-sm">
 												{formatDateTime(selectedApplicant.createdAt)}
 											</span>
@@ -797,7 +797,7 @@ function ApplicantsListPage() {
 																						className="flex items-center justify-between bg-[#F3F4F6] px-4 py-3 rounded-lg border-l-4 border-[#3A52A6]"
 																					>
 																						<div className="flex items-center gap-3 flex-1 min-w-0">
-																							<FileText className="w-5 h-5 text-secondary flex-shrink-0" />
+																							<FileText className="w-5 h-5 text-secondary shrink-0" />
 																							<p className="text-[11px] text-primary truncate">
 																								{item.formFieldId}
 																							</p>
@@ -807,7 +807,7 @@ function ApplicantsListPage() {
 																								e.stopPropagation();
 																								handleFileOpen(url);
 																							}}
-																							className="p-2 hover:bg-[#E0ECFF] rounded-lg transition-colors flex-shrink-0"
+																							className="p-2 hover:bg-[#E0ECFF] rounded-lg transition-colors shrink-0"
 																						>
 																							<ExternalLink className="w-4 h-4 text-primary" />
 																						</button>
@@ -894,7 +894,7 @@ function ApplicantsListPage() {
 														});
 														setConfirmationModal(true);
 													}}
-													className="flex-1 py-3 cursor-pointer rounded-lg text-sm flex items-center justify-center gap-1.5 transition-all duration-100 hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] active:shadow-md bg-[#8B5CF6] cursor-pointer text-tertiary hover:bg-[#7C3AED]"
+													className="flex-1 py-3 cursor-pointer rounded-lg text-sm flex items-center justify-center gap-1.5 transition-all duration-100 hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] active:shadow-md bg-[#8B5CF6] text-tertiary hover:bg-[#7C3AED]"
 												>
 													<Star size={15} />
 													Shortlist
@@ -910,7 +910,7 @@ function ApplicantsListPage() {
 														});
 														setConfirmationModal(true);
 													}}
-													className="flex-1 py-3 cursor-pointer rounded-lg text-sm flex items-center justify-center gap-1.5 transition-all duration-100 hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] active:shadow-md bg-[#31D0AA] cursor-pointer text-tertiary hover:bg-[#10B981]"
+													className="flex-1 py-3 cursor-pointer rounded-lg text-sm flex items-center justify-center gap-1.5 transition-all duration-100 hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] active:shadow-md bg-[#31D0AA] text-tertiary hover:bg-[#10B981]"
 												>
 													<CheckCircle2 size={15} />
 													Approve

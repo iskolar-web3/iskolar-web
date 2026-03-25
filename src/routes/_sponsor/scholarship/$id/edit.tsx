@@ -321,7 +321,7 @@ function EditScholarshipPage() {
 	if (loading) {
 		return (
 			<div className="min-h-screen">
-				<div className="max-w-[40rem] mx-auto">
+				<div className="max-w-160 mx-auto">
 					<div className="space-y-4">
 						{/* Status Skeleton */}
 						<Skeleton className="w-full h-12 rounded-lg bg-muted" />
@@ -404,7 +404,7 @@ function EditScholarshipPage() {
 		<div className="min-h-screen">
 			{toast && <Toast {...toast} />}
 
-			<div className="max-w-[40rem] mx-auto">
+			<div className="max-w-160 mx-auto">
 				<div className="space-y-4">
 					{/* Status */}
 					<div>
@@ -450,7 +450,7 @@ function EditScholarshipPage() {
 							>
 								<SelectTrigger
 									disabled={saving}
-									className={`w-full px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-[placeholder]:text-gray-400 ${
+									className={`w-full px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
 										form.formState.errors.scholarshipType
 											? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444]"
 											: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"

@@ -211,7 +211,7 @@ function CreateScholarship() {
               value={scholarshipType}
               onValueChange={(value) => setValue('scholarshipType', value as ScholarshipType, { shouldValidate: true })}
             >
-              <SelectTrigger disabled={loading} className={`w-full px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
+              <SelectTrigger disabled={loading} className={`w-full cursor-pointer px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
                 errors.scholarshipType
                   ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary'
                   : 'border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary'
@@ -274,8 +274,8 @@ function CreateScholarship() {
                         placeholder="Scholarship Title"
                         disabled={loading}
                         className={`w-full text-2xl border-b-2 ${
-                          errors.name ? 'border-[#EF4444]' : 'border-transparent'
-                        } bg-transparent pb-2 focus:outline-none focus:border-[#3A52A6] text-primary`}
+                          errors.name ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
+                        } bg-transparent pb-2 focus:outline-none focus:border-[#3A52A6] text-primary transition-colors`}
                       />
                     )}
                   />
@@ -293,11 +293,11 @@ function CreateScholarship() {
                   {description ? 'Edit Description' : 'Add Description'}
                 </button>
 
-                {/* Total Amount & Slot */}
-                <div className="grid grid-cols-10 gap-3">
-                  <div className="flex flex-col col-span-6">
-                    {/* Amount type toggle — scoped to this column */}
-                    <div className="flex rounded-sm overflow-hidden border border-[#C4CBD5] text-xs mb-1.5 h-7">
+                {/* Scholarship Amount */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs text-[#6B7280]">Scholarship Amount</span>
+                    <div className="flex rounded-sm overflow-hidden border border-[#C4CBD5] text-xs h-7">
                       {(['fixed', 'range', 'varies'] as const).map((t) => (
                         <button
                           key={t}
@@ -310,83 +310,87 @@ function CreateScholarship() {
                             setValue('totalAmountMax', undefined);
                             form.clearErrors(['totalAmount', 'totalAmountMin', 'totalAmountMax']);
                           }}
-                          className={`flex-1 py-1.5 capitalize cursor-pointer transition-colors ${amountType === t ? 'bg-[#3A52A6] text-white' : 'bg-[#F8F9FC] text-[#6B7280] hover:bg-gray-100'}`}
+                          className={`px-3 capitalize cursor-pointer transition-colors ${amountType === t ? 'bg-[#3A52A6] text-white' : 'bg-[#F8F9FC] text-[#6B7280] hover:bg-gray-100'}`}
                         >
                           {t}
                         </button>
                       ))}
                     </div>
-                    {amountType === 'fixed' && (
+                  </div>
+                  {amountType === 'fixed' && (
+                    <Controller
+                      control={control}
+                      name="totalAmount"
+                      render={({ field }) => (
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#6B7280]">₱</span>
+                          <input
+                            {...field}
+                            type="number"
+                            disabled={loading}
+                            placeholder="Amount per scholar"
+                            className={`w-full pl-7 pr-4 py-3 rounded-lg border ${
+                              errors.totalAmount ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
+                            } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
+                          />
+                        </div>
+                      )}
+                    />
+                  )}
+                  {amountType === 'varies' && (
+                    <p className="text-xs text-[#6B7280] px-1 py-2.5">Amount varies — describe it in the description field.</p>
+                  )}
+                  {amountType === 'range' && (
+                    <div className="flex items-center gap-2">
                       <Controller
                         control={control}
-                        name="totalAmount"
+                        name="totalAmountMin"
                         render={({ field }) => (
-                          <div className="relative">
+                          <div className="relative flex-1">
                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#6B7280]">₱</span>
                             <input
                               {...field}
                               type="number"
                               disabled={loading}
-                              placeholder="Amount per scholar"
-                              className={`w-full pl-7 pr-4 py-3 rounded-lg border ${
-                                errors.totalAmount ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
+                              placeholder="Min"
+                              className={`w-full pl-7 pr-3 py-3 rounded-lg border ${
+                                errors.totalAmountMin ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
                               } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
                             />
                           </div>
                         )}
                       />
-                    )}
-                    {amountType === 'varies' && (
-                      <p className="text-xs text-[#6B7280] px-1 py-2">Amount varies — describe it in the description field.</p>
-                    )}
-                    {amountType === 'range' && (
-                      <div className="flex items-center gap-2">
-                        <Controller
-                          control={control}
-                          name="totalAmountMin"
-                          render={({ field }) => (
-                            <div className="relative flex-1">
-                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#6B7280]">₱</span>
-                              <input
-                                {...field}
-                                type="number"
-                                disabled={loading}
-                                placeholder="Min"
-                                className={`w-full pl-7 pr-3 py-3 rounded-lg border ${
-                                  errors.totalAmountMin ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
-                                } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
-                              />
-                            </div>
-                          )}
-                        />
-                        <span className="text-xs text-[#6B7280] shrink-0">to</span>
-                        <Controller
-                          control={control}
-                          name="totalAmountMax"
-                          render={({ field }) => (
-                            <div className="relative flex-1">
-                              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#6B7280]">₱</span>
-                              <input
-                                {...field}
-                                type="number"
-                                disabled={loading}
-                                placeholder="Max"
-                                className={`w-full pl-7 pr-3 py-3 rounded-lg border ${
-                                  errors.totalAmountMax ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
-                                } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
-                              />
-                            </div>
-                          )}
-                        />
-                      </div>
-                    )}
-                    {errors.totalAmount && <p className="text-xs text-[#EF4444] mt-1">{errors.totalAmount.message}</p>}
-                    {errors.totalAmountMin && <p className="text-xs text-[#EF4444] mt-1">{errors.totalAmountMin.message}</p>}
-                    {errors.totalAmountMax && <p className="text-xs text-[#EF4444] mt-1">{errors.totalAmountMax.message}</p>}
-                  </div>
+                      <span className="text-xs text-[#6B7280] shrink-0">to</span>
+                      <Controller
+                        control={control}
+                        name="totalAmountMax"
+                        render={({ field }) => (
+                          <div className="relative flex-1">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#6B7280]">₱</span>
+                            <input
+                              {...field}
+                              type="number"
+                              disabled={loading}
+                              placeholder="Max"
+                              className={`w-full pl-7 pr-3 py-3 rounded-lg border ${
+                                errors.totalAmountMax ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
+                              } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
+                            />
+                          </div>
+                        )}
+                      />
+                    </div>
+                  )}
+                  {errors.totalAmount && <p className="text-xs text-[#EF4444] mt-1">{errors.totalAmount.message}</p>}
+                  {errors.totalAmountMin && <p className="text-xs text-[#EF4444] mt-1">{errors.totalAmountMin.message}</p>}
+                  {errors.totalAmountMax && <p className="text-xs text-[#EF4444] mt-1">{errors.totalAmountMax.message}</p>}
+                </div>
 
-                  <div className="flex flex-col col-span-4">
-                    <label className="flex items-center justify-end gap-1 mb-1.5 cursor-pointer h-7">
+                {/* Available Slots */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs text-[#6B7280]">Available Slots</span>
+                    <label className="flex items-center gap-1.5 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={unlimitedSlots}
@@ -402,25 +406,25 @@ function CreateScholarship() {
                       />
                       <span className="text-xs text-[#6B7280]">No limit</span>
                     </label>
-                    {!unlimitedSlots && (
-                      <Controller
-                        control={control}
-                        name="totalSlots"
-                        render={({ field }) => (
-                          <input
-                            {...field}
-                            type="number"
-                            disabled={loading}
-                            placeholder="Total slots"
-                            className={`w-full px-4 py-3 rounded-lg border ${
-                              errors.totalSlots ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
-                            } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
-                          />
-                        )}
-                      />
-                    )}
-                    {errors.totalSlots && <p className="text-xs text-[#EF4444] mt-1">{errors.totalSlots.message}</p>}
                   </div>
+                  {!unlimitedSlots && (
+                    <Controller
+                      control={control}
+                      name="totalSlots"
+                      render={({ field }) => (
+                        <input
+                          {...field}
+                          type="number"
+                          disabled={loading}
+                          placeholder="Number of scholars"
+                          className={`w-full px-4 py-3 rounded-lg border ${
+                            errors.totalSlots ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
+                          } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
+                        />
+                      )}
+                    />
+                  )}
+                  {errors.totalSlots && <p className="text-xs text-[#EF4444] mt-1">{errors.totalSlots.message}</p>}
                 </div>
 
                 {/* Application Deadline */}
@@ -434,7 +438,7 @@ function CreateScholarship() {
                           <button
                             type="button"
                             disabled={loading}
-                            className={`w-full px-4 py-3 text-sm border rounded-lg bg-[#F8F9FC] focus:outline-none focus:ring-2 focus:ring-[#3A52A6] flex items-center justify-between ${
+                            className={`w-full cursor-pointer px-4 py-3 text-sm border rounded-lg bg-[#F8F9FC] focus:outline-none focus:ring-2 focus:ring-[#3A52A6] flex items-center justify-between ${
                               field.value ? 'text-primary' : 'text-gray-400'
                             } ${errors.applicationDeadline ? 'border-[#EF4444]' : 'border-[#C4CBD5]'}`}
                           >
@@ -535,7 +539,7 @@ function CreateScholarship() {
             {requiredDocuments.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-3">
                 {requiredDocuments.map((doc, index) => (
-                  <span key={index} className="inline-flex items-center gap-2 px-3 py-2 bg-[#F9FAFB] text-[#374151] text-xs rounded-md border border-border rounded-lg">
+                  <span key={index} className="inline-flex items-center gap-2 px-3 py-2 bg-[#F9FAFB] text-[#374151] text-xs rounded-md border border-border">
                     {doc}
                     <button disabled={loading} onClick={() => removeDocument(index)} className="hover:text-[#2A4296]">
                       <X size={14} />
