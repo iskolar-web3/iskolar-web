@@ -14,6 +14,7 @@ const navLinks = [
       { name: "Company Overview", href: "/about#company-overview" },
       { name: "Mission & Vision", href: "/about#mission-vision" },
       { name: "Our Team", href: "/about#team" },
+      { name: "Partnerships", href: "/about#partnerships" },
     ],
   },
 ]
