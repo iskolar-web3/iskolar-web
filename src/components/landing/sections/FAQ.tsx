@@ -72,7 +72,7 @@ function AccordionItem({ question, answer, isOpen, onToggle }: AccordionItemProp
       >
         <span>{question}</span>
         <ChevronDown 
-          className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 ${
+          className={`w-5 h-5 shrink-0 transition-transform duration-300 ${
             isOpen ? 'rotate-180' : ''
           }`}
         />

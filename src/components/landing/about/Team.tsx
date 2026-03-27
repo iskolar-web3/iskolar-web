@@ -15,7 +15,7 @@ const Card = ({ image, name, role, university, link }: { image: string; name: st
     />
     <h3 className="text-xl font-bold text-secondary mb-1">{name}</h3>
     <p className="text-sm text-secondary/85 mb-1">{role}</p>
-    <p className="text-xs text-secondary/60 italic mb-4 flex items-center gap-1">
+    <p className="text-[12.5px] text-secondary/60 italic mb-4 flex items-center gap-1">
       {university}
     </p>
     <a href={link} target="_blank" className="p-2 text-secondary/80 hover:text-secondary rounded-full transition-all">

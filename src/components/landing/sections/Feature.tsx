@@ -195,7 +195,7 @@ export function Features() {
                     className="group relative bg-background rounded-tr-full rounded-bl-full border border-[#6073F2]/20 px-8 py-4 transition-all duration-300 hover:shadow-sm hover:-translate-x-1"
                   >
                     <div className="relative flex items-start gap-3">
-                      <span className="flex-shrink-0 font-semibold text-2xl text-secondary/60">
+                      <span className="shrink-0 font-semibold text-2xl text-secondary/60">
                         #{String(feature.order).padStart(2, "0")}
                       </span>
                       <div className="flex-1">
@@ -227,7 +227,7 @@ export function Features() {
                           {feature.description}
                         </p>
                       </div>
-                      <span className="flex-shrink-0 font-semibold text-2xl text-secondary/60">
+                      <span className="shrink-0 font-semibold text-2xl text-secondary/60">
                         #{String(feature.order).padStart(2, "0")}
                       </span>
                     </div>

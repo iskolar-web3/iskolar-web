@@ -108,7 +108,7 @@ export function TargetUsers() {
                 </div>
 
                 {/* Description */}
-                <div className="relative pb-4 flex-grow">
+                <div className="relative pb-4 grow">
                   <p className="md:text-base text-secondary/80 leading-relaxed">
                     {user.description}
                   </p>
@@ -129,7 +129,7 @@ export function TargetUsers() {
                 )}
 
                 {/* Animated underline accent */}
-                <div className="absolute inset-x-6 bottom-0 h-px bg-gradient-to-r from-transparent via-blue-500/60 to-transparent scale-x-0 origin-center group-hover:scale-x-100 transition-transform duration-500" />
+                <div className="absolute inset-x-6 bottom-0 h-px bg-linear-to-r from-transparent via-blue-500/60 to-transparent scale-x-0 origin-center group-hover:scale-x-100 transition-transform duration-500" />
               </div>
             </MotionItem>
           ))}
