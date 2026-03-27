@@ -44,7 +44,7 @@ export function useScholarshipForm(sponsorId: string) {
 		defaultValues: {
 			criterias: [],
 			formFields: [],
-			imageUrl: "",
+			imageUrl: undefined,
 			description: "",
 			name: "",
 			requirements: [],
@@ -85,8 +85,7 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
 
 	const removeImage = useCallback(() => {
 		setImagePreview(null);
-		// imageUrl will be repopulated by the placeholder effect on next render
-		form.setValue("imageUrl", "", { shouldValidate: false });
+		form.setValue("imageUrl", undefined, { shouldValidate: false });
 	}, [form]);
 
 	const addCriterion = useCallback(() => {

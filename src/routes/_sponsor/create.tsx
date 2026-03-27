@@ -195,7 +195,8 @@ function CreateScholarship() {
         ? { totalAmount: undefined }
         : { totalAmount: undefined, totalAmountMin: undefined, totalAmountMax: undefined };
     const slotsPayload = unlimitedSlots ? { totalSlots: undefined } : {};
-    mutation.mutate({ ...data, ...amountPayload, ...slotsPayload } as ScholarshipFormData);
+    const imageUrl = data.imageUrl || '/scholarship-banner-placeholder.png';
+    mutation.mutate({ ...data, ...amountPayload, ...slotsPayload, imageUrl } as ScholarshipFormData);
   };
 
   return (
@@ -207,6 +208,9 @@ function CreateScholarship() {
         <div className="space-y-4 lg:col-span-8">
           {/* Type */}
           <div>
+            <label className="block text-xs text-[#6B7280] mb-1.5 ml-0.5">
+              Scholarship Type <span className="text-[#EF4444]">*</span>
+            </label>
             <Select
               value={scholarshipType}
               onValueChange={(value) => setValue('scholarshipType', value as ScholarshipType, { shouldValidate: true })}
@@ -245,9 +249,7 @@ function CreateScholarship() {
                       </button>
                     </div>
                   ) : (
-                    <div className={`border-2 border-dashed ${
-                      errors.imageUrl ? 'border-[#EF4444]' : 'border-[#3A52A6]'
-                    } rounded-lg text-center cursor-pointer hover:bg-[#F0F7FF] transition-colors flex flex-col items-center justify-center w-full aspect-square px-4`}>
+                    <div className="border-2 border-dashed border-[#3A52A6] rounded-lg text-center cursor-pointer hover:bg-[#F0F7FF] transition-colors flex flex-col items-center justify-center w-full aspect-square px-4">
                       <Upload className="mb-3 text-[#5B7BA6]" size={40} />
                       <p className="text-secondary text-sm opacity-70">Click to select an image</p>
                       <input
@@ -259,19 +261,21 @@ function CreateScholarship() {
                     </div>
                   )}
                 </label>
-                {errors.imageUrl && <p className="text-xs text-[#EF4444] mt-1">{errors.imageUrl.message}</p>}
               </div>
 
-              <div className="md:w-2/3 space-y-3.5">
+              <div className="md:w-2/3 space-y-4">
                 {/* Title */}
                 <div>
+                  <label className="block text-xs text-[#6B7280] mb-1 ml-0.5">
+                    Title <span className="text-[#EF4444]">*</span>
+                  </label>
                   <Controller
                     control={control}
                     name="name"
                     render={({ field }) => (
                       <input
                         {...field}
-                        placeholder="Scholarship Title"
+                        placeholder="Enter Scholarship Title"
                         disabled={loading}
                         className={`w-full text-2xl border-b-2 ${
                           errors.name ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
@@ -429,6 +433,9 @@ function CreateScholarship() {
 
                 {/* Application Deadline */}
                 <div>
+                  <label className="block text-xs text-[#6B7280] mb-1.5 ml-0.5">
+                    Application Deadline <span className="text-[#EF4444]">*</span>
+                  </label>
                   <Controller
                     control={control}
                     name="applicationDeadline"
@@ -478,6 +485,9 @@ function CreateScholarship() {
 
           {/* Criteria */}
           <div>
+            <label className="block text-xs text-[#6B7280] mb-1.5 ml-0.5">
+              Eligibility Criteria <span className="text-[#EF4444]">*</span>
+            </label>
             <div className="flex gap-2">
               <input
                 value={criteriaInput}
@@ -515,6 +525,9 @@ function CreateScholarship() {
 
           {/* Required Documents */}
           <div>
+            <label className="block text-xs text-[#6B7280] mb-1.5 ml-0.5">
+              Required Documents <span className="text-[#EF4444]">*</span>
+            </label>
             <div className="flex gap-2">
               <input
                 value={documentsInput}
@@ -553,7 +566,7 @@ function CreateScholarship() {
           {/* Custom Form Fields */}
           <div>
             <div className="mb-3">
-              <label className="block text-sm text-[#4A5568] mb-1 ml-0.5">Application Form</label>
+              <label className="block text-sm text-[#4A5568] mb-1 ml-0.5">Application Form <span className="text-[#EF4444]">*</span></label>
               <p className="text-xs text-[#6B7280] ml-0.5">Add custom fields to collect information from applicants.</p>
             </div>
 
