@@ -64,10 +64,10 @@ export function Problem() {
                <MotionItem className="flex items-center col-span-2 justify-center md:justify-start group/image">
                 <div className="relative w-46 h-30 md:w-74 md:h-48 flex items-center p-1 border-2 border-secondary justify-center overflow-hidden rounded-lg">
                   {/* Gradient background */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-secondary/20 to-secondary/10 group-hover:from-secondary/30 group-hover/image:from-secondary/30 rounded-lg group-hover:to-secondary/15 group-hover/image:to-secondary/15 transition-all duration-400" />
+                  <div className="absolute inset-0 bg-linear-to-br from-secondary/20 to-secondary/10 group-hover:from-secondary/30 group-hover/image:from-secondary/30 rounded-lg group-hover:to-secondary/15 group-hover/image:to-secondary/15 transition-all duration-400" />
                     {/* Image */}
                     <motion.img
-                      src={`/landing/problem-${problem.number}.jpg`}
+                      src={`/landing/problem-${problem.number}.png`}
                       alt={problem.title}
                       className="w-full h-full object-cover rounded-md relative z-10 opacity-80 group-hover/image:opacity-100 transition-opacity duration-400"
                       whileHover={{ scale: 1.05 }}

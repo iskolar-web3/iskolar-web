@@ -33,7 +33,7 @@ export function Solution() {
   return (
     <section id="solution" className="relative overflow-hidden py-18 lg:py-28 px-6 md:px-26 bg-secondary">
       {/* Decorative grid lines */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(239,165,8,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(239,165,8,0.03)_1px,transparent_1px)] bg-[size:64px_64px]" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(239,165,8,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(239,165,8,0.03)_1px,transparent_1px)] bg-size-[64px_64px]" />
 
       <MotionContainer
         className="relative z-26"
@@ -48,7 +48,7 @@ export function Solution() {
           <h2 className="text-3xl sm:text-4xl lg:text-5xl text-tertiary mt-4 mb-6 text-balance">
             Introducing <span className="text-[#efa508] relative inline-block">
               iSkolar
-              <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#efa508] to-transparent" />
+              <div className="absolute -bottom-2 left-0 right-0 h-1 bg-linear-to-r from-transparent via-[#efa508] to-transparent" />
             </span>
           </h2>
           <p className="text-lg text-tertiary/80 max-w-3xl mx-auto text-pretty leading-relaxed">
@@ -70,7 +70,7 @@ export function Solution() {
               >
                 {/* Icon Side */}
                 <MotionItem 
-                  className="flex-shrink-0 relative group will-change-transform"
+                  className="shrink-0 relative group will-change-transform"
                   variants={{
                     hidden: { opacity: 0, scale: 0.8 },
                     visible: { 
@@ -81,20 +81,20 @@ export function Solution() {
                   }}
                   whileHover={{ scale: 1.05, rotate: 3 }}
                 >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${solution.gradient} opacity-20 blur-xl md:blur-2xl group-hover:opacity-30 transition-opacity duration-500 rounded-full scale-150`} />
-                  <div className={`relative w-32 h-32 lg:w-43 lg:h-43 rounded-3xl bg-gradient-to-br ${solution.gradient} p-1 shadow-2xl transform transition-all duration-500`}>
+                  <div className={`absolute inset-0 bg-linear-to-br ${solution.gradient} opacity-20 blur-xl md:blur-2xl group-hover:opacity-30 transition-opacity duration-500 rounded-full scale-150`} />
+                  <div className={`relative w-32 h-32 lg:w-43 lg:h-43 rounded-3xl bg-linear-to-br ${solution.gradient} p-1 shadow-2xl transform transition-all duration-500`}>
                     <div className="w-full h-full bg-secondary/95 backdrop-blur-none lg:backdrop-blur-sm rounded-3xl flex items-center justify-center">
                       <solution.icon className="w-14 h-14 lg:w-16 lg:h-16 text-white drop-shadow-lg" strokeWidth={1.5} />
                     </div>
                   </div>
                   {/* Decorative elements */}
                   <motion.div 
-                    className={`hidden md:block absolute -top-4 -right-4 w-8 h-8 rounded-full bg-gradient-to-br ${solution.gradient} opacity-60`}
+                    className={`hidden md:block absolute -top-4 -right-4 w-8 h-8 rounded-full bg-linear-to-br ${solution.gradient} opacity-60`}
                     animate={{ scale: [1, 1.2, 1] }}
                     transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
                   />
                   <motion.div 
-                    className={`hidden md:block absolute -bottom-4 -left-4 w-6 h-6 rounded-full bg-gradient-to-br ${solution.gradient} opacity-40`}
+                    className={`hidden md:block absolute -bottom-4 -left-4 w-6 h-6 rounded-full bg-linear-to-br ${solution.gradient} opacity-40`}
                     animate={{ scale: [1, 1.3, 1] }}
                     transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
                   />
@@ -136,9 +136,9 @@ export function Solution() {
         {/* Bottom CTA */}
         <MotionItem className="text-center mt-34">
           <div className="inline-flex items-center gap-3 text-tertiary/65 text-base">
-            <div className="h-px w-14 bg-gradient-to-r from-transparent to-tertiary/20" />
+            <div className="h-px w-14 bg-linear-to-r from-transparent to-tertiary/20" />
             <span>Scholarships that find you, so you don’t have to.</span>
-            <div className="h-px w-14 bg-gradient-to-l from-transparent to-tertiary/20" />
+            <div className="h-px w-14 bg-linear-to-l from-transparent to-tertiary/20" />
           </div>
         </MotionItem>
       </MotionContainer>

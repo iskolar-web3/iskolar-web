@@ -4,6 +4,7 @@ import { useSmoothScroll } from "@/hooks/useSmoothScroll";
 import Navbar from "@/components/landing/Navbar"
 import AnimatedBackground from "@/components/landing/AnimatedBackground"
 import { Footer } from "@/components/landing/sections/Footer"
+import { Partnerships } from "@/components/landing/about/Partnerships"
 import CompanyOverviewSection from "@/components/landing/about/CompanyOverview"
 import MissionVisionSection from "@/components/landing/about/MissionVision"
 import TeamSection from "@/components/landing/about/Team"
@@ -39,6 +40,7 @@ function About() {
         <CompanyOverviewSection />
         <MissionVisionSection />
         <TeamSection />
+        <Partnerships />
       </div>
 
       <Footer />
