@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { Facebook, Linkedin, Mail, Instagram } from "lucide-react"
 
 const quickLinks = [
@@ -8,11 +9,13 @@ const quickLinks = [
   { name: "Company Overview", href: "/about/#company-overview" },
   { name: "Mission & Vision", href: "/about/#mission-vision" },
   { name: "Our Team", href: "/about/#team" },
+  { name: "Partnerships", href: "/about/#partnerships" },
 ]
 
 const legalLinks = [
-  { name: "Privacy Policy", href: "/" },
-  { name: "Terms & Conditions", href: "/" },
+  { name: "", href: "/" },
+  // { name: "Privacy Policy", href: "/" },
+  // { name: "Terms & Conditions", href: "/" },
 ]
 
 const socialLinks = [
@@ -21,7 +24,22 @@ const socialLinks = [
   { name: "Instagram", icon: Instagram, href: "https://www.instagram.com/iskolar_web3/" },
 ]
 
+const GMAIL_COMPOSE_URL = "https://mail.google.com/mail/u/0/#all?compose=new"
+const CONTACT_EMAIL = "scholarpass23@gmail.com"
+
 export function Footer() {
+  const [emailCopied, setEmailCopied] = useState(false)
+
+  const handleEmailClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    navigator.clipboard.writeText(CONTACT_EMAIL)
+    setEmailCopied(true)
+    setTimeout(() => {
+      window.open(GMAIL_COMPOSE_URL, "_blank")
+      setEmailCopied(false)
+    }, 650)
+  }
+
   return (
     <footer className="bg-background text-tertiary">
       {/* Horizontal line at top */}
@@ -95,11 +113,12 @@ export function Footer() {
             <div>
               <h4 className="text-secondary text-lg mb-4">Contact Us</h4>
               <a
-                href="mailto:scholarpass23@gmail.com"
+                href={GMAIL_COMPOSE_URL}
+                onClick={handleEmailClick}
                 className="flex items-center gap-2 text-secondary/80 hover:text-secondary transition-colors text-sm"
               >
                 <Mail className="w-4 h-4" />
-                scholarpass23@gmail.com
+                {emailCopied ? "Copied!" : CONTACT_EMAIL}
               </a>
             </div>
           </div>

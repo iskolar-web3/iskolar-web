@@ -57,7 +57,7 @@ export function Roadmap() {
         {/* Timeline */}
         <div className="relative">
           {/* Vertical Line */}
-          <div className="absolute left-4 lg:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-secondary/50 via-secondary via-[#6073F2] to-[#6073F2]/10  lg:-translate-x-1/2" />
+          <div className="absolute left-4 lg:left-1/2 top-0 bottom-0 w-0.5 bg-linear-to-b from-secondary/50 via-secondary to-[#6073F2]/10  lg:-translate-x-1/2" />
 
           {/* Milestone Items */}
           <div className="space-y-12 lg:space-y-16">

@@ -44,7 +44,7 @@ export function Hero() {
   return (
     <section
       id="home"
-      className="relative min-h-[100dvh] px-6 flex items-center justify-center flex-shrink-0 pt-20 pb-16 overflow-hidden support-[min-height:100dvh]:min-h-[100dvh]"
+      className="relative min-h-dvh px-6 flex items-center justify-center shrink-0 pt-20 pb-16 overflow-hidden support-[min-height:100dvh]:min-h-[100dvh]"
     >
       <div className="absolute inset-0 z-26 overflow-hidden pointer-events-none">
         {/* Graduation cap shape with animated gradient */}
@@ -52,7 +52,7 @@ export function Hero() {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 0.2, scale: 1 }}
           transition={{ duration: 1.5, ease: "easeOut" }}
-          className="absolute top-[8%] right-[2%] w-[80vw] max-w-[400px] aspect-[4/3] md:w-[500px] md:h-[380px] lg:w-[550px] lg:h-[425px] opacity-20"
+          className="absolute top-[8%] right-[2%] w-[80vw] max-w-[400px] aspect-4/3 md:w-[500px] md:h-[380px] lg:w-[550px] lg:h-[425px] opacity-20"
         >
           <GraduationCapBg />
         </motion.div>
@@ -78,7 +78,7 @@ export function Hero() {
       </div>
 
       {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-secondary/5 via-transparent to-[#efa508]/5 z-0" />
+      <div className="absolute inset-0 bg-linear-to-br from-secondary/5 via-transparent to-[#efa508]/5 z-0" />
 
       <MotionContainer
         className="relative z-10 max-w-5xl mx-auto text-center"

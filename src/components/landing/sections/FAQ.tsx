@@ -72,7 +72,7 @@ function AccordionItem({ question, answer, isOpen, onToggle }: AccordionItemProp
       >
         <span>{question}</span>
         <ChevronDown 
-          className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 ${
+          className={`w-5 h-5 shrink-0 transition-transform duration-300 ${
             isOpen ? 'rotate-180' : ''
           }`}
         />
@@ -89,11 +89,25 @@ function AccordionItem({ question, answer, isOpen, onToggle }: AccordionItemProp
   )
 }
 
+const GMAIL_COMPOSE_URL = "https://mail.google.com/mail/u/0/#all?compose=new"
+const CONTACT_EMAIL = "scholarpass23@gmail.com"
+
 export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
+  const [emailCopied, setEmailCopied] = useState(false)
 
   const handleToggle = (index: number) => {
     setOpenIndex(openIndex === index ? null : index)
+  }
+
+  const handleEmailClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    navigator.clipboard.writeText(CONTACT_EMAIL)
+    setEmailCopied(true)
+    setTimeout(() => {
+      window.open(GMAIL_COMPOSE_URL, "_blank")
+      setEmailCopied(false)
+    }, 650)
   }
 
   return (
@@ -126,10 +140,11 @@ export function FAQ() {
         <MotionItem className="mt-26 text-center relative z-26">
           <p className="text-secondary/80 mb-4">Still have questions?</p>
           <a
-            href="mailto:scholarpass23@gmail.com"
+            href={GMAIL_COMPOSE_URL}
+            onClick={handleEmailClick}
             className="inline-flex items-center text-secondary hover:underline mb-16"
           >
-            Contact us at scholarpass23@gmail.com
+            {emailCopied ? "Email copied!" : `Contact us at ${CONTACT_EMAIL}`}
           </a>
         </MotionItem>
       </MotionContainer>
