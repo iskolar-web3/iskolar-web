@@ -1,7 +1,7 @@
 import { useState, useEffect, type JSX } from "react";
 import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { AnimatePresence } from "framer-motion";
-import { usePageTitle } from "@/hooks/usePageTitle";
+import { SEO } from "@/components/SEO";
 import ApplicationDetailsModal from "@/components/student/home/ApplicationDetailsDrawer";
 import { useToast } from "@/hooks/useToast";
 import Toast from "@/components/Toast";
@@ -30,8 +30,6 @@ export const Route = createFileRoute("/_student/home/")({
 });
 
 function Home(): JSX.Element {
-	usePageTitle("Home");
-
 	const [selectedApplication, setSelectedApplication] =
 		useState<Application | null>(null);
 	const { toast, showError } = useToast();
@@ -55,6 +53,7 @@ function Home(): JSX.Element {
 
 	return (
 		<main className="min-h-screen">
+			<SEO title="Home" noindex={true} />
 			{toast && <Toast {...toast} />}
 
 			<div className="max-w-176 mx-auto space-y-12">

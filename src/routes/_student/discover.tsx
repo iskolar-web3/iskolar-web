@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Toast from "@/components/Toast";
 import { useToast } from "@/hooks/useToast";
 import ScholarshipDetailsModal from "@/components/student/discover/ScholarshipDetailsDrawer";
-import { usePageTitle } from "@/hooks/usePageTitle";
+import { SEO } from "@/components/SEO";
 import {
 	ScholarshipPurpose,
 	ScholarshipType,
@@ -25,8 +25,6 @@ export const Route = createFileRoute("/_student/discover")({
 });
 
 function DiscoverScholarship() {
-	usePageTitle("Discover");
-
 	const [sortBy, setSortBy] = useState("Newest");
 	const [scholarshipType, setScholarshipType] =
 		useState<ScholarshipType | null>(null);
@@ -99,6 +97,7 @@ function DiscoverScholarship() {
 
 	return (
 		<div className="min-h-screen">
+			<SEO title="Discover Scholarships" noindex={true} />
 			{toast && <Toast {...toast} />}
 
 			{/* Mobile/Tablet Layout */}

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { usePageTitle } from "@/hooks/usePageTitle";
+import { SEO } from "@/components/SEO";
 import { useSmoothScroll } from "@/hooks/useSmoothScroll";
 import Navbar from "@/components/landing/Navbar"; 
 import AnimatedBackground from "@/components/landing/AnimatedBackground";
@@ -20,11 +20,11 @@ export const Route = createFileRoute("/")({
 });
 
 function App() {
-	usePageTitle("");
   useSmoothScroll();
 
 	return (
 		<main className="relative min-h-screen bg-background">
+			<SEO canonicalPath="/" />
 			<Navbar/>
 			<AnimatedBackground/>
 			<Hero/>

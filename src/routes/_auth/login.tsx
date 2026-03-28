@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { usePageTitle } from "@/hooks/usePageTitle";
+import { SEO } from "@/components/SEO";
 import Toast from "@/components/Toast";
 import { useToast } from '@/hooks/useToast';
 import Preloader from "@/components/Preloader";
@@ -52,8 +52,6 @@ async function login(value: LoginFormData): Promise<AuthSession> {
 }
 
 function LoginPage(): JSX.Element {
-  usePageTitle("Log In");
-  
   const navigate = useNavigate();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -135,6 +133,7 @@ function LoginPage(): JSX.Element {
 
   return (
     <>
+      <SEO title="Log In" noindex={true} />
       {showPreloader && (
         <Preloader 
           onComplete={handlePreloaderComplete}

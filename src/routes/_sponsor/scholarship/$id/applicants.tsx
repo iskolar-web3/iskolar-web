@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/dialog";
 import Toast from "@/components/Toast";
 import { useToast } from "@/hooks/useToast";
-import { usePageTitle } from "@/hooks/usePageTitle";
+import { SEO } from "@/components/SEO";
 import { handleError } from "@/lib/errorHandler";
 import { logger } from "@/lib/logger";
 import { formatDateTime } from "@/utils/formatting.utils";
@@ -63,7 +63,6 @@ export const Route = createFileRoute("/_sponsor/scholarship/$id/applicants")({
 });
 
 function ApplicantsListPage() {
-	usePageTitle("Applicants");
 
 	const params = Route.useParams();
 	const queryClient = useQueryClient();
@@ -322,6 +321,7 @@ function ApplicantsListPage() {
 
 	return (
 		<div className="min-h-screen bg-[#F8F9FC]">
+			<SEO title="Applicants" noindex={true} />
 			{toast && <Toast {...toast} />}
 
 			{loading ? (

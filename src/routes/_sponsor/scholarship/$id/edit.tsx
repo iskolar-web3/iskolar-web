@@ -29,7 +29,7 @@ import Toast from "@/components/Toast";
 import DescriptionModal from "@/components/sponsor/create-scholarship/DescriptionModal";
 import CustomFormFieldModal from "@/components/sponsor/create-scholarship/CustomFormFieldModal";
 import { useToast } from "@/hooks/useToast";
-import { usePageTitle } from "@/hooks/usePageTitle";
+import { SEO } from "@/components/SEO";
 import { handleError } from "@/lib/errorHandler";
 import { logger } from "@/lib/logger";
 import {
@@ -97,7 +97,6 @@ export const Route = createFileRoute("/_sponsor/scholarship/$id/edit")({
 //
 
 function EditScholarshipPage() {
-	usePageTitle("Edit");
 
 	const params = Route.useParams();
 
@@ -371,6 +370,7 @@ function EditScholarshipPage() {
 
 	return (
 		<div className="min-h-screen">
+			<SEO title="Edit Scholarship" noindex={true} />
 			{toast && <Toast {...toast} />}
 
 			<div className="max-w-[40rem] mx-auto">

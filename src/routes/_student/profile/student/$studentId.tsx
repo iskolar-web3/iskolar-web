@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { User, Edit, Plus } from "lucide-react";
 import { motion } from "framer-motion";
-import { usePageTitle } from "@/hooks/usePageTitle";
+import { SEO } from "@/components/SEO";
 import { useRef, useState } from "react";
 import { useToast } from "@/hooks/useToast";
 import Toast from "@/components/Toast";
@@ -27,7 +27,6 @@ export const Route = createFileRoute("/_student/profile/student/$studentId")({
 });
 
 function StudentProfilePage() {
-	usePageTitle("Profile");
 
 	const auth = useAuth<Student>();
 	const [isCredentialModalOpen, setIsCredentialModalOpen] = useState(false);
@@ -91,6 +90,7 @@ function StudentProfilePage() {
 
 	return (
 		<div className="min-h-screen">
+			<SEO title="Profile" noindex={true} />
 			{toast && <Toast {...toast} />}
 
 			{/* Credential Upload Modal */}
