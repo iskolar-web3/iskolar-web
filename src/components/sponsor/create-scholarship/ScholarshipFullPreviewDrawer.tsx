@@ -172,7 +172,7 @@ export default function ScholarshipFullPreviewModal({
 						{scholarship.description && (
 							<div className="mb-6">
 								<h3 className="text-sm text-primary mb-2">About Scholarship</h3>
-								<p className="text-[#6B7280] text-xs leading-relaxed">
+								<p className="text-[#6B7280] text-xs leading-relaxed whitespace-pre-wrap">
 									{scholarship.description}
 								</p>
 							</div>

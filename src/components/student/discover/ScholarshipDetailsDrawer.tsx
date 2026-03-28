@@ -178,7 +178,7 @@ export default function ScholarshipDetailsModal({ scholarship, onClose }: { scho
             {scholarship.description && (
               <div className="mb-6">
                 <h3 className="text-sm text-primary mb-2">About Scholarship</h3>
-                <p className="text-[#6B7280] text-xs leading-relaxed">{scholarship.description}</p>
+                <p className="text-[#6B7280] text-xs leading-relaxed whitespace-pre-wrap">{scholarship.description}</p>
               </div>
             )}
 
