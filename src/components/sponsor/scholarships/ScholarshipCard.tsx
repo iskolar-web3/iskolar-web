@@ -1,7 +1,7 @@
 import { Calendar, Users, Coins, Edit2, Trash2, UserIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
-import { calculateAmountPerScholar, formatCurrency } from '@/utils/formatting.utils';
+import { formatCurrency } from '@/utils/formatting.utils';
 import type { Scholarship } from '@/lib/scholarship/model';
 import { getSponsorName } from '@/lib/sponsor/api';
 import { format } from 'date-fns';
@@ -43,7 +43,9 @@ export default function ScholarshipCard({
   const contextMenuRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const amountPerScholar = calculateAmountPerScholar(scholarship.totalAmount, scholarship.totalSlots);
+  const isRange = scholarship.totalAmountMin != null || scholarship.totalAmountMax != null;
+  const isFixed = !isRange && scholarship.totalAmount != null;
+  const isVaries = !isRange && !isFixed;
 
   /**
    * Handles right-click context menu
@@ -126,7 +128,7 @@ export default function ScholarshipCard({
       }}
       onClick={onClick}
       onContextMenu={handleContextMenu}
-      className="bg-white cursor-pointer rounded-lg border border-border hover:border-[#3A52A6] transition-colors relative shadow-sm"
+      className="bg-white cursor-pointer rounded-md border border-border hover:border-[#3A52A6] transition-colors relative shadow-sm"
     >
       {/* Context Menu */}
       <AnimatePresence>
@@ -143,7 +145,7 @@ export default function ScholarshipCard({
               top: `${contextMenuPosition.y}px`,
               zIndex: 100,
             }}
-            className="bg-white rounded-lg shadow-xl border border-border py-1 min-w-[160px]"
+            className="bg-white rounded-lg shadow-xl border border-border py-1 min-w-40"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -177,10 +179,10 @@ export default function ScholarshipCard({
           {/* Image */}
           <motion.div 
             transition={{ duration: 0.3 }}
-            className="w-32 h-32 bg-white/10 flex-shrink-0 overflow-hidden rounded-tl-lg"
+            className="w-32 h-32 bg-white/10 shrink-0 overflow-hidden rounded-tl-lg"
           >
             <img
-              src={scholarship.imageUrl || "/logo.jpg"}
+              src={scholarship.imageUrl || "/scholarship-banner-placeholder.png"}
               alt="Preview"
               className="w-full h-full object-cover"
             />
@@ -200,20 +202,12 @@ export default function ScholarshipCard({
               >
                 {scholarship.scholarshipType.name}
               </motion.span>
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: index * 0.05 + 0.15 }}
-                className="px-2 py-0.5 bg-white/90 text-secondary text-[10px] md:text-[11px] rounded"
-              >
-                {scholarship.purpose.name}
-              </motion.span>
             </div>
 
             {/* Sponsor and Deadline */}
             <div className="space-y-1.5 text-xs opacity-90">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-card flex items-center justify-center flex-shrink-0">
+                <div className="w-4 h-4 rounded-full bg-card flex items-center justify-center shrink-0">
                   {scholarship?.sponsor?.avatarUrl ? (
                     <img
                       src={scholarship?.sponsor?.avatarUrl}
@@ -259,12 +253,9 @@ export default function ScholarshipCard({
               <Coins size={14} />
               <span>Amount</span>
             </div>
-            <p className="text-primary text-sm md:text-base">
-              {amountPerScholar !== null
-                ? formatCurrency(amountPerScholar, { minimumFractionDigits: 0, maximumFractionDigits: 0 })
-                : '₱0.00'}
-            </p>
-            <p className="text-xs text-[#6B7280]">per scholar</p>
+            {isFixed && (<><p className="text-primary text-sm md:text-base">{formatCurrency(scholarship.totalAmount!, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p><p className="text-xs text-[#6B7280]">per scholar</p></>)}
+            {isRange && (<><p className="text-primary text-sm md:text-base">{formatCurrency(scholarship.totalAmountMin ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}{" – "}{formatCurrency(scholarship.totalAmountMax ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p><p className="text-xs text-[#6B7280]">per scholar</p></>)}
+            {isVaries && (<><p className="text-primary text-sm md:text-base">Varies</p><p className="text-xs text-[#6B7280]">see details</p></>)}
           </motion.div>
 
           <motion.div
@@ -275,54 +266,9 @@ export default function ScholarshipCard({
               <Users size={14} />
               <span>Slots</span>
             </div>
-            <p className="text-primary text-sm md:text-base">{scholarship.totalSlots}</p>
+            <p className="text-primary text-sm md:text-base">{scholarship.totalSlots ?? "No limit"}</p>
             <p className="text-xs text-[#6B7280]">scholars</p>
           </motion.div>
-        </div>
-
-        {/* Criteria and Documents */}
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <h4 className="text-[#6B7280] text-xs tracking-wide mb-2">
-              Criteria
-            </h4>
-            <div className="flex flex-wrap gap-1.5">
-              {scholarship.criterias.slice(0, 2).map((item, i) => (
-                <span
-                  key={i}
-                  className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[10px] md:text-[11px] rounded border border-border"
-                >
-                  {item}
-                </span>
-              ))}
-              {scholarship.criterias.length > 2 && (
-                <span className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[10px] md:text-[11px] rounded border border-border">
-                  +{scholarship.criterias.length - 2}
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <h4 className="text-[#6B7280] text-[11px] tracking-wide mb-2">
-              Required Documents
-            </h4>
-            <div className="flex flex-wrap gap-1.5">
-              {scholarship.requirements.slice(0, 2).map((item, i) => (
-                <span
-                  key={i}
-                  className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[10px] md:text-[11px] rounded border border-border"
-                >
-                  {item}
-                </span>
-              ))}
-              {scholarship.requirements.length > 2 && (
-                <span className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[10px] md:text-[11px]] rounded border border-border">
-                  +{scholarship.requirements.length - 2}
-                </span>
-              )}
-            </div>
-          </div>
         </div>
       </div>
     </motion.div>

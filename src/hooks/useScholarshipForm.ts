@@ -44,7 +44,7 @@ export function useScholarshipForm(sponsorId: string) {
 		defaultValues: {
 			criterias: [],
 			formFields: [],
-			imageUrl: "",
+			imageUrl: undefined,
 			description: "",
 			name: "",
 			requirements: [],
@@ -60,7 +60,7 @@ export function useScholarshipForm(sponsorId: string) {
 	const criteria = form.watch("criterias");
 	const requirements = form.watch("requirements");
 
-	const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) {
 			const reader = new FileReader();
@@ -85,7 +85,7 @@ export function useScholarshipForm(sponsorId: string) {
 
 	const removeImage = useCallback(() => {
 		setImagePreview(null);
-		form.setValue("imageUrl", "", { shouldValidate: true });
+		form.setValue("imageUrl", undefined, { shouldValidate: false });
 	}, [form]);
 
 	const addCriterion = useCallback(() => {

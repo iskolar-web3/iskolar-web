@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Info } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
 	Dialog,
 	DialogContent,
@@ -111,9 +112,21 @@ export default function CustomFormFieldModal({
 				showCloseButton={true}
 			>
 				<DialogHeader>
-					<h3 className="text-lg text-secondary">
-						{editingField ? "Edit Field" : "Add Form Field"}
-					</h3>
+					<div className="flex items-center gap-2">
+						<h3 className="text-lg text-secondary">
+							{editingField ? "Edit Field" : "Add Form Field"}
+						</h3>
+						<TooltipProvider delayDuration={100}>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<Info size={15} className="text-[#6B7280] cursor-pointer shrink-0" />
+								</TooltipTrigger>
+								<TooltipContent side="right" className="max-w-63 text-xs bg-[#3A52A6] text-white [&>svg]:fill-[#3A52A6] [&>svg]:bg-[#3A52A6]">
+									Name, gender, email, date of birth, and contact number are already in the student profile — no need to include them here.
+								</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+					</div>
 				</DialogHeader>
 
 				<div className="space-y-4">

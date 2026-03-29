@@ -5,8 +5,9 @@ import { validateFormField } from "./helper";
 import { studentSchema } from "../student/model";
 
 export enum ScholarshipType {
+	NeedBased = "need-based",
 	MeritBased = "merit-based",
-	SkillBased = "skill-based",
+	Combined = "combined",
 }
 
 export enum ScholarshipStatus {
@@ -18,10 +19,6 @@ export enum ScholarshipStatus {
 	Archived = "archived",
 }
 
-export enum ScholarshipPurpose {
-	Allowance = "allowance",
-	Tuition = "tuition",
-}
 
 export enum FormFieldType {
 	ShortAnswer = "short_answer",
@@ -61,11 +58,12 @@ export const scholarshipSchema = <T extends z.ZodType>(sponsor: T) =>
 		description: z.string().nullable(),
 		scholarshipType: enumDetailSchema(ScholarshipType),
 		status: enumDetailSchema(ScholarshipStatus),
-		totalAmount: z.coerce.number().positive(),
-		totalSlots: z.number().positive(),
+		totalAmount: z.coerce.number().positive().optional().nullable(),
+		totalAmountMin: z.coerce.number().positive().optional().nullable(),
+		totalAmountMax: z.coerce.number().positive().optional().nullable(),
+		totalSlots: z.number().positive().optional().nullable(),
 		applicationDeadline: z.coerce.date(),
 		imageUrl: z.string().nullable(),
-		purpose: enumDetailSchema(ScholarshipPurpose),
 		criterias: z.string().array().default([]),
 		requirements: z.string().array().default([]),
 		sponsor: sponsor,
@@ -112,11 +110,12 @@ export const createScholarshipRequestSchema = z.object({
 		error: "Please select a scholarship type",
 	}),
 	status: z.enum(ScholarshipStatus).default(ScholarshipStatus.Draft),
-	totalAmount: z.coerce.number().positive(),
-	totalSlots: z.coerce.number().positive(),
-	applicationDeadline: z.date(),
-	imageUrl: z.string().nonempty("Please upload a scholarship image"),
-	purpose: z.enum(ScholarshipPurpose, { message: "Please select a purpose" }),
+	totalAmount: z.coerce.number().positive().optional(),
+	totalAmountMin: z.coerce.number().positive().optional(),
+	totalAmountMax: z.coerce.number().positive().optional(),
+	totalSlots: z.coerce.number().positive().optional(),
+	applicationDeadline: z.date({ error: "Please set an application deadline" }),
+	imageUrl: z.string().optional(),
 	criterias: z
 		.string()
 		.array()

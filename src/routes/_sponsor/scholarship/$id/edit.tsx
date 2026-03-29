@@ -34,7 +34,6 @@ import { handleError } from "@/lib/errorHandler";
 import { logger } from "@/lib/logger";
 import {
 	FormFieldType,
-	ScholarshipPurpose,
 	ScholarshipStatus,
 	ScholarshipType,
 	updateScholarshipRequestSchema,
@@ -128,11 +127,12 @@ function EditScholarshipPage() {
 			name: scholarship.name,
 			requirements: scholarship.requirements,
 			status: scholarship.status.code,
-			totalAmount: scholarship.totalAmount,
-			totalSlots: scholarship.totalSlots,
+			totalAmount: scholarship.totalAmount ?? undefined,
+			totalAmountMin: scholarship.totalAmountMin ?? undefined,
+			totalAmountMax: scholarship.totalAmountMax ?? undefined,
+			totalSlots: scholarship.totalSlots ?? undefined,
 			scholarshipType: scholarship.scholarshipType.code,
 			applicationDeadline: scholarship.applicationDeadline,
-			purpose: scholarship.purpose.code,
 		},
 	});
 
@@ -148,6 +148,12 @@ function EditScholarshipPage() {
 	);
 	const [loading, setLoading] = useState(false);
 	const [saving, setSaving] = useState(false);
+	const [amountType, setAmountType] = useState<'fixed' | 'varies' | 'range'>(() => {
+		if (scholarship.totalAmountMin != null || scholarship.totalAmountMax != null) return 'range';
+		if (scholarship.totalAmount != null) return 'fixed';
+		return 'varies';
+	});
+	const [unlimitedSlots, setUnlimitedSlots] = useState(scholarship.totalSlots == null);
 	const { toast, showSuccess, showError } = useToast();
 
 	const criterias = form.watch("criterias") || [];
@@ -155,7 +161,6 @@ function EditScholarshipPage() {
 	const formFields = form.watch("formFields") || [];
 	const description = form.watch("description");
 	const type = form.watch("scholarshipType");
-	const purpose = form.watch("purpose");
 	const status = form.watch("status");
 
 	const hydrateForm = useCallback(
@@ -283,14 +288,43 @@ function EditScholarshipPage() {
 	});
 
 	const onSubmit = async (data: EditScholarshipFormData) => {
+		if (amountType === 'fixed' && !data.totalAmount) {
+			form.setError("totalAmount", { message: "Please enter a valid amount" });
+			return;
+		}
+		if (amountType === 'range') {
+			if (!data.totalAmountMin) {
+				form.setError("totalAmountMin", { message: "Please enter a minimum amount" });
+				return;
+			}
+			if (!data.totalAmountMax) {
+				form.setError("totalAmountMax", { message: "Please enter a maximum amount" });
+				return;
+			}
+			if (data.totalAmountMin >= data.totalAmountMax) {
+				form.setError("totalAmountMax", { message: "Max must be greater than min" });
+				return;
+			}
+		}
+		if (!unlimitedSlots && !data.totalSlots) {
+			form.setError("totalSlots", { message: "Please enter the number of slots" });
+			return;
+		}
 		setSaving(true);
-		mutation.mutate(data);
+		const amountPayload: Partial<EditScholarshipFormData> =
+			amountType === 'fixed'
+				? { totalAmountMin: undefined, totalAmountMax: undefined }
+				: amountType === 'range'
+				? { totalAmount: undefined }
+				: { totalAmount: undefined, totalAmountMin: undefined, totalAmountMax: undefined };
+		const slotsPayload = unlimitedSlots ? { totalSlots: undefined } : {};
+		mutation.mutate({ ...data, ...amountPayload, ...slotsPayload });
 	};
 
 	if (loading) {
 		return (
 			<div className="min-h-screen">
-				<div className="max-w-[40rem] mx-auto">
+				<div className="max-w-160 mx-auto">
 					<div className="space-y-4">
 						{/* Status Skeleton */}
 						<Skeleton className="w-full h-12 rounded-lg bg-muted" />
@@ -373,7 +407,7 @@ function EditScholarshipPage() {
 		<div className="min-h-screen">
 			{toast && <Toast {...toast} />}
 
-			<div className="max-w-[40rem] mx-auto">
+			<div className="max-w-160 mx-auto">
 				<div className="space-y-4">
 					{/* Status */}
 					<div>
@@ -419,7 +453,7 @@ function EditScholarshipPage() {
 							>
 								<SelectTrigger
 									disabled={saving}
-									className={`w-full px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-[placeholder]:text-gray-400 ${
+									className={`w-full px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
 										form.formState.errors.scholarshipType
 											? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444]"
 											: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
@@ -428,11 +462,14 @@ function EditScholarshipPage() {
 									<SelectValue placeholder="Select type" />
 								</SelectTrigger>
 								<SelectContent>
+									<SelectItem value={ScholarshipType.NeedBased}>
+										Need-Based
+									</SelectItem>
 									<SelectItem value={ScholarshipType.MeritBased}>
 										Merit-Based
 									</SelectItem>
-									<SelectItem value={ScholarshipType.SkillBased}>
-										Skill-Based
+									<SelectItem value={ScholarshipType.Combined}>
+										Combined
 									</SelectItem>
 								</SelectContent>
 							</Select>
@@ -443,36 +480,6 @@ function EditScholarshipPage() {
 							)}
 						</div>
 
-						<div>
-							<Select
-								value={purpose}
-								onValueChange={(value) =>
-									form.setValue("purpose", value as ScholarshipPurpose, {
-										shouldValidate: true,
-									})
-								}
-							>
-								<SelectTrigger
-									disabled={saving}
-									className={`w-full px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-[placeholder]:text-gray-400 ${
-										form.formState.errors.purpose
-											? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444]"
-											: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
-									}`}
-								>
-									<SelectValue placeholder="Select purpose" />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="allowance">Allowance</SelectItem>
-									<SelectItem value="tuition">Tuition</SelectItem>
-								</SelectContent>
-							</Select>
-							{form.formState.errors.purpose && (
-								<p className="text-xs text-[#EF4444] mt-1">
-									{form.formState.errors.purpose.message}
-								</p>
-							)}
-						</div>
 					</div>
 
 					<div className="bg-[#F8F9FC] rounded-xl p-4 shadow-sm">
@@ -565,48 +572,149 @@ function EditScholarshipPage() {
 
 								<div className="grid grid-cols-2 gap-4">
 									<div>
-										<Controller
-											control={form.control}
-											name="totalAmount"
-											render={({ field }) => (
-												<input
-													{...field}
-													type="number"
+										<div className="flex rounded-lg overflow-hidden border border-[#C4CBD5] mb-1.5 text-xs">
+											{(['fixed', 'range', 'varies'] as const).map((t) => (
+												<button
+													key={t}
+													type="button"
 													disabled={saving}
-													placeholder="Total amount"
-													className={`w-full px-4 py-3 rounded-lg border ${
-														form.formState.errors.totalAmount
-															? "border-[#EF4444]"
-															: "border-[#C4CBD5]"
-													} bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
+													onClick={() => {
+														setAmountType(t);
+														form.setValue("totalAmount", undefined);
+														form.setValue("totalAmountMin", undefined);
+														form.setValue("totalAmountMax", undefined);
+														form.clearErrors(["totalAmount", "totalAmountMin", "totalAmountMax"]);
+													}}
+													className={`flex-1 py-1.5 capitalize transition-colors ${amountType === t ? "bg-[#3A52A6] text-white" : "bg-[#F8F9FC] text-[#6B7280] hover:bg-gray-100"}`}
+												>
+													{t}
+												</button>
+											))}
+										</div>
+										{amountType === 'fixed' && (
+											<Controller
+												control={form.control}
+												name="totalAmount"
+												render={({ field }) => (
+													<div className="relative">
+														<span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#6B7280]">₱</span>
+														<input
+															{...field}
+															type="number"
+															disabled={saving}
+															placeholder="0.00"
+															className={`w-full pl-7 pr-4 py-3 rounded-lg border ${
+																form.formState.errors.totalAmount
+																	? "border-[#EF4444]"
+																	: "border-[#C4CBD5]"
+															} bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
+														/>
+													</div>
+												)}
+											/>
+										)}
+										{amountType === 'varies' && (
+											<p className="text-xs text-[#6B7280] px-1 py-2">Amount varies — describe it in the description field.</p>
+										)}
+										{amountType === 'range' && (
+											<div className="flex items-center gap-2">
+												<Controller
+													control={form.control}
+													name="totalAmountMin"
+													render={({ field }) => (
+														<div className="relative flex-1">
+															<span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#6B7280]">₱</span>
+															<input
+																{...field}
+																type="number"
+																disabled={saving}
+																placeholder="Min"
+																className={`w-full pl-7 pr-3 py-3 rounded-lg border ${
+																	form.formState.errors.totalAmountMin ? "border-[#EF4444]" : "border-[#C4CBD5]"
+																} bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
+															/>
+														</div>
+													)}
 												/>
-											)}
-										/>
+												<span className="text-xs text-[#6B7280] shrink-0">to</span>
+												<Controller
+													control={form.control}
+													name="totalAmountMax"
+													render={({ field }) => (
+														<div className="relative flex-1">
+															<span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#6B7280]">₱</span>
+															<input
+																{...field}
+																type="number"
+																disabled={saving}
+																placeholder="Max"
+																className={`w-full pl-7 pr-3 py-3 rounded-lg border ${
+																	form.formState.errors.totalAmountMax ? "border-[#EF4444]" : "border-[#C4CBD5]"
+																} bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
+															/>
+														</div>
+													)}
+												/>
+											</div>
+										)}
 										{form.formState.errors.totalAmount && (
 											<p className="text-xs text-[#EF4444] mt-1">
 												{form.formState.errors.totalAmount.message}
 											</p>
 										)}
+										{form.formState.errors.totalAmountMin && (
+											<p className="text-xs text-[#EF4444] mt-1">
+												{form.formState.errors.totalAmountMin.message}
+											</p>
+										)}
+										{form.formState.errors.totalAmountMax && (
+											<p className="text-xs text-[#EF4444] mt-1">
+												{form.formState.errors.totalAmountMax.message}
+											</p>
+										)}
 									</div>
 
 									<div>
-										<Controller
-											control={form.control}
-											name="totalSlots"
-											render={({ field }) => (
-												<input
-													{...field}
-													type="number"
-													disabled={saving}
-													placeholder="Total slots"
-													className={`w-full px-4 py-3 rounded-lg border ${
-														form.formState.errors.totalSlots
-															? "border-[#EF4444]"
-															: "border-[#C4CBD5]"
-													} bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
-												/>
-											)}
-										/>
+										{!unlimitedSlots && (
+											<Controller
+												control={form.control}
+												name="totalSlots"
+												render={({ field }) => (
+													<input
+														{...field}
+														type="number"
+														disabled={saving}
+														placeholder="Total slots"
+														className={`w-full px-4 py-3 rounded-lg border ${
+															form.formState.errors.totalSlots
+																? "border-[#EF4444]"
+																: "border-[#C4CBD5]"
+														} bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
+													/>
+												)}
+											/>
+										)}
+										{unlimitedSlots && (
+											<div className="w-full px-4 py-3 rounded-lg border border-[#C4CBD5] bg-[#F8F9FC] text-sm text-[#6B7280]">
+												Unlimited
+											</div>
+										)}
+										<label className="flex items-center gap-2 mt-1.5 cursor-pointer">
+											<input
+												type="checkbox"
+												checked={unlimitedSlots}
+												disabled={saving}
+												onChange={(e) => {
+													setUnlimitedSlots(e.target.checked);
+													if (e.target.checked) {
+														form.setValue("totalSlots", undefined);
+														form.clearErrors("totalSlots");
+													}
+												}}
+												className="w-3.5 h-3.5 accent-[#3A52A6]"
+											/>
+											<span className="text-xs text-[#6B7280]">Unlimited</span>
+										</label>
 										{form.formState.errors.totalSlots && (
 											<p className="text-xs text-[#EF4444] mt-1">
 												{form.formState.errors.totalSlots.message}

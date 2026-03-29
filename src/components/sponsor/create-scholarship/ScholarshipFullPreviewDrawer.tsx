@@ -4,17 +4,14 @@ import {
 	Users,
 	Coins,
 	ChevronsRight,
-	Images,
 	UserIcon,
 } from "lucide-react";
 import { useState } from "react";
 import {
-	calculateAmountPerScholar,
 	formatCurrency,
 	formatDeadline,
 } from "@/utils/formatting.utils";
 import {
-	ScholarshipPurpose,
 	ScholarshipType,
 	type ScholarshipFormData,
 } from "@/lib/scholarship/model";
@@ -48,10 +45,9 @@ export default function ScholarshipFullPreviewModal({
 	const [isExiting, setIsExiting] = useState(false);
 
 	const auth = useAuth<AnySponsor>();
-	const amountPerScholar = calculateAmountPerScholar(
-		scholarship.totalAmount,
-		scholarship.totalSlots,
-	);
+	const isRange = scholarship.totalAmountMin != null || scholarship.totalAmountMax != null;
+	const isFixed = !isRange && scholarship.totalAmount != null;
+	const isVaries = !isRange && !isFixed;
 
 	/**
 	 * Handles modal close with exit animation
@@ -100,17 +96,11 @@ export default function ScholarshipFullPreviewModal({
 					<div className="p-5">
 						{/* Image Banner */}
 						<div className="relative w-full aspect-square mb-5 rounded-lg overflow-hidden shadow-[0_0_20px_2px_rgba(0,0,0,0.2)]">
-							{scholarship.imageUrl ? (
-								<img
-									src={scholarship.imageUrl}
-									alt={scholarship.name || "Scholarship"}
-									className="w-full h-full object-cover"
-								/>
-							) : (
-								<div className="w-full h-full bg-gray-100 flex items-center justify-center">
-									<Images className="text-gray-400" size={80} />
-								</div>
-							)}
+							<img
+								src={scholarship.imageUrl || "/scholarship-banner-placeholder.png"}
+								alt={scholarship.name || "Scholarship"}
+								className="w-full h-full object-cover"
+							/>
 						</div>
 
 						{/* Title and Badges */}
@@ -119,18 +109,16 @@ export default function ScholarshipFullPreviewModal({
 						</h1>
 						<div className="flex gap-2 mb-4">
 							{scholarship.scholarshipType && (
-								<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">
-									{scholarship.scholarshipType === ScholarshipType.MeritBased
-										? "Merit-Based"
-										: "Skill-Based"}
-								</span>
-							)}
-							{scholarship.purpose && (
-								<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">
-									{scholarship.purpose === ScholarshipPurpose.Allowance
-										? "Allowance"
-										: "Tuition"}
-								</span>
+								scholarship.scholarshipType === ScholarshipType.Combined ? (
+									<>
+										<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">Merit-Based</span>
+										<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">Need-Based</span>
+									</>
+								) : (
+									<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">
+										{scholarship.scholarshipType === ScholarshipType.NeedBased ? "Need-Based" : "Merit-Based"}
+									</span>
+								)
 							)}
 						</div>
 
@@ -165,15 +153,9 @@ export default function ScholarshipFullPreviewModal({
 									<Coins size={16} />
 									<span className="text-xs">Amount</span>
 								</div>
-								<p className="text-base text-primary mb-0.5">
-									{amountPerScholar !== null
-										? formatCurrency(amountPerScholar, {
-												minimumFractionDigits: 2,
-												maximumFractionDigits: 2,
-											})
-										: "₱0.00"}
-								</p>
-								<p className="text-xs text-[#6B7280]">per scholar</p>
+								{isFixed && (<><p className="text-base text-primary mb-0.5">{formatCurrency(scholarship.totalAmount!, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p><p className="text-xs text-[#6B7280]">per scholar</p></>)}
+								{isRange && (<><p className="text-base text-primary mb-0.5">{formatCurrency(scholarship.totalAmountMin ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}{" – "}{formatCurrency(scholarship.totalAmountMax ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p><p className="text-xs text-[#6B7280]">per scholar</p></>)}
+								{isVaries && (<><p className="text-base text-primary mb-0.5">Varies</p><p className="text-xs text-[#6B7280]">see details</p></>)}
 							</div>
 
 							<div className="bg-[#F9FAFB] border border-border rounded-lg p-3">
@@ -181,9 +163,7 @@ export default function ScholarshipFullPreviewModal({
 									<Users size={16} />
 									<span className="text-xs">Slots</span>
 								</div>
-								<p className="text-base text-primary mb-0.5">
-									{scholarship.totalSlots || 0}
-								</p>
+								<p className="text-base text-primary mb-0.5">{scholarship.totalSlots ?? "No limit"}</p>
 								<p className="text-xs text-[#6B7280]">scholars</p>
 							</div>
 						</div>
@@ -192,7 +172,7 @@ export default function ScholarshipFullPreviewModal({
 						{scholarship.description && (
 							<div className="mb-6">
 								<h3 className="text-sm text-primary mb-2">About Scholarship</h3>
-								<p className="text-[#6B7280] text-xs leading-relaxed">
+								<p className="text-[#6B7280] text-xs leading-relaxed whitespace-pre-wrap">
 									{scholarship.description}
 								</p>
 							</div>

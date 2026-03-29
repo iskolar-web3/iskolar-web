@@ -47,7 +47,7 @@ export default function DescriptionModal({
         <textarea
           value={tempDescription}
           onChange={(e) => setTempDescription(e.target.value)}
-          placeholder="Enter detailed description of the scholarship program..."
+          placeholder="Covers tuition + monthly stipend. Add any special notes, eligibility background, or coverage details here."
           className="w-full h-45 px-4 py-3 rounded-lg border border-[#C4CBD5] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6] resize-none"
         />
         <DialogFooter className="flex gap-3 mt-4">

@@ -11,7 +11,6 @@ import {
 	UserIcon,
 } from "lucide-react";
 import {
-	calculateAmountPerScholar,
 	formatCurrency,
 	formatDate,
 	formatDateTime,
@@ -86,11 +85,10 @@ export default function ApplicationDetailsModal({
 
 	const statusStyle = statusStyles[application.application.status.code];
 
-	const amountPerScholar =
-		calculateAmountPerScholar(
-			application.scholarship.totalAmount,
-			application.scholarship.totalSlots,
-		) ?? 0;
+	const s = application.scholarship;
+	const isRange = s.totalAmountMin != null || s.totalAmountMax != null;
+	const isFixed = !isRange && s.totalAmount != null;
+	
 
 	/**
 	 * Handles modal close with exit animation
@@ -121,7 +119,7 @@ export default function ApplicationDetailsModal({
 					stiffness: 300,
 					duration: 0.1,
 				}}
-				className="relative h-full w-full max-w-[30rem] overflow-y-auto rounded-lg bg-[#FEFEFD] shadow-2xl"
+				className="relative h-full w-full max-w-120 overflow-y-auto rounded-lg bg-[#FEFEFD] shadow-2xl"
 				style={{
 					scrollbarWidth: "thin",
 					scrollbarColor: "#CBD5E1 #F1F5F9",
@@ -165,7 +163,7 @@ export default function ApplicationDetailsModal({
 					{/* Scholarship Image */}
 					<div className="relative w-full aspect-square rounded-lg overflow-hidden shadow-[0_0_20px_2px_rgba(0,0,0,0.2)]">
 						<img
-							src={application.scholarship.imageUrl || ""}
+							src={application.scholarship.imageUrl || "/scholarship-banner-placeholder.png"}
 							alt={application.scholarship.name}
 							className="w-full h-full object-cover"
 						/>
@@ -180,15 +178,12 @@ export default function ApplicationDetailsModal({
 							<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">
 								{application.scholarship.scholarshipType.name}
 							</span>
-							<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">
-								{application.scholarship.purpose.name}
-							</span>
 						</div>
 
 						{/* Sponsor and Deadline */}
 						<div className="space-y-3 text-[#6B7280]">
 							<div className="flex items-center gap-2">
-								<div className="w-5.5 h-5.5 rounded-full flex items-center justify-center flex-shrink-0">
+								<div className="w-5.5 h-5.5 rounded-full flex items-center justify-center shrink-0">
 									{application.scholarship.sponsor.avatarUrl ? (
 										<img
 											src={application.scholarship.sponsor.avatarUrl}
@@ -220,14 +215,9 @@ export default function ApplicationDetailsModal({
 								<Coins size={16} />
 								<span className="text-xs">Amount</span>
 							</div>
-							<p className="text-base text-[#111827] mb-0.5">
-								{formatCurrency(amountPerScholar, {
-									locale: "en-PH",
-									minimumFractionDigits: 2,
-									maximumFractionDigits: 2,
-								})}
-							</p>
-							<p className="text-xs text-[#6B7280]">per scholar</p>
+							{isFixed && (<><p className="text-base text-[#111827] mb-0.5">{formatCurrency(s.totalAmount!, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p><p className="text-xs text-[#6B7280]">per scholar</p></>)}
+							{isRange && (<><p className="text-base text-[#111827] mb-0.5">{formatCurrency(s.totalAmountMin ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} – {formatCurrency(s.totalAmountMax ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p><p className="text-xs text-[#6B7280]">per scholar</p></>)}
+							{!isFixed && !isRange && (<><p className="text-base text-[#111827] mb-0.5">Varies</p><p className="text-xs text-[#6B7280]">see details</p></>)}
 						</div>
 
 						<div className="bg-[#F9FAFB] border border-border rounded-lg p-3">
@@ -236,7 +226,7 @@ export default function ApplicationDetailsModal({
 								<span className="text-xs">Slots</span>
 							</div>
 							<p className="text-base text-[#111827] mb-0.5">
-								{application.scholarship.totalSlots}
+								{application.scholarship.totalSlots ?? "No limit"}
 							</p>
 							<p className="text-xs text-[#6B7280]">scholars</p>
 						</div>
@@ -323,7 +313,7 @@ export default function ApplicationDetailsModal({
 
 					{/* Info Footer */}
 					<div className="flex items-start gap-2 rounded-md bg-[#FEF3C7] p-3 text-xs text-[#78350F]">
-						<Info size={17} className="flex-shrink-0 mt-0.5" />
+						<Info size={17} className="shrink-0 mt-0.5" />
 						<p className="leading-relaxed">
 							You cannot edit or delete this application.
 						</p>

@@ -1,6 +1,6 @@
 import { Calendar, Users, Coins, UserIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { calculateAmountPerScholar, formatCurrency, formatDate } from '@/utils/formatting.utils';
+import { formatCurrency, formatDate } from '@/utils/formatting.utils';
 import type { Scholarship } from '@/lib/scholarship/model';
 import { getSponsorName } from '@/lib/sponsor/api';
 
@@ -23,7 +23,9 @@ export interface ScholarshipCardProps {
  * @returns Animated scholarship card component
  */
 export default function ScholarshipCard({ scholarship, index, onClick }: ScholarshipCardProps) {
-  const amountPerScholar = calculateAmountPerScholar(scholarship.totalAmount, scholarship.totalSlots);
+  const isRange = scholarship.totalAmountMin != null || scholarship.totalAmountMax != null;
+  const isFixed = !isRange && scholarship.totalAmount != null;
+  const isVaries = !isRange && !isFixed;
   
   return (
     <motion.div
@@ -39,7 +41,7 @@ export default function ScholarshipCard({ scholarship, index, onClick }: Scholar
         transition: { duration: 0.2 }
       }}
       onClick={onClick}
-      className="bg-card cursor-pointer rounded-lg overflow-hidden border border-[#D3DCF6] hover:border-[#3A52A6] transition-colors"
+      className="bg-card cursor-pointer rounded-md overflow-hidden border border-[#D3DCF6] hover:border-[#3A52A6] transition-colors"
     >
       {/* Header */}
       <div className="bg-[#3A52A6]">
@@ -47,10 +49,10 @@ export default function ScholarshipCard({ scholarship, index, onClick }: Scholar
           {/* Image */}
           <motion.div 
             transition={{ duration: 0.3 }}
-            className="w-32 h-32 bg-white/10 flex-shrink-0 overflow-hidden"
+            className="w-32 h-32 bg-white/10 shrink-0 overflow-hidden"
           >
             <img
-              src={scholarship.imageUrl || "/logo.jpg"}
+              src={scholarship.imageUrl || "/scholarship-banner-placeholder.png"}
               alt="Preview"
               className="w-full h-full object-cover"
             />
@@ -70,20 +72,12 @@ export default function ScholarshipCard({ scholarship, index, onClick }: Scholar
               >
                 {scholarship.scholarshipType.name}
               </motion.span>
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: index * 0.05 + 0.15 }}
-                className="px-2 py-0.5 bg-white/90 text-secondary text-[10px] md:text-[11px] rounded"
-              >
-                {scholarship.purpose.name}
-              </motion.span>
             </div>
 
             {/* Sponsor and Deadline */}
             <div className="space-y-1.5 text-xs">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded-full bg-card flex items-center justify-center flex-shrink-0">
+                <div className="w-4 h-4 rounded-full bg-card flex items-center justify-center shrink-0">
                   {scholarship?.sponsor?.avatarUrl ? (
                     <img
                       src={scholarship?.sponsor?.avatarUrl}
@@ -117,12 +111,9 @@ export default function ScholarshipCard({ scholarship, index, onClick }: Scholar
               <Coins size={16} />
               <span>Amount</span>
             </div>
-            <p className="text-sm md:text-base text-primary">
-              {amountPerScholar !== null
-                ? formatCurrency(amountPerScholar, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                : '₱0.00'}
-            </p>
-            <p className="text-xs text-[#6B7280]">per scholar</p>
+            {isFixed && (<><p className="text-sm md:text-base text-primary">{formatCurrency(scholarship.totalAmount!, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p><p className="text-xs text-[#6B7280]">per scholar</p></>)}
+            {isRange && (<><p className="text-sm md:text-base text-primary">{formatCurrency(scholarship.totalAmountMin ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}{" – "}{formatCurrency(scholarship.totalAmountMax ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p><p className="text-xs text-[#6B7280]">per scholar</p></>)}
+            {isVaries && (<><p className="text-sm md:text-base text-primary">Varies</p><p className="text-xs text-[#6B7280]">see details</p></>)}
           </motion.div>
 
           <motion.div
@@ -133,54 +124,9 @@ export default function ScholarshipCard({ scholarship, index, onClick }: Scholar
               <Users size={16} />
               <span>Slots</span>
             </div>
-            <p className="text-sm md:text-base text-primary">{scholarship.totalSlots}</p>
+            <p className="text-sm md:text-base text-primary">{scholarship.totalSlots ?? "No limit"}</p>
             <p className="text-xs text-[#6B7280]">scholars</p>
           </motion.div>
-        </div>
-
-        {/* Criteria and Documents */}
-        <div className="grid grid-cols-2 gap-6 text-sm">
-          <div>
-            <h4 className="text-[#6B7280] text-xs tracking-wide mb-2">
-              Criteria
-            </h4>
-            <div className="flex flex-wrap gap-2">
-              {scholarship.criterias.slice(0, 2).map((item, i) => (
-                <span
-                  key={i}
-                  className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[10px] md:text-[11px] rounded border border-border"
-                >
-                  {item}
-                </span>
-              ))}
-              {scholarship.criterias.length > 2 && (
-                <span className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[10px] md:text-[11px] rounded border border-border">
-                  + {scholarship.criterias.length - 2} more
-                </span>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <h4 className="text-[#6B7280] text-xs tracking-wider mb-2">
-              Required Documents
-            </h4>
-            <div className="flex flex-wrap gap-2">
-              {scholarship.requirements.slice(0, 2).map((item, i) => (
-                <span
-                  key={i}
-                  className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[10px] md:text-[11px] rounded border border-border"
-                >
-                  {item}
-                </span>
-              ))}
-              {scholarship.requirements.length > 2 && (
-                <span className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[10px] md:text-[11px] rounded border border-border">
-                  + {scholarship.requirements.length - 2} more
-                </span>
-              )}
-            </div>
-          </div>
         </div>
       </div>
     </motion.div>
