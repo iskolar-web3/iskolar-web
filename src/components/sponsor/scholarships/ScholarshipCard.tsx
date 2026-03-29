@@ -2,7 +2,7 @@ import { Calendar, Users, Coins, Edit2, Trash2, UserIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useRef, useEffect } from 'react';
 import { formatCurrency } from '@/utils/formatting.utils';
-import type { Scholarship } from '@/lib/scholarship/model';
+import { ScholarshipType, type Scholarship } from '@/lib/scholarship/model';
 import { getSponsorName } from '@/lib/sponsor/api';
 import { format } from 'date-fns';
 
@@ -193,15 +193,36 @@ export default function ScholarshipCard({
             <h3 className="text-lg mb-1 line-clamp-1">{scholarship.name}</h3>
             
             {/* Badges */}
-            <div className="flex gap-2 mb-3">
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: index * 0.05 + 0.1 }}
-                className="px-2 py-0.5 bg-white/90 text-secondary text-[10px] md:text-[11px] rounded"
-              >
-                {scholarship.scholarshipType.name}
-              </motion.span>
+            <div className="flex flex-wrap gap-2 mb-3">
+              {scholarship.scholarshipType.code === ScholarshipType.Combined ? (
+                <>
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: index * 0.05 + 0.1 }}
+                    className="px-2 py-0.5 bg-white/90 text-secondary text-[10px] md:text-[11px] rounded"
+                  >
+                    Merit-Based
+                  </motion.span>
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: index * 0.05 + 0.15 }}
+                    className="px-2 py-0.5 bg-white/90 text-secondary text-[10px] md:text-[11px] rounded"
+                  >
+                    Need-Based
+                  </motion.span>
+                </>
+              ) : (
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: index * 0.05 + 0.1 }}
+                  className="px-2 py-0.5 bg-white/90 text-secondary text-[10px] md:text-[11px] rounded"
+                >
+                  {scholarship.scholarshipType.name}
+                </motion.span>
+              )}
             </div>
 
             {/* Sponsor and Deadline */}
