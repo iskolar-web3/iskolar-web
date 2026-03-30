@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/select";
 import Toast from "@/components/Toast";
 import { useToast } from "@/hooks/useToast";
-import { usePageTitle } from "@/hooks/usePageTitle";
+import { SEO } from "@/components/SEO";
 import { compressFile } from "@/utils/fileCompression.utils";
 import { handleError } from "@/lib/errorHandler";
 import { logger } from "@/lib/logger";
@@ -62,7 +62,6 @@ export const Route = createFileRoute("/_student/scholarship/$id/apply")({
 });
 
 function ApplyScholarshipPage() {
-	usePageTitle("Apply");
 
 	const [showConfirmation, setShowConfirmation] = useState(false);
 	const [pendingData, setPendingData] = useState<CreateApplicationRequest>();
@@ -687,6 +686,7 @@ function ApplyScholarshipPage() {
 	//
 	return (
 		<div className="min-h-screen bg-[#F8F9FC]">
+			<SEO title="Apply" noindex={true} />
 			{toast && <Toast {...toast} />}
 
 			<div className="max-w-[40rem] mx-auto space-y-4">

@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { motion, AnimatePresence } from "framer-motion";
-import { usePageTitle } from "@/hooks/usePageTitle";
+import { SEO } from "@/components/SEO";
 import { HiAcademicCap, HiHeart, HiBuildingOffice2, HiUser, HiUserGroup, HiBuildingLibrary, HiArrowLeft } from "react-icons/hi2";
 import Toast from "@/components/Toast";
 import { useToast } from '@/hooks/useToast';
@@ -27,8 +27,6 @@ const sponsorRoleSchema = z.object({
 });
 
 function RoleSelection() {
-  usePageTitle("Role Selection");
-
   const navigate = useNavigate();
 
   const [selectedRole, setSelectedRole] = useState<Role>(null);
@@ -225,6 +223,7 @@ function RoleSelection() {
 
   return (
     <>
+      <SEO title="Role Selection" noindex={true} />
       {toast && <Toast {...toast} />}
 
       <motion.div 

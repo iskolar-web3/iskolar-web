@@ -20,7 +20,7 @@ import FilterSelect from "@/components/sponsor/scholarships/Filters";
 import ScholarshipCard from "@/components/sponsor/scholarships/ScholarshipCard";
 import ScholarshipCardSkeleton from "@/components/ScholarshipCardSkeleton";
 import ScholarshipDetailsModal from "@/components/sponsor/scholarships/ScholarshipDetailsDrawer";
-import { usePageTitle } from "@/hooks/usePageTitle";
+import { SEO } from "@/components/SEO";
 import Toast from "@/components/Toast";
 import { useToast } from "@/hooks/useToast";
 import {
@@ -40,7 +40,6 @@ export const Route = createFileRoute("/_sponsor/scholarships")({
 });
 
 function Scholarships() {
-	usePageTitle("Scholarships");
 
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
@@ -154,6 +153,7 @@ function Scholarships() {
 
 	return (
 		<div className="min-h-screen">
+			<SEO title="My Scholarships" noindex={true} />
 			{toast && <Toast {...toast} />}
 
 			{/* Mobile/Tablet Layout */}

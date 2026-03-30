@@ -1,5 +1,6 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
+import { HelmetProvider } from "react-helmet-async";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 
 import * as TanStackQueryProvider from "./integrations/tanstack-query/root-provider.tsx";
@@ -39,13 +40,15 @@ if (rootElement && !rootElement.innerHTML) {
 	const root = ReactDOM.createRoot(rootElement);
 	root.render(
 		<StrictMode>
-			<TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
-				<WagmiProvider>
-					<AuthProvider>
-						<App />
-					</AuthProvider>
-				</WagmiProvider>
-			</TanStackQueryProvider.Provider>
+			<HelmetProvider>
+				<TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
+					<WagmiProvider>
+						<AuthProvider>
+							<App />
+						</AuthProvider>
+					</WagmiProvider>
+				</TanStackQueryProvider.Provider>
+			</HelmetProvider>
 		</StrictMode>,
 	);
 }
