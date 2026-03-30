@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { usePageTitle } from "@/hooks/usePageTitle";
 import Toast from "@/components/Toast";
 import { useToast } from "@/hooks/useToast";
 import type { JSX } from "react";
@@ -9,6 +8,7 @@ import { Loader2, MailCheck, ArrowLeft, RefreshCw } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import { requestPasswordReset } from "@/lib/user/password";
+import { SEO } from "@/components/SEO";
 
 const confirmationSearchSchema = z.object({
 	email: z.string().catch(""),
@@ -30,8 +30,6 @@ function maskEmail(email: string): string {
 }
 
 function ConfirmationPage(): JSX.Element {
-	usePageTitle("Confirmation");
-
 	const navigate = useNavigate();
 	const { email } = Route.useSearch();
 	const { toast, showSuccess, showError } = useToast();
@@ -69,6 +67,7 @@ function ConfirmationPage(): JSX.Element {
 
 	return (
 		<>
+			<SEO title="Confirmation" noindex={true} />
 			{toast && <Toast {...toast} />}
 
 			<motion.div

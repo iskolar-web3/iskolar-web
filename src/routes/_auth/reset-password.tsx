@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { usePageTitle } from "@/hooks/usePageTitle";
 import Toast from "@/components/Toast";
 import { useToast } from "@/hooks/useToast";
 import type { JSX } from "react";
@@ -11,6 +10,7 @@ import { z } from "zod";
 import { Loader2, Eye, EyeOff, ShieldCheck, AlertCircle, ArrowLeft } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { validateResetToken, resetPassword } from "@/lib/user/password";
+import { SEO } from "@/components/SEO";
 
 const resetPasswordSearchSchema = z.object({
 	token: z.string().catch(""),
@@ -41,8 +41,6 @@ const resetPasswordSchema = z
 type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
 function ResetPasswordPage(): JSX.Element {
-	usePageTitle("Reset Password");
-
 	const navigate = useNavigate();
 	const { token } = Route.useSearch();
 	const { toast, showError } = useToast();
@@ -138,6 +136,7 @@ function ResetPasswordPage(): JSX.Element {
 	// ── Render: reset form ────────────────────────────────────────────────────
 	return (
 		<>
+			<SEO title="Reset Password" noindex={true} />
 			{toast && <Toast {...toast} />}
 
 			<motion.div

@@ -1,6 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { usePageTitle } from "@/hooks/usePageTitle";
 import Toast from "@/components/Toast";
 import { useToast } from "@/hooks/useToast";
 import type { JSX } from "react";
@@ -10,6 +9,7 @@ import { z } from "zod";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { requestPasswordReset } from "@/lib/user/password";
+import { SEO } from "@/components/SEO";
 
 export const Route = createFileRoute("/_auth/forgot-password")({
 	component: ForgotPasswordPage,
@@ -28,8 +28,6 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 function ForgotPasswordPage(): JSX.Element {
-	usePageTitle("Forgot Password");
-
 	const navigate = useNavigate();
 	const { toast, showError } = useToast();
 
@@ -59,6 +57,7 @@ function ForgotPasswordPage(): JSX.Element {
 
 	return (
 		<>
+			<SEO title="Forgot Password" noindex={true} />
 			{toast && <Toast {...toast} />}
 
 			<motion.div
