@@ -1,17 +1,17 @@
-import { useState, useCallback } from "react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { normalizeText } from "@/utils/normalize.utils";
-import {
-	createScholarshipRequestSchema,
-	ScholarshipStatus,
-	type ScholarshipFormData,
-} from "@/lib/scholarship/model";
+import { useCallback, useState } from "react";
+import { useForm } from "react-hook-form";
 // import { useAuth } from "@/auth";
 // import type { AnySponsor } from "@/lib/sponsor/model";
 import { uploadFile } from "@/lib/api";
-import { ACCESS_TOKEN_KEY } from "@/lib/user/auth";
 import { getCookie } from "@/lib/cookie";
+import {
+	createScholarshipRequestSchema,
+	type ScholarshipFormData,
+	ScholarshipStatus,
+} from "@/lib/scholarship/model";
+import { ACCESS_TOKEN_KEY } from "@/lib/user/auth";
+import { normalizeText } from "@/utils/normalize.utils";
 
 /**
  * Custom hook for managing scholarship creation/edit form
@@ -60,7 +60,7 @@ export function useScholarshipForm(sponsorId: string) {
 	const criteria = form.watch("criterias");
 	const requirements = form.watch("requirements");
 
-const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) {
 			const reader = new FileReader();
@@ -118,6 +118,30 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		}
 	}, [documentsInput, requirements, form]);
 
+	const addCriterionDirect = useCallback(
+		(value: string) => {
+			const normalized = normalizeText(value);
+			if (normalized && !criteria.includes(normalized)) {
+				form.setValue("criterias", [...criteria, normalized], {
+					shouldValidate: true,
+				});
+			}
+		},
+		[criteria, form],
+	);
+
+	const addDocumentDirect = useCallback(
+		(value: string) => {
+			const normalized = normalizeText(value);
+			if (normalized && !requirements.includes(normalized)) {
+				form.setValue("requirements", [...requirements, normalized], {
+					shouldValidate: true,
+				});
+			}
+		},
+		[requirements, form],
+	);
+
 	const removeDocument = useCallback(
 		(index: number) => {
 			form.setValue(
@@ -148,6 +172,8 @@ const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		removeCriterion,
 		addDocument,
 		removeDocument,
+		addCriterionDirect,
+		addDocumentDirect,
 		resetForm,
 	};
 }

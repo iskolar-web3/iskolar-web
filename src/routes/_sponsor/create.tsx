@@ -23,6 +23,8 @@ import ScholarshipFullPreviewModal from '@/components/sponsor/create-scholarship
 import CustomFormFieldModal from '@/components/sponsor/create-scholarship/CustomFormFieldModal';
 import CustomFormFieldsList from '@/components/sponsor/create-scholarship/CustomFormFieldsList';
 import DescriptionModal from '@/components/sponsor/create-scholarship/DescriptionModal';
+import PresetPickerPopover from '@/components/sponsor/create-scholarship/PresetPickerPopover';
+import { PRESET_CRITERIA, PRESET_DOCUMENTS } from '@/lib/scholarship/presets';
 import { useScholarshipForm } from '@/hooks/useScholarshipForm';
 import { useScholarshipPreview } from '@/hooks/useScholarshipPreview';
 import { useToast } from '@/hooks/useToast';
@@ -65,16 +67,12 @@ function CreateScholarship() {
   const {
     form,
     imagePreview,
-    criteriaInput,
-    setCriteriaInput,
-    documentsInput,
-    setDocumentsInput,
     handleImageUpload,
     removeImage,
-    addCriterion,
     removeCriterion,
-    addDocument,
     removeDocument,
+    addCriterionDirect,
+    addDocumentDirect,
     resetForm,
   } = useScholarshipForm(auth.profile.id);
 
@@ -497,26 +495,14 @@ function CreateScholarship() {
             <label className="block text-xs text-[#6B7280] mb-1.5 ml-0.5">
               Eligibility Criteria <span className="text-[#EF4444]">*</span>
             </label>
-            <div className="flex gap-2">
-              <input
-                value={criteriaInput}
-                disabled={loading}
-                onChange={(e) => setCriteriaInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCriterion())}
-                placeholder="Enter eligibility criterion"
-                className={`flex-1 px-4 py-3 rounded-lg border ${
-                  errors.criterias ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
-                } bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
-              />
-              <button
-                type="button"
-                disabled={loading}
-                onClick={addCriterion}
-                className="w-11 h-11 bg-[#3A52A6] text-tertiary rounded-lg flex items-center justify-center hover:bg-[#2A4296] transition-colors"
-              >
-                <Plus size={20} />
-              </button>
-            </div>
+            <PresetPickerPopover
+              presets={PRESET_CRITERIA}
+              selectedItems={criteria}
+              onSelect={addCriterionDirect}
+              disabled={loading}
+              hasError={!!errors.criterias}
+              placeholder="Select eligibility criteria"
+            />
             {errors.criterias && <p className="text-xs text-[#EF4444] mt-1">{errors.criterias.message}</p>}
             {criteria.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-3">
@@ -537,26 +523,14 @@ function CreateScholarship() {
             <label className="block text-xs text-[#6B7280] mb-1.5 ml-0.5">
               Required Documents <span className="text-[#EF4444]">*</span>
             </label>
-            <div className="flex gap-2">
-              <input
-                value={documentsInput}
-                disabled={loading}
-                onChange={(e) => setDocumentsInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addDocument())}
-                placeholder="Enter required document"
-                className={`flex-1 px-4 py-3 rounded-lg border ${
-                  errors.requirements ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
-                } bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
-              />
-              <button
-                type="button"
-                disabled={loading}
-                onClick={addDocument}
-                className="w-11 h-11 bg-[#3A52A6] text-tertiary rounded-lg flex items-center justify-center hover:bg-[#2A4296] transition-colors"
-              >
-                <Plus size={20} />
-              </button>
-            </div>
+            <PresetPickerPopover
+              presets={PRESET_DOCUMENTS}
+              selectedItems={requiredDocuments}
+              onSelect={addDocumentDirect}
+              disabled={loading}
+              hasError={!!errors.requirements}
+              placeholder="Select required documents"
+            />
             {errors.requirements && <p className="text-xs text-[#EF4444] mt-1">{errors.requirements.message}</p>}
             {requiredDocuments.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-3">

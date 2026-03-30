@@ -28,6 +28,8 @@ import {
 import Toast from "@/components/Toast";
 import DescriptionModal from "@/components/sponsor/create-scholarship/DescriptionModal";
 import CustomFormFieldModal from "@/components/sponsor/create-scholarship/CustomFormFieldModal";
+import PresetPickerPopover from "@/components/sponsor/create-scholarship/PresetPickerPopover";
+import { PRESET_CRITERIA, PRESET_DOCUMENTS } from "@/lib/scholarship/presets";
 import { useToast } from "@/hooks/useToast";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { handleError } from "@/lib/errorHandler";
@@ -139,8 +141,6 @@ function EditScholarshipPage() {
 	const [imagePreview, setImagePreview] = useState<string | null>(
 		scholarship.imageUrl,
 	);
-	const [criteriaInput, setCriteriaInput] = useState("");
-	const [documentsInput, setDocumentsInput] = useState("");
 	const [showDescriptionModal, setShowDescriptionModal] = useState(false);
 	const [showCustomFieldModal, setShowCustomFieldModal] = useState(false);
 	const [editingFieldIndex, setEditingFieldIndex] = useState<number | null>(
@@ -211,16 +211,6 @@ function EditScholarshipPage() {
 		}
 	};
 
-	const addCriterion = () => {
-		const trimmed = criteriaInput.trim();
-		if (trimmed) {
-			form.setValue("criterias", [...(criterias || []), trimmed], {
-				shouldValidate: true,
-			});
-			setCriteriaInput("");
-		}
-	};
-
 	const removeCriterion = (index: number) => {
 		form.setValue(
 			"criterias",
@@ -229,22 +219,30 @@ function EditScholarshipPage() {
 		);
 	};
 
-	const addDocument = () => {
-		const trimmed = documentsInput.trim();
-		if (trimmed) {
-			form.setValue("requirements", [...(requiredDocuments || []), trimmed], {
-				shouldValidate: true,
-			});
-			setDocumentsInput("");
-		}
-	};
-
 	const removeDocument = (index: number) => {
 		form.setValue(
 			"requirements",
 			requiredDocuments?.filter((_, i) => i !== index),
 			{ shouldValidate: true },
 		);
+	};
+
+	const addCriterionDirect = (value: string) => {
+		const trimmed = value.trim();
+		if (trimmed && !criterias?.includes(trimmed)) {
+			form.setValue("criterias", [...(criterias || []), trimmed], {
+				shouldValidate: true,
+			});
+		}
+	};
+
+	const addDocumentDirect = (value: string) => {
+		const trimmed = value.trim();
+		if (trimmed && !requiredDocuments?.includes(trimmed)) {
+			form.setValue("requirements", [...(requiredDocuments || []), trimmed], {
+				shouldValidate: true,
+			});
+		}
 	};
 
 	const openCustomFormModal = (index?: number) => {
@@ -776,31 +774,14 @@ function EditScholarshipPage() {
 					</div>
 
 					<div>
-						<div className="flex gap-2">
-							<input
-								value={criteriaInput}
-								disabled={saving}
-								onChange={(event) => setCriteriaInput(event.target.value)}
-								onKeyDown={(event) =>
-									event.key === "Enter" &&
-									(event.preventDefault(), addCriterion())
-								}
-								placeholder="Enter eligibility criterion"
-								className={`flex-1 px-4 py-3 rounded-lg border ${
-									form.formState.errors.criterias
-										? "border-[#EF4444]"
-										: "border-[#C4CBD5]"
-								} bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
-							/>
-							<button
-								type="button"
-								disabled={saving}
-								onClick={addCriterion}
-								className="w-11 h-11 bg-[#3A52A6] text-tertiary rounded-lg flex items-center justify-center hover:bg-[#2A4296] transition-colors"
-							>
-								<Plus size={20} />
-							</button>
-						</div>
+						<PresetPickerPopover
+							presets={PRESET_CRITERIA}
+							selectedItems={criterias || []}
+							onSelect={addCriterionDirect}
+							disabled={saving}
+							hasError={!!form.formState.errors.criterias}
+							placeholder="Select eligibility criteria"
+						/>
 						{form.formState.errors.criterias && (
 							<p className="text-xs text-[#EF4444] mt-1">
 								{form.formState.errors.criterias.message}
@@ -828,31 +809,14 @@ function EditScholarshipPage() {
 					</div>
 
 					<div>
-						<div className="flex gap-2">
-							<input
-								value={documentsInput}
-								disabled={saving}
-								onChange={(event) => setDocumentsInput(event.target.value)}
-								onKeyDown={(event) =>
-									event.key === "Enter" &&
-									(event.preventDefault(), addDocument())
-								}
-								placeholder="Enter required document"
-								className={`flex-1 px-4 py-3 rounded-lg border ${
-									form.formState.errors.requirements
-										? "border-[#EF4444]"
-										: "border-[#C4CBD5]"
-								} bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
-							/>
-							<button
-								type="button"
-								disabled={saving}
-								onClick={addDocument}
-								className="w-11 h-11 bg-[#3A52A6] text-tertiary rounded-lg flex items-center justify-center hover:bg-[#2A4296] transition-colors"
-							>
-								<Plus size={20} />
-							</button>
-						</div>
+						<PresetPickerPopover
+							presets={PRESET_DOCUMENTS}
+							selectedItems={requiredDocuments || []}
+							onSelect={addDocumentDirect}
+							disabled={saving}
+							hasError={!!form.formState.errors.requirements}
+							placeholder="Select required documents"
+						/>
 						{form.formState.errors.requirements && (
 							<p className="text-xs text-[#EF4444] mt-1">
 								{form.formState.errors.requirements.message}
