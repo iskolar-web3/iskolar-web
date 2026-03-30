@@ -188,15 +188,20 @@ function CreateScholarship() {
       return;
     }
     setLoading(true);
-    const amountPayload: Partial<ScholarshipFormData> =
-      amountType === 'fixed'
-        ? { totalAmountMin: undefined, totalAmountMax: undefined }
-        : amountType === 'range'
-        ? { totalAmount: undefined }
-        : { totalAmount: undefined, totalAmountMin: undefined, totalAmountMax: undefined };
-    const slotsPayload = unlimitedSlots ? { totalSlots: undefined } : {};
-    const imageUrl = data.imageUrl || '/scholarship-banner-placeholder.png';
-    mutation.mutate({ ...data, ...amountPayload, ...slotsPayload, imageUrl } as ScholarshipFormData);
+    try {
+      const amountPayload: Partial<ScholarshipFormData> =
+        amountType === 'fixed'
+          ? { totalAmountMin: undefined, totalAmountMax: undefined }
+          : amountType === 'range'
+          ? { totalAmount: undefined }
+          : { totalAmount: undefined, totalAmountMin: undefined, totalAmountMax: undefined };
+      const slotsPayload = unlimitedSlots ? { totalSlots: undefined } : {};
+      const imageUrl = data.imageUrl || '/scholarship-banner-placeholder.png';
+      mutation.mutate({ ...data, ...amountPayload, ...slotsPayload, imageUrl } as ScholarshipFormData);
+    } catch (err) {
+      showError('Error', err instanceof Error ? err.message : 'Something went wrong');
+      setLoading(false);
+    }
   };
 
   return (
@@ -333,6 +338,7 @@ function CreateScholarship() {
                             type="number"
                             disabled={loading}
                             placeholder="Amount per scholar"
+                            onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
                             className={`w-full pl-7 pr-4 py-3 rounded-lg border ${
                               errors.totalAmount ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
                             } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
@@ -357,6 +363,7 @@ function CreateScholarship() {
                               type="number"
                               disabled={loading}
                               placeholder="Min"
+                              onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
                               className={`w-full pl-7 pr-3 py-3 rounded-lg border ${
                                 errors.totalAmountMin ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
                               } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
@@ -376,6 +383,7 @@ function CreateScholarship() {
                               type="number"
                               disabled={loading}
                               placeholder="Max"
+                              onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
                               className={`w-full pl-7 pr-3 py-3 rounded-lg border ${
                                 errors.totalAmountMax ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
                               } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
@@ -421,6 +429,7 @@ function CreateScholarship() {
                           type="number"
                           disabled={loading}
                           placeholder="Number of scholars"
+                          onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
                           className={`w-full px-4 py-3 rounded-lg border ${
                             errors.totalSlots ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
                           } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
