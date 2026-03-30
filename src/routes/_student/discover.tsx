@@ -10,7 +10,6 @@ import { useToast } from "@/hooks/useToast";
 import ScholarshipDetailsModal from "@/components/student/discover/ScholarshipDetailsDrawer";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import {
-	ScholarshipPurpose,
 	ScholarshipType,
 	type Scholarship,
 } from "@/lib/scholarship/model";
@@ -30,7 +29,6 @@ function DiscoverScholarship() {
 	const [sortBy, setSortBy] = useState("Newest");
 	const [scholarshipType, setScholarshipType] =
 		useState<ScholarshipType | null>(null);
-	const [purpose, setPurpose] = useState<ScholarshipPurpose | null>(null);
 	const [sponsorType, setSponsorType] = useState<SponsorType | null>(null);
 	const [amountRange, setAmountRange] = useState({ min: "", max: "" });
 	const [slotRange, setSlotRange] = useState({ min: "", max: "" });
@@ -60,9 +58,6 @@ function DiscoverScholarship() {
 				scholarshipType === null ||
 				scholarship.scholarshipType.code === scholarshipType;
 
-			const matchesPurpose =
-				purpose === null || scholarship.purpose.code === purpose;
-
 			const matchesSponsorType =
 				sponsorType === null ||
 				scholarship.sponsor?.sponsorType.code === sponsorType;
@@ -77,12 +72,11 @@ function DiscoverScholarship() {
 				(!amountRange.max || amountPerScholar <= Number(amountRange.max));
 
 			const matchesSlots =
-				(!slotRange.min || scholarship.totalSlots >= Number(slotRange.min)) &&
-				(!slotRange.max || scholarship.totalSlots <= Number(slotRange.max));
+				(!slotRange.min || (scholarship.totalSlots ?? 0) >= Number(slotRange.min)) &&
+				(!slotRange.max || (scholarship.totalSlots ?? 0) <= Number(slotRange.max));
 
 			return (
 				matchesType &&
-				matchesPurpose &&
 				matchesSponsorType &&
 				matchesAmount &&
 				matchesSlots
@@ -91,7 +85,6 @@ function DiscoverScholarship() {
 	}, [
 		scholarshipsQuery,
 		scholarshipType,
-		purpose,
 		sponsorType,
 		amountRange,
 		slotRange,
@@ -176,20 +169,10 @@ function DiscoverScholarship() {
 									options={[
 										null,
 										ScholarshipType.MeritBased,
-										ScholarshipType.SkillBased,
+										ScholarshipType.Combined,
 									]}
 									value={scholarshipType}
 									onChange={setScholarshipType}
-								/>
-								<Filters
-									title="Scholarship Purpose"
-									options={[
-										null,
-										ScholarshipPurpose.Allowance,
-										ScholarshipPurpose.Tuition,
-									]}
-									value={purpose}
-									onChange={setPurpose}
 								/>
 								<Filters
 									title="Sponsor Type"
@@ -305,21 +288,12 @@ function DiscoverScholarship() {
 							title="Scholarship Type"
 							options={[
 								null,
+								ScholarshipType.NeedBased,
 								ScholarshipType.MeritBased,
-								ScholarshipType.SkillBased,
+								ScholarshipType.Combined,
 							]}
 							value={scholarshipType}
 							onChange={setScholarshipType}
-						/>
-						<Filters
-							title="Scholarship Purpose"
-							options={[
-								null,
-								ScholarshipPurpose.Allowance,
-								ScholarshipPurpose.Tuition,
-							]}
-							value={purpose}
-							onChange={setPurpose}
 						/>
 						<Filters
 							title="Sponsor Type"

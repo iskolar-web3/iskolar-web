@@ -96,7 +96,7 @@ export function HomeApplications(props: Props): JSX.Element {
 								<div className="flex bg-[#3A52A6]">
 									<div className="relative w-32 h-32 shrink-0 bg-[#1D2A5B]">
 										<img
-											src={item.scholarship.imageUrl || ""}
+											src={item.scholarship.imageUrl || "/scholarship-banner-placeholder.png"}
 											alt={item.scholarship.name}
 											className="h-full w-full object-cover"
 										/>
@@ -112,9 +112,6 @@ export function HomeApplications(props: Props): JSX.Element {
 												<div className="flex gap-1 mb-3">
 													<span className="px-2 py-0.5 bg-white/90 text-secondary text-[10px] md:text-[11px] rounded whitespace-nowrap">
 														{item.scholarship.scholarshipType.name}
-													</span>
-													<span className="px-2 py-0.5 bg-white/90 text-secondary text-[10px] md:text-[11px] rounded whitespace-nowrap">
-														{item.scholarship.purpose.name}
 													</span>
 												</div>
 

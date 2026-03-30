@@ -1,6 +1,6 @@
-import { Calendar, Users, Coins, Images, UserIcon } from 'lucide-react';
-import { calculateAmountPerScholar, formatCurrency, formatDeadline } from '@/utils/formatting.utils';
-import { ScholarshipPurpose, ScholarshipType, type ScholarshipFormData } from '@/lib/scholarship/model';
+import { Calendar, Users, Coins, UserIcon } from 'lucide-react';
+import { formatCurrency, formatDeadline } from '@/utils/formatting.utils';
+import { ScholarshipType, type ScholarshipFormData } from '@/lib/scholarship/model';
 import { useAuth } from '@/auth';
 import type { AnySponsor } from '@/lib/sponsor/model';
 import { getSponsorName } from '@/lib/sponsor/api';
@@ -11,6 +11,10 @@ import { getSponsorName } from '@/lib/sponsor/api';
 interface ScholarshipPreviewCardProps {
   /** Partial scholarship data to display in preview */
   scholarship: Partial<ScholarshipFormData>;
+  /** Amount mode selected in the form */
+  amountType?: 'fixed' | 'range' | 'varies';
+  /** Whether slots are set to unlimited */
+  unlimitedSlots?: boolean;
   /** Optional callback when card is clicked */
   onClick?: () => void;
 }
@@ -21,30 +25,27 @@ interface ScholarshipPreviewCardProps {
  * @param props - Component props
  * @returns Preview card component with scholarship details
  */
-export default function ScholarshipPreviewCard({ scholarship, onClick }: ScholarshipPreviewCardProps) {
-  const amountPerScholar = calculateAmountPerScholar(scholarship.totalAmount, scholarship.totalSlots);
-  const auth = useAuth<AnySponsor>()
+export default function ScholarshipPreviewCard({ scholarship, amountType = 'fixed', unlimitedSlots = false, onClick }: ScholarshipPreviewCardProps) {
+  const auth = useAuth<AnySponsor>();
+
+  const isFixed = amountType === 'fixed';
+  const isRange = amountType === 'range';
+  const isVaries = amountType === 'varies';
 
   return (
     <div
       onClick={onClick}
-      className="bg-card rounded-xl overflow-hidden border border-[#D3DCF6] cursor-pointer transition-transform duration-200 hover:scale-98"
+      className="bg-card rounded-md overflow-hidden border border-[#D3DCF6] cursor-pointer transition-transform duration-200 hover:scale-98"
     >
       <div className="bg-[#3A52A6]">
         <div className="flex">
           {/* Image Section */}
           <div className="relative w-32 h-32 shrink-0">
-            {scholarship.imageUrl ? (
-              <img
-                src={scholarship.imageUrl}
-                alt="Preview"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full bg-white/20 flex items-center justify-center">
-                <Images className="text-tertiary/60" size={32} />
-              </div>
-            )}
+            <img
+              src={scholarship.imageUrl || "/scholarship-banner-placeholder.png"}
+              alt="Preview"
+              className="w-full h-full object-cover"
+            />
           </div>
 
           {/* Info */}
@@ -53,16 +54,16 @@ export default function ScholarshipPreviewCard({ scholarship, onClick }: Scholar
               {scholarship.name || 'Scholarship Title'}
             </h3>
 
-            {(scholarship.scholarshipType || scholarship.purpose) && (
+            {scholarship.scholarshipType && (
               <div className="flex flex-wrap items-center gap-2 mb-4">
-                {scholarship.scholarshipType && (
+                {scholarship.scholarshipType === ScholarshipType.Combined ? (
+                  <>
+                    <span className="px-2 py-0.5 bg-white/90 text-secondary text-[11px] rounded">Merit-Based</span>
+                    <span className="px-2 py-0.5 bg-white/90 text-secondary text-[11px] rounded">Need-Based</span>
+                  </>
+                ) : (
                   <span className="px-2 py-0.5 bg-white/90 text-secondary text-[11px] rounded">
-                    {scholarship.scholarshipType === ScholarshipType.MeritBased ? 'Merit-Based' : 'Skill-Based'}
-                  </span>
-                )}
-                {scholarship.purpose && (
-                  <span className="px-2 py-0.5 bg-white/90 text-secondary text-[11px] rounded">
-                    {scholarship.purpose === ScholarshipPurpose.Allowance ? 'Allowance' : 'Tuition'}
+                    {scholarship.scholarshipType === ScholarshipType.NeedBased ? 'Need-Based' : 'Merit-Based'}
                   </span>
                 )}
               </div>
@@ -101,21 +102,30 @@ export default function ScholarshipPreviewCard({ scholarship, onClick }: Scholar
               <Coins size={16} />
               <span>Amount</span>
             </div>
-            <p className="text-base text-primary">
-              {amountPerScholar !== null
-                ? formatCurrency(amountPerScholar, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                    showSpace: true,
-                  })
-                : scholarship.totalAmount
-                ? formatCurrency(scholarship.totalAmount, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })
-                : '₱0.00'}
-            </p>
-            <p className="text-xs text-[#6B7280]">per scholar</p>
+            {isFixed && (
+              <>
+                <p className="text-base text-primary">
+                  {formatCurrency(scholarship.totalAmount ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                </p>
+                <p className="text-xs text-[#6B7280]">per scholar</p>
+              </>
+            )}
+            {isRange && (
+              <>
+                <p className="text-base text-primary">
+                  {formatCurrency(scholarship.totalAmountMin ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                  {' – '}
+                  {formatCurrency(scholarship.totalAmountMax ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                </p>
+                <p className="text-xs text-[#6B7280]">per scholar</p>
+              </>
+            )}
+            {isVaries && (
+              <>
+                <p className="text-base text-primary">Varies</p>
+                <p className="text-xs text-[#6B7280]">see details</p>
+              </>
+            )}
           </div>
 
           <div className="bg-[#F9FAFB] border border-border rounded-lg p-3">
@@ -123,57 +133,8 @@ export default function ScholarshipPreviewCard({ scholarship, onClick }: Scholar
               <Users size={16} />
               <span>Slots</span>
             </div>
-            <p className="text-base text-primary">{scholarship.totalSlots || '0'}</p>
+            <p className="text-base text-primary">{unlimitedSlots ? 'No limit' : (scholarship.totalSlots ?? 0)}</p>
             <p className="text-xs text-[#6B7280]">scholars</p>
-          </div>
-        </div>
-
-        {/* Criteria and Required Documents */}
-        <div className="mt-2 grid grid-cols-2 gap-8 text-sm">
-          <div>
-            <h4 className="text-[#4B5563] text-xs tracking-wider mb-2">Criteria</h4>
-            {scholarship.criterias && scholarship.criterias.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {scholarship.criterias.slice(0, 2).map((c, i) => (
-                  <span
-                    key={i}
-                    className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[11px] rounded border border-border"
-                  >
-                    {c}
-                  </span>
-                ))}
-                {scholarship.criterias.length > 2 && (
-                  <span className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[11px] rounded border border-border">
-                    +{scholarship.criterias.length - 2} more
-                  </span>
-                )}
-              </div>
-            ) : (
-              <p className="text-[#9CA3AF] text-xs">No criteria added</p>
-            )}
-          </div>
-
-          <div>
-            <h4 className="text-[#4B5563] text-xs tracking-wider mb-2">Required Documents</h4>
-            {scholarship.requirements && scholarship.requirements.length > 0 ? (
-              <div className="flex flex-wrap gap-2">
-                {scholarship.requirements.slice(0, 2).map((d, i) => (
-                  <span
-                    key={i}
-                    className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[11px] rounded border border-border"
-                  >
-                    {d}
-                  </span>
-                ))}
-                {scholarship.requirements.length > 2 && (
-                  <span className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[11px] rounded border border-border">
-                    +{scholarship.requirements.length - 2} more
-                  </span>
-                )}
-              </div>
-            ) : (
-              <p className="text-[#9CA3AF] text-xs">No documents added</p>
-            )}
           </div>
         </div>
       </div>

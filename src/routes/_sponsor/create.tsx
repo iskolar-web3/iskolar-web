@@ -23,13 +23,15 @@ import ScholarshipFullPreviewModal from '@/components/sponsor/create-scholarship
 import CustomFormFieldModal from '@/components/sponsor/create-scholarship/CustomFormFieldModal';
 import CustomFormFieldsList from '@/components/sponsor/create-scholarship/CustomFormFieldsList';
 import DescriptionModal from '@/components/sponsor/create-scholarship/DescriptionModal';
+import PresetPickerPopover from '@/components/sponsor/create-scholarship/PresetPickerPopover';
+import { PRESET_CRITERIA, PRESET_DOCUMENTS } from '@/lib/scholarship/presets';
 import { useScholarshipForm } from '@/hooks/useScholarshipForm';
 import { useScholarshipPreview } from '@/hooks/useScholarshipPreview';
 import { useToast } from '@/hooks/useToast';
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { useAuth } from '@/auth';
 import type { AnySponsor } from '@/lib/sponsor/model';
-import { ScholarshipPurpose, ScholarshipStatus, ScholarshipType, type CreateFormFieldRequest, type Scholarship, type ScholarshipFormData } from '@/lib/scholarship/model';
+import { ScholarshipStatus, ScholarshipType, type CreateFormFieldRequest, type Scholarship, type ScholarshipFormData } from '@/lib/scholarship/model';
 import { BACKEND_URL, type ApiResponse } from '@/lib/api';
 import { ACCESS_TOKEN_KEY } from '@/lib/user/auth';
 import { getCookie } from '@/lib/cookie';
@@ -65,16 +67,12 @@ function CreateScholarship() {
   const {
     form,
     imagePreview,
-    criteriaInput,
-    setCriteriaInput,
-    documentsInput,
-    setDocumentsInput,
     handleImageUpload,
     removeImage,
-    addCriterion,
     removeCriterion,
-    addDocument,
     removeDocument,
+    addCriterionDirect,
+    addDocumentDirect,
     resetForm,
   } = useScholarshipForm(auth.profile.id);
 
@@ -86,6 +84,8 @@ function CreateScholarship() {
   const [editingFieldIndex, setEditingFieldIndex] = useState<number | null>(null);
   const [showFullPreview, setShowFullPreview] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [amountType, setAmountType] = useState<'fixed' | 'varies' | 'range'>('fixed');
+  const [unlimitedSlots, setUnlimitedSlots] = useState(false);
 
   const criteria = watch('criterias');
   const requiredDocuments = watch('requirements');
@@ -93,19 +93,21 @@ function CreateScholarship() {
   const description = watch('description');
   const title = watch('name');
   const totalAmount = watch('totalAmount');
+  const totalAmountMin = watch('totalAmountMin');
+  const totalAmountMax = watch('totalAmountMax');
   const totalSlot = watch('totalSlots');
   const applicationDeadline = watch('applicationDeadline');
   const scholarshipType = watch('scholarshipType');
-  const purpose = watch('purpose');
   const imageUrl = watch('imageUrl');
 
   const { previewScholarship } = useScholarshipPreview({
     scholarshipType,
-    purpose,
     name: title,
     description,
     imageUrl,
     totalAmount,
+    totalAmountMin,
+    totalAmountMax,
     totalSlots: totalSlot,
     applicationDeadline,
     criterias: criteria,
@@ -161,58 +163,75 @@ function CreateScholarship() {
 	});
 
   const onSubmit = async (data: ScholarshipFormData) => {
+    if (amountType === 'fixed' && !data.totalAmount) {
+      form.setError('totalAmount', { message: 'Please enter a valid amount' });
+      return;
+    }
+    if (amountType === 'range') {
+      if (!data.totalAmountMin) {
+        form.setError('totalAmountMin', { message: 'Please enter a minimum amount' });
+        return;
+      }
+      if (!data.totalAmountMax) {
+        form.setError('totalAmountMax', { message: 'Please enter a maximum amount' });
+        return;
+      }
+      if (data.totalAmountMin >= data.totalAmountMax) {
+        form.setError('totalAmountMax', { message: 'Max must be greater than min' });
+        return;
+      }
+    }
+    if (!unlimitedSlots && !data.totalSlots) {
+      form.setError('totalSlots', { message: 'Please enter the number of slots' });
+      return;
+    }
     setLoading(true);
-    mutation.mutate(data)
+    try {
+      const amountPayload: Partial<ScholarshipFormData> =
+        amountType === 'fixed'
+          ? { totalAmountMin: undefined, totalAmountMax: undefined }
+          : amountType === 'range'
+          ? { totalAmount: undefined }
+          : { totalAmount: undefined, totalAmountMin: undefined, totalAmountMax: undefined };
+      const slotsPayload = unlimitedSlots ? { totalSlots: undefined } : {};
+      const imageUrl = data.imageUrl || '/scholarship-banner-placeholder.png';
+      mutation.mutate({ ...data, ...amountPayload, ...slotsPayload, imageUrl } as ScholarshipFormData);
+    } catch (err) {
+      showError('Error', err instanceof Error ? err.message : 'Something went wrong');
+      setLoading(false);
+    }
   };
 
   return (
     <div className="max-w-7xl mx-auto">
       {toast && <Toast {...toast} />}
       
-      <div className="grid grid-cols-1 lg:grid-cols-2">
+      <div className="grid grid-cols-1 lg:grid-cols-15">
         {/* Scholarship Details */}
-        <div className="space-y-4">
-          {/* Type and Purpose */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Select 
-                value={scholarshipType} 
-                onValueChange={(value) => setValue('scholarshipType', value as ScholarshipType, { shouldValidate: true })}
-              >
-                <SelectTrigger disabled={loading} className={`w-full px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-[placeholder]:text-gray-400 ${
-                  errors.scholarshipType
-                    ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary'
-                    : 'border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary'
-                }`}>
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={ScholarshipType.MeritBased}>Merit-Based</SelectItem>
-                  <SelectItem value={ScholarshipType.SkillBased}>Skill-Based</SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.scholarshipType && <p className="text-xs text-[#EF4444] mt-1">{errors.scholarshipType.message}</p>}
-            </div>
-
-            <div>
-              <Select 
-                value={purpose} 
-                onValueChange={(value) => setValue('purpose', value as ScholarshipPurpose, { shouldValidate: true })}
-              >
-                <SelectTrigger disabled={loading} className={`w-full px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-[placeholder]:text-gray-400 ${
-                  errors.purpose
-                    ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary'
-                    : 'border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary'
-                }`}>
-                  <SelectValue placeholder="Select purpose" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={ScholarshipPurpose.Allowance}>Allowance</SelectItem>
-                  <SelectItem value={ScholarshipPurpose.Tuition}>Tuition</SelectItem>
-                </SelectContent>
-              </Select>
-              {errors.purpose && <p className="text-xs text-[#EF4444] mt-1">{errors.purpose.message}</p>}
-            </div>
+        <div className="space-y-4 lg:col-span-8">
+          {/* Type */}
+          <div>
+            <label className="block text-xs text-[#6B7280] mb-1.5 ml-0.5">
+              Scholarship Type <span className="text-[#EF4444]">*</span>
+            </label>
+            <Select
+              value={scholarshipType}
+              onValueChange={(value) => setValue('scholarshipType', value as ScholarshipType, { shouldValidate: true })}
+            >
+              <SelectTrigger disabled={loading} className={`w-full cursor-pointer px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
+                errors.scholarshipType
+                  ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary'
+                  : 'border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary'
+              }`}>
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ScholarshipType.MeritBased}>Merit-Based</SelectItem>
+                <SelectItem value={ScholarshipType.NeedBased}>Need-Based</SelectItem>
+                <SelectItem value={ScholarshipType.Combined}>Combined (Merit-Based + Need-Based)</SelectItem>
+              </SelectContent>
+            </Select>
+            {errors.scholarshipType && <p className="text-xs text-[#EF4444] mt-1">{errors.scholarshipType.message}</p>}
           </div>
 
           <div className="bg-[#F8F9FC] rounded-xl p-3 shadow-sm">
@@ -233,9 +252,7 @@ function CreateScholarship() {
                       </button>
                     </div>
                   ) : (
-                    <div className={`border-2 border-dashed ${
-                      errors.imageUrl ? 'border-[#EF4444]' : 'border-[#3A52A6]'
-                    } rounded-lg text-center cursor-pointer hover:bg-[#F0F7FF] transition-colors flex flex-col items-center justify-center w-full aspect-square px-4`}>
+                    <div className="border-2 border-dashed border-[#3A52A6] rounded-lg text-center cursor-pointer hover:bg-[#F0F7FF] transition-colors flex flex-col items-center justify-center w-full aspect-square px-4">
                       <Upload className="mb-3 text-[#5B7BA6]" size={40} />
                       <p className="text-secondary text-sm opacity-70">Click to select an image</p>
                       <input
@@ -247,23 +264,25 @@ function CreateScholarship() {
                     </div>
                   )}
                 </label>
-                {errors.imageUrl && <p className="text-xs text-[#EF4444] mt-1">{errors.imageUrl.message}</p>}
               </div>
 
-              <div className="md:w-2/3 space-y-3.5">
+              <div className="md:w-2/3 space-y-4">
                 {/* Title */}
                 <div>
+                  <label className="block text-xs text-[#6B7280] mb-1 ml-0.5">
+                    Title <span className="text-[#EF4444]">*</span>
+                  </label>
                   <Controller
                     control={control}
                     name="name"
                     render={({ field }) => (
                       <input
                         {...field}
-                        placeholder="Scholarship Title"
+                        placeholder="Enter Scholarship Title"
                         disabled={loading}
                         className={`w-full text-2xl border-b-2 ${
-                          errors.name ? 'border-[#EF4444]' : 'border-transparent'
-                        } bg-transparent pb-2 focus:outline-none focus:border-[#3A52A6] text-primary`}
+                          errors.name ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
+                        } bg-transparent pb-2 focus:outline-none focus:border-[#3A52A6] text-primary transition-colors`}
                       />
                     )}
                   />
@@ -281,28 +300,124 @@ function CreateScholarship() {
                   {description ? 'Edit Description' : 'Add Description'}
                 </button>
 
-                {/* Total Amount & Slot */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
+                {/* Scholarship Amount */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs text-[#6B7280]">Scholarship Amount</span>
+                    <div className="flex rounded-sm overflow-hidden border border-[#C4CBD5] text-xs h-7">
+                      {(['fixed', 'range', 'varies'] as const).map((t) => (
+                        <button
+                          key={t}
+                          type="button"
+                          disabled={loading}
+                          onClick={() => {
+                            setAmountType(t);
+                            setValue('totalAmount', undefined);
+                            setValue('totalAmountMin', undefined);
+                            setValue('totalAmountMax', undefined);
+                            form.clearErrors(['totalAmount', 'totalAmountMin', 'totalAmountMax']);
+                          }}
+                          className={`px-3 capitalize cursor-pointer transition-colors ${amountType === t ? 'bg-[#3A52A6] text-white' : 'bg-[#F8F9FC] text-[#6B7280] hover:bg-gray-100'}`}
+                        >
+                          {t}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  {amountType === 'fixed' && (
                     <Controller
                       control={control}
                       name="totalAmount"
                       render={({ field }) => (
-                        <input
-                          {...field}
-                          type="number"
-                          disabled={loading}
-                          placeholder="Total amount"
-                          className={`w-full px-4 py-3 rounded-lg border ${
-                            errors.totalAmount ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
-                          } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
-                        />
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#6B7280]">₱</span>
+                          <input
+                            {...field}
+                            type="number"
+                            disabled={loading}
+                            placeholder="Amount per scholar"
+                            onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
+                            className={`w-full pl-7 pr-4 py-3 rounded-lg border ${
+                              errors.totalAmount ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
+                            } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
+                          />
+                        </div>
                       )}
                     />
-                    {errors.totalAmount && <p className="text-xs text-[#EF4444] mt-1">{errors.totalAmount.message}</p>}
-                  </div>
+                  )}
+                  {amountType === 'varies' && (
+                    <p className="text-xs text-[#6B7280] px-1 py-2.5">Amount varies — describe it in the description field.</p>
+                  )}
+                  {amountType === 'range' && (
+                    <div className="flex items-center gap-2">
+                      <Controller
+                        control={control}
+                        name="totalAmountMin"
+                        render={({ field }) => (
+                          <div className="relative flex-1">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#6B7280]">₱</span>
+                            <input
+                              {...field}
+                              type="number"
+                              disabled={loading}
+                              placeholder="Min"
+                              onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
+                              className={`w-full pl-7 pr-3 py-3 rounded-lg border ${
+                                errors.totalAmountMin ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
+                              } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
+                            />
+                          </div>
+                        )}
+                      />
+                      <span className="text-xs text-[#6B7280] shrink-0">to</span>
+                      <Controller
+                        control={control}
+                        name="totalAmountMax"
+                        render={({ field }) => (
+                          <div className="relative flex-1">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#6B7280]">₱</span>
+                            <input
+                              {...field}
+                              type="number"
+                              disabled={loading}
+                              placeholder="Max"
+                              onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
+                              className={`w-full pl-7 pr-3 py-3 rounded-lg border ${
+                                errors.totalAmountMax ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
+                              } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
+                            />
+                          </div>
+                        )}
+                      />
+                    </div>
+                  )}
+                  {errors.totalAmount && <p className="text-xs text-[#EF4444] mt-1">{errors.totalAmount.message}</p>}
+                  {errors.totalAmountMin && <p className="text-xs text-[#EF4444] mt-1">{errors.totalAmountMin.message}</p>}
+                  {errors.totalAmountMax && <p className="text-xs text-[#EF4444] mt-1">{errors.totalAmountMax.message}</p>}
+                </div>
 
-                  <div>
+                {/* Available Slots */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs text-[#6B7280]">Available Slots</span>
+                    <label className="flex items-center gap-1.5 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={unlimitedSlots}
+                        disabled={loading}
+                        onChange={(e) => {
+                          setUnlimitedSlots(e.target.checked);
+                          if (e.target.checked) {
+                            setValue('totalSlots', undefined);
+                            form.clearErrors('totalSlots');
+                          }
+                        }}
+                        className="w-3.5 h-3.5 cursor-pointer accent-[#3A52A6]"
+                      />
+                      <span className="text-xs text-[#6B7280]">No limit</span>
+                    </label>
+                  </div>
+                  {!unlimitedSlots && (
                     <Controller
                       control={control}
                       name="totalSlots"
@@ -311,19 +426,23 @@ function CreateScholarship() {
                           {...field}
                           type="number"
                           disabled={loading}
-                          placeholder="Total slots"
+                          placeholder="Number of scholars"
+                          onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
                           className={`w-full px-4 py-3 rounded-lg border ${
                             errors.totalSlots ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
                           } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
                         />
                       )}
                     />
-                    {errors.totalSlots && <p className="text-xs text-[#EF4444] mt-1">{errors.totalSlots.message}</p>}
-                  </div>
+                  )}
+                  {errors.totalSlots && <p className="text-xs text-[#EF4444] mt-1">{errors.totalSlots.message}</p>}
                 </div>
 
                 {/* Application Deadline */}
                 <div>
+                  <label className="block text-xs text-[#6B7280] mb-1.5 ml-0.5">
+                    Application Deadline <span className="text-[#EF4444]">*</span>
+                  </label>
                   <Controller
                     control={control}
                     name="applicationDeadline"
@@ -333,7 +452,7 @@ function CreateScholarship() {
                           <button
                             type="button"
                             disabled={loading}
-                            className={`w-full px-4 py-3 text-sm border rounded-lg bg-[#F8F9FC] focus:outline-none focus:ring-2 focus:ring-[#3A52A6] flex items-center justify-between ${
+                            className={`w-full cursor-pointer px-4 py-3 text-sm border rounded-lg bg-[#F8F9FC] focus:outline-none focus:ring-2 focus:ring-[#3A52A6] flex items-center justify-between ${
                               field.value ? 'text-primary' : 'text-gray-400'
                             } ${errors.applicationDeadline ? 'border-[#EF4444]' : 'border-[#C4CBD5]'}`}
                           >
@@ -373,26 +492,17 @@ function CreateScholarship() {
 
           {/* Criteria */}
           <div>
-            <div className="flex gap-2">
-              <input
-                value={criteriaInput}
-                disabled={loading}
-                onChange={(e) => setCriteriaInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCriterion())}
-                placeholder="Enter eligibility criterion"
-                className={`flex-1 px-4 py-3 rounded-lg border ${
-                  errors.criterias ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
-                } bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
-              />
-              <button
-                type="button"
-                disabled={loading}
-                onClick={addCriterion}
-                className="w-11 h-11 bg-[#3A52A6] text-tertiary rounded-lg flex items-center justify-center hover:bg-[#2A4296] transition-colors"
-              >
-                <Plus size={20} />
-              </button>
-            </div>
+            <label className="block text-xs text-[#6B7280] mb-1.5 ml-0.5">
+              Eligibility Criteria <span className="text-[#EF4444]">*</span>
+            </label>
+            <PresetPickerPopover
+              presets={PRESET_CRITERIA}
+              selectedItems={criteria}
+              onSelect={addCriterionDirect}
+              disabled={loading}
+              hasError={!!errors.criterias}
+              placeholder="Select eligibility criteria"
+            />
             {errors.criterias && <p className="text-xs text-[#EF4444] mt-1">{errors.criterias.message}</p>}
             {criteria.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-3">
@@ -410,31 +520,22 @@ function CreateScholarship() {
 
           {/* Required Documents */}
           <div>
-            <div className="flex gap-2">
-              <input
-                value={documentsInput}
-                disabled={loading}
-                onChange={(e) => setDocumentsInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addDocument())}
-                placeholder="Enter required document"
-                className={`flex-1 px-4 py-3 rounded-lg border ${
-                  errors.requirements ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
-                } bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
-              />
-              <button
-                type="button"
-                disabled={loading}
-                onClick={addDocument}
-                className="w-11 h-11 bg-[#3A52A6] text-tertiary rounded-lg flex items-center justify-center hover:bg-[#2A4296] transition-colors"
-              >
-                <Plus size={20} />
-              </button>
-            </div>
+            <label className="block text-xs text-[#6B7280] mb-1.5 ml-0.5">
+              Required Documents <span className="text-[#EF4444]">*</span>
+            </label>
+            <PresetPickerPopover
+              presets={PRESET_DOCUMENTS}
+              selectedItems={requiredDocuments}
+              onSelect={addDocumentDirect}
+              disabled={loading}
+              hasError={!!errors.requirements}
+              placeholder="Select required documents"
+            />
             {errors.requirements && <p className="text-xs text-[#EF4444] mt-1">{errors.requirements.message}</p>}
             {requiredDocuments.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-3">
                 {requiredDocuments.map((doc, index) => (
-                  <span key={index} className="inline-flex items-center gap-2 px-3 py-2 bg-[#F9FAFB] text-[#374151] text-xs rounded-md border border-border rounded-lg">
+                  <span key={index} className="inline-flex items-center gap-2 px-3 py-2 bg-[#F9FAFB] text-[#374151] text-xs rounded-md border border-border">
                     {doc}
                     <button disabled={loading} onClick={() => removeDocument(index)} className="hover:text-[#2A4296]">
                       <X size={14} />
@@ -448,7 +549,7 @@ function CreateScholarship() {
           {/* Custom Form Fields */}
           <div>
             <div className="mb-3">
-              <label className="block text-sm text-[#4A5568] mb-1 ml-0.5">Application Form</label>
+              <label className="block text-sm text-[#4A5568] mb-1 ml-0.5">Application Form <span className="text-[#EF4444]">*</span></label>
               <p className="text-xs text-[#6B7280] ml-0.5">Add custom fields to collect information from applicants.</p>
             </div>
 
@@ -493,13 +594,15 @@ function CreateScholarship() {
         </div>
 
         {/* Live Preview */}
-        <div className="lg:sticky lg:top-6 h-fit md:ml-24">
+        <div className="lg:sticky lg:col-span-7 lg:top-6 h-fit md:ml-24">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-sm text-primary">Live Preview</h2>
           </div>
           
-          <ScholarshipPreviewCard 
+          <ScholarshipPreviewCard
             scholarship={previewScholarship}
+            amountType={amountType}
+            unlimitedSlots={unlimitedSlots}
             onClick={() => setShowFullPreview(true)}
           />
         </div>

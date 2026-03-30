@@ -1,17 +1,17 @@
-import { useState, useCallback } from "react";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { normalizeText } from "@/utils/normalize.utils";
-import {
-	createScholarshipRequestSchema,
-	ScholarshipStatus,
-	type ScholarshipFormData,
-} from "@/lib/scholarship/model";
+import { useCallback, useState } from "react";
+import { useForm } from "react-hook-form";
 // import { useAuth } from "@/auth";
 // import type { AnySponsor } from "@/lib/sponsor/model";
 import { uploadFile } from "@/lib/api";
-import { ACCESS_TOKEN_KEY } from "@/lib/user/auth";
 import { getCookie } from "@/lib/cookie";
+import {
+	createScholarshipRequestSchema,
+	type ScholarshipFormData,
+	ScholarshipStatus,
+} from "@/lib/scholarship/model";
+import { ACCESS_TOKEN_KEY } from "@/lib/user/auth";
+import { normalizeText } from "@/utils/normalize.utils";
 
 /**
  * Custom hook for managing scholarship creation/edit form
@@ -44,7 +44,7 @@ export function useScholarshipForm(sponsorId: string) {
 		defaultValues: {
 			criterias: [],
 			formFields: [],
-			imageUrl: "",
+			imageUrl: undefined,
 			description: "",
 			name: "",
 			requirements: [],
@@ -85,7 +85,7 @@ export function useScholarshipForm(sponsorId: string) {
 
 	const removeImage = useCallback(() => {
 		setImagePreview(null);
-		form.setValue("imageUrl", "", { shouldValidate: true });
+		form.setValue("imageUrl", undefined, { shouldValidate: false });
 	}, [form]);
 
 	const addCriterion = useCallback(() => {
@@ -118,6 +118,30 @@ export function useScholarshipForm(sponsorId: string) {
 		}
 	}, [documentsInput, requirements, form]);
 
+	const addCriterionDirect = useCallback(
+		(value: string) => {
+			const normalized = normalizeText(value);
+			if (normalized && !criteria.includes(normalized)) {
+				form.setValue("criterias", [...criteria, normalized], {
+					shouldValidate: true,
+				});
+			}
+		},
+		[criteria, form],
+	);
+
+	const addDocumentDirect = useCallback(
+		(value: string) => {
+			const normalized = normalizeText(value);
+			if (normalized && !requirements.includes(normalized)) {
+				form.setValue("requirements", [...requirements, normalized], {
+					shouldValidate: true,
+				});
+			}
+		},
+		[requirements, form],
+	);
+
 	const removeDocument = useCallback(
 		(index: number) => {
 			form.setValue(
@@ -148,6 +172,8 @@ export function useScholarshipForm(sponsorId: string) {
 		removeCriterion,
 		addDocument,
 		removeDocument,
+		addCriterionDirect,
+		addDocumentDirect,
 		resetForm,
 	};
 }

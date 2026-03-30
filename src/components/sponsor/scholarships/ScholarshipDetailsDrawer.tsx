@@ -4,7 +4,6 @@ import {
 	Users,
 	Coins,
 	ChevronsRight,
-	Images,
 	Edit2,
 	Trash2,
 	Archive,
@@ -20,11 +19,10 @@ import {
 	DialogFooter,
 } from "@/components/ui/dialog";
 import {
-	calculateAmountPerScholar,
 	formatCurrency,
 	formatDeadline,
 } from "@/utils/formatting.utils";
-import { FormFieldType, ScholarshipStatus, type Scholarship } from "@/lib/scholarship/model";
+import { FormFieldType, ScholarshipStatus, ScholarshipType, type Scholarship } from "@/lib/scholarship/model";
 import { getSponsorName } from "@/lib/sponsor/api";
 import { getFieldTypeLabel, renderFieldTypeIcon } from "@/utils/formField.utils";
 
@@ -61,10 +59,9 @@ export default function ScholarshipDetailsModal({
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const [loading, setLoading] = useState(false);
 
-	const amountPerScholar = calculateAmountPerScholar(
-		scholarship.totalAmount,
-		scholarship.totalSlots,
-	);
+	const isRange = scholarship.totalAmountMin != null || scholarship.totalAmountMax != null;
+	const isFixed = !isRange && scholarship.totalAmount != null;
+	const isVaries = !isRange && !isFixed;
 
 	/**
 	 * Checks if the scholarship is closed
@@ -143,7 +140,7 @@ export default function ScholarshipDetailsModal({
 						stiffness: 300,
 						duration: 0.1,
 					}}
-					className="relative w-full max-w-[30rem] h-full bg-card shadow-2xl rounded-lg overflow-y-auto custom-scrollbar"
+					className="relative w-full max-w-120 h-full bg-card shadow-2xl rounded-lg overflow-y-auto custom-scrollbar"
 				>
 					{/* Header */}
 					<div className="sticky top-0 bg-card border-b border-border px-5 py-3 flex items-center justify-between z-10">
@@ -181,17 +178,11 @@ export default function ScholarshipDetailsModal({
 
 						{/* Image Banner */}
 						<div className="relative w-full aspect-square mb-5 rounded-lg overflow-hidden shadow-[0_0_20px_2px_rgba(0,0,0,0.2)]">
-							{scholarship.imageUrl ? (
-								<img
-									src={scholarship.imageUrl}
-									alt={scholarship.name || "Scholarship"}
-									className="w-full h-full object-cover"
-								/>
-							) : (
-								<div className="w-full h-full bg-gray-100 flex items-center justify-center">
-									<Images className="text-gray-400" size={80} />
-								</div>
-							)}
+							<img
+								src={scholarship.imageUrl || "/scholarship-banner-placeholder.png"}
+								alt={scholarship.name || "Scholarship"}
+								className="w-full h-full object-cover"
+							/>
 						</div>
 
 						{/* Title and Badges */}
@@ -199,14 +190,14 @@ export default function ScholarshipDetailsModal({
 							{scholarship.name || "Scholarship Title"}
 						</h1>
 						<div className="flex gap-2 mb-4">
-							{scholarship.scholarshipType.code && (
+							{scholarship.scholarshipType.code === ScholarshipType.Combined ? (
+								<>
+									<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">Merit-Based</span>
+									<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">Need-Based</span>
+								</>
+							) : (
 								<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">
 									{scholarship.scholarshipType.name}
-								</span>
-							)}
-							{scholarship.purpose.code && (
-								<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">
-									{scholarship.purpose.name}
 								</span>
 							)}
 						</div>
@@ -214,7 +205,7 @@ export default function ScholarshipDetailsModal({
 						{/* Sponsor and Deadline */}
 						<div className="space-y-3 mb-4 text-[#6B7280]">
 							<div className="flex items-center gap-2">
-								<div className="w-5.5 h-5.5 rounded-full flex items-center justify-center flex-shrink-0">
+								<div className="w-5.5 h-5.5 rounded-full flex items-center justify-center shrink-0">
 									{scholarship?.sponsor?.avatarUrl ? (
 										<img
 											src={scholarship?.sponsor?.avatarUrl}
@@ -255,15 +246,9 @@ export default function ScholarshipDetailsModal({
 									<Coins size={16} />
 									<span className="text-xs">Amount</span>
 								</div>
-								<p className="text-base text-primary mb-0.5">
-									{amountPerScholar !== null
-										? formatCurrency(amountPerScholar, {
-												minimumFractionDigits: 2,
-												maximumFractionDigits: 2,
-											})
-										: "₱0.00"}
-								</p>
-								<p className="text-xs text-[#6B7280]">per scholar</p>
+								{isFixed && (<><p className="text-base text-primary mb-0.5">{formatCurrency(scholarship.totalAmount!, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p><p className="text-xs text-[#6B7280]">per scholar</p></>)}
+								{isRange && (<><p className="text-base text-primary mb-0.5">{formatCurrency(scholarship.totalAmountMin ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} – {formatCurrency(scholarship.totalAmountMax ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p><p className="text-xs text-[#6B7280]">per scholar</p></>)}
+								{isVaries && (<><p className="text-base text-primary mb-0.5">Varies</p><p className="text-xs text-[#6B7280]">see details</p></>)}
 							</div>
 
 							<div className="bg-[#F9FAFB] border border-border rounded-lg p-3">
@@ -272,7 +257,7 @@ export default function ScholarshipDetailsModal({
 									<span className="text-xs">Slots</span>
 								</div>
 								<p className="text-base text-primary mb-0.5">
-									{scholarship.totalSlots || 0}
+									{scholarship.totalSlots ?? "No limit"}
 								</p>
 								<p className="text-xs text-[#6B7280]">scholars</p>
 							</div>
@@ -282,7 +267,7 @@ export default function ScholarshipDetailsModal({
 						{scholarship.description && (
 							<div className="mb-6">
 								<h3 className="text-sm text-primary mb-2">About Scholarship</h3>
-								<p className="text-[#6B7280] text-xs leading-relaxed">
+								<p className="text-[#6B7280] text-xs leading-relaxed whitespace-pre-wrap">
 									{scholarship.description}
 								</p>
 							</div>
@@ -343,7 +328,7 @@ export default function ScholarshipDetailsModal({
 											key={i}
 											className="flex items-start gap-3 p-3 bg-[#F9FAFB] border border-[#E0ECFF] rounded-lg"
 										>
-											<div className="w-9 h-9 bg-[#E0ECFF] rounded-lg flex items-center justify-center flex-shrink-0">
+											<div className="w-9 h-9 bg-[#E0ECFF] rounded-lg flex items-center justify-center shrink-0">
 												{renderFieldTypeIcon(fieldType)}
 											</div>
 											<div className="flex-1 min-w-0">
