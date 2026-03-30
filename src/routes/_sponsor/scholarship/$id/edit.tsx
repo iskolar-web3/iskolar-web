@@ -31,7 +31,7 @@ import CustomFormFieldModal from "@/components/sponsor/create-scholarship/Custom
 import PresetPickerPopover from "@/components/sponsor/create-scholarship/PresetPickerPopover";
 import { PRESET_CRITERIA, PRESET_DOCUMENTS } from "@/lib/scholarship/presets";
 import { useToast } from "@/hooks/useToast";
-import { usePageTitle } from "@/hooks/usePageTitle";
+import { SEO } from "@/components/SEO";
 import { handleError } from "@/lib/errorHandler";
 import { logger } from "@/lib/logger";
 import {
@@ -98,7 +98,6 @@ export const Route = createFileRoute("/_sponsor/scholarship/$id/edit")({
 //
 
 function EditScholarshipPage() {
-	usePageTitle("Edit");
 
 	const params = Route.useParams();
 
@@ -403,6 +402,7 @@ function EditScholarshipPage() {
 
 	return (
 		<div className="min-h-screen">
+			<SEO title="Edit Scholarship" noindex={true} />
 			{toast && <Toast {...toast} />}
 
 			<div className="max-w-160 mx-auto">
