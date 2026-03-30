@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { usePageTitle } from "@/hooks/usePageTitle";
+import { SEO } from "@/components/SEO";
 import Toast from "@/components/Toast";
 import { useToast } from "@/hooks/useToast";
 import Preloader from "@/components/Preloader";
@@ -221,8 +221,6 @@ async function createGovernmentSponsor(
 }
 
 function ProfileSetup() {
-	usePageTitle("Profile Setup");
-
 	const navigate = useNavigate();
 	const { role } = Route.useSearch();
 
@@ -561,6 +559,7 @@ function ProfileSetup() {
 
 	return (
 		<>
+			<SEO title="Profile Setup" noindex={true} />
 			{showPreloader && (
 				<Preloader onComplete={handlePreloaderComplete} minDisplayTime={2000} />
 			)}

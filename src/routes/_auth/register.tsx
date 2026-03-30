@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { usePageTitle } from "@/hooks/usePageTitle";
+import { SEO } from "@/components/SEO";
 import Toast from "@/components/Toast";
 import { useToast } from "@/hooks/useToast";
 import { SiGoogle } from "react-icons/si";
@@ -60,8 +60,6 @@ async function register(value: RegisterFormData): Promise<User> {
 }
 
 function RegisterPage(): JSX.Element {
-	usePageTitle("Sign Up");
-
 	const navigate = useNavigate();
 
 	// TODO: Remove this and use mutation.isPending instead
@@ -101,6 +99,7 @@ function RegisterPage(): JSX.Element {
 
 	return (
 		<>
+			<SEO title="Sign Up" noindex={true} />
 			{toast && <Toast {...toast} />}
 
 			<motion.div

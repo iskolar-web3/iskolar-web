@@ -1,15 +1,13 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import type { Variants } from 'framer-motion'
-import { usePageTitle } from "../../hooks/usePageTitle";
+import { SEO } from "@/components/SEO";
 
 export const Route = createFileRoute('/_onboarding/welcome')({
   component: WelcomePage,
 })
 
 function WelcomePage() {
-  usePageTitle("Welcome");
-
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
@@ -90,10 +88,12 @@ function WelcomePage() {
   const subtitleText = "Connecting Students and Sponsors";
 
   return (
-    <motion.div 
-      className="text-center"
-      variants={containerVariants}
-      initial="hidden"
+    <>
+      <SEO title="Welcome" noindex={true} />
+      <motion.div
+        className="text-center"
+        variants={containerVariants}
+        initial="hidden"
       animate="visible"
       exit="exit"
     >
@@ -158,5 +158,6 @@ function WelcomePage() {
         </Link>
       </motion.div>
     </motion.div>
+    </>
   );
 }

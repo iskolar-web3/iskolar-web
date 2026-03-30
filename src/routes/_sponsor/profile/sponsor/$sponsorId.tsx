@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { User, Building2, Edit } from "lucide-react";
 import { motion } from "framer-motion";
-import { usePageTitle } from "@/hooks/usePageTitle";
+import { SEO } from "@/components/SEO";
 import { useRef, useState } from "react";
 import { useToast } from "@/hooks/useToast";
 import { useMutation } from "@tanstack/react-query";
@@ -41,7 +41,6 @@ export const Route = createFileRoute("/_sponsor/profile/sponsor/$sponsorId")({
 });
 
 function SponsorProfile() {
-	usePageTitle("Profile");
 
 	const auth = useAuth<AnySponsor>();
 
@@ -149,6 +148,7 @@ function SponsorProfile() {
 
 	return (
 		<div className="min-h-screen">
+			<SEO title="Profile" noindex={true} />
 			{toast && <Toast {...toast} />}
 			<div className="max-w-176 mx-auto space-y-6">
 				{/* Profile Header */}

@@ -28,7 +28,7 @@ import { PRESET_CRITERIA, PRESET_DOCUMENTS } from '@/lib/scholarship/presets';
 import { useScholarshipForm } from '@/hooks/useScholarshipForm';
 import { useScholarshipPreview } from '@/hooks/useScholarshipPreview';
 import { useToast } from '@/hooks/useToast';
-import { usePageTitle } from "@/hooks/usePageTitle";
+import { SEO } from "@/components/SEO";
 import { useAuth } from '@/auth';
 import type { AnySponsor } from '@/lib/sponsor/model';
 import { ScholarshipStatus, ScholarshipType, type CreateFormFieldRequest, type Scholarship, type ScholarshipFormData } from '@/lib/scholarship/model';
@@ -61,7 +61,6 @@ async function createScholarship(value: ScholarshipFormData): Promise<ApiRespons
 
 
 function CreateScholarship() {
-  usePageTitle('Create');
 
   const auth = useAuth<AnySponsor>()
   const {
@@ -204,6 +203,7 @@ function CreateScholarship() {
 
   return (
     <div className="max-w-7xl mx-auto">
+      <SEO title="Create Scholarship" noindex={true} />
       {toast && <Toast {...toast} />}
       
       <div className="grid grid-cols-1 lg:grid-cols-15">
