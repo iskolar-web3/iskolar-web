@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SEO } from "@/components/SEO";
 import { useSmoothScroll } from "@/hooks/useSmoothScroll";
-import Navbar from "@/components/landing/Navbar"; 
+import Navbar from "@/components/landing/Navbar";
 import AnimatedBackground from "@/components/landing/AnimatedBackground";
 import { Hero } from "@/components/landing/sections/Hero";
+import { ScrollToTop } from "@/components/landing/ScrollToTop";
 import { Suspense, lazy } from "react";
 
 // Lazy load below-the-fold sections
@@ -37,6 +38,7 @@ function App() {
         <FAQ/>
         <Footer/>
       </Suspense>
+			<ScrollToTop />
 		</main>
 	);
 }

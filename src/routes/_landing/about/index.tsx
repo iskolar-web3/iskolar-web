@@ -8,6 +8,7 @@ import { Partnerships } from "@/components/landing/about/Partnerships"
 import CompanyOverviewSection from "@/components/landing/about/CompanyOverview"
 import MissionVisionSection from "@/components/landing/about/MissionVision"
 import TeamSection from "@/components/landing/about/Team"
+import { ScrollToTop } from "@/components/landing/ScrollToTop"
 import { useEffect } from 'react'
 
 export const Route = createFileRoute('/_landing/about/')({
@@ -47,6 +48,7 @@ function About() {
       </div>
 
       <Footer />
+      <ScrollToTop />
     </main>
   )
 }
