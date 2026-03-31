@@ -49,7 +49,7 @@ const landingLinks = [
 ];
 
 const SHOW_BETA_NOTICE = import.meta.env.VITE_SHOW_BETA_NOTICE !== "false";
-const COUNTDOWN_SECONDS = 11;
+const COUNTDOWN_SECONDS = 6;
 
 function useBlogImage(url: string) {
 	const [image, setImage] = useState<string | null>(null);
