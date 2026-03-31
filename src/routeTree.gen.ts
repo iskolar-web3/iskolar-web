@@ -21,8 +21,10 @@ import { Route as SponsorCreateRouteImport } from './routes/_sponsor/create'
 import { Route as OnboardingWelcomeRouteImport } from './routes/_onboarding/welcome'
 import { Route as OnboardingRoleSelectionRouteImport } from './routes/_onboarding/role-selection'
 import { Route as OnboardingProfileSetupRouteImport } from './routes/_onboarding/profile-setup'
+import { Route as AuthTermsConditionsRouteImport } from './routes/_auth/terms-conditions'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
+import { Route as AuthPrivacyPolicyRouteImport } from './routes/_auth/privacy-policy'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
 import { Route as AuthConfirmationRouteImport } from './routes/_auth/confirmation'
@@ -91,6 +93,11 @@ const OnboardingProfileSetupRoute = OnboardingProfileSetupRouteImport.update({
   path: '/profile-setup',
   getParentRoute: () => OnboardingRoute,
 } as any)
+const AuthTermsConditionsRoute = AuthTermsConditionsRouteImport.update({
+  id: '/terms-conditions',
+  path: '/terms-conditions',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -99,6 +106,11 @@ const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
 const AuthRegisterRoute = AuthRegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthPrivacyPolicyRoute = AuthPrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
@@ -174,8 +186,10 @@ export interface FileRoutesByFullPath {
   '/confirmation': typeof AuthConfirmationRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
+  '/privacy-policy': typeof AuthPrivacyPolicyRoute
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
+  '/terms-conditions': typeof AuthTermsConditionsRoute
   '/profile-setup': typeof OnboardingProfileSetupRoute
   '/role-selection': typeof OnboardingRoleSelectionRoute
   '/welcome': typeof OnboardingWelcomeRoute
@@ -197,8 +211,10 @@ export interface FileRoutesByTo {
   '/confirmation': typeof AuthConfirmationRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
+  '/privacy-policy': typeof AuthPrivacyPolicyRoute
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
+  '/terms-conditions': typeof AuthTermsConditionsRoute
   '/profile-setup': typeof OnboardingProfileSetupRoute
   '/role-selection': typeof OnboardingRoleSelectionRoute
   '/welcome': typeof OnboardingWelcomeRoute
@@ -226,8 +242,10 @@ export interface FileRoutesById {
   '/_auth/confirmation': typeof AuthConfirmationRoute
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/login': typeof AuthLoginRoute
+  '/_auth/privacy-policy': typeof AuthPrivacyPolicyRoute
   '/_auth/register': typeof AuthRegisterRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
+  '/_auth/terms-conditions': typeof AuthTermsConditionsRoute
   '/_onboarding/profile-setup': typeof OnboardingProfileSetupRoute
   '/_onboarding/role-selection': typeof OnboardingRoleSelectionRoute
   '/_onboarding/welcome': typeof OnboardingWelcomeRoute
@@ -251,8 +269,10 @@ export interface FileRouteTypes {
     | '/confirmation'
     | '/forgot-password'
     | '/login'
+    | '/privacy-policy'
     | '/register'
     | '/reset-password'
+    | '/terms-conditions'
     | '/profile-setup'
     | '/role-selection'
     | '/welcome'
@@ -274,8 +294,10 @@ export interface FileRouteTypes {
     | '/confirmation'
     | '/forgot-password'
     | '/login'
+    | '/privacy-policy'
     | '/register'
     | '/reset-password'
+    | '/terms-conditions'
     | '/profile-setup'
     | '/role-selection'
     | '/welcome'
@@ -302,8 +324,10 @@ export interface FileRouteTypes {
     | '/_auth/confirmation'
     | '/_auth/forgot-password'
     | '/_auth/login'
+    | '/_auth/privacy-policy'
     | '/_auth/register'
     | '/_auth/reset-password'
+    | '/_auth/terms-conditions'
     | '/_onboarding/profile-setup'
     | '/_onboarding/role-selection'
     | '/_onboarding/welcome'
@@ -415,6 +439,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingProfileSetupRouteImport
       parentRoute: typeof OnboardingRoute
     }
+    '/_auth/terms-conditions': {
+      id: '/_auth/terms-conditions'
+      path: '/terms-conditions'
+      fullPath: '/terms-conditions'
+      preLoaderRoute: typeof AuthTermsConditionsRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/reset-password': {
       id: '/_auth/reset-password'
       path: '/reset-password'
@@ -427,6 +458,13 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof AuthRegisterRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/privacy-policy': {
+      id: '/_auth/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof AuthPrivacyPolicyRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/login': {
@@ -532,16 +570,20 @@ interface AuthRouteChildren {
   AuthConfirmationRoute: typeof AuthConfirmationRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
+  AuthPrivacyPolicyRoute: typeof AuthPrivacyPolicyRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
+  AuthTermsConditionsRoute: typeof AuthTermsConditionsRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthConfirmationRoute: AuthConfirmationRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
+  AuthPrivacyPolicyRoute: AuthPrivacyPolicyRoute,
   AuthRegisterRoute: AuthRegisterRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
+  AuthTermsConditionsRoute: AuthTermsConditionsRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
