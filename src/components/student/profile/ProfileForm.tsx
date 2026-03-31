@@ -74,7 +74,7 @@ const StudentProfileForm = forwardRef<HTMLFormElement, StudentProfileFormProps>(
 				},
 				gender: profile.gender.code,
 				schoolName: profile.schoolName || "",
-				educationLevel: profile.educationLevel ?? undefined,
+				educationLevel: profile.educationLevel?.code,
 			},
 		});
 
@@ -171,9 +171,9 @@ const StudentProfileForm = forwardRef<HTMLFormElement, StudentProfileFormProps>(
 						</label>
 						<div className="min-h-10 px-4 bg-[#F9FAFB] border border-border rounded-sm flex items-center gap-2">
 							<p className="text-sm md:text-sm text-primary">
-								{profile.educationLevel === "secondary_education"
+								{profile.educationLevel?.code === "secondary_education"
 									? "Secondary Education (High School)"
-									: profile.educationLevel === "tertiary_education"
+									: profile.educationLevel?.code === "tertiary_education"
 										? "Tertiary Education (Higher Education)"
 										: "—"}
 							</p>
