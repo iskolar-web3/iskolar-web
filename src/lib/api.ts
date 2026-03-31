@@ -46,6 +46,8 @@ export function getDefaultPathOfRole(user: User): string {
 			return "/home";
 		case UserRole.Sponsor:
 			return "/scholarships";
+		case UserRole.Admin:
+			return "/dashboard";
 		default:
 			return "/role-selection";
 	}
