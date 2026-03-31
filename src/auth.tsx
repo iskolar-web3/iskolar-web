@@ -79,6 +79,10 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 					setProfile(sponsor);
 					break;
 
+				case UserRole.Admin:
+					setProfile(null);
+					break;
+
 				default:
 					setProfile(null);
 			}
