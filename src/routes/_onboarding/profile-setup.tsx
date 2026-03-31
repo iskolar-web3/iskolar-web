@@ -776,7 +776,7 @@ function ProfileSetup() {
 													? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
 													: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
 											}`}
-											placeholder="Enter your school name"
+											placeholder="What school are you from?"
 										/>
 										{studentForm.formState.errors.schoolName && (
 											<p className="mt-1 text-xs text-[#EF4444]">
