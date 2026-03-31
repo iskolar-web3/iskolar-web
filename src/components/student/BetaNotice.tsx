@@ -246,7 +246,7 @@ export function BetaNoticeModal(): JSX.Element | null {
 									You can close this in {countdown}s
 								</p>
 							) : (
-								<div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+								<div className="flex flex-col gap-3">
 									<label className="flex items-center gap-2 cursor-pointer select-none">
 										<input
 											type="checkbox"
@@ -259,7 +259,7 @@ export function BetaNoticeModal(): JSX.Element | null {
 									<button
 										type="button"
 										onClick={handleClose}
-										className="w-full sm:w-auto py-2.5 px-6 cursor-pointer rounded-lg bg-[#3A52A6] text-white text-sm font-medium hover:bg-[#2f4389] transition-colors"
+										className="w-full py-2.5 cursor-pointer rounded-lg bg-[#3A52A6] text-white text-sm font-medium hover:bg-[#2f4389] transition-colors"
 									>
 										Got it, let's go!
 									</button>
