@@ -37,6 +37,9 @@ const registerSchema = z
 				"Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
 			),
 		confirmPassword: z.string().min(1, "Please confirm your password"),
+		agreeToPolicies: z
+			.boolean()
+			.refine((v) => v === true, "You must agree to continue"),
 	})
 	.refine((data) => data.password === data.confirmPassword, {
 		message: "Passwords do not match",
@@ -46,9 +49,10 @@ const registerSchema = z
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 async function register(value: RegisterFormData): Promise<User> {
+	const { email, password } = value;
 	const response = await fetch(`${BACKEND_URL}/register`, {
 		method: "POST",
-		body: JSON.stringify(value),
+		body: JSON.stringify({ email, password }),
 		headers: { "Content-Type": "application/json" },
 	});
 	const result: ApiResponse<User> = await response.json();
@@ -71,6 +75,9 @@ function RegisterPage(): JSX.Element {
 	const form = useForm<RegisterFormData>({
 		resolver: zodResolver(registerSchema),
 		mode: "onBlur",
+		defaultValues: {
+			agreeToPolicies: false,
+		},
 	});
 
 	const mutation = useMutation({
@@ -90,6 +97,8 @@ function RegisterPage(): JSX.Element {
 		setLoading(true);
 		mutation.mutate(value);
 	};
+
+	const agreed = form.watch("agreeToPolicies");
 
 	// const handleGoogleSignUp = () => {
 	// 	showError(`Error`, "Google Auth is not available at the moment.", 2500);
@@ -232,12 +241,45 @@ function RegisterPage(): JSX.Element {
 							)}
 						</div>
 
+						<div className="pt-1">
+							<label className="flex items-start gap-2 cursor-pointer">
+								<input
+									type="checkbox"
+									{...form.register("agreeToPolicies")}
+									disabled={loading}
+									className="mt-0.5 w-3.5 h-3.5 xl:w-4 xl:h-4 rounded border-[#C4CBD5] text-secondary focus:ring-[#3A52A6] cursor-pointer"
+								/>
+								<span className="text-[11px] sm:text-[10px] xl:text-sm text-[#8C8C8C] leading-snug">
+									I agree to the{" "}
+									<Link
+										to="/terms-conditions"
+										className="text-secondary hover:underline"
+									>
+										Terms &amp; Conditions
+									</Link>{" "}
+									and{" "}
+									<Link
+										to="/privacy-policy"
+										className="text-secondary hover:underline"
+									>
+										Privacy Policy
+									</Link>
+									.
+								</span>
+							</label>
+							{form.formState.errors.agreeToPolicies && (
+								<p className="mt-1 text-[10px] sm:text-[9px] xl:text-xs text-[#EF4444]">
+									{form.formState.errors.agreeToPolicies.message}
+								</p>
+							)}
+						</div>
+
 						<button
 							type="submit"
 							className={`w-full py-3 sm:py-3 xl:py-3.5 mt-6 sm:mt-5 rounded-lg text-[#F0F7FF] text-xs sm:text-[11px] xl:text-sm cursor-pointer hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] active:shadow-md transition-all bg-[#3A52A6] ${
-								loading && "opacity-60 cursor-not-allowed"
+								(loading || !agreed) && "opacity-60 cursor-not-allowed"
 							}`}
-							disabled={loading}
+							disabled={loading || !agreed}
 						>
 							{loading ? (
 								<span className="flex items-center justify-center">
