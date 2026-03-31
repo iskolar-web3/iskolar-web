@@ -199,6 +199,10 @@ function RegisterPage(): JSX.Element {
 									{form.formState.errors.password.message}
 								</p>
 							)}
+							<p className="mt-1 text-[10px] sm:text-[9px] xl:text-xs text-[#8C8C8C]">
+								Must be 8 characters, including uppercase, lowercase, number, and
+								special character.
+							</p>
 						</div>
 
 						<div>
