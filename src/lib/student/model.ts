@@ -22,7 +22,7 @@ export const studentSchema = z.object({
 	birthDate: z.coerce.date(),
 	gender: enumDetailSchema(Gender),
 	school: schoolSchema.nullable(),
-	educationLevel: z.enum(EducationLevel).nullish(),
+	educationLevel: enumDetailSchema(EducationLevel).nullable(),
 	schoolName: z.string().nullish(),
 	contact: contactDetailSchema,
 	avatarUrl: z.string().nullable(),
