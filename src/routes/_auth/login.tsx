@@ -234,12 +234,13 @@ function LoginPage(): JSX.Element {
                 />
                 <span className="ml-1 text-[#8C8C8C] text-xs sm:text-[11px] xl:text-sm">Remember Me</span>
               </label>
-              <Link
-                to="/forgot-password"
-                className="text-secondary text-xs sm:text-[11px] xl:text-sm hover:underline"
+              <button
+                type="button"
+                onClick={() => showError("Unavailable", "Forgot password is not available at the moment.", 3000)}
+                className="text-secondary text-xs sm:text-[11px] xl:text-sm hover:underline cursor-pointer"
               >
                 Forgot password?
-              </Link>
+              </button>
             </div>
 
             <button
