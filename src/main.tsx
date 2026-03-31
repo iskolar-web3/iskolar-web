@@ -13,9 +13,6 @@ import "./styles.css";
 import reportWebVitals from "./reportWebVitals.ts";
 import { AuthProvider, useAuth } from "./auth.tsx";
 import { Skeleton } from "./components/ui/skeleton.tsx";
-import { setupAdmin } from "./lib/admin/api.ts";
-
-setupAdmin();
 
 // Create a new router instance
 
