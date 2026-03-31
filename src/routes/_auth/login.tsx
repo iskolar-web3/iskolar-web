@@ -5,7 +5,7 @@ import { SEO } from "@/components/SEO";
 import Toast from "@/components/Toast";
 import { useToast } from '@/hooks/useToast';
 import Preloader from "@/components/Preloader";
-import { SiGoogle } from "react-icons/si";
+// import { SiGoogle } from "react-icons/si";
 import type { JSX } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -120,16 +120,12 @@ function LoginPage(): JSX.Element {
     navigate({ to: "/welcome" });
   };
 
-  const handleGoogleSignIn = () => {
-    showError( `Error`, 'Google Auth is not available at the moment.', 2500);
+  // const handleGoogleSignIn = () => {
+  //   showError( `Error`, 'Google Auth is not available at the moment.', 2500);
     
-    // Handle Google sign in
-  };
+  //   // Handle Google sign in
+  // };
 
-  const handleForgotPassword = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    showError(`Error`, 'Forgot password feature is not available yet.', 2500);
-  };
 
   return (
     <>
@@ -238,20 +234,13 @@ function LoginPage(): JSX.Element {
                 />
                 <span className="ml-1 text-[#8C8C8C] text-xs sm:text-[11px] xl:text-sm">Remember Me</span>
               </label>
-              {/* Uncomment when forgot password is available */}
-              {/* <Link 
-                to="/"
-                className="text-secondary text-xs sm:text-[11px] hover:underline"
+              <button
+                type="button"
+                onClick={() => showError("Unavailable", "Forgot password is not available at the moment.", 3000)}
+                className="text-secondary text-xs sm:text-[11px] xl:text-sm hover:underline cursor-pointer"
               >
                 Forgot password?
-              </Link> */}
-              <a 
-                href="#"
-                onClick={handleForgotPassword}
-                className="text-secondary text-xs sm:text-[11px] xl:text-sm hover:underline"
-              >
-                Forgot password?
-              </a>
+              </button>
             </div>
 
             <button
@@ -272,16 +261,16 @@ function LoginPage(): JSX.Element {
           </form>
 
           {/* Divider */}
-          <div className="flex items-center my-5 sm:my-4">
+          {/* <div className="flex items-center my-5 sm:my-4">
             <div className="flex-1 border-t border-dashed border-[#3A52A6] opacity-50"></div>
             <span className="px-2 text-[10px] sm:text-[9px] xl:text-xs text-[#8C8C8C]">
               Or log in with
             </span>
             <div className="flex-1 border-t border-dashed border-[#3A52A6] opacity-50"></div>
-          </div>
+          </div> */}
 
           {/* Google sign in button */}
-          <div className="flex justify-center">
+          {/* <div className="flex justify-center">
             <button
               onClick={handleGoogleSignIn}
               type="button"
@@ -289,7 +278,7 @@ function LoginPage(): JSX.Element {
             >
               <SiGoogle size={24} className="text-secondary sm:w-6 sm:h-6" />
             </button>
-          </div>
+          </div> */}
         </div>
       </motion.div>
       )}

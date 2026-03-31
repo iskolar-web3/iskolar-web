@@ -49,16 +49,24 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 			}
 
 			const session = await validateSession(token);
+
 			if (session.data === null) {
+				deleteCookie(ACCESS_TOKEN_KEY);
+				deleteCookie(REFRESH_TOKEN_KEY);
 				setUser(null);
 				setError(new Error(session.message));
 				return null;
 			}
 
+			const maxAgeSeconds = session.data.user.role
+				? 30 * 24 * 60 * 60 // 30 days
+				: 60 * 60; // 1 hour
+			const expires = new Date(Date.now() + maxAgeSeconds * 1000);
+
 			setUser(session.data.user);
 			setSessionToken(token);
-			setCookie(ACCESS_TOKEN_KEY, session.data.token);
-			setCookie(REFRESH_TOKEN_KEY, session.data.refreshToken);
+			setCookie(ACCESS_TOKEN_KEY, session.data.token, { expires });
+			setCookie(REFRESH_TOKEN_KEY, session.data.refreshToken, { expires });
 
 			switch (session.data.user.role?.code) {
 				case UserRole.Student:
@@ -104,7 +112,7 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 				user,
 				setUser,
 				profile,
-                setProfile,
+				setProfile,
 				getSession,
 				logout,
 				sessionToken,

@@ -49,7 +49,14 @@ const landingLinks = [
 ];
 
 const SHOW_BETA_NOTICE = import.meta.env.VITE_SHOW_BETA_NOTICE !== "false";
-const COUNTDOWN_SECONDS = 11;
+const COUNTDOWN_SECONDS = 6;
+const DISMISSED_KEY = "betaNotice_dismissed";
+
+function shouldShowModal(): boolean {
+	if (!SHOW_BETA_NOTICE) return false;
+	if (localStorage.getItem(DISMISSED_KEY) === "true") return false;
+	return true;
+}
 
 function useBlogImage(url: string) {
 	const [image, setImage] = useState<string | null>(null);
@@ -72,8 +79,9 @@ function useBlogImage(url: string) {
 }
 
 export function BetaNoticeModal(): JSX.Element | null {
-	const [open, setOpen] = useState(SHOW_BETA_NOTICE);
+	const [open, setOpen] = useState(() => shouldShowModal());
 	const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
+	const [dontShowAgain, setDontShowAgain] = useState(false);
 	const blogImage = useBlogImage(BLOG_POST.href);
 
 	useEffect(() => {
@@ -85,6 +93,9 @@ export function BetaNoticeModal(): JSX.Element | null {
 	}, [open, countdown]);
 
 	function handleClose() {
+		if (dontShowAgain) {
+			localStorage.setItem(DISMISSED_KEY, "true");
+		}
 		setOpen(false);
 	}
 
@@ -235,13 +246,24 @@ export function BetaNoticeModal(): JSX.Element | null {
 									You can close this in {countdown}s
 								</p>
 							) : (
-								<button
-									type="button"
-									onClick={handleClose}
-									className="w-full py-2.5 cursor-pointer rounded-lg bg-[#3A52A6] text-white text-sm font-medium hover:bg-[#2f4389] transition-colors"
-								>
-									Got it, let's go!
-								</button>
+								<div className="flex flex-col gap-3">
+									<label className="flex items-center gap-2 cursor-pointer select-none">
+										<input
+											type="checkbox"
+											checked={dontShowAgain}
+											onChange={(e) => setDontShowAgain(e.target.checked)}
+											className="w-4 h-4 rounded border-[#D3DCF6] accent-[#3A52A6] cursor-pointer"
+										/>
+										<span className="text-sm text-[#6B7280]">Don't show again</span>
+									</label>
+									<button
+										type="button"
+										onClick={handleClose}
+										className="w-full py-2.5 cursor-pointer rounded-lg bg-[#3A52A6] text-white text-sm font-medium hover:bg-[#2f4389] transition-colors"
+									>
+										Got it, let's go!
+									</button>
+								</div>
 							)}
 						</div>
 					</motion.div>

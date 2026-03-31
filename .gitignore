@@ -12,6 +12,9 @@ count.txt
 .env.*
 !.env.example
 
+# Claude Code local settings
+.claude/settings.local.json
+
 # Vite files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*

@@ -4,6 +4,7 @@ import HeaderNav from "@/components/HeaderNav";
 import { UserRole } from "@/lib/user/model";
 import { getDefaultPathOfRole } from "@/lib/api";
 import { BetaNoticeModal } from "@/components/student/BetaNotice";
+import { FeedbackWidget } from "@/components/FeedbackWidget";
 
 export const Route = createFileRoute("/_student")({
 	component: StudentLayout,
@@ -34,6 +35,7 @@ function StudentLayout(): JSX.Element {
 				<Outlet />
 			</div>
 			<BetaNoticeModal />
+			<FeedbackWidget />
 		</div>
 	);
 }

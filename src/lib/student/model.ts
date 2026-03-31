@@ -8,6 +8,11 @@ export enum Gender {
 	Female = "female",
 }
 
+export enum EducationLevel {
+	Secondary = "secondary_education",
+	Tertiary = "tertiary_education",
+}
+
 export const studentSchema = z.object({
 	id: z.uuidv4(),
 	userId: z.uuidv4(),
@@ -17,6 +22,8 @@ export const studentSchema = z.object({
 	birthDate: z.coerce.date(),
 	gender: enumDetailSchema(Gender),
 	school: schoolSchema.nullable(),
+	educationLevel: enumDetailSchema(EducationLevel).nullable(),
+	schoolName: z.string().nullish(),
 	contact: contactDetailSchema,
 	avatarUrl: z.string().nullable(),
 	email: z.email(),
@@ -33,6 +40,8 @@ export const createStudentRequestSchema = z.object({
 		message: "Date of birth cannot be in the future",
 	}),
 	contact: createContactRequestSchema,
+	educationLevel: z.enum(EducationLevel, { message: "Please select an education level" }),
+	schoolName: z.string().min(1, "School name is required"),
 });
 
 export const updateStudentRequestSchema = createStudentRequestSchema
@@ -42,5 +51,7 @@ export const updateStudentRequestSchema = createStudentRequestSchema
 	.partial()
 	.extend({
 		id: z.uuidv4(),
+		educationLevel: z.enum(EducationLevel).optional(),
+		schoolName: z.string().optional(),
 	});
 export type UpdateStudentRequest = z.infer<typeof updateStudentRequestSchema>;
