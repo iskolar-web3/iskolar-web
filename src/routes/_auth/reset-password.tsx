@@ -99,7 +99,7 @@ function ResetPasswordPage(): JSX.Element {
 	}
 
 	// ── Render: invalid / expired token ──────────────────────────────────────
-	if (tokenQuery.isError || tokenQuery.data?.valid === false) {
+	if (tokenQuery.isError) {
 		return <InvalidTokenView />;
 	}
 
