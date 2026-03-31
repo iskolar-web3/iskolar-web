@@ -72,6 +72,7 @@ const StudentProfileForm = forwardRef<HTMLFormElement, StudentProfileFormProps>(
 					contactType: profile.contact.code,
 				},
 				gender: profile.gender.code,
+				schoolName: profile.school?.name || "",
 			},
 		});
 
@@ -83,7 +84,7 @@ const StudentProfileForm = forwardRef<HTMLFormElement, StudentProfileFormProps>(
 						<label className="block text-xs text-[#6B7280] mb-1.5">
 							First Name
 						</label>
-						<div className="min-h-[40px] px-4 bg-[#F9FAFB] border border-border rounded-sm flex items-center gap-2">
+						<div className="min-h-10 px-4 bg-[#F9FAFB] border border-border rounded-sm flex items-center gap-2">
 							<p className="text-sm md:text-sm text-primary">
 								{profile.firstName}
 							</p>
@@ -94,7 +95,7 @@ const StudentProfileForm = forwardRef<HTMLFormElement, StudentProfileFormProps>(
 						<label className="block text-xs text-[#6B7280] mb-1.5">
 							Middle Name
 						</label>
-						<div className="min-h-[40px] px-4 bg-[#F9FAFB] border border-border rounded-sm flex items-center gap-2">
+						<div className="min-h-10 px-4 bg-[#F9FAFB] border border-border rounded-sm flex items-center gap-2">
 							<p className="text-sm md:text-sm text-primary">
 								{profile.middleName}
 							</p>
@@ -105,7 +106,7 @@ const StudentProfileForm = forwardRef<HTMLFormElement, StudentProfileFormProps>(
 						<label className="block text-xs text-[#6B7280] mb-1.5">
 							Last Name
 						</label>
-						<div className="min-h-[40px] px-4 bg-[#F9FAFB] border border-border rounded-sm flex items-center gap-2">
+						<div className="min-h-10 px-4 bg-[#F9FAFB] border border-border rounded-sm flex items-center gap-2">
 							<p className="text-sm md:text-sm text-primary">
 								{profile.lastName}
 							</p>
@@ -116,7 +117,7 @@ const StudentProfileForm = forwardRef<HTMLFormElement, StudentProfileFormProps>(
 						<label className="block text-xs text-[#6B7280] mb-1.5">
 							Gender
 						</label>
-						<div className="min-h-[40px] px-4 bg-[#F9FAFB] border border-border rounded-sm flex items-center gap-2">
+						<div className="min-h-10 px-4 bg-[#F9FAFB] border border-border rounded-sm flex items-center gap-2">
 							<p className="text-sm md:text-sm text-primary">
 								{[
 									{ value: Gender.Male, label: "Male" },
@@ -132,7 +133,7 @@ const StudentProfileForm = forwardRef<HTMLFormElement, StudentProfileFormProps>(
 						<label className="block text-xs text-[#6B7280] mb-1.5">
 							Date of Birth
 						</label>
-						<div className="min-h-[40px] px-4 bg-[#F9FAFB] border border-border rounded-sm flex items-center gap-2">
+						<div className="min-h-10 px-4 bg-[#F9FAFB] border border-border rounded-sm flex items-center gap-2">
 							<p className="text-sm md:text-sm text-primary">
 								{profile.birthDate
 									? format(profile.birthDate, "MMMM d, yyyy")
@@ -144,9 +145,20 @@ const StudentProfileForm = forwardRef<HTMLFormElement, StudentProfileFormProps>(
 						<label className="block text-xs text-[#6B7280] mb-1.5">
 							Contact Number
 						</label>
-						<div className="min-h-[40px] px-4 bg-[#F9FAFB] border border-border rounded-sm flex items-center gap-2">
+						<div className="min-h-10 px-4 bg-[#F9FAFB] border border-border rounded-sm flex items-center gap-2">
 							<p className="text-xs md:text-sm text-primary">
 								{profile.contact.value || "—"}
+							</p>
+						</div>
+					</div>
+
+					<div>
+						<label className="block text-xs text-[#6B7280] mb-1.5">
+							School
+						</label>
+						<div className="min-h-10 px-4 bg-[#F9FAFB] border border-border rounded-sm flex items-center gap-2">
+							<p className="text-sm md:text-sm text-primary">
+								{profile.school?.name || "—"}
 							</p>
 						</div>
 					</div>
@@ -173,7 +185,7 @@ const StudentProfileForm = forwardRef<HTMLFormElement, StudentProfileFormProps>(
 								<Input
 									{...field}
 									disabled={isSaving}
-									className={`min-h-[40px] h-auto px-4 bg-[#F9FAFB] border-border rounded-sm text-sm md:text-sm ${
+									className={`min-h-10 h-auto px-4 bg-[#F9FAFB] border-border rounded-sm text-sm md:text-sm ${
 										errors.firstName
 											? "border-[#EF4444] focus-visible:ring-[#EF4444]/20"
 											: ""
@@ -199,7 +211,7 @@ const StudentProfileForm = forwardRef<HTMLFormElement, StudentProfileFormProps>(
 								<Input
 									{...field}
 									disabled={isSaving}
-									className={`min-h-[40px] h-auto px-4 bg-[#F9FAFB] border-border rounded-sm text-sm md:text-sm ${
+									className={`min-h-10 h-auto px-4 bg-[#F9FAFB] border-border rounded-sm text-sm md:text-sm ${
 										errors.middleName
 											? "border-[#EF4444] focus-visible:ring-[#EF4444]/20"
 											: ""
@@ -225,7 +237,7 @@ const StudentProfileForm = forwardRef<HTMLFormElement, StudentProfileFormProps>(
 								<Input
 									{...field}
 									disabled={isSaving}
-									className={`min-h-[40px] h-auto px-4 bg-[#F9FAFB] border-border rounded-sm text-sm md:text-sm ${
+									className={`min-h-10 h-auto px-4 bg-[#F9FAFB] border-border rounded-sm text-sm md:text-sm ${
 										errors.lastName
 											? "border-[#EF4444] focus-visible:ring-[#EF4444]/20"
 											: ""
@@ -254,7 +266,7 @@ const StudentProfileForm = forwardRef<HTMLFormElement, StudentProfileFormProps>(
 									disabled={isSaving}
 								>
 									<SelectTrigger
-										className={`min-h-[40px] h-auto w-full px-4 bg-[#F9FAFB] border-border rounded-sm text-sm md:text-sm ${
+										className={`min-h-10 h-auto w-full px-4 bg-[#F9FAFB] border-border rounded-sm text-sm md:text-sm ${
 											errors.gender
 												? "border-[#EF4444] focus:ring-[#EF4444]/20"
 												: ""
@@ -290,7 +302,7 @@ const StudentProfileForm = forwardRef<HTMLFormElement, StudentProfileFormProps>(
 											<button
 												type="button"
 												disabled={isSaving}
-												className={`w-full min-h-[40px] px-4 bg-[#F9FAFB] text-sm border border-border rounded-sm focus:outline-none focus:ring-2 transition-all text-left flex items-center justify-between ${
+												className={`w-full min-h-10 px-4 bg-[#F9FAFB] text-sm border border-border rounded-sm focus:outline-none focus:ring-2 transition-all text-left flex items-center justify-between ${
 													field.value ? "text-primary" : "text-gray-400"
 												} ${
 													errors.birthDate
@@ -338,7 +350,7 @@ const StudentProfileForm = forwardRef<HTMLFormElement, StudentProfileFormProps>(
 									{...field}
 									type="tel"
 									disabled={isSaving}
-									className={`min-h-[40px] h-auto px-4 bg-[#F9FAFB] border-border rounded-sm text-xs md:text-sm ${
+									className={`min-h-10 h-auto px-4 bg-[#F9FAFB] border-border rounded-sm text-xs md:text-sm ${
 										errors.contact?.value
 											? "border-[#EF4444] focus-visible:ring-[#EF4444]/20"
 											: ""
@@ -347,6 +359,33 @@ const StudentProfileForm = forwardRef<HTMLFormElement, StudentProfileFormProps>(
 								{errors.contact?.value && (
 									<p className="mt-1 text-xs text-[#EF4444]">
 										{errors.contact.value?.message}
+									</p>
+								)}
+							</div>
+						)}
+					/>
+
+					<Controller
+						name="schoolName"
+						control={control}
+						render={({ field }) => (
+							<div>
+								<label className="block text-xs text-[#6B7280] mb-1.5">
+									School
+								</label>
+								<Input
+									{...field}
+									disabled={isSaving}
+									className={`min-h-10 h-auto px-4 bg-[#F9FAFB] border-border rounded-sm text-sm md:text-sm ${
+										errors.schoolName
+											? "border-[#EF4444] focus-visible:ring-[#EF4444]/20"
+											: ""
+									}`}
+									placeholder="Enter your school name"
+								/>
+								{errors.schoolName && (
+									<p className="mt-1 text-xs text-[#EF4444]">
+										{errors.schoolName.message}
 									</p>
 								)}
 							</div>

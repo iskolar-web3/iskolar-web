@@ -33,6 +33,7 @@ export const createStudentRequestSchema = z.object({
 		message: "Date of birth cannot be in the future",
 	}),
 	contact: createContactRequestSchema,
+	schoolName: z.string().min(1, "School name is required"),
 });
 
 export const updateStudentRequestSchema = createStudentRequestSchema

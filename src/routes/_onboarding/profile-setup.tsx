@@ -84,6 +84,7 @@ const createStudentSchema = z.object({
 		message: "Date of birth cannot be in the future",
 	}),
 	contact: createContactRequestSchema,
+	schoolName: z.string().min(1, "School name is required"),
 });
 
 // individual Sponsor validation
@@ -250,6 +251,7 @@ function ProfileSetup() {
 				contactType: ContactType.Phone,
 				value: "",
 			},
+			schoolName: "",
 		},
 	});
 
@@ -584,7 +586,7 @@ function ProfileSetup() {
 							<h1 className="text-3xl sm:text-4xl md:text-5xl text-secondary mb-1.5 sm:mb-2">
 								Welcome to iSkolar
 							</h1>
-							<p className="text-base sm:text-lg sm:text-xl text-secondary/80">
+							<p className="text-base sm:text-lg text-secondary/80">
 								Complete your profile to get started
 							</p>
 						</motion.div>
@@ -667,7 +669,7 @@ function ProfileSetup() {
 											}
 										>
 											<SelectTrigger
-												className={`w-full px-4 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-[placeholder]:text-gray-400 ${
+												className={`w-full px-4 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
 													studentForm.formState.errors.gender
 														? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
 														: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
@@ -761,6 +763,24 @@ function ProfileSetup() {
 										{studentForm.formState.errors.contact?.value && (
 											<p className="mt-1 text-xs text-[#EF4444]">
 												{studentForm.formState.errors.contact?.value?.message}
+											</p>
+										)}
+									</div>
+
+									<div>
+										<input
+											type="text"
+											{...studentForm.register("schoolName")}
+											className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:text-gray-400 ${
+												studentForm.formState.errors.schoolName
+													? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
+													: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
+											}`}
+											placeholder="Enter your school name"
+										/>
+										{studentForm.formState.errors.schoolName && (
+											<p className="mt-1 text-xs text-[#EF4444]">
+												{studentForm.formState.errors.schoolName.message}
 											</p>
 										)}
 									</div>
@@ -874,7 +894,7 @@ function ProfileSetup() {
 											}
 										>
 											<SelectTrigger
-												className={`w-full text-sm px-4 border rounded-lg focus:outline-none focus:ring-2 transition-all data-[placeholder]:text-gray-400 ${
+												className={`w-full text-sm px-4 border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
 													individualSponsorForm.formState.errors.employmentType
 														? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
 														: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
@@ -1057,7 +1077,7 @@ function ProfileSetup() {
 											}
 										>
 											<SelectTrigger
-												className={`w-full text-sm px-4 border rounded-lg focus:outline-none focus:ring-2 transition-all data-[placeholder]:text-gray-400 ${
+												className={`w-full text-sm px-4 border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
 													organizationSponsorForm.formState.errors
 														.organizationType
 														? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
@@ -1181,7 +1201,7 @@ function ProfileSetup() {
 											}
 										>
 											<SelectTrigger
-												className={`w-full text-sm px-4 border rounded-lg focus:outline-none focus:ring-2 transition-all data-[placeholder]:text-gray-400 ${
+												className={`w-full text-sm px-4 border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
 													governmentSponsorForm.formState.errors.agencyType
 														? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
 														: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
@@ -1300,7 +1320,7 @@ function ProfileSetup() {
 											}
 										>
 											<SelectTrigger
-												className={`w-full text-sm px-4 border rounded-lg focus:outline-none focus:ring-2 transition-all data-[placeholder]:text-gray-400 ${
+												className={`w-full text-sm px-4 border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
 													schoolForm.formState.errors.schoolType
 														? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
 														: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
