@@ -100,8 +100,9 @@ function ConfirmationPage(): JSX.Element {
 				)}
 
 				<p className="text-[9px] sm:text-[11px] xl:text-[13px] text-[#8C8C8C] mb-6 max-w-xs mx-auto">
-					<p>The link expires in <span className="font-medium text-primary">15 minutes</span>.</p>
-					<p>Check your spam folder if you don't see it.</p>
+					The link expires in <span className="font-medium text-primary">15 minutes</span>.
+                    <br />
+					Check your spam folder if you don't see it.
 				</p>
 
 				{/* Resend */}
