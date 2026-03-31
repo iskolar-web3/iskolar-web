@@ -7,16 +7,6 @@ import type {
 	UserListQuery,
 } from "./model";
 
-export async function setupAdmin(): Promise<void> {
-	try {
-		await fetch(`${BACKEND_URL}/admin/setup`, {
-			method: "POST",
-		});
-	} catch {
-		// Silently ignore - admin may already exist or server unreachable
-	}
-}
-
 export async function getDashboardMetrics(
 	token: string,
 ): Promise<ApiResponse<DashboardMetrics>> {
