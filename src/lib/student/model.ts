@@ -22,8 +22,8 @@ export const studentSchema = z.object({
 	birthDate: z.coerce.date(),
 	gender: enumDetailSchema(Gender),
 	school: schoolSchema.nullable(),
-	educationLevel: z.enum(EducationLevel).nullable(),
-	schoolName: z.string().nullable(),
+	educationLevel: z.enum(EducationLevel).nullish(),
+	schoolName: z.string().nullish(),
 	contact: contactDetailSchema,
 	avatarUrl: z.string().nullable(),
 	email: z.email(),
@@ -51,5 +51,7 @@ export const updateStudentRequestSchema = createStudentRequestSchema
 	.partial()
 	.extend({
 		id: z.uuidv4(),
+		educationLevel: z.enum(EducationLevel).optional(),
+		schoolName: z.string().optional(),
 	});
 export type UpdateStudentRequest = z.infer<typeof updateStudentRequestSchema>;
