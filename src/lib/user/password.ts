@@ -21,17 +21,9 @@ export interface ForgotPasswordRequest {
  * NOTE: Always return 200 regardless of whether the email exists (prevents
  * user-enumeration attacks). The `message` in `ApiResponse` can be generic.
  */
-export interface ForgotPasswordResponse {
-	message: string;
-}
 
 /** GET /reset-password/validate?token=<token> — response body */
 export interface ValidateResetTokenResponse {
-	/**
-	 * `true` if the token exists, has not expired, and has not been used.
-	 * `false` (or non-200) if invalid / expired / already used.
-	 */
-	valid: boolean;
 	/** Optionally return the masked email associated with the token for display purposes. */
 	maskedEmail?: string;
 }
@@ -42,20 +34,6 @@ export interface ResetPasswordRequest {
 	newPassword: string;
 }
 
-/**
- * POST /reset-password — response body
- *
- * Backend should:
- * 1. Validate token (exists, not expired, not used).
- * 2. Hash the new password (bcrypt / argon2).
- * 3. Update the user's password in the database.
- * 4. Mark the token as used / delete it to prevent replay.
- * 5. Optionally invalidate all existing sessions for that user.
- */
-export interface ResetPasswordResponse {
-	message: string;
-}
-
 // ─── API Functions ─────────────────────────────────────────────────────────────
 
 /**
@@ -63,19 +41,16 @@ export interface ResetPasswordResponse {
  *
  * @endpoint POST /forgot-password
  */
-export async function requestPasswordReset(
-	email: string,
-): Promise<ForgotPasswordResponse> {
+export async function requestPasswordReset(email: string): Promise<void> {
 	const response = await fetch(`${BACKEND_URL}/forgot-password`, {
 		method: "POST",
 		body: JSON.stringify({ email } satisfies ForgotPasswordRequest),
 		headers: { "Content-Type": "application/json" },
 	});
-	const result: ApiResponse<ForgotPasswordResponse> = await response.json();
+	const result: ApiResponse = await response.json();
 	if (!response.ok) {
 		throw new Error(result.message || "Failed to send password reset email");
 	}
-	return result.data;
 }
 
 /**
@@ -87,7 +62,7 @@ export async function validateResetToken(
 	token: string,
 ): Promise<ValidateResetTokenResponse> {
 	const response = await fetch(
-		`${BACKEND_URL}/reset-password/validate?token=${encodeURIComponent(token)}`,
+		`${BACKEND_URL}/reset-password?token=${encodeURIComponent(token)}`,
 		{ method: "GET" },
 	);
 	const result: ApiResponse<ValidateResetTokenResponse> = await response.json();
@@ -101,11 +76,16 @@ export async function validateResetToken(
  * Submits a new password using a valid reset token.
  *
  * @endpoint POST /reset-password
+ * 1. Validate token (exists, not expired, not used).
+ * 2. Hash the new password (bcrypt / argon2).
+ * 3. Update the user's password in the database.
+ * 4. Mark the token as used / delete it to prevent replay.
+ * 5. Optionally invalidate all existing sessions for that user.
  */
 export async function resetPassword(
 	token: string,
 	newPassword: string,
-): Promise<ResetPasswordResponse> {
+): Promise<void> {
 	const response = await fetch(`${BACKEND_URL}/reset-password`, {
 		method: "POST",
 		body: JSON.stringify({
@@ -114,9 +94,8 @@ export async function resetPassword(
 		} satisfies ResetPasswordRequest),
 		headers: { "Content-Type": "application/json" },
 	});
-	const result: ApiResponse<ResetPasswordResponse> = await response.json();
+	const result: ApiResponse = await response.json();
 	if (!response.ok) {
 		throw new Error(result.message || "Failed to reset password");
 	}
-	return result.data;
 }
