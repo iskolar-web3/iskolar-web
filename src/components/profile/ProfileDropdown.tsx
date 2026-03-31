@@ -126,10 +126,10 @@ export default function ProfileDropdown({ onClose }: ProfileDropdownProps) {
 	/**
 	 * Handles account navigation
 	 */
-	const handleAccountClick = () => {
-		onClose();
-		// navigate({ to: '/account' });
-	};
+	// const handleAccountClick = () => {
+	// 	onClose();
+	// 	// navigate({ to: '/account' });
+	// };
 
 	/**
 	 * Handles user logout
@@ -163,7 +163,7 @@ export default function ProfileDropdown({ onClose }: ProfileDropdownProps) {
 					className="w-full px-3 md:px-4 py-2 md:py-3 border-b border-border hover:bg-[#F9FAFB] transition-colors cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
 				>
 					<div className="flex items-center gap-3">
-						<div className="w-8 md:w-10 h-8 md:h-10 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+						<div className="w-8 md:w-10 h-8 md:h-10 rounded-full bg-muted flex items-center justify-center shrink-0">
 							{auth.user?.avatarUrl ? (
 								<img
 									src={auth.user.avatarUrl}
@@ -185,14 +185,14 @@ export default function ProfileDropdown({ onClose }: ProfileDropdownProps) {
 				</button>
 
 				{/* Account Option */}
-				<button
+				{/* <button
 					type="button"
 					onClick={handleAccountClick}
 					disabled={!auth.user}
 					className="w-full px-3 cursor-pointer md:px-4 py-2 md:py-3 text-left text-xs md:text-sm text-[#6B7280] hover:bg-[#F9FAFB] transition-colors border-b border-border disabled:cursor-not-allowed disabled:opacity-60"
 				>
 					Account
-				</button>
+				</button> */}
 
 				{/* Logout Option */}
 				<button
@@ -208,7 +208,7 @@ export default function ProfileDropdown({ onClose }: ProfileDropdownProps) {
 			<AnimatePresence>
 				{showLogoutConfirmation && (
 					<div
-						className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50"
+						className="fixed inset-0 z-60 flex items-center justify-center bg-black/50"
 						onClick={() => setShowLogoutConfirmation(false)}
 					>
 						<motion.div
