@@ -18,6 +18,7 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import {
+	EducationLevel,
 	Gender,
 	updateStudentRequestSchema,
 	type Student,
@@ -72,7 +73,8 @@ const StudentProfileForm = forwardRef<HTMLFormElement, StudentProfileFormProps>(
 					contactType: profile.contact.code,
 				},
 				gender: profile.gender.code,
-				schoolName: profile.school?.name || "",
+				schoolName: profile.schoolName || "",
+				educationLevel: profile.educationLevel ?? undefined,
 			},
 		});
 
@@ -158,7 +160,22 @@ const StudentProfileForm = forwardRef<HTMLFormElement, StudentProfileFormProps>(
 						</label>
 						<div className="min-h-10 px-4 bg-[#F9FAFB] border border-border rounded-sm flex items-center gap-2">
 							<p className="text-sm md:text-sm text-primary">
-								{profile.school?.name || "—"}
+								{profile.schoolName || "—"}
+							</p>
+						</div>
+					</div>
+
+					<div>
+						<label className="block text-xs text-[#6B7280] mb-1.5">
+							Education Level
+						</label>
+						<div className="min-h-10 px-4 bg-[#F9FAFB] border border-border rounded-sm flex items-center gap-2">
+							<p className="text-sm md:text-sm text-primary">
+								{profile.educationLevel === "secondary_education"
+									? "Secondary Education (High School)"
+									: profile.educationLevel === "tertiary_education"
+										? "Tertiary Education (Higher Education)"
+										: "—"}
 							</p>
 						</div>
 					</div>
@@ -386,6 +403,46 @@ const StudentProfileForm = forwardRef<HTMLFormElement, StudentProfileFormProps>(
 								{errors.schoolName && (
 									<p className="mt-1 text-xs text-[#EF4444]">
 										{errors.schoolName.message}
+									</p>
+								)}
+							</div>
+						)}
+					/>
+
+					<Controller
+						name="educationLevel"
+						control={control}
+						render={({ field }) => (
+							<div>
+								<label className="block text-xs text-[#6B7280] mb-1.5">
+									Education Level
+								</label>
+								<Select
+									onValueChange={field.onChange}
+									defaultValue={field.value}
+									disabled={isSaving}
+								>
+									<SelectTrigger
+										className={`min-h-10 h-auto w-full px-4 bg-[#F9FAFB] border-border rounded-sm text-sm md:text-sm ${
+											errors.educationLevel
+												? "border-[#EF4444] focus:ring-[#EF4444]/20"
+												: ""
+										}`}
+									>
+										<SelectValue placeholder="Select education level" />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value={EducationLevel.Secondary}>
+											Secondary Education (High School)
+										</SelectItem>
+										<SelectItem value={EducationLevel.Tertiary}>
+											Tertiary Education (Higher Education)
+										</SelectItem>
+									</SelectContent>
+								</Select>
+								{errors.educationLevel && (
+									<p className="mt-1 text-xs text-[#EF4444]">
+										{errors.educationLevel.message}
 									</p>
 								)}
 							</div>

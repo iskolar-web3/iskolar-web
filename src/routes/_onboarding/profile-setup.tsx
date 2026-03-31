@@ -41,7 +41,7 @@ import {
 	type IndividualSponsor,
 	type OrganizationSponsor,
 } from "@/lib/sponsor/model";
-import { Gender, type Student } from "@/lib/student/model";
+import { EducationLevel, Gender, type Student } from "@/lib/student/model";
 // import { profileService } from '@/services/profile.service';
 
 export const Route = createFileRoute("/_onboarding/profile-setup")({
@@ -85,6 +85,7 @@ const createStudentSchema = z.object({
 	}),
 	contact: createContactRequestSchema,
 	schoolName: z.string().min(1, "School name is required"),
+	educationLevel: z.enum(EducationLevel, { message: "Please select an education level" }),
 });
 
 // individual Sponsor validation
@@ -252,6 +253,7 @@ function ProfileSetup() {
 				value: "",
 			},
 			schoolName: "",
+			educationLevel: undefined,
 		},
 	});
 
@@ -669,7 +671,7 @@ function ProfileSetup() {
 											}
 										>
 											<SelectTrigger
-												className={`w-full px-4 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
+												className={`w-full px-4 cursor-pointer text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
 													studentForm.formState.errors.gender
 														? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
 														: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
@@ -694,7 +696,7 @@ function ProfileSetup() {
 											<PopoverTrigger asChild>
 												<button
 													type="button"
-													className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all text-left flex items-center justify-between ${
+													className={`w-full cursor-pointer px-4 py-3 sm:py-3.5 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all text-left flex items-center justify-between ${
 														studentForm.watch("birthDate")
 															? "text-primary"
 															: "text-gray-400"
@@ -763,6 +765,42 @@ function ProfileSetup() {
 										{studentForm.formState.errors.contact?.value && (
 											<p className="mt-1 text-xs text-[#EF4444]">
 												{studentForm.formState.errors.contact?.value?.message}
+											</p>
+										)}
+									</div>
+
+									<div>
+										<Select
+											value={studentForm.watch("educationLevel")}
+											onValueChange={(value) =>
+												studentForm.setValue(
+													"educationLevel",
+													value as EducationLevel,
+													{ shouldValidate: true },
+												)
+											}
+										>
+											<SelectTrigger
+												className={`w-full px-4 cursor-pointer text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-[placeholder]:text-gray-400 ${
+													studentForm.formState.errors.educationLevel
+														? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
+														: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
+												}`}
+											>
+												<SelectValue placeholder="Select your education level" />
+											</SelectTrigger>
+											<SelectContent>
+												<SelectItem value={EducationLevel.Secondary}>
+													Secondary Education (High School)
+												</SelectItem>
+												<SelectItem value={EducationLevel.Tertiary}>
+													Tertiary Education (Higher Education)
+												</SelectItem>
+											</SelectContent>
+										</Select>
+										{studentForm.formState.errors.educationLevel && (
+											<p className="mt-1 text-xs text-[#EF4444]">
+												{studentForm.formState.errors.educationLevel.message}
 											</p>
 										)}
 									</div>
@@ -894,7 +932,7 @@ function ProfileSetup() {
 											}
 										>
 											<SelectTrigger
-												className={`w-full text-sm px-4 border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
+												className={`w-full cursor-pointer text-sm px-4 border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
 													individualSponsorForm.formState.errors.employmentType
 														? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
 														: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
@@ -933,7 +971,7 @@ function ProfileSetup() {
 											<PopoverTrigger asChild>
 												<button
 													type="button"
-													className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all text-left flex items-center justify-between ${
+													className={`w-full px-4 cursor-pointer py-3 sm:py-3.5 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all text-left flex items-center justify-between ${
 														individualSponsorForm.watch("birthDate")
 															? "text-primary"
 															: "text-gray-400"
@@ -1077,7 +1115,7 @@ function ProfileSetup() {
 											}
 										>
 											<SelectTrigger
-												className={`w-full text-sm px-4 border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
+												className={`w-full text-sm cursor-pointer px-4 border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
 													organizationSponsorForm.formState.errors
 														.organizationType
 														? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
@@ -1201,7 +1239,7 @@ function ProfileSetup() {
 											}
 										>
 											<SelectTrigger
-												className={`w-full text-sm px-4 border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
+												className={`w-full text-sm px-4 cursor-pointer border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
 													governmentSponsorForm.formState.errors.agencyType
 														? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
 														: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
