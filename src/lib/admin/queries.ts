@@ -1,5 +1,10 @@
 import { queryOptions } from "@tanstack/react-query";
-import { getDashboardMetrics, getSignupTimeline, getUsers } from "./api";
+import {
+	getDashboardMetrics,
+	getSignupTimeline,
+	getStudentDistribution,
+	getUsers,
+} from "./api";
 import type { UserListQuery } from "./model";
 
 export function adminDashboardQueryOptions(token: string) {
@@ -18,6 +23,17 @@ export function adminSignupTimelineQueryOptions(token: string, days = 30) {
 		queryKey: ["admin", "signups", days],
 		queryFn: async () => {
 			const res = await getSignupTimeline(token, days);
+			return res.data;
+		},
+		staleTime: 60 * 1000,
+	});
+}
+
+export function adminStudentDistributionQueryOptions(token: string) {
+	return queryOptions({
+		queryKey: ["admin", "students", "distribution"],
+		queryFn: async () => {
+			const res = await getStudentDistribution(token);
 			return res.data;
 		},
 		staleTime: 60 * 1000,

@@ -4,9 +4,11 @@ import { useAuth } from "@/auth";
 import {
 	adminDashboardQueryOptions,
 	adminSignupTimelineQueryOptions,
+	adminStudentDistributionQueryOptions,
 } from "@/lib/admin/queries";
 import MetricCard from "@/components/admin/MetricCard";
 import SignupChart from "@/components/admin/SignupChart";
+import StudentDistributionChart from "@/components/admin/StudentDistributionChart";
 import { LocalTimeClock } from "@/components/landing/LocalTimeClock";
 import {
 	Users,
@@ -14,7 +16,6 @@ import {
 	Heart,
 	ShieldCheck,
 	TrendingUp,
-	Activity,
 	ArrowUpRight,
 } from "lucide-react";
 
@@ -32,6 +33,8 @@ function AdminDashboard() {
 	const { data: timeline, isLoading: timelineLoading } = useQuery(
 		adminSignupTimelineQueryOptions(token),
 	);
+	const { data: studentDistribution, isLoading: studentDistributionLoading } =
+		useQuery(adminStudentDistributionQueryOptions(token));
 
 	const spotlightMetrics = metrics
 		? [
@@ -41,7 +44,7 @@ function AdminDashboard() {
 					icon: Users,
 					description: "All registered accounts across the beta.",
 					className:
-						"md:col-span-2 bg-[linear-gradient(135deg,#FFFFFF_0%,#F5F9FF_100%)]",
+						"md:col-span-2 xl:col-span-1 bg-[linear-gradient(135deg,#FFFFFF_0%,#F5F9FF_100%)]",
 					iconClassName: "bg-white",
 				},
 				{
@@ -69,14 +72,6 @@ function AdminDashboard() {
 					icon: TrendingUp,
 					description: "A quick read on support balance.",
 				},
-				{
-					title: "Active (7 Days)",
-					value: metrics.activeUsersLast7Days,
-					icon: Activity,
-					description: `${metrics.signupsLast7Days} new signups this week`,
-					className:
-						"xl:col-span-2 bg-[radial-gradient(circle_at_top_right,#EEF5FF_0%,#FFFFFF_60%)]",
-				},
 			]
 		: [];
 
@@ -87,6 +82,7 @@ function AdminDashboard() {
 
 	return (
 		<div className="space-y-6">
+			{/* Header panel */}
 			<div className="relative overflow-hidden rounded-[36px] border border-[#D7E5FF] bg-[linear-gradient(135deg,#F8FBFF_0%,#EEF5FF_54%,#FFFFFF_100%)] px-6 py-6 shadow-[0_26px_60px_-36px_rgba(58,82,166,0.45)] sm:px-8 sm:py-7">
 				<div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/60 blur-2xl" />
 				<div className="absolute bottom-0 right-0 h-20 w-32 rounded-tl-[80px] bg-[#EAF2FF]" />
@@ -142,9 +138,10 @@ function AdminDashboard() {
 				</div>
 			</div>
 
+			{/* Metric cards */}
 			{metricsLoading ? (
-				<div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-					{Array.from({ length: 6 }).map((_, i) => (
+				<div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
+					{Array.from({ length: 5 }).map((_, i) => (
 						<div
 							key={i}
 							className="h-36 animate-pulse rounded-[28px] border border-[#E0ECFF] bg-white"
@@ -152,17 +149,28 @@ function AdminDashboard() {
 					))}
 				</div>
 			) : metrics ? (
-				<div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+				<div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
 					{spotlightMetrics.map((metric) => (
 						<MetricCard key={metric.title} {...metric} />
 					))}
 				</div>
 			) : null}
 
+			{/* Signup timeline chart */}
 			{timelineLoading ? (
 				<div className="h-80 animate-pulse rounded-4xl border border-[#E0ECFF] bg-white" />
 			) : timeline ? (
 				<SignupChart data={timeline} />
+			) : null}
+
+			{/* Student school & education level distribution */}
+			{studentDistributionLoading ? (
+				<div className="grid gap-4 lg:grid-cols-2">
+					<div className="h-96 animate-pulse rounded-4xl border border-[#E0ECFF] bg-white" />
+					<div className="h-96 animate-pulse rounded-4xl border border-[#E0ECFF] bg-white" />
+				</div>
+			) : studentDistribution ? (
+				<StudentDistributionChart data={studentDistribution} />
 			) : null}
 		</div>
 	);
