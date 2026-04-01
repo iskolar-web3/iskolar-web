@@ -7,6 +7,7 @@ import {
 } from "@/lib/admin/queries";
 import MetricCard from "@/components/admin/MetricCard";
 import SignupChart from "@/components/admin/SignupChart";
+import { LocalTimeClock } from "@/components/landing/LocalTimeClock";
 import {
 	Users,
 	GraduationCap,
@@ -14,6 +15,7 @@ import {
 	ShieldCheck,
 	TrendingUp,
 	Activity,
+	ArrowUpRight,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_admin/dashboard")({
@@ -31,64 +33,134 @@ function AdminDashboard() {
 		adminSignupTimelineQueryOptions(token),
 	);
 
+	const spotlightMetrics = metrics
+		? [
+				{
+					title: "Total Users",
+					value: metrics.totalUsers,
+					icon: Users,
+					description: "All registered accounts across the beta.",
+					className:
+						"md:col-span-2 bg-[linear-gradient(135deg,#FFFFFF_0%,#F5F9FF_100%)]",
+					iconClassName: "bg-white",
+				},
+				{
+					title: "Students",
+					value: metrics.studentCount,
+					icon: GraduationCap,
+					description: "Learners currently in the ecosystem.",
+				},
+				{
+					title: "Sponsors",
+					value: metrics.sponsorCount,
+					icon: Heart,
+					description: "Supporters helping the network grow.",
+					className: "bg-[#FBFDFF]",
+				},
+				{
+					title: "Admins",
+					value: metrics.adminCount,
+					icon: ShieldCheck,
+					description: "Stewards managing the platform.",
+				},
+				{
+					title: "Sponsor:Student Ratio",
+					value: `${metrics.sponsorToStudentRatio}:1`,
+					icon: TrendingUp,
+					description: "A quick read on support balance.",
+				},
+				{
+					title: "Active (7 Days)",
+					value: metrics.activeUsersLast7Days,
+					icon: Activity,
+					description: `${metrics.signupsLast7Days} new signups this week`,
+					className:
+						"xl:col-span-2 bg-[radial-gradient(circle_at_top_right,#EEF5FF_0%,#FFFFFF_60%)]",
+				},
+			]
+		: [];
+
+	const peakSignupDay = timeline?.reduce(
+		(peak, entry) => (!peak || entry.count > peak.count ? entry : peak),
+		null as (typeof timeline)[number] | null,
+	);
+
 	return (
-		<div>
-			<div className="mb-6">
-				<h1 className="text-xl text-primary">Dashboard</h1>
-				<p className="text-sm text-[#6B7280] mt-1">
-					iSkolar beta signup overview
-				</p>
+		<div className="space-y-6">
+			<div className="relative overflow-hidden rounded-[36px] border border-[#D7E5FF] bg-[linear-gradient(135deg,#F8FBFF_0%,#EEF5FF_54%,#FFFFFF_100%)] px-6 py-6 shadow-[0_26px_60px_-36px_rgba(58,82,166,0.45)] sm:px-8 sm:py-7">
+				<div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/60 blur-2xl" />
+				<div className="absolute bottom-0 right-0 h-20 w-32 rounded-tl-[80px] bg-[#EAF2FF]" />
+				<div className="relative flex flex-col gap-6">
+					<div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+						<h1 className="text-3xl font-semibold tracking-tight text-primary sm:text-[2.2rem]">
+							Dashboard
+						</h1>
+						<LocalTimeClock compact />
+					</div>
+
+					<div className="grid gap-3 md:grid-cols-3">
+						<div className="rounded-3xl border border-white/70 bg-white/90 p-4 shadow-[0_16px_35px_-28px_rgba(58,82,166,0.7)]">
+							<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
+								This week
+							</p>
+							<p className="mt-2 text-2xl font-semibold text-primary">
+								{metrics?.signupsLast7Days ?? "--"}
+							</p>
+							<p className="mt-1 text-sm text-[#6B7280]">New signups recorded</p>
+						</div>
+						<div className="rounded-3xl border border-white/70 bg-[#F9FBFF] p-4">
+							<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
+								Peak day
+							</p>
+							<p className="mt-2 text-2xl font-semibold text-primary">
+								{peakSignupDay?.count ?? "--"}
+							</p>
+							<p className="mt-1 text-sm text-[#6B7280]">
+								{peakSignupDay
+									? new Date(peakSignupDay.date).toLocaleDateString("en-US", {
+											month: "short",
+											day: "numeric",
+										})
+									: "Waiting for timeline"}
+							</p>
+						</div>
+						<div className="rounded-3xl border border-[#D8E6FF] bg-background px-4 py-4 text-primary">
+							<div className="flex items-start justify-between gap-3">
+								<div>
+									<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
+										Engagement
+									</p>
+									<p className="mt-2 text-2xl font-semibold">
+										{metrics?.activeUsersLast7Days ?? "--"}
+									</p>
+								</div>
+								<ArrowUpRight className="mt-1 h-4 w-4 text-primary/80" />
+							</div>
+							<p className="mt-1 text-sm text-primary/70">Active in the last 7 days</p>
+						</div>
+					</div>
+				</div>
 			</div>
 
 			{metricsLoading ? (
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+				<div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
 					{Array.from({ length: 6 }).map((_, i) => (
 						<div
 							key={i}
-							className="bg-white rounded-xl border border-[#E0ECFF] p-5 h-28 animate-pulse"
+							className="h-36 animate-pulse rounded-[28px] border border-[#E0ECFF] bg-white"
 						/>
 					))}
 				</div>
 			) : metrics ? (
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-					<MetricCard
-						title="Total Users"
-						value={metrics.totalUsers}
-						icon={Users}
-						description="All registered accounts"
-					/>
-					<MetricCard
-						title="Students"
-						value={metrics.studentCount}
-						icon={GraduationCap}
-					/>
-					<MetricCard
-						title="Sponsors"
-						value={metrics.sponsorCount}
-						icon={Heart}
-					/>
-					<MetricCard
-						title="Admins"
-						value={metrics.adminCount}
-						icon={ShieldCheck}
-					/>
-					<MetricCard
-						title="Sponsor:Student Ratio"
-						value={`${metrics.sponsorToStudentRatio}:1`}
-						icon={TrendingUp}
-						description="Sponsor to student ratio"
-					/>
-					<MetricCard
-						title="Active (7 Days)"
-						value={metrics.activeUsersLast7Days}
-						icon={Activity}
-						description={`${metrics.signupsLast7Days} new signups this week`}
-					/>
+				<div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+					{spotlightMetrics.map((metric) => (
+						<MetricCard key={metric.title} {...metric} />
+					))}
 				</div>
 			) : null}
 
 			{timelineLoading ? (
-				<div className="bg-white rounded-xl border border-[#E0ECFF] p-5 h-80 animate-pulse" />
+				<div className="h-80 animate-pulse rounded-4xl border border-[#E0ECFF] bg-white" />
 			) : timeline ? (
 				<SignupChart data={timeline} />
 			) : null}
