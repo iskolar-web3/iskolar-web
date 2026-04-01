@@ -13,6 +13,21 @@ export type SignupTimelineEntry = {
 	count: number;
 };
 
+export type SchoolDistributionEntry = {
+	schoolName: string;
+	count: number;
+};
+
+export type EducationLevelDistributionEntry = {
+	educationLevel: string;
+	count: number;
+};
+
+export type StudentDistribution = {
+	schools: SchoolDistributionEntry[];
+	educationLevels: EducationLevelDistributionEntry[];
+};
+
 export type UserListItem = {
 	id: string;
 	email: string;

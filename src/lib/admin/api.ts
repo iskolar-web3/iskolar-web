@@ -3,6 +3,7 @@ import type {
 	DashboardMetrics,
 	PaginatedResponse,
 	SignupTimelineEntry,
+	StudentDistribution,
 	UserListItem,
 	UserListQuery,
 } from "./model";
@@ -30,6 +31,17 @@ export async function getSignupTimeline(
 			credentials: "include",
 		},
 	);
+	return response.json();
+}
+
+export async function getStudentDistribution(
+	token: string,
+): Promise<ApiResponse<StudentDistribution>> {
+	const response = await fetch(`${BACKEND_URL}/admin/dashboard/students`, {
+		method: "GET",
+		headers: { Authorization: `Bearer ${token}` },
+		credentials: "include",
+	});
 	return response.json();
 }
 
