@@ -82,7 +82,9 @@ function RegisterPage(): JSX.Element {
 		mutationFn: register,
 		onSuccess: async () => {
 			showSuccess(`Success`, "Login successful", 1250);
-			await navigate({ to: "/login" });
+			setTimeout(() => {
+				navigate({ to: "/login" });
+			}, 1250);
 		},
 		onError: (err) => {
 			showError("Error", err.message);
