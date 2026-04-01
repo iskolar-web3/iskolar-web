@@ -87,8 +87,8 @@ export default function AdminSidebar() {
 			<Dialog open={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
 				<DialogContent>
 					<DialogHeader>
-						<DialogTitle>Confirm Logout</DialogTitle>
-						<DialogDescription>
+						<DialogTitle className="font-normal">Confirm Logout</DialogTitle>
+						<DialogDescription className="text-foreground">
 							Are you sure you want to log out? You will need to log in again to access the admin panel.
 						</DialogDescription>
 					</DialogHeader>
@@ -96,12 +96,14 @@ export default function AdminSidebar() {
 						<Button
 							variant="outline"
 							onClick={() => setIsLogoutDialogOpen(false)}
+							className="cursor-pointer"
 						>
 							Cancel
 						</Button>
 						<Button
 							variant="destructive"
 							onClick={handleConfirmLogout}
+							className="cursor-pointer"
 						>
 							Logout
 						</Button>
