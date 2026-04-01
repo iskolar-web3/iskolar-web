@@ -184,7 +184,7 @@ function AdminUsers() {
 			</div>
 
 			{isLoading ? (
-				<div className="h-96 animate-pulse rounded-[32px] border border-[#E0ECFF] bg-white" />
+				<div className="h-96 animate-pulse rounded-4xl border border-[#E0ECFF] bg-white" />
 			) : data ? (
 				<UserTable
 					data={data}
@@ -194,7 +194,7 @@ function AdminUsers() {
 					onPageChange={setPage}
 				/>
 			) : (
-				<div className="rounded-[32px] border border-[#E0ECFF] bg-white p-10 text-center text-sm text-[#9CA3AF]">
+				<div className="rounded-4xl border border-[#E0ECFF] bg-white p-10 text-center text-sm text-[#9CA3AF]">
 					Failed to load users
 				</div>
 			)}

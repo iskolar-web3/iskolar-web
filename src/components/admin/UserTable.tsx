@@ -147,7 +147,7 @@ export default function UserTable({
 									className="transition-colors hover:bg-[#F7FAFF]"
 								>
 									<td className="px-6 py-4 text-sm text-primary">
-										<div className="flex min-w-[240px] items-center gap-3">
+										<div className="flex min-w-60items-center gap-3">
 											<div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#D9E7FF] bg-[#F3F8FF]">
 												<Mail className="h-4 w-4 text-[#3A52A6]" />
 											</div>
