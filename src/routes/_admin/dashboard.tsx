@@ -92,7 +92,7 @@ function AdminDashboard() {
 				<div className="absolute bottom-0 right-0 h-20 w-32 rounded-tl-[80px] bg-[#EAF2FF]" />
 				<div className="relative flex flex-col gap-6">
 					<div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-						<h1 className="text-3xl font-semibold tracking-tight text-primary sm:text-[2.2rem]">
+						<h1 className="text-3xl tracking-tight text-primary sm:text-[2.2rem]">
 							Dashboard
 						</h1>
 						<LocalTimeClock compact />
@@ -103,7 +103,7 @@ function AdminDashboard() {
 							<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
 								This week
 							</p>
-							<p className="mt-2 text-2xl font-semibold text-primary">
+							<p className="mt-2 text-2xl text-primary">
 								{metrics?.signupsLast7Days ?? "--"}
 							</p>
 							<p className="mt-1 text-sm text-[#6B7280]">New signups recorded</p>
@@ -112,7 +112,7 @@ function AdminDashboard() {
 							<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
 								Peak day
 							</p>
-							<p className="mt-2 text-2xl font-semibold text-primary">
+							<p className="mt-2 text-2xl text-primary">
 								{peakSignupDay?.count ?? "--"}
 							</p>
 							<p className="mt-1 text-sm text-[#6B7280]">
@@ -130,7 +130,7 @@ function AdminDashboard() {
 									<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
 										Engagement
 									</p>
-									<p className="mt-2 text-2xl font-semibold">
+									<p className="mt-2 text-2xl">
 										{metrics?.activeUsersLast7Days ?? "--"}
 									</p>
 								</div>

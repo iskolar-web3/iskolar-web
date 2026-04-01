@@ -27,15 +27,15 @@ export default function SignupChart({ data }: SignupChartProps) {
 	);
 
 	return (
-		<div className="relative overflow-hidden rounded-[32px] border border-[#D8E6FF] bg-white p-6 shadow-[0_22px_55px_-34px_rgba(58,82,166,0.55)]">
+		<div className="relative overflow-hidden rounded-4xl border border-[#D8E6FF] bg-white p-6 shadow-[0_22px_55px_-34px_rgba(58,82,166,0.55)]">
 			<div className="absolute -right-16 top-0 h-36 w-36 rounded-full bg-[#EEF4FF]" />
 			<div className="absolute bottom-0 left-0 h-24 w-24 rounded-tr-[80px] bg-[#F7FAFF]" />
 			<div className="relative mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
 				<div>
-					<p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#8CA2D6]">
+					<p className="text-[11px] uppercase tracking-[0.24em] text-[#8CA2D6]">
 						Growth pulse
 					</p>
-					<h3 className="mt-2 text-lg font-semibold text-primary">
+					<h3 className="mt-2 text-lg text-primary">
 						Signups in the last 30 days
 					</h3>
 					<p className="mt-1 text-sm text-[#6B7280]">
@@ -47,13 +47,13 @@ export default function SignupChart({ data }: SignupChartProps) {
 						<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
 							Total
 						</p>
-						<p className="mt-1 text-xl font-semibold text-primary">{total}</p>
+						<p className="mt-1 text-xl text-primary">{total}</p>
 					</div>
 					<div className="rounded-2xl border border-[#E0ECFF] bg-[#F8FBFF] px-4 py-3">
 						<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
 							Peak day
 						</p>
-						<p className="mt-1 text-xl font-semibold text-primary">
+						<p className="mt-1 text-xl text-primary">
 							{peak ? peak.count : 0}
 						</p>
 						{peak ? (
