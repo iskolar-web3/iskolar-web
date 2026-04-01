@@ -1,4 +1,12 @@
-import { ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+	ChevronUp,
+	ChevronDown,
+	ChevronLeft,
+	ChevronRight,
+	Mail,
+	Clock3,
+	CalendarDays,
+} from "lucide-react";
 import type { UserListItem, PaginatedResponse } from "@/lib/admin/model";
 import { format } from "date-fns";
 
@@ -13,21 +21,21 @@ interface UserTableProps {
 function RoleBadge({ code, name }: { code: string | null; name: string | null }) {
 	if (!code || !name) {
 		return (
-			<span className="inline-flex px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-500">
+			<span className="inline-flex rounded-full border border-[#E5ECFA] bg-[#F7FAFF] px-2.5 py-1 text-xs text-[#7C879C]">
 				No role
 			</span>
 		);
 	}
 
 	const colors: Record<string, string> = {
-		student: "bg-blue-50 text-blue-700",
-		sponsor: "bg-purple-50 text-purple-700",
-		admin: "bg-amber-50 text-amber-700",
+		student: "border-[#D8E6FF] bg-[#EFF5FF] text-[#3659A8]",
+		sponsor: "border-[#DDE1FF] bg-[#F2F3FF] text-[#4D57B8]",
+		admin: "border-[#DFE6F5] bg-[#F4F7FC] text-[#4A5B7C]",
 	};
 
 	return (
 		<span
-			className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${colors[code] || "bg-gray-100 text-gray-600"}`}
+			className={`inline-flex rounded-full border px-2.5 py-1 text-xs ${colors[code] || "border-[#E5ECFA] bg-[#F7FAFF] text-[#7C879C]"}`}
 		>
 			{name}
 		</span>
@@ -36,14 +44,14 @@ function RoleBadge({ code, name }: { code: string | null; name: string | null })
 
 function StatusBadge({ code, name }: { code: string; name: string }) {
 	const colors: Record<string, string> = {
-		active: "bg-green-50 text-green-700",
-		inactive: "bg-gray-100 text-gray-600",
-		suspended: "bg-red-50 text-red-700",
+		active: "border-[#CBEBDD] bg-[#F0FBF5] text-[#1F7A52]",
+		inactive: "border-[#E0E8F5] bg-[#F5F8FC] text-[#637189]",
+		suspended: "border-[#F2D3DA] bg-[#FFF4F6] text-[#B14866]",
 	};
 
 	return (
 		<span
-			className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${colors[code] || "bg-gray-100 text-gray-600"}`}
+			className={`inline-flex rounded-full border px-2.5 py-1 text-xs ${colors[code] || "border-[#E0E8F5] bg-[#F5F8FC] text-[#637189]"}`}
 		>
 			{name}
 		</span>
@@ -83,15 +91,25 @@ export default function UserTable({
 	];
 
 	return (
-		<div className="bg-white rounded-xl border border-[#E0ECFF] overflow-hidden">
+		<div className="overflow-hidden rounded-3xl border border-[#D8E6FF] bg-white shadow-[0_24px_55px_-38px_rgba(58,82,166,0.45)]">
+			<div className="border-b border-[#E7F0FF] bg-[linear-gradient(180deg,#FCFDFF_0%,#F6FAFF_100%)] px-6 py-4">
+				<div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+					<div>
+						<h2 className="text-base text-primary">Registered users</h2>
+					</div>
+					<p className="text-xs uppercase tracking-[0.18em] text-[#8CA2D6]">
+						{data.total} total users
+					</p>
+				</div>
+			</div>
 			<div className="overflow-x-auto">
 				<table className="w-full">
 					<thead>
-						<tr className="border-b border-[#E0ECFF]">
+						<tr className="border-b border-[#E7F0FF] bg-[#FBFDFF]">
 							{columns.map((col) => (
 								<th
 									key={col.key}
-									className={`px-5 py-3 text-left text-xs font-medium text-[#6B7280] uppercase tracking-wider ${
+									className={`px-6 py-4 text-left text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6] ${
 										col.sortable
 											? "cursor-pointer select-none hover:text-primary"
 											: ""
@@ -112,12 +130,12 @@ export default function UserTable({
 							))}
 						</tr>
 					</thead>
-					<tbody className="divide-y divide-[#F0F7FF]">
+					<tbody className="divide-y divide-[#EEF4FF]">
 						{data.items.length === 0 ? (
 							<tr>
 								<td
 									colSpan={columns.length}
-									className="px-5 py-10 text-center text-sm text-[#9CA3AF]"
+									className="px-6 py-14 text-center text-sm text-[#9CA3AF]"
 								>
 									No users found
 								</td>
@@ -126,25 +144,51 @@ export default function UserTable({
 							data.items.map((user) => (
 								<tr
 									key={user.id}
-									className="hover:bg-[#F0F7FF] transition-colors"
+									className="transition-colors hover:bg-[#F7FAFF]"
 								>
-									<td className="px-5 py-3.5 text-sm text-primary">
-										{user.email}
+									<td className="px-6 py-4 text-sm text-primary">
+										<div className="flex min-w-60items-center gap-3">
+											<div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#D9E7FF] bg-[#F3F8FF]">
+												<Mail className="h-4 w-4 text-[#3A52A6]" />
+											</div>
+											<div className="min-w-0">
+												<p className="truncate text-primary">
+													{user.email}
+												</p>
+												<p className="text-xs text-[#8A94A8]">User account</p>
+											</div>
+										</div>
 									</td>
-									<td className="px-5 py-3.5">
+									<td className="px-6 py-4">
 										<RoleBadge code={user.roleCode} name={user.roleName} />
 									</td>
-									<td className="px-5 py-3.5">
+									<td className="px-6 py-4">
 										<StatusBadge
 											code={user.statusCode}
 											name={user.statusName}
 										/>
 									</td>
-									<td className="px-5 py-3.5 text-sm text-[#6B7280]">
-										{format(new Date(user.createdAt), "MMM d, yyyy")}
+									<td className="px-6 py-4 text-sm text-[#6B7280]">
+										<div className="flex items-center gap-2">
+											<CalendarDays className="h-4 w-4 text-[#9CB0D9]" />
+											<div>
+												<p>{format(new Date(user.createdAt), "MMM d, yyyy")}</p>
+												<p className="text-xs text-[#9AA5BA]">
+													{format(new Date(user.createdAt), "p")}
+												</p>
+											</div>
+										</div>
 									</td>
-									<td className="px-5 py-3.5 text-sm text-[#6B7280]">
-										{format(new Date(user.lastLoginAt), "MMM d, yyyy")}
+									<td className="px-6 py-4 text-sm text-[#6B7280]">
+										<div className="flex items-center gap-2">
+											<Clock3 className="h-4 w-4 text-[#9CB0D9]" />
+											<div>
+												<p>{format(new Date(user.lastLoginAt), "MMM d, yyyy")}</p>
+												<p className="text-xs text-[#9AA5BA]">
+													{format(new Date(user.lastLoginAt), "p")}
+												</p>
+											</div>
+										</div>
 									</td>
 								</tr>
 							))
@@ -154,8 +198,8 @@ export default function UserTable({
 			</div>
 
 			{data.totalPages > 1 && (
-				<div className="flex items-center justify-between px-5 py-3 border-t border-[#E0ECFF]">
-					<p className="text-xs text-[#9CA3AF]">
+				<div className="flex flex-col gap-3 border-t border-[#E7F0FF] bg-[#FBFDFF] px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+					<p className="text-xs text-[#8A94A8]">
 						Showing {(data.page - 1) * data.limit + 1} to{" "}
 						{Math.min(data.page * data.limit, data.total)} of {data.total} users
 					</p>
@@ -164,7 +208,7 @@ export default function UserTable({
 							type="button"
 							onClick={() => onPageChange(data.page - 1)}
 							disabled={data.page <= 1}
-							className="p-1.5 rounded-md hover:bg-[#F0F7FF] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+							className="rounded-xl p-2 transition-colors hover:bg-[#EEF5FF] disabled:cursor-not-allowed disabled:opacity-40"
 						>
 							<ChevronLeft className="w-4 h-4 text-[#6B7280]" />
 						</button>
@@ -186,10 +230,10 @@ export default function UserTable({
 										<button
 											type="button"
 											onClick={() => onPageChange(p)}
-											className={`w-8 h-8 rounded-md text-xs font-medium transition-colors ${
+											className={`h-9 w-9 rounded-xl text-xs transition-colors ${
 												p === data.page
-													? "bg-[#3A52A6] text-white"
-													: "text-[#6B7280] hover:bg-[#F0F7FF]"
+													? "bg-[#3A52A6] text-white shadow-[0_14px_28px_-18px_rgba(58,82,166,0.8)]"
+													: "text-[#6B7280] hover:bg-[#EEF5FF]"
 											}`}
 										>
 											{p}
@@ -201,7 +245,7 @@ export default function UserTable({
 							type="button"
 							onClick={() => onPageChange(data.page + 1)}
 							disabled={data.page >= data.totalPages}
-							className="p-1.5 rounded-md hover:bg-[#F0F7FF] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+							className="rounded-xl p-2 transition-colors hover:bg-[#EEF5FF] disabled:cursor-not-allowed disabled:opacity-40"
 						>
 							<ChevronRight className="w-4 h-4 text-[#6B7280]" />
 						</button>
