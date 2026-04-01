@@ -15,9 +15,9 @@ import { statusStyles } from "@/components/student/home/ApplicationDetailsDrawer
 import {
 	formatDate,
 	formatTime,
-	formatAmountPerScholar,
+	formatCurrency,
 } from "@/utils/formatting.utils";
-import { type Application } from "@/lib/scholarship/model";
+import { type Application, ScholarshipType } from "@/lib/scholarship/model";
 import { getSponsorName } from "@/lib/sponsor/api";
 import { format } from "date-fns";
 
@@ -109,10 +109,21 @@ export function HomeApplications(props: Props): JSX.Element {
 													{item.scholarship.name}
 												</h3>
 
-												<div className="flex gap-1 mb-3">
-													<span className="px-2 py-0.5 bg-white/90 text-secondary text-[10px] md:text-[11px] rounded whitespace-nowrap">
-														{item.scholarship.scholarshipType.name}
-													</span>
+												<div className="flex flex-wrap gap-1 mb-3">
+													{item.scholarship.scholarshipType.code === ScholarshipType.Combined ? (
+														<>
+															<span className="px-2 py-0.5 bg-white/90 text-secondary text-[10px] md:text-[11px] rounded whitespace-nowrap">
+																Merit-Based
+															</span>
+															<span className="px-2 py-0.5 bg-white/90 text-secondary text-[10px] md:text-[11px] rounded whitespace-nowrap">
+																Need-Based
+															</span>
+														</>
+													) : (
+														<span className="px-2 py-0.5 bg-white/90 text-secondary text-[10px] md:text-[11px] rounded whitespace-nowrap">
+															{item.scholarship.scholarshipType.name}
+														</span>
+													)}
 												</div>
 
 												<div className="space-y-1.5 text-xs">
@@ -178,80 +189,32 @@ export function HomeApplications(props: Props): JSX.Element {
 								</div>
 
 								{/* Body */}
-								<div className="space-y-4 bg-white px-4 py-3 md:px-5 md:py-4">
-									<div className="grid grid-cols-2 gap-2 md:gap-3">
-										<div className="rounded-xl border border-border bg-[#F9FAFB] p-3">
-											<div className="mb-1 flex items-center gap-1.5 text-[11px] text-[#6B7280]">
-												<Coins className="h-3.5 w-3.5" />
+								<div className="p-4">
+									<div className="grid grid-cols-2 gap-2">
+										<div className="rounded-lg border border-border bg-[#F9FAFB] p-3">
+											<div className="mb-1 flex items-center gap-1.5 text-xs text-[#6B7280]">
+												<Coins size={16} />
 												<span>Amount</span>
 											</div>
-											<p className="text-sm text-primary">
-												{formatAmountPerScholar(
-													item.scholarship.totalAmount,
-													item.scholarship.totalSlots,
-													{ locale: "en-PH" },
-												)}
-											</p>
-											<p className="text-[11px] text-[#6B7280]">per scholar</p>
+											{(() => {
+												const s = item.scholarship;
+												const isRange = s.totalAmountMin != null || s.totalAmountMax != null;
+												const isFixed = !isRange && s.totalAmount != null;
+												if (isFixed) return (<><p className="text-sm text-primary">{formatCurrency(s.totalAmount!, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p><p className="text-xs text-[#6B7280]">per scholar</p></>);
+												if (isRange) return (<><p className="text-sm text-primary">{formatCurrency(s.totalAmountMin ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}{" – "}{formatCurrency(s.totalAmountMax ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</p><p className="text-xs text-[#6B7280]">per scholar</p></>);
+												return (<><p className="text-sm text-primary">Varies</p><p className="text-xs text-[#6B7280]">see details</p></>);
+											})()}
 										</div>
 
-										<div className="rounded-xl border border-border bg-[#F9FAFB] p-3">
-											<div className="mb-1 flex items-center gap-1.5 text-[11px] text-[#6B7280]">
-												<Users className="h-3.5 w-3.5" />
+										<div className="rounded-lg border border-border bg-[#F9FAFB] p-3">
+											<div className="mb-1 flex items-center gap-1.5 text-xs text-[#6B7280]">
+												<Users size={16} />
 												<span>Slots</span>
 											</div>
 											<p className="text-sm text-primary">
-												{item.scholarship.totalSlots}
+												{item.scholarship.totalSlots ?? "No limit"}
 											</p>
-											<p className="text-[11px] text-[#6B7280]">scholars</p>
-										</div>
-									</div>
-
-									<div className="grid grid-cols-2 gap-4 md:gap-6">
-										<div>
-											<h4 className="mb-1.5 text-xs tracking-wide text-[#6B7280]">
-												Criteria
-											</h4>
-											<div className="flex flex-wrap gap-1.5">
-												{item.scholarship.criterias
-													.slice(0, 2)
-													.map((item, i) => (
-														<span
-															key={i}
-															className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[10px] md:text-[11px] rounded border border-border"
-														>
-															{item}
-														</span>
-													))}
-												{item.scholarship.criterias.length > 2 && (
-													<span className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[10px] md:text-[11px] rounded border border-border">
-														+ {item.scholarship.criterias.length - 2} more
-													</span>
-												)}
-											</div>
-										</div>
-
-										<div>
-											<h4 className="mb-1.5 text-xs tracking-wide text-[#6B7280]">
-												Required Documents
-											</h4>
-											<div className="flex flex-wrap gap-1.5">
-												{item.scholarship.requirements
-													.slice(0, 2)
-													.map((item, i) => (
-														<span
-															key={i}
-															className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[10px] md:text-[11px] rounded border border-border"
-														>
-															{item}
-														</span>
-													))}
-												{item.scholarship.requirements.length > 2 && (
-													<span className="px-2.5 py-1 bg-[#F9FAFB] text-[#374151] text-[10px] md:text-[11px] rounded border border-border">
-														+ {item.scholarship.requirements.length - 2} more
-													</span>
-												)}
-											</div>
+											<p className="text-xs text-[#6B7280]">scholars</p>
 										</div>
 									</div>
 								</div>
