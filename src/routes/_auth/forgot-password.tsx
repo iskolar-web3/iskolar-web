@@ -1,9 +1,8 @@
-import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import Toast from "@/components/Toast";
 import { useToast } from "@/hooks/useToast";
 import type { JSX } from "react";
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -30,12 +29,7 @@ type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 function ForgotPasswordPage(): JSX.Element {
 	const navigate = useNavigate();
-	const router = useRouter();
 	const { toast, showError } = useToast();
-
-	useEffect(() => {
-		router.history.back();
-	}, []);
 
 	const form = useForm<ForgotPasswordFormData>({
 		resolver: zodResolver(forgotPasswordSchema),

@@ -49,10 +49,10 @@ const registerSchema = z
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 async function register(value: RegisterFormData): Promise<User> {
-	const { email, password } = value;
+	const { email, password, confirmPassword } = value;
 	const response = await fetch(`${BACKEND_URL}/register`, {
 		method: "POST",
-		body: JSON.stringify({ email, password }),
+		body: JSON.stringify({ email, password, confirmPassword }),
 		headers: { "Content-Type": "application/json" },
 	});
 	const result: ApiResponse<User> = await response.json();
@@ -66,8 +66,6 @@ async function register(value: RegisterFormData): Promise<User> {
 function RegisterPage(): JSX.Element {
 	const navigate = useNavigate();
 
-	// TODO: Remove this and use mutation.isPending instead
-	const [loading, setLoading] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const { toast, showSuccess, showError } = useToast();
@@ -84,7 +82,6 @@ function RegisterPage(): JSX.Element {
 		mutationFn: register,
 		onSuccess: async () => {
 			showSuccess(`Success`, "Login successful", 1250);
-			setLoading(false);
 			await navigate({ to: "/login" });
 		},
 		onError: (err) => {
@@ -94,7 +91,6 @@ function RegisterPage(): JSX.Element {
 	});
 
 	const onSubmit = async (value: RegisterFormData) => {
-		setLoading(true);
 		mutation.mutate(value);
 	};
 
@@ -147,7 +143,7 @@ function RegisterPage(): JSX.Element {
 								type="email"
 								placeholder="Enter Email"
 								{...form.register("email")}
-								disabled={loading}
+								disabled={mutation.isPending}
 								className={`w-full px-4 py-3 sm:px-3 sm:py-2.5 xl:py-3 rounded-lg text-xs sm:text-[11px] xl:text-sm focus:outline-none focus:ring-1 transition-all bg-transparent border text-primary placeholder:text-[#C4CBD5] ${
 									form.formState.errors.email
 										? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444]"
@@ -174,7 +170,7 @@ function RegisterPage(): JSX.Element {
 									type={showPassword ? "text" : "password"}
 									placeholder="Enter Password"
 									{...form.register("password")}
-									disabled={loading}
+									disabled={mutation.isPending}
 									className={`w-full px-4 py-3 sm:px-3 sm:py-2.5 xl:py-3 pr-10 rounded-lg text-xs sm:text-[11px] xl:text-sm focus:outline-none focus:ring-1 transition-all bg-transparent border text-primary placeholder:text-[#C4CBD5] ${
 										form.formState.errors.password
 											? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444]"
@@ -218,7 +214,7 @@ function RegisterPage(): JSX.Element {
 									type={showConfirmPassword ? "text" : "password"}
 									placeholder="Confirm Password"
 									{...form.register("confirmPassword")}
-									disabled={loading}
+									disabled={mutation.isPending}
 									className={`w-full px-4 py-3 sm:px-3 sm:py-2.5 xl:py-3 pr-10 rounded-lg text-xs sm:text-[11px] xl:text-sm  focus:outline-none focus:ring-1 transition-all bg-transparent border text-primary placeholder:text-[#C4CBD5] ${
 										form.formState.errors.confirmPassword
 											? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444]"
@@ -250,7 +246,7 @@ function RegisterPage(): JSX.Element {
 								<input
 									type="checkbox"
 									{...form.register("agreeToPolicies")}
-									disabled={loading}
+									disabled={mutation.isPending}
 									className="mt-0.5 w-3.5 h-3.5 xl:w-4 xl:h-4 rounded border-[#C4CBD5] text-secondary focus:ring-[#3A52A6] cursor-pointer"
 								/>
 								<span className="text-[11px] sm:text-[10px] xl:text-sm text-[#8C8C8C] leading-snug">
@@ -281,11 +277,11 @@ function RegisterPage(): JSX.Element {
 						<button
 							type="submit"
 							className={`w-full py-3 sm:py-3 xl:py-3.5 mt-6 sm:mt-5 rounded-lg text-[#F0F7FF] text-xs sm:text-[11px] xl:text-sm cursor-pointer hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] active:shadow-md transition-all bg-[#3A52A6] ${
-								(loading || !agreed) && "opacity-60 cursor-not-allowed"
+								(mutation.isPending || !agreed) && "opacity-60 cursor-not-allowed"
 							}`}
-							disabled={loading || !agreed}
+							disabled={mutation.isPending || !agreed}
 						>
-							{loading ? (
+							{mutation.isPending ? (
 								<span className="flex items-center justify-center">
 									<Loader2 className="w-4 h-4 animate-spin" />
 								</span>
