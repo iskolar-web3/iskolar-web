@@ -108,7 +108,7 @@ function AdminDashboard() {
 							</p>
 							<p className="mt-1 text-sm text-[#6B7280]">New signups recorded</p>
 						</div>
-						<div className="rounded-3xl border border-white/70 bg-[#F9FBFF] p-4">
+						<div className="rounded-3xl border border-white/70 bg-white/90 p-4 shadow-[0_16px_35px_-28px_rgba(58,82,166,0.7)]">
 							<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
 								Peak day
 							</p>
@@ -124,7 +124,7 @@ function AdminDashboard() {
 									: "Waiting for timeline"}
 							</p>
 						</div>
-						<div className="rounded-3xl border border-[#D8E6FF] bg-background px-4 py-4 text-primary">
+						<div className="rounded-3xl border border-white/70 bg-white/90 p-4 shadow-[0_16px_35px_-28px_rgba(58,82,166,0.7)]">
 							<div className="flex items-start justify-between gap-3">
 								<div>
 									<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
