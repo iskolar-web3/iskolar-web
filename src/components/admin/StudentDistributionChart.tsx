@@ -11,7 +11,37 @@ import {
 	Legend,
 	ResponsiveContainer,
 } from "recharts";
+import type { TooltipContentProps } from "recharts";
 import type { StudentDistribution } from "@/lib/admin/model";
+
+function SchoolTooltip({ active, payload }: TooltipContentProps) {
+	if (!active || !payload?.length) return null;
+	const item = payload[0];
+	const count = Number(item.value ?? 0);
+	return (
+		<div className="rounded-2xl border border-[#E0ECFF] bg-white px-4 py-3 shadow-[0_12px_30px_-18px_rgba(58,82,166,0.45)]">
+			<p className="text-sm font-medium text-primary">{item.name}</p>
+			<p className="mt-0.5 text-sm text-[#6B7280]">
+				{count} student{count !== 1 ? "s" : ""}
+			</p>
+		</div>
+	);
+}
+
+function EduTooltip({ active, payload }: TooltipContentProps) {
+	if (!active || !payload?.length) return null;
+	const item = payload[0];
+	const count = Number(item.value ?? 0);
+	const name = (item.payload as { name: string }).name;
+	return (
+		<div className="rounded-2xl border border-[#E0ECFF] bg-white px-4 py-3 shadow-[0_12px_30px_-18px_rgba(58,82,166,0.45)]">
+			<p className="text-sm font-medium text-primary">{name}</p>
+			<p className="mt-0.5 text-sm text-[#6B7280]">
+				{count} student{count !== 1 ? "s" : ""}
+			</p>
+		</div>
+	);
+}
 
 const PIE_COLORS = [
 	"#3A52A6",
@@ -84,19 +114,7 @@ export default function StudentDistributionChart({
 										/>
 									))}
 								</Pie>
-								<Tooltip
-									contentStyle={{
-										borderRadius: "16px",
-										border: "1px solid #E0ECFF",
-										backgroundColor: "#FFFFFF",
-										fontSize: "13px",
-										boxShadow: "0 12px 30px -18px rgba(58,82,166,0.45)",
-									}}
-									formatter={(value) => {
-										const count = value as number;
-										return [`${count} student${count !== 1 ? "s" : ""}`, "Count"];
-									}}
-								/>
+								<Tooltip content={SchoolTooltip} />
 								<Legend
 									iconType="circle"
 									iconSize={8}
@@ -164,19 +182,7 @@ export default function StudentDistributionChart({
 									tickLine={false}
 									width={140}
 								/>
-								<Tooltip
-									contentStyle={{
-										borderRadius: "16px",
-										border: "1px solid #E0ECFF",
-										backgroundColor: "#FFFFFF",
-										fontSize: "13px",
-										boxShadow: "0 12px 30px -18px rgba(58,82,166,0.45)",
-									}}
-									formatter={(value) => {
-										const count = value as number;
-										return [`${count} student${count !== 1 ? "s" : ""}`, "Count"];
-									}}
-								/>
+								<Tooltip content={(props) => <EduTooltip {...props} />} />
 								<Bar dataKey="value" radius={4} name="Students">
 									{eduData.map((_, i) => (
 										<Cell
