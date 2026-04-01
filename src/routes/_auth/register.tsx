@@ -81,7 +81,7 @@ function RegisterPage(): JSX.Element {
 	const mutation = useMutation({
 		mutationFn: register,
 		onSuccess: async () => {
-			showSuccess(`Success`, "Login successful", 1250);
+			showSuccess(`Success`, "Registration successful", 1250);
 			setTimeout(() => {
 				navigate({ to: "/login" });
 			}, 1250);
