@@ -49,10 +49,10 @@ const registerSchema = z
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 async function register(value: RegisterFormData): Promise<User> {
-	const { email, password } = value;
+	const { email, password, confirmPassword } = value;
 	const response = await fetch(`${BACKEND_URL}/register`, {
 		method: "POST",
-		body: JSON.stringify({ email, password }),
+		body: JSON.stringify({ email, password, confirmPassword }),
 		headers: { "Content-Type": "application/json" },
 	});
 	const result: ApiResponse<User> = await response.json();
