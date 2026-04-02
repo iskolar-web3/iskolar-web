@@ -21,6 +21,7 @@ import { Route as SponsorCreateRouteImport } from './routes/_sponsor/create'
 import { Route as OnboardingWelcomeRouteImport } from './routes/_onboarding/welcome'
 import { Route as OnboardingRoleSelectionRouteImport } from './routes/_onboarding/role-selection'
 import { Route as OnboardingProfileSetupRouteImport } from './routes/_onboarding/profile-setup'
+import { Route as AuthVerifyRouteImport } from './routes/_auth/verify'
 import { Route as AuthTermsConditionsRouteImport } from './routes/_auth/terms-conditions'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
@@ -92,6 +93,11 @@ const OnboardingProfileSetupRoute = OnboardingProfileSetupRouteImport.update({
   id: '/profile-setup',
   path: '/profile-setup',
   getParentRoute: () => OnboardingRoute,
+} as any)
+const AuthVerifyRoute = AuthVerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
+  getParentRoute: () => AuthRoute,
 } as any)
 const AuthTermsConditionsRoute = AuthTermsConditionsRouteImport.update({
   id: '/terms-conditions',
@@ -190,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/terms-conditions': typeof AuthTermsConditionsRoute
+  '/verify': typeof AuthVerifyRoute
   '/profile-setup': typeof OnboardingProfileSetupRoute
   '/role-selection': typeof OnboardingRoleSelectionRoute
   '/welcome': typeof OnboardingWelcomeRoute
@@ -215,6 +222,7 @@ export interface FileRoutesByTo {
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/terms-conditions': typeof AuthTermsConditionsRoute
+  '/verify': typeof AuthVerifyRoute
   '/profile-setup': typeof OnboardingProfileSetupRoute
   '/role-selection': typeof OnboardingRoleSelectionRoute
   '/welcome': typeof OnboardingWelcomeRoute
@@ -246,6 +254,7 @@ export interface FileRoutesById {
   '/_auth/register': typeof AuthRegisterRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/_auth/terms-conditions': typeof AuthTermsConditionsRoute
+  '/_auth/verify': typeof AuthVerifyRoute
   '/_onboarding/profile-setup': typeof OnboardingProfileSetupRoute
   '/_onboarding/role-selection': typeof OnboardingRoleSelectionRoute
   '/_onboarding/welcome': typeof OnboardingWelcomeRoute
@@ -273,6 +282,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/terms-conditions'
+    | '/verify'
     | '/profile-setup'
     | '/role-selection'
     | '/welcome'
@@ -298,6 +308,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/terms-conditions'
+    | '/verify'
     | '/profile-setup'
     | '/role-selection'
     | '/welcome'
@@ -328,6 +339,7 @@ export interface FileRouteTypes {
     | '/_auth/register'
     | '/_auth/reset-password'
     | '/_auth/terms-conditions'
+    | '/_auth/verify'
     | '/_onboarding/profile-setup'
     | '/_onboarding/role-selection'
     | '/_onboarding/welcome'
@@ -438,6 +450,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/profile-setup'
       preLoaderRoute: typeof OnboardingProfileSetupRouteImport
       parentRoute: typeof OnboardingRoute
+    }
+    '/_auth/verify': {
+      id: '/_auth/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof AuthVerifyRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/_auth/terms-conditions': {
       id: '/_auth/terms-conditions'
@@ -574,6 +593,7 @@ interface AuthRouteChildren {
   AuthRegisterRoute: typeof AuthRegisterRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthTermsConditionsRoute: typeof AuthTermsConditionsRoute
+  AuthVerifyRoute: typeof AuthVerifyRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
@@ -584,6 +604,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthRegisterRoute: AuthRegisterRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthTermsConditionsRoute: AuthTermsConditionsRoute,
+  AuthVerifyRoute: AuthVerifyRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
