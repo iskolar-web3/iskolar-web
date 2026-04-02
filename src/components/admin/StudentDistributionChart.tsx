@@ -215,10 +215,10 @@ export default function StudentDistributionChart({
 								<YAxis
 									type="category"
 									dataKey="name"
-									tick={{ fontSize: 12, fill: "#6B7280" }}
+									tick={{ fontSize: 11, fill: "#6B7280" }}
 									axisLine={false}
 									tickLine={false}
-									width={140}
+									width={110}
 								/>
 								<Tooltip content={EduTooltip} />
 								<Bar dataKey="value" radius={4} name="Students">

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useRef } from "react";
 import { useAuth } from "@/auth";
-import { adminUsersQueryOptions } from "@/lib/admin/queries";
+import { adminUsersQueryOptions, adminDashboardQueryOptions } from "@/lib/admin/queries";
 import UserTable from "@/components/admin/UserTable";
 import { LocalTimeClock } from "@/components/landing/LocalTimeClock";
 import { Search, Users, ShieldCheck, GraduationCap, HeartHandshake } from "lucide-react";
@@ -33,6 +33,7 @@ function AdminUsers() {
 	};
 
 	const { data, isLoading } = useQuery(adminUsersQueryOptions(token, params));
+	const { data: metrics } = useQuery(adminDashboardQueryOptions(token));
 
 	const searchTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
 	const handleSearchChange = (value: string) => {
@@ -61,16 +62,6 @@ function AdminUsers() {
 		setPage(1);
 	};
 
-	const visibleRoleCounts = data?.items.reduce(
-		(counts, user) => {
-			if (user.roleCode === "student") counts.students += 1;
-			if (user.roleCode === "sponsor") counts.sponsors += 1;
-			if (user.roleCode === "admin") counts.admins += 1;
-			return counts;
-		},
-		{ students: 0, sponsors: 0, admins: 0 },
-	);
-
 	return (
 		<div className="space-y-6">
 			<div className="relative overflow-hidden rounded-3xl border border-[#D7E5FF] bg-[linear-gradient(135deg,#F8FBFF_0%,#EEF5FF_54%,#FFFFFF_100%)] px-6 py-6 shadow-[0_26px_60px_-36px_rgba(58,82,166,0.45)] sm:px-8 sm:py-7">
@@ -84,7 +75,7 @@ function AdminUsers() {
 						<LocalTimeClock compact />
 					</div>
 
-					<div className="grid gap-3 md:grid-cols-4">
+					<div className="grid grid-cols-2 gap-3 md:grid-cols-4">
 						<div className="rounded-xl border border-white/70 bg-white/92 p-4 shadow-[0_16px_35px_-28px_rgba(58,82,166,0.7)]">
 							<div className="flex items-start justify-between gap-3">
 								<div>
@@ -107,7 +98,7 @@ function AdminUsers() {
 										Students
 									</p>
 									<p className="mt-2 text-2xl text-primary">
-										{visibleRoleCounts?.students ?? "--"}
+										{metrics?.studentCount ?? "--"}
 									</p>
 								</div>
 								<div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#D9E7FF] bg-[#F3F8FF]">
@@ -122,7 +113,7 @@ function AdminUsers() {
 										Sponsors
 									</p>
 									<p className="mt-2 text-2xl text-primary">
-										{visibleRoleCounts?.sponsors ?? "--"}
+										{metrics?.sponsorCount ?? "--"}
 									</p>
 								</div>
 								<div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#D9E7FF] bg-[#F3F8FF]">
@@ -137,7 +128,7 @@ function AdminUsers() {
 										Admins
 									</p>
 									<p className="mt-2 text-2xl">
-										{visibleRoleCounts?.admins ?? "--"}
+										{metrics?.adminCount ?? "--"}
 									</p>
 								</div>
 								<div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#D9E7FF] bg-[#F3F8FF]">
@@ -158,7 +149,7 @@ function AdminUsers() {
 						</p>
 					</div>
 					<div className="flex flex-col gap-3 sm:flex-row">
-						<div className="relative flex-1 min-w-[260px]">
+						<div className="relative flex-1 sm:min-w-[260px]">
 							<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9CA3AF]" />
 							<input
 								type="text"
@@ -172,7 +163,7 @@ function AdminUsers() {
 						<select
 							value={role || "all"}
 							onChange={(e) => handleRoleChange(e.target.value)}
-							className="rounded-lg border border-[#D3DCF6] bg-[#FBFDFF] px-4 py-2.5 text-sm text-primary focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[#3A52A6]"
+							className="w-full rounded-lg border border-[#D3DCF6] bg-[#FBFDFF] px-4 py-2.5 text-sm text-primary focus:border-transparent focus:outline-none focus:ring-2 focus:ring-[#3A52A6] sm:w-auto"
 						>
 							<option value="all">All Roles</option>
 							<option value="student">Student</option>

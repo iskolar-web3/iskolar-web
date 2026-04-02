@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { LayoutDashboard, Users, LogOut } from "lucide-react";
 import { useAuth } from "@/auth";
@@ -17,12 +17,21 @@ const navItems = [
 	{ label: "Users", path: "/users", icon: Users },
 ];
 
-export default function AdminSidebar() {
+interface AdminSidebarProps {
+	open: boolean;
+	onClose: () => void;
+}
+
+export default function AdminSidebar({ open, onClose }: AdminSidebarProps) {
 	const router = useRouterState();
 	const navigate = useNavigate();
 	const auth = useAuth();
 	const currentPath = router.location.pathname;
 	const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+
+	useEffect(() => {
+		onClose();
+	}, [currentPath]);
 
 	const handleLogoutClick = () => {
 		setIsLogoutDialogOpen(true);
@@ -36,7 +45,16 @@ export default function AdminSidebar() {
 
 	return (
 		<>
-			<aside className="fixed top-0 left-0 h-screen w-60 bg-white border-r border-[#E0ECFF] flex flex-col z-40">
+			{/* Mobile overlay */}
+			{open && (
+				<div
+					className="fixed inset-0 z-30 bg-black/40 lg:hidden"
+					onClick={onClose}
+				/>
+			)}
+			<aside
+				className={`fixed top-0 left-0 h-screen w-60 bg-white border-r border-[#E0ECFF] flex flex-col z-40 transition-transform duration-300 lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}
+			>
 				<div className="flex items-center gap-2 px-5 py-4 border-b border-[#E0ECFF]">
 					<img src="/logo.png" alt="iSkolar Logo" className="w-9 h-9" />
 					<span className="text-lg text-secondary">iSkolar</span>

@@ -94,7 +94,7 @@ function AdminDashboard() {
 						<LocalTimeClock compact />
 					</div>
 
-					<div className="grid gap-3 md:grid-cols-3">
+					<div className="grid gap-3 sm:grid-cols-3">
 						<div className="rounded-3xl border border-white/70 bg-white/90 p-4 shadow-[0_16px_35px_-28px_rgba(58,82,166,0.7)]">
 							<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
 								This week
