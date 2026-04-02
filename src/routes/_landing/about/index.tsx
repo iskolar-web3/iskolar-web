@@ -33,15 +33,19 @@ function About() {
 	useSmoothScroll();
 
 	useEffect(() => {
-		// Handle hash scrolling on initial load
-		if (window.location.hash) {
-			const element = document.querySelector(window.location.hash);
+		if (!window.location.hash) return;
+		const hash = window.location.hash;
+		let attempts = 0;
+		const tryScroll = () => {
+			const element = document.querySelector(hash);
 			if (element) {
-				setTimeout(() => {
-					element.scrollIntoView({ behavior: "smooth" });
-				}, 100);
+				element.scrollIntoView({ behavior: "smooth" });
+			} else if (attempts < 20) {
+				attempts++;
+				setTimeout(tryScroll, 100);
 			}
-		}
+		};
+		setTimeout(tryScroll, 100);
 	}, []);
 
 	return (
