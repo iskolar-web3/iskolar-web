@@ -28,7 +28,7 @@ function RouteComponent(): JSX.Element {
 	}
 
 	if (tokenQuery.isError) {
-		return <div>erawrr</div>;
+		return <div>error</div>;
 	}
 
 	return (

@@ -24,6 +24,7 @@ import { Route as OnboardingProfileSetupRouteImport } from './routes/_onboarding
 import { Route as AuthVerifyRouteImport } from './routes/_auth/verify'
 import { Route as AuthTermsConditionsRouteImport } from './routes/_auth/terms-conditions'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
+import { Route as AuthResendRouteImport } from './routes/_auth/resend'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthPrivacyPolicyRouteImport } from './routes/_auth/privacy-policy'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
@@ -107,6 +108,11 @@ const AuthTermsConditionsRoute = AuthTermsConditionsRouteImport.update({
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthResendRoute = AuthResendRouteImport.update({
+  id: '/resend',
+  path: '/resend',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthRegisterRoute = AuthRegisterRouteImport.update({
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
   '/privacy-policy': typeof AuthPrivacyPolicyRoute
   '/register': typeof AuthRegisterRoute
+  '/resend': typeof AuthResendRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/terms-conditions': typeof AuthTermsConditionsRoute
   '/verify': typeof AuthVerifyRoute
@@ -220,6 +227,7 @@ export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/privacy-policy': typeof AuthPrivacyPolicyRoute
   '/register': typeof AuthRegisterRoute
+  '/resend': typeof AuthResendRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/terms-conditions': typeof AuthTermsConditionsRoute
   '/verify': typeof AuthVerifyRoute
@@ -252,6 +260,7 @@ export interface FileRoutesById {
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/privacy-policy': typeof AuthPrivacyPolicyRoute
   '/_auth/register': typeof AuthRegisterRoute
+  '/_auth/resend': typeof AuthResendRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/_auth/terms-conditions': typeof AuthTermsConditionsRoute
   '/_auth/verify': typeof AuthVerifyRoute
@@ -280,6 +289,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/privacy-policy'
     | '/register'
+    | '/resend'
     | '/reset-password'
     | '/terms-conditions'
     | '/verify'
@@ -306,6 +316,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/privacy-policy'
     | '/register'
+    | '/resend'
     | '/reset-password'
     | '/terms-conditions'
     | '/verify'
@@ -337,6 +348,7 @@ export interface FileRouteTypes {
     | '/_auth/login'
     | '/_auth/privacy-policy'
     | '/_auth/register'
+    | '/_auth/resend'
     | '/_auth/reset-password'
     | '/_auth/terms-conditions'
     | '/_auth/verify'
@@ -472,6 +484,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthResetPasswordRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/resend': {
+      id: '/_auth/resend'
+      path: '/resend'
+      fullPath: '/resend'
+      preLoaderRoute: typeof AuthResendRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/register': {
       id: '/_auth/register'
       path: '/register'
@@ -591,6 +610,7 @@ interface AuthRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
   AuthPrivacyPolicyRoute: typeof AuthPrivacyPolicyRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
+  AuthResendRoute: typeof AuthResendRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthTermsConditionsRoute: typeof AuthTermsConditionsRoute
   AuthVerifyRoute: typeof AuthVerifyRoute
@@ -602,6 +622,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
   AuthPrivacyPolicyRoute: AuthPrivacyPolicyRoute,
   AuthRegisterRoute: AuthRegisterRoute,
+  AuthResendRoute: AuthResendRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthTermsConditionsRoute: AuthTermsConditionsRoute,
   AuthVerifyRoute: AuthVerifyRoute,
