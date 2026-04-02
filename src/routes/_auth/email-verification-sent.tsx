@@ -9,6 +9,7 @@ import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import { resendVerificationEmail } from "@/lib/user/auth";
 import { SEO } from "@/components/SEO";
+import { FeedbackWidget } from "@/components/FeedbackWidget";
 
 const searchSchema = z.object({
 	email: z.string().catch(""),
@@ -66,6 +67,7 @@ function EmailVerificationSentPage(): JSX.Element {
 		<>
 			<SEO title="Verify Your Email" noindex={true} />
 			{toast && <Toast {...toast} />}
+			<FeedbackWidget />
 
 			<motion.div
 				className="rounded-xl py-8 px-10 md:py-10 md:px-12 lg:py-8 lg:px-10 sm:py-6 sm:px-6 shadow-[1px_1px_4px_1px_rgba(96,126,242,0.5)] bg-[#F0F7FF] w-full max-w-md mx-auto text-center"

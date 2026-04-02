@@ -17,6 +17,7 @@ import { setCookie } from "@/lib/cookie";
 import { UserRole, type AuthSession } from "@/lib/user/model";
 import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/lib/user/auth";
 import { useAuth } from "@/auth";
+import { FeedbackWidget } from "@/components/FeedbackWidget";
 
 export const Route = createFileRoute("/_auth/login")({
   component: LoginPage,
@@ -151,13 +152,14 @@ function LoginPage(): JSX.Element {
     <>
       <SEO title="Log In" noindex={true} />
       {showPreloader && (
-        <Preloader 
+        <Preloader
           onComplete={handlePreloaderComplete}
           minDisplayTime={2000}
         />
       )}
-      
+
       {toast && <Toast {...toast} />}
+      <FeedbackWidget />
       
       {!showPreloader && (
       <motion.div 

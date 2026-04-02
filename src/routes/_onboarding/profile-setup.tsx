@@ -5,6 +5,7 @@ import { SEO } from "@/components/SEO";
 import Toast from "@/components/Toast";
 import { useToast } from "@/hooks/useToast";
 import Preloader from "@/components/Preloader";
+import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -564,6 +565,7 @@ function ProfileSetup() {
 	return (
 		<>
 			<SEO title="Profile Setup" noindex={true} />
+			<FeedbackWidget />
 			{showPreloader && (
 				<Preloader onComplete={handlePreloaderComplete} minDisplayTime={2000} />
 			)}
