@@ -30,3 +30,15 @@ export async function validateVerificationToken(
 
 	return result;
 }
+
+export async function resendVerificationEmail(email: string): Promise<void> {
+	const response = await fetch(`${BACKEND_URL}/verify/resend`, {
+		method: "POST",
+		body: JSON.stringify({ email }),
+		headers: { "Content-Type": "application/json" },
+	});
+	const result: ApiResponse = await response.json();
+	if (!response.ok) {
+		throw new Error(result.message || "Failed to resend verification link.");
+	}
+}

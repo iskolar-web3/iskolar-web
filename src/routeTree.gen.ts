@@ -21,6 +21,7 @@ import { Route as SponsorCreateRouteImport } from './routes/_sponsor/create'
 import { Route as OnboardingWelcomeRouteImport } from './routes/_onboarding/welcome'
 import { Route as OnboardingRoleSelectionRouteImport } from './routes/_onboarding/role-selection'
 import { Route as OnboardingProfileSetupRouteImport } from './routes/_onboarding/profile-setup'
+import { Route as AuthVerifyEmailRouteImport } from './routes/_auth/verify-email'
 import { Route as AuthVerifyRouteImport } from './routes/_auth/verify'
 import { Route as AuthTermsConditionsRouteImport } from './routes/_auth/terms-conditions'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
@@ -29,6 +30,7 @@ import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthPrivacyPolicyRouteImport } from './routes/_auth/privacy-policy'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
+import { Route as AuthEmailVerificationSentRouteImport } from './routes/_auth/email-verification-sent'
 import { Route as AuthConfirmationRouteImport } from './routes/_auth/confirmation'
 import { Route as AdminUsersRouteImport } from './routes/_admin/users'
 import { Route as AdminDashboardRouteImport } from './routes/_admin/dashboard'
@@ -95,6 +97,11 @@ const OnboardingProfileSetupRoute = OnboardingProfileSetupRouteImport.update({
   path: '/profile-setup',
   getParentRoute: () => OnboardingRoute,
 } as any)
+const AuthVerifyEmailRoute = AuthVerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthVerifyRoute = AuthVerifyRouteImport.update({
   id: '/verify',
   path: '/verify',
@@ -135,6 +142,12 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthEmailVerificationSentRoute =
+  AuthEmailVerificationSentRouteImport.update({
+    id: '/email-verification-sent',
+    path: '/email-verification-sent',
+    getParentRoute: () => AuthRoute,
+  } as any)
 const AuthConfirmationRoute = AuthConfirmationRouteImport.update({
   id: '/confirmation',
   path: '/confirmation',
@@ -196,6 +209,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AdminDashboardRoute
   '/users': typeof AdminUsersRoute
   '/confirmation': typeof AuthConfirmationRoute
+  '/email-verification-sent': typeof AuthEmailVerificationSentRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
   '/privacy-policy': typeof AuthPrivacyPolicyRoute
@@ -204,6 +218,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof AuthResetPasswordRoute
   '/terms-conditions': typeof AuthTermsConditionsRoute
   '/verify': typeof AuthVerifyRoute
+  '/verify-email': typeof AuthVerifyEmailRoute
   '/profile-setup': typeof OnboardingProfileSetupRoute
   '/role-selection': typeof OnboardingRoleSelectionRoute
   '/welcome': typeof OnboardingWelcomeRoute
@@ -223,6 +238,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AdminDashboardRoute
   '/users': typeof AdminUsersRoute
   '/confirmation': typeof AuthConfirmationRoute
+  '/email-verification-sent': typeof AuthEmailVerificationSentRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
   '/privacy-policy': typeof AuthPrivacyPolicyRoute
@@ -231,6 +247,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof AuthResetPasswordRoute
   '/terms-conditions': typeof AuthTermsConditionsRoute
   '/verify': typeof AuthVerifyRoute
+  '/verify-email': typeof AuthVerifyEmailRoute
   '/profile-setup': typeof OnboardingProfileSetupRoute
   '/role-selection': typeof OnboardingRoleSelectionRoute
   '/welcome': typeof OnboardingWelcomeRoute
@@ -256,6 +273,7 @@ export interface FileRoutesById {
   '/_admin/dashboard': typeof AdminDashboardRoute
   '/_admin/users': typeof AdminUsersRoute
   '/_auth/confirmation': typeof AuthConfirmationRoute
+  '/_auth/email-verification-sent': typeof AuthEmailVerificationSentRoute
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/privacy-policy': typeof AuthPrivacyPolicyRoute
@@ -264,6 +282,7 @@ export interface FileRoutesById {
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/_auth/terms-conditions': typeof AuthTermsConditionsRoute
   '/_auth/verify': typeof AuthVerifyRoute
+  '/_auth/verify-email': typeof AuthVerifyEmailRoute
   '/_onboarding/profile-setup': typeof OnboardingProfileSetupRoute
   '/_onboarding/role-selection': typeof OnboardingRoleSelectionRoute
   '/_onboarding/welcome': typeof OnboardingWelcomeRoute
@@ -285,6 +304,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/users'
     | '/confirmation'
+    | '/email-verification-sent'
     | '/forgot-password'
     | '/login'
     | '/privacy-policy'
@@ -293,6 +313,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/terms-conditions'
     | '/verify'
+    | '/verify-email'
     | '/profile-setup'
     | '/role-selection'
     | '/welcome'
@@ -312,6 +333,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/users'
     | '/confirmation'
+    | '/email-verification-sent'
     | '/forgot-password'
     | '/login'
     | '/privacy-policy'
@@ -320,6 +342,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/terms-conditions'
     | '/verify'
+    | '/verify-email'
     | '/profile-setup'
     | '/role-selection'
     | '/welcome'
@@ -344,6 +367,7 @@ export interface FileRouteTypes {
     | '/_admin/dashboard'
     | '/_admin/users'
     | '/_auth/confirmation'
+    | '/_auth/email-verification-sent'
     | '/_auth/forgot-password'
     | '/_auth/login'
     | '/_auth/privacy-policy'
@@ -352,6 +376,7 @@ export interface FileRouteTypes {
     | '/_auth/reset-password'
     | '/_auth/terms-conditions'
     | '/_auth/verify'
+    | '/_auth/verify-email'
     | '/_onboarding/profile-setup'
     | '/_onboarding/role-selection'
     | '/_onboarding/welcome'
@@ -463,6 +488,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingProfileSetupRouteImport
       parentRoute: typeof OnboardingRoute
     }
+    '/_auth/verify-email': {
+      id: '/_auth/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof AuthVerifyEmailRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/verify': {
       id: '/_auth/verify'
       path: '/verify'
@@ -517,6 +549,13 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/email-verification-sent': {
+      id: '/_auth/email-verification-sent'
+      path: '/email-verification-sent'
+      fullPath: '/email-verification-sent'
+      preLoaderRoute: typeof AuthEmailVerificationSentRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/confirmation': {
@@ -606,6 +645,7 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface AuthRouteChildren {
   AuthConfirmationRoute: typeof AuthConfirmationRoute
+  AuthEmailVerificationSentRoute: typeof AuthEmailVerificationSentRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthPrivacyPolicyRoute: typeof AuthPrivacyPolicyRoute
@@ -614,10 +654,12 @@ interface AuthRouteChildren {
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthTermsConditionsRoute: typeof AuthTermsConditionsRoute
   AuthVerifyRoute: typeof AuthVerifyRoute
+  AuthVerifyEmailRoute: typeof AuthVerifyEmailRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthConfirmationRoute: AuthConfirmationRoute,
+  AuthEmailVerificationSentRoute: AuthEmailVerificationSentRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthPrivacyPolicyRoute: AuthPrivacyPolicyRoute,
@@ -626,6 +668,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthTermsConditionsRoute: AuthTermsConditionsRoute,
   AuthVerifyRoute: AuthVerifyRoute,
+  AuthVerifyEmailRoute: AuthVerifyEmailRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)

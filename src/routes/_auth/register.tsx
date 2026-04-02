@@ -68,7 +68,7 @@ function RegisterPage(): JSX.Element {
 
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-	const { toast, showSuccess, showError } = useToast();
+	const { toast, showError } = useToast();
 
 	const form = useForm<RegisterFormData>({
 		resolver: zodResolver(registerSchema),
@@ -80,11 +80,11 @@ function RegisterPage(): JSX.Element {
 
 	const mutation = useMutation({
 		mutationFn: register,
-		onSuccess: async () => {
-			showSuccess(`Success`, "Registration successful", 1250);
-			setTimeout(() => {
-				navigate({ to: "/login" });
-			}, 1250);
+		onSuccess: async (_data, variables) => {
+			await navigate({
+				to: "/email-verification-sent",
+				search: { email: variables.email },
+			});
 		},
 		onError: (err) => {
 			showError("Error", err.message);
