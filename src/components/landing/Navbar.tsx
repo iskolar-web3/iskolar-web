@@ -233,29 +233,44 @@ export default function Navbar() {
 						<div className="px-4 py-4 space-y-2">
 							{navLinks.map((link) => (
 								<div key={link.name}>
-									<a
-										href={link.href}
-										onClick={(e) => {
-											if (!link.dropdown) {
+									{!link.href.startsWith("#") ? (
+										<Link
+											to={link.href.split("#")[0] as "/"}
+											preload="intent"
+											onClick={(e) => {
+												if (link.dropdown) {
+													e.preventDefault();
+													setActiveDropdown(
+														activeDropdown === link.name ? null : link.name,
+													);
+												} else {
+													handleNavClick(e, link.href);
+													setIsMobileMenuOpen(false);
+												}
+											}}
+											className="py-2 text-secondary hover:text-secondary flex items-center justify-between"
+										>
+											<span>{link.name}</span>
+											{link.dropdown && (
+												<ChevronDown
+													className={`w-4 h-4 transition-transform duration-200 ${
+														activeDropdown === link.name ? "rotate-180" : ""
+													}`}
+												/>
+											)}
+										</Link>
+									) : (
+										<a
+											href={link.href}
+											onClick={(e) => {
 												handleNavClick(e, link.href);
-											} else {
-												e.preventDefault();
-												setActiveDropdown(
-													activeDropdown === link.name ? null : link.name,
-												);
-											}
-										}}
-										className="block py-2 text-secondary hover:text-secondary flex items-center justify-between"
-									>
-										<span>{link.name}</span>
-										{link.dropdown && (
-											<ChevronDown
-												className={`w-4 h-4 transition-transform duration-200 ${
-													activeDropdown === link.name ? "rotate-180" : ""
-												}`}
-											/>
-										)}
-									</a>
+												setIsMobileMenuOpen(false);
+											}}
+											className="py-2 text-secondary hover:text-secondary flex items-center justify-between"
+										>
+											<span>{link.name}</span>
+										</a>
+									)}
 									{link.dropdown && activeDropdown === link.name && (
 										<motion.div
 											className="pl-4 space-y-1"
@@ -264,16 +279,36 @@ export default function Navbar() {
 											exit={{ opacity: 0, height: 0 }}
 											transition={{ duration: 0.2, ease: "easeOut" }}
 										>
-											{link.dropdown.map((item) => (
-												<a
-													key={item.name}
-													href={item.href}
-													onClick={(e) => handleNavClick(e, item.href)}
-													className="flex items-center gap-2 py-1.5 text-sm text-secondary/75 hover:text-secondary/80"
-												>
-													{item.name}
-												</a>
-											))}
+											{link.dropdown.map((item) =>
+												!item.href.startsWith("#") ? (
+													<Link
+														key={item.name}
+														to={item.href.split("#")[0] as "/"}
+														preload="intent"
+														onClick={(e) => {
+															handleNavClick(e, item.href);
+															setIsMobileMenuOpen(false);
+															setActiveDropdown(null);
+														}}
+														className="flex items-center gap-2 py-1.5 text-sm text-secondary/75 hover:text-secondary/80"
+													>
+														{item.name}
+													</Link>
+												) : (
+													<a
+														key={item.name}
+														href={item.href}
+														onClick={(e) => {
+															handleNavClick(e, item.href);
+															setIsMobileMenuOpen(false);
+															setActiveDropdown(null);
+														}}
+														className="flex items-center gap-2 py-1.5 text-sm text-secondary/75 hover:text-secondary/80"
+													>
+														{item.name}
+													</a>
+												),
+											)}
 										</motion.div>
 									)}
 								</div>
