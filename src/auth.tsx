@@ -50,7 +50,7 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 
 			const session = await validateSession(token);
 
-			if (session.data === null) {
+			if (!session.data) {
 				deleteCookie(ACCESS_TOKEN_KEY);
 				deleteCookie(REFRESH_TOKEN_KEY);
 				setUser(null);

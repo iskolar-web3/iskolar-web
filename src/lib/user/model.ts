@@ -21,6 +21,7 @@ export const userSchema = z.object({
 	avatarUrl: z.string().nullable(),
 	role: enumDetailSchema(UserRole).nullable(),
 	status: enumDetailSchema(UserStatus),
+	isVerified: z.boolean().default(false),
 });
 
 export type User = z.output<typeof userSchema>;
