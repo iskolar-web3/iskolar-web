@@ -106,7 +106,7 @@ export function BetaNoticeModal(): JSX.Element | null {
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
-					className="fixed inset-0 z-50 flex items-center justify-center p-4"
+					className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 overflow-y-auto"
 				>
 					{/* Blur backdrop */}
 					<div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
@@ -117,7 +117,7 @@ export function BetaNoticeModal(): JSX.Element | null {
 						animate={{ opacity: 1, scale: 1, y: 0 }}
 						exit={{ opacity: 0, scale: 0.95, y: 20 }}
 						transition={{ type: "spring", damping: 30, stiffness: 300 }}
-						className="relative w-full max-w-3xl rounded-2xl border border-[#D3DCF6] bg-white shadow-xl"
+						className="relative w-full max-w-3xl rounded-2xl border border-[#D3DCF6] bg-white shadow-xl max-h-[calc(100dvh-2rem)] overflow-y-auto"
 					>
 						{/* Close button */}
 						<button
