@@ -1,213 +1,294 @@
-import { useState, useEffect } from "react"
-import { Menu, X, ChevronDown } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+import { Link, useLocation } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDown, Menu, X } from "lucide-react";
+import { useEffect, useState } from "react";
 
-const navLinks = [
-  { name: "Home", href: "/" },
-  { name: "Features", href: "#features" },
-  { name: "Roadmap", href: "#roadmap" },
-  { name: "FAQs", href: "#faqs" },
-  {
-    name: "About",
-    href: "/about",
-    dropdown: [
-      { name: "Company Overview", href: "/about#company-overview" },
-      { name: "Mission & Vision", href: "/about#mission-vision" },
-      { name: "Our Team", href: "/about#team" },
-      { name: "Partnerships", href: "/about#partnerships" },
-    ],
-  },
-]
+const homeLinks = [
+	{ name: "Overview", href: "#home" },
+	{ name: "Features", href: "#features" },
+	{ name: "Roadmap", href: "#roadmap" },
+	{ name: "FAQs", href: "#faqs" },
+	{
+		name: "About",
+		href: "/about",
+		dropdown: [
+			{ name: "Company Overview", href: "/about#company-overview" },
+			{ name: "Mission & Vision", href: "/about#mission-vision" },
+			{ name: "Our Team", href: "/about#team" },
+			{ name: "Partnerships", href: "/about#partnerships" },
+		],
+	},
+];
+
+const aboutLinks = [
+	{
+		name: "Home",
+		href: "/",
+		dropdown: [
+			{ name: "Overview", href: "/#home" },
+			{ name: "Features", href: "/#features" },
+			{ name: "Roadmap", href: "/#roadmap" },
+			{ name: "FAQs", href: "/#faqs" },
+		],
+	},
+	{ name: "Company Overview", href: "/about#company-overview" },
+	{ name: "Mission & Vision", href: "/about#mission-vision" },
+	{ name: "Our Team", href: "/about#team" },
+	{ name: "Partnerships", href: "/about#partnerships" },
+];
 
 export default function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
+	const location = useLocation();
+	const isAboutPage =
+		location.pathname === "/about" || location.pathname === "/about/";
+	const navLinks = isAboutPage ? aboutLinks : homeLinks;
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20)
-    }
-    window.addEventListener("scroll", handleScroll)
-    
-    // Close dropdown when clicking outside
-    const handleClickOutside = (event: MouseEvent) => {
-      if (activeDropdown && !(event.target as Element).closest('.relative')) {
-        setActiveDropdown(null)
-      }
-    }
-    document.addEventListener('click', handleClickOutside)
+	const [isScrolled, setIsScrolled] = useState(false);
+	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+	const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
-    return () => {
-      window.removeEventListener("scroll", handleScroll)
-      document.removeEventListener('click', handleClickOutside)
-    }
-  }, [activeDropdown])
+	useEffect(() => {
+		const handleScroll = () => {
+			setIsScrolled(window.scrollY > 20);
+		};
+		window.addEventListener("scroll", handleScroll);
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (href.startsWith('#')) {
-      e.preventDefault()
-      const element = document.querySelector(href)
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' })
-      }
-      setIsMobileMenuOpen(false)
-    }
-  }
+		// Close dropdown when clicking outside
+		const handleClickOutside = (event: MouseEvent) => {
+			if (activeDropdown && !(event.target as Element).closest(".relative")) {
+				setActiveDropdown(null);
+			}
+		};
+		document.addEventListener("click", handleClickOutside);
 
-  return (
-    <>
-      <nav
-        className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-          isScrolled ? "bg-card shadow-md" : "bg-transparent"
-        }`}
-        style={{ backdropFilter: isScrolled ? 'blur(12px)' : 'none' }}
-      >
-        <div className="px-4 sm:px-12 lg:px-26">
-          <div className="flex items-center justify-between h-16 lg:h-20">
-            {/* Logo */}
-            <a href="/#home" className="flex items-center gap-2">
-              <div className="w-25 h-10 md:w-34 md:h-14 flex items-center justify-center">
-                <img
-                  src={"/logo2.png"}
-                  alt="Logo"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <span className="text-sm px-2 py-1 bg-none border-2 border-secondary text-secondary rounded-sm">
-                Beta
-              </span>
-            </a>
+		return () => {
+			window.removeEventListener("scroll", handleScroll);
+			document.removeEventListener("click", handleClickOutside);
+		};
+	}, [activeDropdown]);
 
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-8">
-              {navLinks.map((link) => (
-                <div
-                  key={link.name}
-                  className="relative"
-                >
-                  <a
-                    href={link.href}
-                    onClick={(e) => {
-                      if (link.dropdown) {
-                        e.preventDefault()
-                        setActiveDropdown(activeDropdown === link.name ? null : link.name)
-                      } else {
-                        handleNavClick(e, link.href)
-                      }
-                    }}
-                    className={`flex items-center gap-1 text-md transition-colors hover:text-secondary/80 ${
-                      isScrolled ? "text-secondary" : "text-secondary"
-                    } ${activeDropdown === link.name ? "text-secondary/80" : ""}`}
-                  >
-                    {link.name}
-                    {link.dropdown && (
-                      <ChevronDown 
-                        className={`w-4 h-4 transition-transform duration-200 ${
-                          activeDropdown === link.name ? "rotate-180" : ""
-                        }`} 
-                      />
-                    )}
-                  </a>
+	const handleNavClick = (
+		e: React.MouseEvent<HTMLAnchorElement>,
+		href: string,
+	) => {
+		const hashOnly = href.startsWith("#");
+		const samePageHash =
+			href.includes("#") && href.startsWith(location.pathname);
 
-                  {/* Dropdown */}
-                  <AnimatePresence>
-                    {link.dropdown && activeDropdown === link.name && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -8 }}
-                        transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="absolute top-full left-0 mt-2 w-56 bg-card rounded-md shadow-lg border border-gray-200 py-2"
-                      >
-                        {link.dropdown.map((item) => (
-                          <a
-                            key={item.name}
-                            href={item.href}
-                            onClick={(e) => {
-                              if (item.href.startsWith('#')) {
-                                  handleNavClick(e, item.href);
-                              } 
-                              // If it's a real page navigation, let it happen but close dropdown
-                              setActiveDropdown(null);
-                            }}
-                            className="flex items-center justify-between px-4 py-2 text-sm text-secondary transition-colors"
-                          >
-                            {item.name}
-                          </a>
-                        ))}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              ))}
-            </div>
+		if (hashOnly || samePageHash) {
+			e.preventDefault();
+			const hash = href.includes("#") ? `#${href.split("#")[1]}` : href;
+			const element = document.querySelector(hash);
+			if (element) {
+				element.scrollIntoView({ behavior: "smooth" });
+			}
+			setIsMobileMenuOpen(false);
+		}
+	};
 
-            {/* CTA Button */}
-            <div className="hidden lg:block">
-              <a
-                href="/login"
-                className="inline-flex items-center justify-center text-sm px-6 py-2 bg-transparent border-2 border-secondary hover:bg-secondary text-secondary hover:text-tertiary rounded-md transition-colors"
-              >
-                Get Started
-              </a>
-            </div>
+	return (
+		<nav
+			className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+				isScrolled ? "bg-card shadow-md" : "bg-transparent"
+			}`}
+			style={{ backdropFilter: isScrolled ? "blur(12px)" : "none" }}
+		>
+			<div className="px-4 sm:px-12 lg:px-26">
+				<div className="flex items-center justify-between h-16 lg:h-20">
+					{/* Logo */}
+					<a href="/#home" className="flex items-center gap-2">
+						<div className="w-25 h-10 md:w-34 md:h-14 flex items-center justify-center">
+							<img
+								src={"/logo2.png"}
+								alt="Logo"
+								className="w-full h-full object-cover"
+							/>
+						</div>
+						<span className="text-sm px-2 py-1 bg-none border-2 border-secondary text-secondary rounded-sm">
+							Beta
+						</span>
+					</a>
 
-            {/* Mobile Menu Button */}
-            <button
-              className="lg:hidden p-2"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label="Toggle menu"
-            >
-              {isMobileMenuOpen ? (
-                <X className="w-6 h-6 text-secondary" />
-              ) : (
-                <Menu className="w-6 h-6 text-secondary" />
-              )}
-            </button>
-          </div>
-        </div>
+					{/* Desktop Navigation */}
+					<div className="hidden lg:flex items-center gap-8">
+						<AnimatePresence mode="wait">
+							{navLinks.map((link, index) => (
+								<motion.div
+									key={link.name}
+									className="relative"
+									initial={{ opacity: 0, y: -10 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: -10 }}
+									transition={{
+										duration: 0.3,
+										delay: index * 0.05,
+										ease: "easeOut",
+									}}
+								>
+									{!link.href.startsWith("#") ? (
+										<Link
+											to={link.href.split("#")[0] as "/"}
+											preload="intent"
+											onClick={(e) => {
+												if (link.dropdown) {
+													e.preventDefault();
+													setActiveDropdown(
+														activeDropdown === link.name ? null : link.name,
+													);
+												} else {
+													handleNavClick(e, link.href);
+												}
+											}}
+											className={`flex items-center gap-1 text-md transition-colors hover:text-secondary/80 text-secondary ${activeDropdown === link.name ? "text-secondary/80" : ""}`}
+										>
+											{link.name}
+											{link.dropdown && (
+												<ChevronDown
+													className={`w-4 h-4 transition-transform duration-200 ${
+														activeDropdown === link.name ? "rotate-180" : ""
+													}`}
+												/>
+											)}
+										</Link>
+									) : (
+										<a
+											href={link.href}
+											onClick={(e) => handleNavClick(e, link.href)}
+											className="flex items-center gap-1 text-md transition-colors hover:text-secondary/80 text-secondary"
+										>
+											{link.name}
+										</a>
+									)}
 
-        {/* Mobile Menu */}
-        {isMobileMenuOpen && (
-          <div className="lg:hidden bg-card border-t border-gray-200">
-            <div className="px-4 py-4 space-y-2">
-              {navLinks.map((link) => (
-                <div key={link.name}>
-                  <a
-                    href={link.href}
-                    onClick={(e) => handleNavClick(e, link.href)}
-                    className="block py-2 text-secondary hover:text-secondary"
-                  >
-                    {link.name}
-                  </a>
-                  {link.dropdown && (
-                    <div className="pl-4 space-y-1">
-                      {link.dropdown.map((item) => (
-                        <a
-                          key={item.name}
-                          href={item.href}
-                          onClick={(e) => handleNavClick(e, item.href)}
-                          className="flex items-center gap-2 py-1.5 text-sm text-secondary/75 hover:text-secondary/80"
-                        >
-                          {item.name}
-                        </a>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
-              <a
-                href="/login"
-                onClick={(e) => handleNavClick(e, '/login')}
-                className="block w-full mt-4 px-6 py-2 text-sm bg-secondary hover:bg-secondary/80 text-tertiary rounded-md text-center transition-colors"
-              >
-                Get Started
-              </a>
-            </div>
-          </div>
-        )}
-      </nav>
-    </>
-  )
+									{/* Dropdown */}
+									<AnimatePresence>
+										{link.dropdown && activeDropdown === link.name && (
+											<motion.div
+												initial={{ opacity: 0, y: -8 }}
+												animate={{ opacity: 1, y: 0 }}
+												exit={{ opacity: 0, y: -8 }}
+												transition={{ duration: 0.2, ease: "easeOut" }}
+												className="absolute top-full left-0 mt-2 w-56 bg-card rounded-md shadow-lg border border-gray-200 py-2"
+											>
+												{link.dropdown.map((item) => (
+													<a
+														key={item.name}
+														href={item.href}
+														onClick={(e) => {
+															if (item.href.startsWith("#")) {
+																handleNavClick(e, item.href);
+															}
+															// If it's a real page navigation, let it happen but close dropdown
+															setActiveDropdown(null);
+														}}
+														className="flex items-center justify-between px-4 py-2 text-sm text-secondary transition-colors hover:bg-secondary/10"
+													>
+														{item.name}
+													</a>
+												))}
+											</motion.div>
+										)}
+									</AnimatePresence>
+								</motion.div>
+							))}
+						</AnimatePresence>
+					</div>
+
+					{/* CTA Button */}
+					<div className="hidden lg:block">
+						<a
+							href="/login"
+							className="inline-flex items-center justify-center text-sm px-6 py-2 bg-transparent border-2 border-secondary hover:bg-secondary text-secondary hover:text-tertiary rounded-md transition-colors"
+						>
+							Get Started
+						</a>
+					</div>
+
+					{/* Mobile Menu Button */}
+					<button
+						type="button"
+						className="lg:hidden p-2"
+						onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+						aria-label="Toggle menu"
+					>
+						{isMobileMenuOpen ? (
+							<X className="w-6 h-6 text-secondary" />
+						) : (
+							<Menu className="w-6 h-6 text-secondary" />
+						)}
+					</button>
+				</div>
+			</div>
+
+			{/* Mobile Menu */}
+			<AnimatePresence>
+				{isMobileMenuOpen && (
+					<motion.div
+						className="lg:hidden bg-card border-t border-gray-200"
+						initial={{ opacity: 0, y: -10 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0, y: -10 }}
+						transition={{ duration: 0.2, ease: "easeOut" }}
+					>
+						<div className="px-4 py-4 space-y-2">
+							{navLinks.map((link) => (
+								<div key={link.name}>
+									<a
+										href={link.href}
+										onClick={(e) => {
+											if (!link.dropdown) {
+												handleNavClick(e, link.href);
+											} else {
+												e.preventDefault();
+												setActiveDropdown(
+													activeDropdown === link.name ? null : link.name,
+												);
+											}
+										}}
+										className="block py-2 text-secondary hover:text-secondary flex items-center justify-between"
+									>
+										<span>{link.name}</span>
+										{link.dropdown && (
+											<ChevronDown
+												className={`w-4 h-4 transition-transform duration-200 ${
+													activeDropdown === link.name ? "rotate-180" : ""
+												}`}
+											/>
+										)}
+									</a>
+									{link.dropdown && activeDropdown === link.name && (
+										<motion.div
+											className="pl-4 space-y-1"
+											initial={{ opacity: 0, height: 0 }}
+											animate={{ opacity: 1, height: "auto" }}
+											exit={{ opacity: 0, height: 0 }}
+											transition={{ duration: 0.2, ease: "easeOut" }}
+										>
+											{link.dropdown.map((item) => (
+												<a
+													key={item.name}
+													href={item.href}
+													onClick={(e) => handleNavClick(e, item.href)}
+													className="flex items-center gap-2 py-1.5 text-sm text-secondary/75 hover:text-secondary/80"
+												>
+													{item.name}
+												</a>
+											))}
+										</motion.div>
+									)}
+								</div>
+							))}
+							<a
+								href="/login"
+								onClick={(e) => handleNavClick(e, "/login")}
+								className="block w-full mt-4 px-6 py-2 text-sm bg-secondary hover:bg-secondary/80 text-tertiary rounded-md text-center transition-colors"
+							>
+								Get Started
+							</a>
+						</div>
+					</motion.div>
+				)}
+			</AnimatePresence>
+		</nav>
+	);
 }

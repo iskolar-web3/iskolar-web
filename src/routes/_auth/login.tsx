@@ -69,7 +69,15 @@ function LoginPage(): JSX.Element {
   
   const mutation = useMutation({
       mutationFn: login,
-      onSuccess: async (res) => {
+      onSuccess: async (res, variables) => {
+        if (!res.user.isVerified) {
+            await navigate({
+                to: "/verify-email",
+                search: { email: variables.email },
+            });
+            return;
+        }
+
         showSuccess(`Success`, 'Login successful', 1250);
         setCookie(ACCESS_TOKEN_KEY, res.token);
         setCookie(REFRESH_TOKEN_KEY, res.refreshToken);
@@ -100,7 +108,15 @@ function LoginPage(): JSX.Element {
                 break;
         }
       },
-      onError: (err) => {
+      onError: async (err, variables) => {
+          const msg = err.message.toLowerCase();
+          if (msg.includes("verif")) {
+              await navigate({
+                  to: "/verify-email",
+                  search: { email: variables.email },
+              });
+              return;
+          }
           showError("Error", err.message)
           console.error(err)
       }
