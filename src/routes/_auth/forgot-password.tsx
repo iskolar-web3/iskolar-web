@@ -10,6 +10,7 @@ import { Loader2, ArrowLeft } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { requestPasswordReset } from "@/lib/user/password";
 import { SEO } from "@/components/SEO";
+import { FeedbackWidget } from "@/components/FeedbackWidget";
 
 export const Route = createFileRoute("/_auth/forgot-password")({
 	component: ForgotPasswordPage,
@@ -59,6 +60,7 @@ function ForgotPasswordPage(): JSX.Element {
 		<>
 			<SEO title="Forgot Password" noindex={true} />
 			{toast && <Toast {...toast} />}
+			<FeedbackWidget />
 
 			<motion.div
 				className="rounded-xl py-6 px-10 md:py-8 md:px-12 lg:py-6 lg:px-10 sm:py-5 sm:px-6 shadow-[1px_1px_4px_1px_rgba(96,126,242,0.5)] bg-[#F0F7FF] w-full max-w-md mx-auto"

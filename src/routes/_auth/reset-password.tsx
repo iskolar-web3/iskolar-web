@@ -11,6 +11,7 @@ import { Loader2, Eye, EyeOff, ShieldCheck, AlertCircle, ArrowLeft } from "lucid
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { validateResetToken, resetPassword } from "@/lib/user/password";
 import { SEO } from "@/components/SEO";
+import { FeedbackWidget } from "@/components/FeedbackWidget";
 
 const resetPasswordSearchSchema = z.object({
 	token: z.string().catch(""),
@@ -138,6 +139,7 @@ function ResetPasswordPage(): JSX.Element {
 		<>
 			<SEO title="Reset Password" noindex={true} />
 			{toast && <Toast {...toast} />}
+			<FeedbackWidget />
 
 			<motion.div
 				className="rounded-2xl py-6 px-10 md:py-8 md:px-12 lg:py-6 lg:px-10 sm:py-5 sm:px-6 shadow-[1px_1px_4px_1px_rgba(96,126,242,0.5)] bg-[#F0F7FF] w-full max-w-md mx-auto"

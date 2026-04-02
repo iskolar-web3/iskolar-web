@@ -7,6 +7,7 @@ import Toast from "@/components/Toast";
 import { useToast } from '@/hooks/useToast';
 import { z } from 'zod';
 import { Loader2 } from "lucide-react";
+import { FeedbackWidget } from "@/components/FeedbackWidget";
 // import { profileService } from '@/services/profile.service';
 
 export const Route = createFileRoute('/_onboarding/role-selection')({
@@ -225,6 +226,7 @@ function RoleSelection() {
     <>
       <SEO title="Role Selection" noindex={true} />
       {toast && <Toast {...toast} />}
+      <FeedbackWidget />
 
       <motion.div 
         className="text-center py-8 sm:py-10 md:py-12 relative"

@@ -2,6 +2,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import type { Variants } from 'framer-motion'
 import { SEO } from "@/components/SEO";
+import { FeedbackWidget } from "@/components/FeedbackWidget";
 
 export const Route = createFileRoute('/_onboarding/welcome')({
   component: WelcomePage,
@@ -90,6 +91,7 @@ function WelcomePage() {
   return (
     <>
       <SEO title="Welcome" noindex={true} />
+      <FeedbackWidget />
       <motion.div
         className="text-center"
         variants={containerVariants}

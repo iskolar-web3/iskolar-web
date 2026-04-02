@@ -13,6 +13,7 @@ import { Loader2, Eye, EyeOff } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { BACKEND_URL, type ApiResponse } from "@/lib/api";
 import type { User } from "@/lib/user/model";
+import { FeedbackWidget } from "@/components/FeedbackWidget";
 
 export const Route = createFileRoute("/_auth/register")({
 	component: RegisterPage,
@@ -108,6 +109,7 @@ function RegisterPage(): JSX.Element {
 		<>
 			<SEO title="Sign Up" noindex={true} />
 			{toast && <Toast {...toast} />}
+			<FeedbackWidget />
 
 			<motion.div
 				className="rounded-2xl py-6 px-10 md:py-8 md:px-12 lg:py-6 lg:px-10 sm:py-5 sm:px-6 shadow-[1px_1px_4px_1px_rgba(96,126,242,0.5)] bg-[#F0F7FF] min-h-[520px] sm:min-h-[480px] w-full max-w-md mx-auto"
