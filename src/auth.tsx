@@ -3,7 +3,6 @@ import {
 	type JSX,
 	type ReactNode,
 	useContext,
-	useRef,
 	useState,
 	useEffect,
 } from "react";
@@ -42,81 +41,63 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<Error | null>(null);
 
-	// Prevents concurrent getSession() calls from racing.
-	// If a call is already in-flight, subsequent callers share the same promise.
-	const inflightRef = useRef<Promise<AuthSession | null> | null>(null);
-
 	async function getSession(): Promise<AuthSession | null> {
-		if (inflightRef.current) {
-			return inflightRef.current;
-		}
-
-		const promise = (async (): Promise<AuthSession | null> => {
-			try {
-				const oldToken = getCookie(ACCESS_TOKEN_KEY);
-				if (!oldToken) {
-					return null;
-				}
-
-				const session = await validateSession(oldToken);
-				if (!session.data) {
-					deleteCookie(ACCESS_TOKEN_KEY);
-					deleteCookie(REFRESH_TOKEN_KEY);
-					setUser(null);
-					setError(new Error(session.message));
-					return null;
-				}
-
-				const maxAgeSeconds = session.data.user.role
-					? 30 * 24 * 60 * 60 // 30 days
-					: 60 * 60; // 1 hour
-				const expires = new Date(Date.now() + maxAgeSeconds * 1000);
-
-				setUser(session.data.user);
-				setSessionToken(session.data.token);
-				setCookie(ACCESS_TOKEN_KEY, session.data.token, { expires });
-				setCookie(REFRESH_TOKEN_KEY, session.data.refreshToken, { expires });
-
-				switch (session.data.user.role?.code) {
-					case UserRole.Student: {
-						const student = await getMyStudentProfile(session.data.token);
-						setProfile(student);
-						break;
-					}
-					case UserRole.Sponsor: {
-						const sponsor = await getMySponsorProfile(session.data.token);
-						setProfile(sponsor);
-						break;
-					}
-					case UserRole.Admin:
-						setProfile(null);
-						break;
-					default:
-						setProfile(null);
-				}
-
-				return session.data;
-			} finally {
-				setIsLoading(false);
-				inflightRef.current = null;
+		try {
+			const oldToken = getCookie(ACCESS_TOKEN_KEY);
+			if (!oldToken) {
+				return null;
 			}
-		})();
 
-		inflightRef.current = promise;
-		return promise;
+			const session = await validateSession(oldToken);
+			if (!session.data) {
+				deleteCookie(ACCESS_TOKEN_KEY);
+				deleteCookie(REFRESH_TOKEN_KEY);
+				setUser(null);
+				setError(new Error(session.message));
+				return null;
+			}
+
+			const maxAgeSeconds = session.data.user.role
+				? 30 * 24 * 60 * 60 // 30 days
+				: 60 * 60; // 1 hour
+			const expires = new Date(Date.now() + maxAgeSeconds * 1000);
+
+			setUser(session.data.user);
+			setSessionToken(session.data.token);
+			setCookie(ACCESS_TOKEN_KEY, session.data.token, { expires });
+			setCookie(REFRESH_TOKEN_KEY, session.data.refreshToken, { expires });
+
+			switch (session.data.user.role?.code) {
+				case UserRole.Student: {
+					const student = await getMyStudentProfile(session.data.token);
+					setProfile(student);
+					break;
+				}
+				case UserRole.Sponsor: {
+					const sponsor = await getMySponsorProfile(session.data.token);
+					setProfile(sponsor);
+					break;
+				}
+				case UserRole.Admin:
+					setProfile(null);
+					break;
+				default:
+					setProfile(null);
+			}
+
+			return session.data;
+		} finally {
+			setIsLoading(false);
+		}
 	}
 
 	async function logout(): Promise<void> {
-		const token = getCookie(ACCESS_TOKEN_KEY);
-		if (!token || !user) {
-			console.log("No token or user");
-			return;
-		}
-
 		setUser(null);
+		setProfile(null);
+		setSessionToken("");
+		setError(null);
 		deleteCookie(ACCESS_TOKEN_KEY);
 		deleteCookie(REFRESH_TOKEN_KEY);
-		console.log("Logged out");
 	}
 
 	useEffect(() => {
