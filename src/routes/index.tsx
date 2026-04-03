@@ -58,12 +58,13 @@ function App() {
 			const element = document.querySelector(hash);
 			if (element) {
 				element.scrollIntoView({ behavior: "smooth" });
-			} else if (attempts < 20) {
+			} else if (attempts < 40) {
 				attempts++;
-				setTimeout(tryScroll, 100);
+				setTimeout(tryScroll, 50);
 			}
 		};
-		setTimeout(tryScroll, 100);
+
+		tryScroll();
 	}, []);
 
 	return (
