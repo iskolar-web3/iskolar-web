@@ -193,7 +193,7 @@ export default function HeaderNav({ role }: HeaderNavProps) {
 						<button
 							type="button"
 							onClick={handleLogoClick}
-							className="flex-shrink-0 cursor-pointer transition-opacity"
+							className="shrink-0 cursor-pointer transition-opacity"
 							aria-label="Go to home"
 						>
 							<img
@@ -334,7 +334,7 @@ export default function HeaderNav({ role }: HeaderNavProps) {
 					</div>
 
 					{/* Notifications and Profile */}
-					<div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+					<div className="flex items-center gap-1 md:gap-2 shrink-0">
 						{/* Notification Bell */}
 						<button
 							type="button"
