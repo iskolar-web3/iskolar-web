@@ -137,10 +137,13 @@ export default function ProfileDropdown({ onClose }: ProfileDropdownProps) {
 	const handleLogout = async () => {
 		try {
 			await auth.logout();
+			setShowLogoutConfirmation(false);
+			onClose();
 			await navigate({ to: "/login" });
 		} catch (err) {
 			const handled = handleError(err, "Failed to logout");
 			logger.error("Logout error:", handled.raw);
+			setShowLogoutConfirmation(false);
 		}
 	};
 
