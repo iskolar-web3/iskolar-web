@@ -11,6 +11,14 @@ import {
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -85,6 +93,8 @@ function CreateScholarship() {
   const [loading, setLoading] = useState(false);
   const [amountType, setAmountType] = useState<'fixed' | 'varies' | 'range'>('fixed');
   const [unlimitedSlots, setUnlimitedSlots] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [pendingFormData, setPendingFormData] = useState<ScholarshipFormData | null>(null);
 
   const criteria = watch('criterias');
   const requiredDocuments = watch('requirements');
@@ -184,17 +194,27 @@ function CreateScholarship() {
       form.setError('totalSlots', { message: 'Please enter the number of slots' });
       return;
     }
+
+    const amountPayload: Partial<ScholarshipFormData> =
+      amountType === 'fixed'
+        ? { totalAmountMin: undefined, totalAmountMax: undefined }
+        : amountType === 'range'
+        ? { totalAmount: undefined }
+        : { totalAmount: undefined, totalAmountMin: undefined, totalAmountMax: undefined };
+    const slotsPayload = unlimitedSlots ? { totalSlots: undefined } : {};
+    const imageUrl = data.imageUrl || '/scholarship-banner-placeholder.png';
+    const formData = { ...data, ...amountPayload, ...slotsPayload, imageUrl } as ScholarshipFormData;
+
+    setPendingFormData(formData);
+    setShowConfirmationModal(true);
+  };
+
+  const handleConfirmSubmit = () => {
+    if (!pendingFormData) return;
     setLoading(true);
     try {
-      const amountPayload: Partial<ScholarshipFormData> =
-        amountType === 'fixed'
-          ? { totalAmountMin: undefined, totalAmountMax: undefined }
-          : amountType === 'range'
-          ? { totalAmount: undefined }
-          : { totalAmount: undefined, totalAmountMin: undefined, totalAmountMax: undefined };
-      const slotsPayload = unlimitedSlots ? { totalSlots: undefined } : {};
-      const imageUrl = data.imageUrl || '/scholarship-banner-placeholder.png';
-      mutation.mutate({ ...data, ...amountPayload, ...slotsPayload, imageUrl } as ScholarshipFormData);
+      mutation.mutate(pendingFormData);
+      setShowConfirmationModal(false);
     } catch (err) {
       showError('Error', err instanceof Error ? err.message : 'Something went wrong');
       setLoading(false);
@@ -632,6 +652,43 @@ function CreateScholarship() {
           isPreview={true}
         />
       )}
+
+      <Dialog open={showConfirmationModal} onOpenChange={setShowConfirmationModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className='font-normal'>Create Scholarship</DialogTitle>
+            <DialogDescription className="text-[#6B7280] font-normal">
+              You're about to create <span className="text-primary">{title || 'this scholarship'}</span>. Are you sure you want to proceed?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 sm:justify-end">
+            <button
+              type="button"
+              onClick={() => setShowConfirmationModal(false)}
+              disabled={loading}
+              className="cursor-pointer px-4 py-2 rounded-lg border border-[#C4CBD5] text-primary text-sm hover:bg-[#F3F4F6] transition-colors"
+            >
+              Review
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirmSubmit}
+              disabled={loading}
+              className={`cursor-pointer px-4 py-2 rounded-lg bg-[#EFA508] text-tertiary text-sm hover:bg-[#D89407] transition-colors ${
+                loading && "opacity-60 cursor-not-allowed"
+              }`}
+            >
+              {loading ? (
+                <span className="flex items-center justify-center">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                </span>
+              ) : (
+                'Create'
+              )}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
