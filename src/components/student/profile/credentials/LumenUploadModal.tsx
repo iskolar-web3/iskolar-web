@@ -22,6 +22,7 @@ import {
 	LUMEN_OWNER_ADDRESS,
 } from "@/lib/lumen/api";
 import { addStoredCredential, updateStoredCredential } from "@/lib/lumen/storage";
+import { useLumenCredentials } from "@/hooks/useLumenFiles";
 import { formatFileSize } from "@/utils/fileHandling.utils";
 import { useToast } from "@/hooks/useToast";
 import Toast from "@/components/Toast";
@@ -34,6 +35,9 @@ interface LumenUploadModalProps {
 	userId: string;
 }
 
+const ALLOWED_FILE_TYPES = ["png", "jpg", "jpeg", "pdf"];
+const MAX_CREDENTIALS = 1;
+
 export default function LumenUploadModal({
 	isOpen,
 	onClose,
@@ -41,6 +45,7 @@ export default function LumenUploadModal({
 	userId,
 }: LumenUploadModalProps) {
 	const { toast, showError } = useToast();
+	const { credentials } = useLumenCredentials(userId);
 
 	const [file, setFile] = useState<File | null>(null);
 	const [credentialType, setCredentialType] = useState("");
@@ -65,16 +70,46 @@ export default function LumenUploadModal({
 			const selected = e.target.files?.[0];
 			e.target.value = "";
 			if (!selected) return;
+
+			// Validate file type
+			const fileExt = selected.name.split(".").pop()?.toLowerCase() ?? "";
+			if (!ALLOWED_FILE_TYPES.includes(fileExt)) {
+				showError(
+					"Invalid file type",
+					"Only PNG, JPG, and PDF files are allowed",
+					3000,
+				);
+				return;
+			}
+
+			// Validate file size
 			if (selected.size > 10 * 1024 * 1024) {
 				showError("File too large", "Maximum file size is 10 MB", 3000);
 				return;
 			}
+
 			setFile(selected);
 		},
 		[showError],
 	);
 
+	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		// Allow only alphanumeric, spaces, hyphens, and apostrophes
+		const value = e.target.value.replace(/[^a-zA-Z0-9\s\-']/g, "");
+		setName(value);
+	};
+
 	const handleUpload = async () => {
+		// Check max credentials limit
+		if (credentials.length >= MAX_CREDENTIALS) {
+			showError(
+				"Upload limit reached",
+				"You can only upload 1 credential. Please delete the existing one to upload a new credential.",
+				4000,
+			);
+			return;
+		}
+
 		if (!credentialType) {
 			showError("Required", "Please select a credential type", 3000);
 			return;
@@ -96,11 +131,24 @@ export default function LumenUploadModal({
 
 		try {
 			const fileExt = file.name.split(".").pop()?.toLowerCase() ?? "pdf";
+			const lumenName = `${userId.slice(0, 8)}-${name.trim()}`;
+
+			// Check for duplicate file
+			const isDuplicate = credentials.some(
+				(cred) => cred.name === name.trim(),
+			);
+			if (isDuplicate) {
+				showError(
+					"Duplicate credential",
+					`A credential named "${name.trim()}" already exists`,
+					3000,
+				);
+				setIsUploading(false);
+				return;
+			}
+
 			const checksum = await computeFileChecksum(file);
 			const description = `${credentialType} credential issued by ${institution.trim()}`;
-
-			// Use userId prefix to avoid file name collisions across users
-			const lumenName = `${userId.slice(0, 8)}-${name.trim()}`;
 
 			const { workflowId, fetchKey } = await createLumenFile({
 				urlPath: "Credential",
@@ -161,6 +209,7 @@ export default function LumenUploadModal({
 	}, [isUploading, resetState, onClose]);
 
 	const isValid = !!credentialType && !!name.trim() && !!institution.trim() && !!file;
+	const hasReachedLimit = credentials.length >= MAX_CREDENTIALS;
 
 	return (
 		<>
@@ -173,13 +222,22 @@ export default function LumenUploadModal({
 					</DialogHeader>
 
 					<div className="px-6 py-4 space-y-4 max-h-[65vh] overflow-y-auto custom-scrollbar">
+						{hasReachedLimit && (
+							<div className="bg-red-50 border border-red-200 rounded-sm p-3">
+								<p className="text-sm text-red-700">
+									You have reached the credential upload limit (1 credential max).
+									Delete your existing credential to upload a new one.
+								</p>
+							</div>
+						)}
+
 						{/* Type */}
 						<div>
 							<label className="block text-xs text-gray-500 mb-1.5">Type*</label>
 							<Select
 								value={credentialType}
 								onValueChange={setCredentialType}
-								disabled={isUploading}
+								disabled={isUploading || hasReachedLimit}
 							>
 								<SelectTrigger className="w-full">
 									<SelectValue placeholder="Select type" />
@@ -196,10 +254,14 @@ export default function LumenUploadModal({
 							<label className="block text-xs text-gray-500 mb-1.5">Credential Name*</label>
 							<Input
 								value={name}
-								onChange={(e) => setName(e.target.value)}
+								onChange={handleNameChange}
 								placeholder="e.g., Dean's List Award"
-								disabled={isUploading}
+								disabled={isUploading || hasReachedLimit}
+								maxLength={50}
 							/>
+							<p className="text-xs text-gray-400 mt-1">
+								Letters, numbers, hyphens, and apostrophes only
+							</p>
 						</div>
 
 						{/* Institution */}
@@ -211,7 +273,7 @@ export default function LumenUploadModal({
 								value={institution}
 								onChange={(e) => setInstitution(e.target.value)}
 								placeholder="e.g., University of the Philippines"
-								disabled={isUploading}
+								disabled={isUploading || hasReachedLimit}
 							/>
 						</div>
 
@@ -224,7 +286,7 @@ export default function LumenUploadModal({
 								type="month"
 								value={issuedDate}
 								onChange={(e) => setIssuedDate(e.target.value)}
-								disabled={isUploading}
+								disabled={isUploading || hasReachedLimit}
 							/>
 						</div>
 
@@ -236,7 +298,11 @@ export default function LumenUploadModal({
 							</label>
 							{!file ? (
 								<label className="block cursor-pointer">
-									<div className="border-2 border-dashed border-gray-300 rounded-sm p-12 text-center hover:border-[#3B5AA8] transition-colors">
+									<div className={`border-2 border-dashed rounded-sm p-12 text-center transition-colors ${
+										hasReachedLimit
+											? "border-gray-200 bg-gray-50 cursor-not-allowed"
+											: "border-gray-300 hover:border-[#3B5AA8]"
+									}`}>
 										<Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
 										<p className="text-sm text-gray-600">
 											Click to upload or drag and drop
@@ -249,7 +315,7 @@ export default function LumenUploadModal({
 										type="file"
 										accept="image/*,.pdf"
 										onChange={handleFileChange}
-										disabled={isUploading}
+										disabled={isUploading || hasReachedLimit}
 										className="hidden"
 									/>
 								</label>
@@ -265,7 +331,7 @@ export default function LumenUploadModal({
 									<button
 										type="button"
 										onClick={() => setFile(null)}
-										disabled={isUploading}
+										disabled={isUploading || hasReachedLimit}
 										className="p-1 text-gray-400 hover:text-gray-600 cursor-pointer disabled:opacity-50"
 									>
 										<X className="w-4 h-4" />
@@ -295,7 +361,7 @@ export default function LumenUploadModal({
 						</Button>
 						<Button
 							onClick={handleUpload}
-							disabled={isUploading || !isValid}
+							disabled={isUploading || !isValid || hasReachedLimit}
 							className="flex-1 bg-[#3B5AA8] hover:bg-[#2f4389] cursor-pointer disabled:bg-gray-300"
 						>
 							{isUploading ? (
