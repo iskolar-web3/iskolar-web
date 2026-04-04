@@ -103,7 +103,7 @@ export default function LumenUploadModal({
 			const lumenName = `${userId.slice(0, 8)}-${name.trim()}`;
 
 			const { workflowId, fetchKey } = await createLumenFile({
-				urlPath: credentialType,
+				urlPath: "Credential",
 				name: lumenName,
 				description,
 				ownerAddress: LUMEN_OWNER_ADDRESS,

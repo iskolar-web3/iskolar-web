@@ -56,7 +56,7 @@ export async function createLumenFile(
 				"Cache-Control": "no-cache",
 			},
 			body: JSON.stringify({
-				Path: "/",
+				Path: "/Credential",
 				Name: params.name,
 				Description: params.description,
 				OwnerAddress: params.ownerAddress,
@@ -96,7 +96,7 @@ export async function createLumenFile(
 	return {
 		workflowId: WorkflowID,
 		sasUrl: SASURL,
-		fetchKey: `${params.name}.${params.fileExtension}`,
+		fetchKey: `Credential/${params.name}.${params.fileExtension}`,
 	};
 }
 
