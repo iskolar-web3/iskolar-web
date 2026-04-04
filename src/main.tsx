@@ -4,7 +4,6 @@ import { HelmetProvider } from "react-helmet-async";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 
 import * as TanStackQueryProvider from "./integrations/tanstack-query/root-provider.tsx";
-import { WagmiProvider } from "./integrations/wagmi/provider.tsx";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
@@ -44,11 +43,9 @@ if (rootElement && !rootElement.innerHTML) {
 		<StrictMode>
 			<HelmetProvider>
 				<TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
-					<WagmiProvider>
-						<AuthProvider>
-							<App />
-						</AuthProvider>
-					</WagmiProvider>
+					<AuthProvider>
+						<App />
+					</AuthProvider>
 				</TanStackQueryProvider.Provider>
 			</HelmetProvider>
 		</StrictMode>,

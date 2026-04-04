@@ -35,7 +35,7 @@ export default function Toast({ visible, type, title, message }: ToastProps): JS
             stiffness: 800,
             damping: 28,
           }}
-          className="fixed top-4 md:top-6 right-4 z-[1000] w-[350px] h-[50px] md:w-[360px] md:h-[60px] rounded-lg flex items-center justify-end shadow-lg"
+          className="fixed top-4 md:top-6 right-4 z-1000 w-[350px] h-[50px] md:w-[360px] md:h-[60px] rounded-lg flex items-center justify-end shadow-lg"
           style={{
             backgroundColor: type === "success" ? "#31D0AA" : "#EF4444",
           }}

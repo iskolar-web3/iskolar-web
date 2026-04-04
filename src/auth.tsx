@@ -68,20 +68,19 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 			setCookie(REFRESH_TOKEN_KEY, session.data.refreshToken, { expires });
 
 			switch (session.data.user.role?.code) {
-				case UserRole.Student:
+				case UserRole.Student: {
 					const student = await getMyStudentProfile(session.data.token);
 					setProfile(student);
 					break;
-
-				case UserRole.Sponsor:
+				}
+				case UserRole.Sponsor: {
 					const sponsor = await getMySponsorProfile(session.data.token);
 					setProfile(sponsor);
 					break;
-
+				}
 				case UserRole.Admin:
 					setProfile(null);
 					break;
-
 				default:
 					setProfile(null);
 			}
@@ -93,16 +92,12 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 	}
 
 	async function logout(): Promise<void> {
-		const token = getCookie(ACCESS_TOKEN_KEY);
-		if (!token || !user) {
-			console.log("No token or user");
-			return;
-		}
-
 		setUser(null);
+		setProfile(null);
+		setSessionToken("");
+		setError(null);
 		deleteCookie(ACCESS_TOKEN_KEY);
 		deleteCookie(REFRESH_TOKEN_KEY);
-		console.log("Logged out");
 	}
 
 	useEffect(() => {

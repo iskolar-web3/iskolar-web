@@ -31,7 +31,7 @@ export default function ScholarshipCardSkeleton({ index = 0 }: ScholarshipCardSk
       <div className="bg-card">
         <div className="flex">
           {/* Image Skeleton */}
-          <div className="w-32 h-32 bg-muted-foreground flex-shrink-0 overflow-hidden">
+          <div className="w-32 h-32 bg-muted-foreground shrink-0 overflow-hidden">
             <Skeleton className="w-full h-full rounded-none bg-muted-foreground" />
           </div>
 

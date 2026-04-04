@@ -72,8 +72,8 @@ export default function Navbar() {
 		href: string,
 	) => {
 		const hashOnly = href.startsWith("#");
-		const samePageHash =
-			href.includes("#") && href.startsWith(location.pathname);
+		const pathBeforeHash = href.split("#")[0];
+		const samePageHash = href.includes("#") && pathBeforeHash === location.pathname;
 
 		if (hashOnly || samePageHash) {
 			e.preventDefault();
@@ -279,36 +279,26 @@ export default function Navbar() {
 											exit={{ opacity: 0, height: 0 }}
 											transition={{ duration: 0.2, ease: "easeOut" }}
 										>
-											{link.dropdown.map((item) =>
-												!item.href.startsWith("#") ? (
-													<Link
-														key={item.name}
-														to={item.href.split("#")[0] as "/"}
-														preload="intent"
-														onClick={(e) => {
+											{link.dropdown.map((item) => (
+												<a
+													key={item.name}
+													href={item.href}
+													onClick={(e) => {
+														const hashOnly = item.href.startsWith("#");
+														const samePageHash =
+															item.href.includes("#") && item.href.startsWith(location.pathname);
+
+														if (hashOnly || samePageHash) {
 															handleNavClick(e, item.href);
-															setIsMobileMenuOpen(false);
-															setActiveDropdown(null);
-														}}
-														className="flex items-center gap-2 py-1.5 text-sm text-secondary/75 hover:text-secondary/80"
-													>
-														{item.name}
-													</Link>
-												) : (
-													<a
-														key={item.name}
-														href={item.href}
-														onClick={(e) => {
-															handleNavClick(e, item.href);
-															setIsMobileMenuOpen(false);
-															setActiveDropdown(null);
-														}}
-														className="flex items-center gap-2 py-1.5 text-sm text-secondary/75 hover:text-secondary/80"
-													>
-														{item.name}
-													</a>
-												),
-											)}
+														}
+														setIsMobileMenuOpen(false);
+														setActiveDropdown(null);
+													}}
+													className="flex items-center gap-2 py-1.5 text-sm text-secondary/75 hover:text-secondary/80"
+												>
+													{item.name}
+												</a>
+											))}
 										</motion.div>
 									)}
 								</div>

@@ -9,8 +9,8 @@ import ProfileSkeleton from "@/components/profile/ProfileSkeleton";
 import ProfileError from "@/components/profile/ProfileError";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import EditHeader from "@/components/profile/EditHeader";
-import CredentialUploadModal from "@/components/student/profile/credentials/CredentialUploadModal";
-import CredentialsList from "@/components/student/profile/credentials/CredentialsList";
+import LumenUploadModal from "@/components/student/profile/credentials/LumenUploadModal";
+import LumenFilesList from "@/components/student/profile/credentials/LumenFilesList";
 import { useAuth } from "@/auth";
 import type { Student, UpdateStudentRequest } from "@/lib/student/model";
 import { UserRole } from "@/lib/user/model";
@@ -32,6 +32,7 @@ function StudentProfilePage() {
 	const [isCredentialModalOpen, setIsCredentialModalOpen] = useState(false);
 	const [isEditing, setIsEditing] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
+	const [credentialRefreshKey, setCredentialRefreshKey] = useState(0);
 
 	const formRef = useRef<HTMLFormElement>(null);
 	const { toast, showSuccess, showError } = useToast();
@@ -85,6 +86,7 @@ function StudentProfilePage() {
 	};
 
 	const handleCredentialSuccess = () => {
+		setCredentialRefreshKey((k) => k + 1);
 		showSuccess("Success", "Your credential has been saved.", 2500);
 	};
 
@@ -94,10 +96,11 @@ function StudentProfilePage() {
 			{toast && <Toast {...toast} />}
 
 			{/* Credential Upload Modal */}
-			<CredentialUploadModal
+			<LumenUploadModal
 				isOpen={isCredentialModalOpen}
 				onClose={() => setIsCredentialModalOpen(false)}
 				onSuccess={handleCredentialSuccess}
+				userId={auth.profile.id}
 			/>
 
 			<div className="max-w-2xl mx-auto space-y-4">
@@ -166,7 +169,7 @@ function StudentProfilePage() {
 						</button>
 					</div>
 
-					<CredentialsList />
+					<LumenFilesList userId={auth.profile.id} refreshKey={credentialRefreshKey} />
 				</motion.div>
 			</div>
 		</div>
