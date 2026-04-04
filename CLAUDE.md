@@ -20,13 +20,13 @@ Run a single test file: `bun test src/path/to/file.test.ts`
 
 ## Architecture
 
-**iSkolar** is a scholarship management platform connecting students and sponsors, with Web3/NFT credential issuance.
+**iSkolar** is a scholarship management platform connecting students and sponsors, with Lumen API-based credential storage.
 
 ### Provider Stack (main.tsx → App.tsx)
 ```
-WagmiProvider → QueryClientProvider → AuthProvider → RouterProvider
+QueryClientProvider → AuthProvider → RouterProvider
 ```
-`AuthProvider` manages session state (access/refresh tokens in cookies). Wagmi/RainbowKit handle wallet connectivity.
+`AuthProvider` manages session state (access/refresh tokens in cookies).
 
 ### Routing
 TanStack Router with file-based routes under `src/routes/`. Route groups:
@@ -44,10 +44,8 @@ TanStack Router with file-based routes under `src/routes/`. Route groups:
 - **Hooks** in `src/hooks/` expose React Query queries/mutations to components
 - **Types** in `src/types/` define shared TypeScript interfaces
 
-### Web3 / NFT Credentials
-- Supported networks: Polygon mainnet, Polygon Amoy, Sepolia, BSC Testnet, Base Sepolia, Hardhat local
-- Contract ABI in `src/lib/contracts.ts` — ERC721 with role-based access for credential issuance/revocation
-- Wagmi hooks used for contract interactions; RainbowKit for wallet UI
+### Credentials
+Credentials are uploaded to Azure Blob Storage via the Lumen API. Student profile shows a credentials section controlled by the `VITE_ENABLE_LUMEN_CREDENTIALS` feature flag.
 
 ### IPFS Storage
 Files (profile images, scholarship banners, application documents) are uploaded to IPFS via Pinata. Requires `VITE_PINATA_JWT` and `VITE_GATEWAY_URL` env vars.
@@ -58,8 +56,15 @@ Files (profile images, scholarship banners, application documents) are uploaded 
 VITE_BACKEND_URL=http://localhost:5000
 VITE_PINATA_JWT=
 VITE_GATEWAY_URL=
-VITE_WALLET_CONNECT_PROJECT_ID=
+VITE_TEST_LUMEN_API_KEY=
+VITE_TEST_LUMEN_API_SECRET=
+VITE_BASE_URL=
+VITE_SHOW_BETA_NOTICE=true
+VITE_ENABLE_LUMEN_CREDENTIALS=true
 ```
+
+### Feature Flags
+- **VITE_ENABLE_LUMEN_CREDENTIALS** (true/false) — Controls visibility of student credentials section. Set to `false` to hide in test/staging environments.
 
 ## Code Style
 

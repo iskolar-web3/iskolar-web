@@ -95,13 +95,15 @@ function StudentProfilePage() {
 			<SEO title="Profile" noindex={true} />
 			{toast && <Toast {...toast} />}
 
-			{/* Credential Upload Modal */}
-			<LumenUploadModal
-				isOpen={isCredentialModalOpen}
-				onClose={() => setIsCredentialModalOpen(false)}
-				onSuccess={handleCredentialSuccess}
-				userId={auth.profile.id}
-			/>
+			{/* Credential Upload Modal - Feature Flag */}
+			{import.meta.env.VITE_ENABLE_LUMEN_CREDENTIALS === "true" && (
+				<LumenUploadModal
+					isOpen={isCredentialModalOpen}
+					onClose={() => setIsCredentialModalOpen(false)}
+					onSuccess={handleCredentialSuccess}
+					userId={auth.profile.id}
+				/>
+			)}
 
 			<div className="max-w-2xl mx-auto space-y-4">
 				{/* Profile Header */}
@@ -149,28 +151,30 @@ function StudentProfilePage() {
 					/>
 				</motion.div>
 
-				{/* Credentials */}
-				<motion.div
-					initial={{ opacity: 0, y: 20 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.3, delay: 0.3 }}
-					className="bg-white rounded-lg shadow-sm border border-[#E0ECFF] p-6"
-				>
-					<div className="flex items-center justify-between mb-6">
-						<div className="flex items-center gap-2">
-							<h2 className="text-lg text-primary">Credentials</h2>
+				{/* Credentials - Feature Flag */}
+				{import.meta.env.VITE_ENABLE_LUMEN_CREDENTIALS === "true" && (
+					<motion.div
+						initial={{ opacity: 0, y: 20 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.3, delay: 0.3 }}
+						className="bg-white rounded-lg shadow-sm border border-[#E0ECFF] p-6"
+					>
+						<div className="flex items-center justify-between mb-6">
+							<div className="flex items-center gap-2">
+								<h2 className="text-lg text-primary">Credentials</h2>
+							</div>
+							<button
+								onClick={() => setIsCredentialModalOpen(true)}
+								className="px-3 py-2 cursor-pointer bg-[#3B5AA8] hover:bg-[#2f4389] text-white text-xs font-medium rounded-sm transition-colors flex items-center gap-2"
+							>
+								<Plus className="w-3.5 h-3.5" />
+								Add Credential
+							</button>
 						</div>
-						<button
-							onClick={() => setIsCredentialModalOpen(true)}
-							className="px-3 py-2 cursor-pointer bg-[#3B5AA8] hover:bg-[#2f4389] text-white text-xs font-medium rounded-sm transition-colors flex items-center gap-2"
-						>
-							<Plus className="w-3.5 h-3.5" />
-							Add Credential
-						</button>
-					</div>
 
-					<LumenFilesList userId={auth.profile.id} refreshKey={credentialRefreshKey} />
-				</motion.div>
+						<LumenFilesList userId={auth.profile.id} refreshKey={credentialRefreshKey} />
+					</motion.div>
+				)}
 			</div>
 		</div>
 	);
