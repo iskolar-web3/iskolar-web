@@ -13,7 +13,7 @@ export async function validateSession(
 		credentials: "include",
 	});
 	if (!response.ok) {
-		return { message: "Unauthorized" };
+		return { message: "Unauthorized", data: null };
 	}
 	const result: ApiResponse<AuthSession> = await response.json();
 	return result;
