@@ -80,7 +80,18 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 				return null;
 			}
 
-			const session = await validateSession(oldToken);
+			let session: Awaited<ReturnType<typeof validateSession>>;
+			try {
+				session = await validateSession(oldToken);
+			} catch {
+				deleteCookie(ACCESS_TOKEN_KEY);
+				deleteCookie(REFRESH_TOKEN_KEY);
+				clearAuthCache();
+				setUser(null);
+				setProfile(null);
+				return null;
+			}
+
 			if (!session.data) {
 				deleteCookie(ACCESS_TOKEN_KEY);
 				deleteCookie(REFRESH_TOKEN_KEY);
