@@ -12,6 +12,9 @@ export async function validateSession(
 		headers: { Authorization: `Bearer ${token}` },
 		credentials: "include",
 	});
+	if (!response.ok) {
+		return { message: "Unauthorized", data: null };
+	}
 	const result: ApiResponse<AuthSession> = await response.json();
 	return result;
 }

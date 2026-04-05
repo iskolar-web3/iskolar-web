@@ -1,4 +1,4 @@
-import { BACKEND_URL, type ApiResponse } from "../api";
+import { BACKEND_URL, safeResponseJson, type ApiResponse } from "../api";
 import { getCookie } from "../cookie";
 import { ACCESS_TOKEN_KEY } from "../user/auth";
 import { studentSchema, type Student, type UpdateStudentRequest } from "./model";
@@ -15,7 +15,7 @@ export async function getMyStudentProfile(
 		return null;
 	}
 
-	const result: ApiResponse<Student | null> = await response.json();
+	const result: ApiResponse<Student | null> = await safeResponseJson(response);
     if(!result.data){
         return null;
     }
@@ -35,7 +35,7 @@ export async function updateStudent(
 			Authorization: `Bearer ${token}`,
 		},
 	});
-	const result: ApiResponse<Student> = await response.json();
+	const result: ApiResponse<Student> = await safeResponseJson(response);
 	if (!response.ok) {
 		throw new Error(result.message || "Failed to create profile.");
 	}

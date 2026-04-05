@@ -13,6 +13,15 @@ type FileDataResponse = {
 export const BACKEND_URL =
 	import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
+export async function safeResponseJson<T>(response: Response): Promise<T> {
+	const text = await response.text();
+	try {
+		return JSON.parse(text) as T;
+	} catch {
+		throw new Error(text || `HTTP ${response.status}`);
+	}
+}
+
 export function enumDetailSchema<T extends EnumLike>(code: T) {
 	return z.object({
 		id: z.number().positive(),
@@ -36,7 +45,7 @@ export async function uploadFile(
         credentials: "include",
     });
 
-	const result: ApiResponse<FileDataResponse> = await response.json();
+	const result: ApiResponse<FileDataResponse> = await safeResponseJson(response);
 	return result;
 }
 

@@ -64,7 +64,7 @@ function Scholarships() {
 	const scholarships = useSuspenseQuery(
 		getMyScholarshipsQuery(auth.sessionToken, {
 			...search,
-			sponsorId: auth.profile.id,
+			sponsorId: auth.profile?.id ?? "",
 		}),
 	);
 

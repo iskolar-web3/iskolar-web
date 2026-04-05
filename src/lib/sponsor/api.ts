@@ -1,4 +1,4 @@
-import { BACKEND_URL, type ApiResponse } from "../api";
+import { BACKEND_URL, safeResponseJson, type ApiResponse } from "../api";
 import { getCookie } from "../cookie";
 import { ACCESS_TOKEN_KEY } from "../user/auth";
 import {
@@ -25,7 +25,7 @@ export async function getMySponsorProfile(
 		return null;
 	}
 
-	const result: ApiResponse<AnySponsor | null> = await response.json();
+	const result: ApiResponse<AnySponsor | null> = await safeResponseJson(response);
 	return anySponsorSchema.parse(result.data);
 }
 
@@ -59,7 +59,7 @@ export async function updateIndividualSponsor(
 			},
 		},
 	);
-	const result: ApiResponse<IndividualSponsor> = await response.json();
+	const result: ApiResponse<IndividualSponsor> = await safeResponseJson(response);
 	if (!response.ok) {
 		throw new Error(result.message || "Failed to update profile.");
 	}
@@ -82,7 +82,7 @@ export async function updateOrganizationSponsor(
 			},
 		},
 	);
-	const result: ApiResponse<OrganizationSponsor> = await response.json();
+	const result: ApiResponse<OrganizationSponsor> = await safeResponseJson(response);
 	if (!response.ok) {
 		throw new Error(result.message || "Failed to update profile.");
 	}
@@ -105,7 +105,7 @@ export async function updateGovernmentSponsor(
 			},
 		},
 	);
-	const result: ApiResponse<GovernmentSponsor> = await response.json();
+	const result: ApiResponse<GovernmentSponsor> = await safeResponseJson(response);
 	if (!response.ok) {
 		throw new Error(result.message || "Failed to update profile.");
 	}

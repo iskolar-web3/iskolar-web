@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import { BACKEND_URL, type ApiResponse } from "../api";
+import { BACKEND_URL, safeResponseJson, type ApiResponse } from "../api";
 import { anySponsorSchema } from "../sponsor/model";
 import {
 	applicantSchema,
@@ -23,6 +23,7 @@ async function getMyScholarships(
 	token: string,
 	params?: GetScholarshipQueryParam,
 ): Promise<Scholarship[]> {
+	if (!token) return [];
 	const url = new URL(`${BACKEND_URL}/scholarships`);
 	if (params?.sponsorId) {
 		url.searchParams.append("sponsorId", params.sponsorId);
@@ -39,7 +40,7 @@ async function getMyScholarships(
 		headers: { Authorization: `Bearer ${token}` },
 		credentials: "include",
 	});
-	const result: ApiResponse<Scholarship[]> = await response.json();
+	const result: ApiResponse<Scholarship[]> = await safeResponseJson(response);
 
 	return scholarshipSchema(anySponsorSchema)
 		.array()
@@ -69,7 +70,7 @@ async function getScholarshipById(id: string): Promise<Scholarship> {
 		headers: { Authorization: `Bearer ${token}` },
 		credentials: "include",
 	});
-	const result: ApiResponse<Scholarship> = await response.json();
+	const result: ApiResponse<Scholarship> = await safeResponseJson(response);
 
 	console.log(result.data);
 
@@ -100,7 +101,7 @@ export async function updateScholarship(
 		},
 		credentials: "include",
 	});
-	const result: ApiResponse<Scholarship> = await response.json();
+	const result: ApiResponse<Scholarship> = await safeResponseJson(response);
 
 	scholarshipSchema(anySponsorSchema).parse(result.data);
 
@@ -119,7 +120,7 @@ async function getApplicants(id: string): Promise<Applicant[]> {
 		headers: { Authorization: `Bearer ${token}` },
 		credentials: "include",
 	});
-	const result: ApiResponse<Applicant[]> = await response.json();
+	const result: ApiResponse<Applicant[]> = await safeResponseJson(response);
 
 	return applicantSchema.array().parse(result.data);
 }
@@ -151,7 +152,7 @@ async function getMyApplications(
 		headers: { Authorization: `Bearer ${token}` },
 		credentials: "include",
 	});
-	const result: ApiResponse<Application[]> = await response.json();
+	const result: ApiResponse<Application[]> = await safeResponseJson(response);
 
 	return applicationSchema.array().parse(result.data);
 }
@@ -182,7 +183,7 @@ export async function createApplication(
 		},
 		credentials: "include",
 	});
-	const result: ApiResponse = await response.json();
+	const result: ApiResponse = await safeResponseJson(response);
 
 	return result;
 }
@@ -207,7 +208,7 @@ export async function updateApplication(
 		},
 		credentials: "include",
 	});
-	const result: ApiResponse = await response.json();
+	const result: ApiResponse = await safeResponseJson(response);
 
 	if (!response.ok) {
 		throw new Error(result.message);
@@ -231,7 +232,7 @@ export async function deleteScholarship(id: string): Promise<ApiResponse> {
 		},
 		credentials: "include",
 	});
-	const result: ApiResponse = await response.json();
+	const result: ApiResponse = await safeResponseJson(response);
 
 	if (!response.ok) {
 		throw new Error(result.message);
@@ -256,7 +257,7 @@ export async function getMyApplicationStatus(
 		headers: { Authorization: `Bearer ${token}` },
 		credentials: "include",
 	});
-	const result: ApiResponse<ApplicationStatus> = await response.json();
+	const result: ApiResponse<ApplicationStatus> = await safeResponseJson(response);
 
 	return applicationStatusSchema.nullable().parse(result.data);
 }
