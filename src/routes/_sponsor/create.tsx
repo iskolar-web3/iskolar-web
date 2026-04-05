@@ -229,38 +229,62 @@ function CreateScholarship() {
       <div className="grid grid-cols-1 lg:grid-cols-15">
         {/* Scholarship Details */}
         <div className="space-y-4 lg:col-span-8">
-          {/* Type */}
-          <div>
-            <label className="block text-xs text-[#6B7280] mb-1.5 ml-0.5">
-              Scholarship Type <span className="text-[#EF4444]">*</span>
-            </label>
-            <Select
-              value={scholarshipType}
-              onValueChange={(value) => setValue('scholarshipType', value as ScholarshipType, { shouldValidate: true })}
-            >
-              <SelectTrigger disabled={loading} className={`w-full cursor-pointer px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
-                errors.scholarshipType
-                  ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary'
-                  : 'border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary'
-              }`}>
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={ScholarshipType.MeritBased}>Merit-Based</SelectItem>
-                <SelectItem value={ScholarshipType.NeedBased}>Need-Based</SelectItem>
-                <SelectItem value={ScholarshipType.Combined}>Combined (Merit-Based + Need-Based)</SelectItem>
-              </SelectContent>
-            </Select>
-            {errors.scholarshipType && <p className="text-xs text-[#EF4444] mt-1">{errors.scholarshipType.message}</p>}
-          </div>
+          <div className="bg-[#F8F9FC] rounded-xl p-3 shadow-sm space-y-4">
+            {/* Row 1: Scholarship Type */}
+            <div>
+              <label className="block text-xs text-[#6B7280] mb-1.5 ml-0.5">
+                Scholarship Type <span className="text-[#EF4444]">*</span>
+              </label>
+              <Select
+                value={scholarshipType}
+                onValueChange={(value) =>
+                  setValue('scholarshipType', value as ScholarshipType, { shouldValidate: true })
+                }
+              >
+                <SelectTrigger
+                  disabled={loading}
+                  className={`w-full cursor-pointer px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-600 [&>span]:text-gray-500 ${
+                    errors.scholarshipType
+                      ? 'border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary'
+                      : 'border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary'
+                  }`}
+                >
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ScholarshipType.MeritBased}>
+                    <span className="text-primary">Merit-Based</span>{' '}
+                    <span className="text-gray-500">
+                      (Awarded for grades, skills, or achievements)
+                    </span>
+                  </SelectItem>
 
-          <div className="bg-[#F8F9FC] rounded-xl p-3 shadow-sm">
-            <div className="flex flex-col md:flex-row gap-4">
-              {/* Image Upload */}
-              <div className="md:w-[218px]">
-                <label className="block">
+                  <SelectItem value={ScholarshipType.NeedBased}>
+                    <span className="text-primary">Need-Based</span>{' '}
+                    <span className="text-gray-500">
+                      (Awarded based on financial need or limited resources)
+                    </span>
+                  </SelectItem>
+
+                  <SelectItem value={ScholarshipType.Combined}>
+                    <span className="text-primary">Combined</span>{' '}
+                    <span className="text-gray-500">
+                      (Merit-Based + Need-Based)
+                    </span>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.scholarshipType && (
+                <p className="text-xs text-[#EF4444] mt-1">{errors.scholarshipType.message}</p>
+              )}
+            </div>
+
+            {/* Row 2: Image + Title + Description */}
+            <div className="flex flex-col md:flex-row gap-4 items-stretch">
+              <div className="md:w-[218px] shrink-0">
+                <label className="block h-full">
                   {imagePreview ? (
-                    <div className="relative w-full aspect-square rounded-lg overflow-hidden">
+                    <div className="relative w-full h-full min-h-[218px] rounded-lg overflow-hidden">
                       <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                       <button
                         type="button"
@@ -272,7 +296,7 @@ function CreateScholarship() {
                       </button>
                     </div>
                   ) : (
-                    <div className="border-2 border-dashed border-[#3A52A6] rounded-lg text-center cursor-pointer hover:bg-[#F0F7FF] transition-colors flex flex-col items-center justify-center w-full aspect-square px-4">
+                    <div className="border-2 border-dashed border-[#3A52A6] rounded-lg text-center cursor-pointer hover:bg-[#F0F7FF] transition-colors flex flex-col items-center justify-center w-full h-full min-h-[218px] px-4">
                       <Upload className="mb-3 text-[#5B7BA6]" size={40} />
                       <p className="text-secondary text-sm opacity-70">Click to select an image</p>
                       <input
@@ -286,8 +310,7 @@ function CreateScholarship() {
                 </label>
               </div>
 
-              <div className="md:w-2/3 space-y-4">
-                {/* Title */}
+              <div className="flex-1 flex flex-col justify-between min-h-[218px] space-y-4">
                 <div>
                   <label className="block text-xs text-[#6B7280] mb-1 ml-0.5">
                     Title <span className="text-[#EF4444]">*</span>
@@ -309,203 +332,224 @@ function CreateScholarship() {
                   {errors.name && <p className="text-xs text-[#EF4444] mt-1">{errors.name.message}</p>}
                 </div>
 
-                {/* Description */}
-                <button
-                  type="button"
-                  disabled={loading}
-                  onClick={() => setShowDescriptionModal(true)}
-                  className="w-full cursor-pointer flex items-center gap-2 px-4 py-3 rounded-lg bg-[#F3F4F6] border text-[#6B7280] text-sm hover:bg-muted transition-colors"
-                >
-                  <span className="text-[#8B9CB5]">☰</span>
-                  {description ? 'Edit Description' : 'Add Description'}
-                </button>
+                <div className="flex-1 flex">
+                  <button
+                    type="button"
+                    disabled={loading}
+                    onClick={() => setShowDescriptionModal(true)}
+                    className="w-full h-full min-h-[140px] cursor-pointer flex items-start gap-2 px-4 py-3 rounded-lg bg-[#F3F4F6] border text-[#6B7280] text-sm hover:bg-muted transition-colors text-left"
+                  >
+                    <span className="text-[#8B9CB5] mt-0.5">☰</span>
+                    <span>{description ? 'Edit Description' : 'Add Description'}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
 
-                {/* Scholarship Amount */}
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs text-[#6B7280]">Scholarship Amount</span>
-                    <div className="flex rounded-sm overflow-hidden border border-[#C4CBD5] text-xs h-7">
-                      {(['fixed', 'range', 'varies'] as const).map((t) => (
-                        <button
-                          key={t}
-                          type="button"
-                          disabled={loading}
-                          onClick={() => {
-                            setAmountType(t);
-                            setValue('totalAmount', undefined);
-                            setValue('totalAmountMin', undefined);
-                            setValue('totalAmountMax', undefined);
-                            form.clearErrors(['totalAmount', 'totalAmountMin', 'totalAmountMax']);
-                          }}
-                          className={`px-3 capitalize cursor-pointer transition-colors ${amountType === t ? 'bg-[#3A52A6] text-white' : 'bg-[#F8F9FC] text-[#6B7280] hover:bg-gray-100'}`}
-                        >
-                          {t}
-                        </button>
-                      ))}
-                    </div>
+            {/* Row 3: Amount + Slots + Deadline */}
+            <div className="space-y-4">
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs text-[#6B7280]">Scholarship Amount</span>
+                  <div className="flex rounded-sm overflow-hidden border border-[#C4CBD5] text-xs h-7">
+                    {(['fixed', 'range', 'varies'] as const).map((t) => (
+                      <button
+                        key={t}
+                        type="button"
+                        disabled={loading}
+                        onClick={() => {
+                          setAmountType(t);
+                          setValue('totalAmount', undefined);
+                          setValue('totalAmountMin', undefined);
+                          setValue('totalAmountMax', undefined);
+                          form.clearErrors(['totalAmount', 'totalAmountMin', 'totalAmountMax']);
+                        }}
+                        className={`px-3 capitalize cursor-pointer transition-colors ${
+                          amountType === t
+                            ? 'bg-[#3A52A6] text-white'
+                            : 'bg-[#F8F9FC] text-[#6B7280] hover:bg-gray-100'
+                        }`}
+                      >
+                        {t}
+                      </button>
+                    ))}
                   </div>
-                  {amountType === 'fixed' && (
+                </div>
+
+                {amountType === 'fixed' && (
+                  <Controller
+                    control={control}
+                    name="totalAmount"
+                    render={({ field }) => (
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#6B7280]">
+                          ₱
+                        </span>
+                        <input
+                          {...field}
+                          type="number"
+                          disabled={loading}
+                          placeholder="Amount per scholar"
+                          onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
+                          className={`w-full pl-7 pr-4 py-3 rounded-lg border ${
+                            errors.totalAmount ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
+                          } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
+                        />
+                      </div>
+                    )}
+                  />
+                )}
+
+                {amountType === 'varies' && (
+                  <p className="text-xs text-[#6B7280] px-1 py-2.5">
+                    Amount varies — describe it in the description field.
+                  </p>
+                )}
+
+                {amountType === 'range' && (
+                  <div className="flex items-center gap-2">
                     <Controller
                       control={control}
-                      name="totalAmount"
+                      name="totalAmountMin"
                       render={({ field }) => (
-                        <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#6B7280]">₱</span>
+                        <div className="relative flex-1">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#6B7280]">
+                            ₱
+                          </span>
                           <input
                             {...field}
                             type="number"
                             disabled={loading}
-                            placeholder="Amount per scholar"
+                            placeholder="Min"
                             onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
-                            className={`w-full pl-7 pr-4 py-3 rounded-lg border ${
-                              errors.totalAmount ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
+                            className={`w-full pl-7 pr-3 py-3 rounded-lg border ${
+                              errors.totalAmountMin ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
                             } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
                           />
                         </div>
                       )}
                     />
-                  )}
-                  {amountType === 'varies' && (
-                    <p className="text-xs text-[#6B7280] px-1 py-2.5">Amount varies — describe it in the description field.</p>
-                  )}
-                  {amountType === 'range' && (
-                    <div className="flex items-center gap-2">
-                      <Controller
-                        control={control}
-                        name="totalAmountMin"
-                        render={({ field }) => (
-                          <div className="relative flex-1">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#6B7280]">₱</span>
-                            <input
-                              {...field}
-                              type="number"
-                              disabled={loading}
-                              placeholder="Min"
-                              onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
-                              className={`w-full pl-7 pr-3 py-3 rounded-lg border ${
-                                errors.totalAmountMin ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
-                              } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
-                            />
-                          </div>
-                        )}
-                      />
-                      <span className="text-xs text-[#6B7280] shrink-0">to</span>
-                      <Controller
-                        control={control}
-                        name="totalAmountMax"
-                        render={({ field }) => (
-                          <div className="relative flex-1">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#6B7280]">₱</span>
-                            <input
-                              {...field}
-                              type="number"
-                              disabled={loading}
-                              placeholder="Max"
-                              onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
-                              className={`w-full pl-7 pr-3 py-3 rounded-lg border ${
-                                errors.totalAmountMax ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
-                              } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
-                            />
-                          </div>
-                        )}
-                      />
-                    </div>
-                  )}
-                  {errors.totalAmount && <p className="text-xs text-[#EF4444] mt-1">{errors.totalAmount.message}</p>}
-                  {errors.totalAmountMin && <p className="text-xs text-[#EF4444] mt-1">{errors.totalAmountMin.message}</p>}
-                  {errors.totalAmountMax && <p className="text-xs text-[#EF4444] mt-1">{errors.totalAmountMax.message}</p>}
-                </div>
-
-                {/* Available Slots */}
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs text-[#6B7280]">Available Slots</span>
-                    <label className="flex items-center gap-1.5 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={unlimitedSlots}
-                        disabled={loading}
-                        onChange={(e) => {
-                          setUnlimitedSlots(e.target.checked);
-                          if (e.target.checked) {
-                            setValue('totalSlots', undefined);
-                            form.clearErrors('totalSlots');
-                          }
-                        }}
-                        className="w-3.5 h-3.5 cursor-pointer accent-[#3A52A6]"
-                      />
-                      <span className="text-xs text-[#6B7280]">No limit</span>
-                    </label>
-                  </div>
-                  {!unlimitedSlots && (
+                    <span className="text-xs text-[#6B7280] shrink-0">to</span>
                     <Controller
                       control={control}
-                      name="totalSlots"
+                      name="totalAmountMax"
                       render={({ field }) => (
-                        <input
-                          {...field}
-                          type="number"
-                          disabled={loading}
-                          placeholder="Number of scholars"
-                          onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
-                          className={`w-full px-4 py-3 rounded-lg border ${
-                            errors.totalSlots ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
-                          } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
-                        />
+                        <div className="relative flex-1">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#6B7280]">
+                            ₱
+                          </span>
+                          <input
+                            {...field}
+                            type="number"
+                            disabled={loading}
+                            placeholder="Max"
+                            onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
+                            className={`w-full pl-7 pr-3 py-3 rounded-lg border ${
+                              errors.totalAmountMax ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
+                            } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
+                          />
+                        </div>
                       )}
                     />
-                  )}
-                  {errors.totalSlots && <p className="text-xs text-[#EF4444] mt-1">{errors.totalSlots.message}</p>}
+                  </div>
+                )}
+
+                {errors.totalAmount && <p className="text-xs text-[#EF4444] mt-1">{errors.totalAmount.message}</p>}
+                {errors.totalAmountMin && <p className="text-xs text-[#EF4444] mt-1">{errors.totalAmountMin.message}</p>}
+                {errors.totalAmountMax && <p className="text-xs text-[#EF4444] mt-1">{errors.totalAmountMax.message}</p>}
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-xs text-[#6B7280]">Available Slots</span>
+                  <label className="flex items-center gap-1.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={unlimitedSlots}
+                      disabled={loading}
+                      onChange={(e) => {
+                        setUnlimitedSlots(e.target.checked);
+                        if (e.target.checked) {
+                          setValue('totalSlots', undefined);
+                          form.clearErrors('totalSlots');
+                        }
+                      }}
+                      className="w-3.5 h-3.5 cursor-pointer accent-[#3A52A6]"
+                    />
+                    <span className="text-xs text-[#6B7280]">No limit</span>
+                  </label>
                 </div>
 
-                {/* Application Deadline */}
-                <div>
-                  <label className="block text-xs text-[#6B7280] mb-1.5 ml-0.5">
-                    Application Deadline <span className="text-[#EF4444]">*</span>
-                  </label>
+                {!unlimitedSlots && (
                   <Controller
                     control={control}
-                    name="applicationDeadline"
+                    name="totalSlots"
                     render={({ field }) => (
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <button
-                            type="button"
-                            disabled={loading}
-                            className={`w-full cursor-pointer px-4 py-3 text-sm border rounded-lg bg-[#F8F9FC] focus:outline-none focus:ring-2 focus:ring-[#3A52A6] flex items-center justify-between ${
-                              field.value ? 'text-primary' : 'text-gray-400'
-                            } ${errors.applicationDeadline ? 'border-[#EF4444]' : 'border-[#C4CBD5]'}`}
-                          >
-                            <span>
-                              {field.value
-                                ? field.value.toLocaleDateString('en-US', {
-                                    month: 'long',
-                                    day: 'numeric',
-                                    year: 'numeric',
-                                  })
-                                : 'Application deadline'}
-                            </span>
-                            <CalendarIcon className="h-4 w-4 opacity-60" />
-                          </button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value ?? undefined}
-                            onSelect={(date) => {
-                              if (date) {
-                                field.onChange(date);
-                              }
-                            }}
-                            disabled={(date) => date < new Date()}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
+                      <input
+                        {...field}
+                        type="number"
+                        disabled={loading}
+                        placeholder="Number of scholars"
+                        onKeyDown={(e) => ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault()}
+                        className={`w-full px-4 py-3 rounded-lg border ${
+                          errors.totalSlots ? 'border-[#EF4444]' : 'border-[#C4CBD5]'
+                        } bg-[#F8F9FC] text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
+                      />
                     )}
                   />
-                  {errors.applicationDeadline && <p className="text-xs text-[#EF4444] mt-1">{errors.applicationDeadline.message}</p>}
-                </div>
+                )}
+
+                {errors.totalSlots && <p className="text-xs text-[#EF4444] mt-1">{errors.totalSlots.message}</p>}
+              </div>
+
+              <div>
+                <label className="block text-xs text-[#6B7280] mb-1.5 ml-0.5">
+                  Application Deadline <span className="text-[#EF4444]">*</span>
+                </label>
+                <Controller
+                  control={control}
+                  name="applicationDeadline"
+                  render={({ field }) => (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button
+                          type="button"
+                          disabled={loading}
+                          className={`w-full cursor-pointer px-4 py-3 text-sm border rounded-lg bg-[#F8F9FC] focus:outline-none focus:ring-2 focus:ring-[#3A52A6] flex items-center justify-between ${
+                            field.value ? 'text-primary' : 'text-gray-400'
+                          } ${errors.applicationDeadline ? 'border-[#EF4444]' : 'border-[#C4CBD5]'}`}
+                        >
+                          <span>
+                            {field.value
+                              ? field.value.toLocaleDateString('en-US', {
+                                  month: 'long',
+                                  day: 'numeric',
+                                  year: 'numeric',
+                                })
+                              : 'Application deadline'}
+                          </span>
+                          <CalendarIcon className="h-4 w-4 opacity-60" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value ?? undefined}
+                          onSelect={(date) => {
+                            if (date) {
+                              field.onChange(date);
+                            }
+                          }}
+                          disabled={(date) => date < new Date()}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                />
+                {errors.applicationDeadline && (
+                  <p className="text-xs text-[#EF4444] mt-1">{errors.applicationDeadline.message}</p>
+                )}
               </div>
             </div>
           </div>
