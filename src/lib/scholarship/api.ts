@@ -23,6 +23,7 @@ async function getMyScholarships(
 	token: string,
 	params?: GetScholarshipQueryParam,
 ): Promise<Scholarship[]> {
+	if (!token) return [];
 	const url = new URL(`${BACKEND_URL}/scholarships`);
 	if (params?.sponsorId) {
 		url.searchParams.append("sponsorId", params.sponsorId);
