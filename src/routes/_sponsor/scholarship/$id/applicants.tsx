@@ -205,10 +205,19 @@ function ApplicantsListPage() {
 		onSuccess: async (res) => {
 			console.log(res);
 			showSuccess(`Success`, res.message, 1250);
+			queryClient.invalidateQueries({
+				queryKey: ["scholarships", "applicants", params.id],
+			});
+			setConfirmationModal(false);
+			setDenialRemarks("");
+			setPendingAction(null);
+			setIsUpdatingStatus(false);
+			handleCloseModal();
 		},
 		onError: (err) => {
 			showError("Error", err.message);
 			console.error(err);
+			setIsUpdatingStatus(false);
 		},
 	});
 
@@ -233,7 +242,6 @@ function ApplicantsListPage() {
 
 		console.log("Updating status", payload);
 		mutation.mutate(payload);
-		setIsUpdatingStatus(false);
 	};
 
 	const getStatusColor = (status: ScholarshipApplicationStatus) => {
