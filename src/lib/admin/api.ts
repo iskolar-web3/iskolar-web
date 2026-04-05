@@ -1,4 +1,4 @@
-import { BACKEND_URL, type ApiResponse } from "@/lib/api";
+import { BACKEND_URL, safeResponseJson, type ApiResponse } from "@/lib/api";
 import type {
 	DashboardMetrics,
 	PaginatedResponse,
@@ -16,7 +16,7 @@ export async function getDashboardMetrics(
 		headers: { Authorization: `Bearer ${token}` },
 		credentials: "include",
 	});
-	return response.json();
+	return safeResponseJson(response);
 }
 
 export async function getSignupTimeline(
@@ -31,7 +31,7 @@ export async function getSignupTimeline(
 			credentials: "include",
 		},
 	);
-	return response.json();
+	return safeResponseJson(response);
 }
 
 export async function getStudentDistribution(
@@ -42,7 +42,7 @@ export async function getStudentDistribution(
 		headers: { Authorization: `Bearer ${token}` },
 		credentials: "include",
 	});
-	return response.json();
+	return safeResponseJson(response);
 }
 
 export async function getUsers(
@@ -66,5 +66,5 @@ export async function getUsers(
 			credentials: "include",
 		},
 	);
-	return response.json();
+	return safeResponseJson(response);
 }
