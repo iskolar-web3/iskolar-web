@@ -332,15 +332,36 @@ function CreateScholarship() {
                   {errors.name && <p className="text-xs text-[#EF4444] mt-1">{errors.name.message}</p>}
                 </div>
 
-                <div className="flex-1 flex">
+                <div className="flex-1">
                   <button
                     type="button"
                     disabled={loading}
                     onClick={() => setShowDescriptionModal(true)}
-                    className="w-full h-full min-h-[140px] cursor-pointer flex items-start gap-2 px-4 py-3 rounded-lg bg-[#F3F4F6] border text-[#6B7280] text-sm hover:bg-muted transition-colors text-left"
+                    className="w-full h-full min-h-[140px] max-h-[140px] cursor-pointer rounded-lg bg-[#F3F4F6] border text-sm hover:bg-muted transition-colors text-left overflow-hidden px-4 py-3"
                   >
-                    <span className="text-[#8B9CB5] mt-0.5">☰</span>
-                    <span>{description ? 'Edit Description' : 'Add Description'}</span>
+                    <div className="flex h-full gap-2 overflow-hidden">
+                      <span className="text-[#8B9CB5] mt-0.5 shrink-0">☰</span>
+
+                      <div className="flex-1 min-w-0 overflow-hidden">
+                        {description ? (
+                          <>
+                            <p className="text-[#6B7280] mb-2">Edit Description</p>
+                            <p
+                              className="text-[#6B7280] whitespace-pre-line wrap-break-word overflow-hidden"
+                              style={{
+                                display: '-webkit-box',
+                                WebkitBoxOrient: 'vertical',
+                                WebkitLineClamp: 4,
+                              }}
+                            >
+                              {description}
+                            </p>
+                          </>
+                        ) : (
+                          <p className="text-[#6B7280]">Add Description</p>
+                        )}
+                      </div>
+                    </div>
                   </button>
                 </div>
               </div>
