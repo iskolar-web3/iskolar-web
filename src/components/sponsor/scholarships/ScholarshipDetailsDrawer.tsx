@@ -18,6 +18,7 @@ import {
 	DialogHeader,
 	DialogFooter,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import {
 	formatCurrency,
 	formatDeadline,
@@ -57,6 +58,8 @@ export default function ScholarshipDetailsModal({
 }: ScholarshipDetailsModalProps) {
 	const [isExiting, setIsExiting] = useState(false);
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
+	const [showTitleModal, setShowTitleModal] = useState(false);
+	const [titleInput, setTitleInput] = useState("");
 	const [loading, setLoading] = useState(false);
 
 	const isRange = scholarship.totalAmountMin != null || scholarship.totalAmountMax != null;
@@ -101,8 +104,16 @@ export default function ScholarshipDetailsModal({
 	};
 
 	/**
-	 * Confirms and executes the delete action
-	 * Handles loading state and error handling
+	 * Moves from the first confirmation modal to the title-type modal
+	 */
+	const proceedToTitleConfirm = () => {
+		setShowDeleteModal(false);
+		setTitleInput("");
+		setShowTitleModal(true);
+	};
+
+	/**
+	 * Confirms and executes the delete action after title is verified
 	 */
 	const confirmDelete = async () => {
 		try {
@@ -110,7 +121,7 @@ export default function ScholarshipDetailsModal({
 
 			onDelete?.(scholarship);
 
-			setShowDeleteModal(false);
+			setShowTitleModal(false);
 			handleClose();
 		} catch (error) {
 			console.error("Delete error:", error);
@@ -431,28 +442,66 @@ export default function ScholarshipDetailsModal({
 						<DialogFooter className="flex gap-3">
 							<button
 								onClick={() => setShowDeleteModal(false)}
-								disabled={loading}
-								className={`flex-1 px-4 py-2 cursor-pointer text-sm bg-tertiary border border-[#D1D5DB] text-[#374151] rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50 ${
-									loading && "opacity-60 cursor-not-allowed"
+								className="flex-1 px-4 py-2 cursor-pointer text-sm bg-tertiary border border-[#D1D5DB] text-[#374151] rounded-md hover:bg-gray-50 transition-colors"
+							>
+								Cancel
+							</button>
+							<button
+								onClick={isClosed() ? confirmDelete : proceedToTitleConfirm}
+								className={`flex-1 px-4 py-2 cursor-pointer text-sm text-tertiary rounded-md transition-colors flex items-center justify-center gap-2 ${
+									isClosed()
+										? "bg-[#F59E0B] hover:bg-[#D97706]"
+										: "bg-[#EF4444] hover:bg-[#DC2626]"
 								}`}
+							>
+								{isClosed() ? "Archive" : "Continue"}
+							</button>
+						</DialogFooter>
+					</DialogContent>
+				</Dialog>
+
+				{/* Title Confirmation Modal */}
+				<Dialog open={showTitleModal} onOpenChange={(open) => { if (!open) { setShowTitleModal(false); setTitleInput(""); } }}>
+					<DialogContent
+						className="bg-tertiary border-0 py-4 px-6 w-[400px]"
+						showCloseButton={true}
+					>
+						<DialogHeader>
+							<div className="text-center">
+								<div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-1 text-[#EF4444]">
+									<AlertCircle size={38} />
+								</div>
+								<h3 className="text-lg text-primary mb-2">Confirm Deletion</h3>
+								<p className="text-sm text-[#374151] font-medium mb-4">
+									Type this to confirm deletion:
+								</p>
+								<p className="text-xs font-medium text-primary mb-4 bg-[#F9FAFB] border border-border rounded px-3 py-2 select-none">
+									{scholarship.name}
+								</p>
+								<Input
+									value={titleInput}
+									onChange={(e) => setTitleInput(e.target.value)}
+									placeholder="Type here"
+									className="text-sm placeholder:text-[#9CA3AF]"
+									autoFocus
+								/>
+							</div>
+						</DialogHeader>
+						<DialogFooter className="flex gap-3 mt-4">
+							<button
+								onClick={() => { setShowTitleModal(false); setTitleInput(""); }}
+								disabled={loading}
+								className="flex-1 px-4 py-2 cursor-pointer text-sm bg-tertiary border border-[#D1D5DB] text-[#374151] rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
 							>
 								Cancel
 							</button>
 							<button
 								onClick={confirmDelete}
-								disabled={loading}
-								className={`flex-1 px-4 py-2 cursor-pointer text-sm text-tertiary rounded-md transition-colors disabled:opacity-50 flex items-center justify-center gap-2 ${
-									isClosed()
-										? "bg-[#F59E0B] hover:bg-[#D97706]"
-										: "bg-[#EF4444] hover:bg-[#DC2626]"
-								} ${loading && "opacity-60 cursor-not-allowed"}`}
+								disabled={loading || titleInput !== scholarship.name}
+								className="flex-1 px-4 py-2 cursor-pointer text-sm text-tertiary bg-[#EF4444] rounded-md transition-colors flex items-center justify-center gap-2 hover:bg-[#DC2626] disabled:opacity-50 disabled:cursor-not-allowed"
 							>
 								{loading ? (
-									<span className="flex items-center justify-center">
-										<Loader2 className="w-4 h-4 animate-spin" />
-									</span>
-								) : isClosed() ? (
-									"Archive"
+									<Loader2 className="w-4 h-4 animate-spin" />
 								) : (
 									"Delete"
 								)}
