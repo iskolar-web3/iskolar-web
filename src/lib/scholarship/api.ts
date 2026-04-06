@@ -56,6 +56,7 @@ export const getMyScholarshipsQuery = (
 	queryOptions({
 		queryKey: ["scholarships", token || getCookie(ACCESS_TOKEN_KEY) || null, params],
 		queryFn: () => getMyScholarships(token, params),
+		refetchOnMount: true,
 	});
 
 async function getScholarshipById(id: string): Promise<Scholarship> {
