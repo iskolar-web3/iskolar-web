@@ -2,6 +2,7 @@ import { MotionContainer, MotionItem } from "@/components/landing/MotionContaine
 
 const partners = [
 	{ src: "/partnerships/byc-ventures.png", alt: "BYC Ventures" },
+	{ src: "/partnerships/cryptita-plays.png", alt: "Cryptita Plays", size: "h-28" },
 ]
 
 export function Partnerships() {
@@ -20,7 +21,7 @@ export function Partnerships() {
 							key={partner.src}
 							src={partner.src}
 							alt={partner.alt}
-							className="h-18 object-contain"
+							className={`${partner.size ?? "h-20"} object-contain`}
 						/>
 					))}
 				</MotionItem>
