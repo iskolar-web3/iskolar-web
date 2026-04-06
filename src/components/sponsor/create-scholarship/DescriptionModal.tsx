@@ -47,9 +47,13 @@ export default function DescriptionModal({
         <textarea
           value={tempDescription}
           onChange={(e) => setTempDescription(e.target.value)}
+          maxLength={1000}
           placeholder="Add details like qualifications, background, or any special notes applicants should know before applying."
           className="w-full h-45 px-4 py-3 rounded-lg border border-[#C4CBD5] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6] resize-none"
         />
+        <div className="text-right text-xs text-[#6B7280]">
+          {tempDescription.length}/1000
+        </div>
         <DialogFooter className="flex gap-3 mt-4">
           <button
             onClick={onClose}

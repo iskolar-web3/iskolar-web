@@ -357,6 +357,7 @@ function CreateScholarship() {
                       <input
                         {...field}
                         placeholder="Enter Scholarship Title"
+                        maxLength={100}
                         disabled={loading}
                         className={`w-full text-2xl border-b-2 ${
                           errors.name ? 'border-[#EF4444]' : 'border-[#C4CBD5]'

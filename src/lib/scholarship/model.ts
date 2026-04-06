@@ -103,9 +103,12 @@ export type CreateFormFieldRequest = z.infer<
 export const createScholarshipRequestSchema = z.object({
 	name: z
 		.string()
-		.nonempty("Scholarship title is required")
-		.max(150, "Title must be less than 150 characters"),
-	description: z.string().optional(),
+		.min(2, "Title must be at least 2 characters")
+		.max(100, "Title must be 100 characters or less"),
+	description: z
+		.string()
+		.max(1000, "Description must be 1000 characters or less")
+		.optional(),
 	scholarshipType: z.enum(ScholarshipType, {
 		error: "Please select a scholarship type",
 	}),
