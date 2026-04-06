@@ -111,11 +111,15 @@ export default function ScholarshipFullPreviewModal({
 							{scholarship.scholarshipType && (
 								scholarship.scholarshipType === ScholarshipType.Combined ? (
 									<>
-										<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">Merit-Based</span>
-										<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">Need-Based</span>
+										<span className="px-2.5 py-1 bg-transparent text-[#374151] text-xs rounded">
+											Merit-Based
+										</span>
+										<span className="px-2.5 py-1 bg-transparent text-[#374151] text-xs rounded">
+											Skill-Based
+										</span>
 									</>
 								) : (
-									<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">
+									<span className="px-2.5 py-1 bg-transparent text-[#374151] text-xs rounded">
 										{scholarship.scholarshipType === ScholarshipType.NeedBased ? "Need-Based" : "Merit-Based"}
 									</span>
 								)

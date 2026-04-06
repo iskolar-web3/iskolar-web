@@ -58,11 +58,15 @@ export default function ScholarshipPreviewCard({ scholarship, amountType = 'fixe
               <div className="flex flex-wrap items-center gap-2 mb-4">
                 {scholarship.scholarshipType === ScholarshipType.Combined ? (
                   <>
-                    <span className="px-2 py-0.5 bg-white/90 text-secondary text-[11px] rounded">Merit-Based</span>
-                    <span className="px-2 py-0.5 bg-white/90 text-secondary text-[11px] rounded">Need-Based</span>
+                    <span className="px-2 py-0.5 text-white text-[11px] rounded bg-transparent">
+                      Merit-Based
+                    </span>
+                    <span className="px-2 py-0.5 text-white text-[11px] rounded bg-transparent">
+                      Skill-Based
+                    </span>
                   </>
                 ) : (
-                  <span className="px-2 py-0.5 bg-white/90 text-secondary text-[11px] rounded">
+                  <span className="px-2 py-0.5 text-white text-[11px] rounded bg-transparent">
                     {scholarship.scholarshipType === ScholarshipType.NeedBased ? 'Need-Based' : 'Merit-Based'}
                   </span>
                 )}
