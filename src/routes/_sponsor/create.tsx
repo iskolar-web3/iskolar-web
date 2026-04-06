@@ -69,6 +69,7 @@ async function createScholarship(value: ScholarshipFormData): Promise<ApiRespons
     return result
 }
 
+const DEFAULT_SCHOLARSHIP_IMAGE = '/scholarship-banner-placeholder.png';
 
 function CreateScholarship() {
 
@@ -118,7 +119,7 @@ function CreateScholarship() {
     scholarshipType,
     name: title,
     description,
-    imageUrl,
+    imageUrl: imageUrl || DEFAULT_SCHOLARSHIP_IMAGE,
     totalAmount,
     totalAmountMin,
     totalAmountMax,
@@ -226,7 +227,7 @@ function CreateScholarship() {
         ? { totalAmount: undefined }
         : { totalAmount: undefined, totalAmountMin: undefined, totalAmountMax: undefined };
     const slotsPayload = unlimitedSlots ? { totalSlots: undefined } : {};
-    const imageUrl = data.imageUrl || '/scholarship-banner-placeholder.png';
+    const imageUrl = data.imageUrl || DEFAULT_SCHOLARSHIP_IMAGE;
     const formData = { ...data, ...amountPayload, ...slotsPayload, imageUrl } as ScholarshipFormData;
 
     setPendingFormData(formData);
@@ -314,15 +315,25 @@ function CreateScholarship() {
                         type="button"
                         disabled={loading}
                         onClick={removeImage}
-                        className="absolute top-2 right-2 bg-black/50 text-tertiary rounded-full p-1.5 hover:bg-black/70"
+                        className="absolute top-2 right-2 bg-black/50 text-tertiary rounded-full p-1.5 hover:bg-black/70 cursor-pointer"
                       >
                         <X size={14} />
                       </button>
                     </div>
                   ) : (
-                    <div className="border-2 border-dashed border-[#3A52A6] rounded-lg text-center cursor-pointer hover:bg-[#F0F7FF] transition-colors flex flex-col items-center justify-center w-full h-full min-h-[218px] px-4">
-                      <Upload className="mb-3 text-[#5B7BA6]" size={40} />
-                      <p className="text-secondary text-sm opacity-70">Click to select an image</p>
+                    <div className="relative w-full h-full min-h-[218px] rounded-lg overflow-hidden cursor-pointer group">
+                      <img
+                        src={DEFAULT_SCHOLARSHIP_IMAGE}
+                        alt="Default scholarship banner"
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                      />
+                      <div className="absolute inset-0 bg-black/20 transition-colors group-hover:bg-black/30" />
+                      <div className="absolute right-3 bottom-3 rounded-md bg-white/92 px-3 py-2 text-xs text-primary shadow-sm backdrop-blur-sm">
+                        <div className="flex items-center gap-2">
+                          <Upload size={14} className="text-secondary" />
+                          <span>Upload an image</span>
+                        </div>
+                      </div>
                       <input
                         type="file"
                         accept="image/*"
