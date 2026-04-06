@@ -45,7 +45,7 @@ import { ScholarshipStatus, ScholarshipType, type CreateFormFieldRequest, type S
 import { BACKEND_URL, type ApiResponse } from '@/lib/api';
 import { ACCESS_TOKEN_KEY } from '@/lib/user/auth';
 import { getCookie } from '@/lib/cookie';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export const Route = createFileRoute('/_sponsor/create')({
   component: CreateScholarship,
@@ -73,6 +73,7 @@ async function createScholarship(value: ScholarshipFormData): Promise<ApiRespons
 function CreateScholarship() {
 
   const auth = useAuth<AnySponsor>()
+  const queryClient = useQueryClient();
   const {
     form,
     imagePreview,
@@ -178,6 +179,7 @@ function CreateScholarship() {
 		mutationFn: createScholarship,
 		onSuccess: async (res) => {
             console.log(res.data)
+      await queryClient.invalidateQueries({ queryKey: ['scholarships'] });
 			showSuccess(
 				`Success`,
 				res.message,
