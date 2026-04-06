@@ -542,6 +542,7 @@ function EditScholarshipPage() {
 											<input
 												{...field}
 												placeholder="Scholarship Title"
+												maxLength={100}
 												disabled={saving}
 												className={`w-full text-2xl border-b-2 ${
 													form.formState.errors.name
@@ -551,6 +552,9 @@ function EditScholarshipPage() {
 											/>
 										)}
 									/>
+									<p className="mt-1 text-right text-xs text-[#6B7280]">
+										{(form.watch("name") || "").length}/100
+									</p>
 									{form.formState.errors.name && (
 										<p className="text-xs text-[#EF4444] mt-1">
 											{form.formState.errors.name.message}

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, X, Info } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Plus, X } from "lucide-react";
 import {
 	Dialog,
 	DialogContent,
@@ -48,6 +47,10 @@ export default function CustomFormFieldModal({
 	onSave,
 	editingField,
 }: CustomFormFieldModalProps) {
+	const [errors, setErrors] = useState<{
+		label?: string;
+		options?: string;
+	}>({});
 	const [newFieldType, setNewFieldType] = useState<FormFieldType>(
 		editingField?.fieldType || FormFieldType.ShortAnswer,
 	);
@@ -73,6 +76,7 @@ export default function CustomFormFieldModal({
 			setDropdownOptions([]);
 		}
 		setDropdownOptionInput("");
+		setErrors({});
 	}, [editingField, isOpen]);
 
 	/**
@@ -81,7 +85,28 @@ export default function CustomFormFieldModal({
 	 */
 	const handleSave = () => {
 		const normalized = normalizeText(newFieldLabel);
-		if (!normalized) return;
+		const typesWithOptions = [
+			FormFieldType.Dropdown,
+			FormFieldType.Checkbox,
+			FormFieldType.MultipleChoice,
+		];
+		const nextErrors: {
+			label?: string;
+			options?: string;
+		} = {};
+
+		if (!normalized) {
+			nextErrors.label = "Field label is required";
+		}
+
+		if (typesWithOptions.includes(newFieldType) && dropdownOptions.length === 0) {
+			nextErrors.options = "Add at least one option";
+		}
+
+		if (Object.keys(nextErrors).length > 0) {
+			setErrors(nextErrors);
+			return;
+		}
 
 		const newField: CreateFormFieldRequest = {
 			fieldType: newFieldType,
@@ -102,6 +127,7 @@ export default function CustomFormFieldModal({
 		if (trimmed && !dropdownOptions.includes({ value: trimmed })) {
 			setDropdownOptions([...dropdownOptions, { value: trimmed }]);
 			setDropdownOptionInput("");
+			setErrors((current) => ({ ...current, options: undefined }));
 		}
 	};
 
@@ -112,41 +138,30 @@ export default function CustomFormFieldModal({
 				showCloseButton={true}
 			>
 				<DialogHeader>
-					<div className="flex items-center gap-2">
-						<h3 className="text-lg text-secondary">
-							{editingField ? "Edit Field" : "Add Form Field"}
-						</h3>
-						<TooltipProvider delayDuration={100}>
-							<Tooltip>
-								<TooltipTrigger asChild>
-									<Info size={15} className="text-[#6B7280] cursor-pointer shrink-0" />
-								</TooltipTrigger>
-								<TooltipContent side="right" className="max-w-63 text-xs bg-[#3A52A6] text-white [&>svg]:fill-[#3A52A6] [&>svg]:bg-[#3A52A6]">
-									Name, gender, email, date of birth, and contact number are already in the student profile — no need to include them here.
-								</TooltipContent>
-							</Tooltip>
-						</TooltipProvider>
-					</div>
+					<h3 className="text-lg text-secondary">
+						{editingField ? "Edit Field" : "Add Form Field"}
+					</h3>
 				</DialogHeader>
 
 				<div className="space-y-4">
 					<div>
 						<label className="block text-sm text-[#4A5568] mb-2">
-							Field Type
+							Field Type <span className="text-[#EF4444]">*</span>
 						</label>
 						<div className="relative">
 							<Select
 								value={newFieldType}
-								onValueChange={(value) =>
-									setNewFieldType(value as FormFieldType)
-								}
+								onValueChange={(value) => {
+									setNewFieldType(value as FormFieldType);
+									setErrors((current) => ({ ...current, options: undefined }));
+								}}
 							>
-								<SelectTrigger className="w-full px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary">
+								<SelectTrigger className="w-full cursor-pointer px-4 py-3 text-sm border rounded-lg focus:outline-none focus:ring-2 border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary">
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent>
 									{Object.values(FormFieldType).map((type) => (
-										<SelectItem key={type} value={type}>
+										<SelectItem key={type} value={type} className="cursor-pointer">
 											<div className="flex items-center gap-2">
 												{renderFieldTypeIcon(type)}
 												<span>{getFieldTypeLabel(type)}</span>
@@ -160,14 +175,22 @@ export default function CustomFormFieldModal({
 
 					<div>
 						<label className="block text-sm text-[#4A5568] mb-2">
-							Field Label
+							Field Label <span className="text-[#EF4444]">*</span>
 						</label>
 						<input
 							value={newFieldLabel}
-							onChange={(e) => setNewFieldLabel(e.target.value)}
+							onChange={(e) => {
+								setNewFieldLabel(e.target.value);
+								setErrors((current) => ({ ...current, label: undefined }));
+							}}
 							placeholder="e.g., Full Name, Email, etc."
-							className="w-full px-4 py-3 rounded-lg border border-[#C4CBD5] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]"
+							className={`w-full px-4 py-3 rounded-lg border ${
+								errors.label ? "border-[#EF4444]" : "border-[#C4CBD5]"
+							} bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
 						/>
+						{errors.label && (
+							<p className="text-xs text-[#EF4444] mt-1">{errors.label}</p>
+						)}
 					</div>
 
 					<div>
@@ -191,7 +214,8 @@ export default function CustomFormFieldModal({
 									? "Checkbox Options"
 									: newFieldType === "multiple_choice"
 										? "Choices"
-										: "Dropdown Options"}
+										: "Dropdown Options"}{" "}
+								<span className="text-[#EF4444]">*</span>
 							</label>
 							<div className="flex gap-2 mb-2">
 								<input
@@ -210,20 +234,29 @@ export default function CustomFormFieldModal({
 													{ value: normalized },
 												]);
 												setDropdownOptionInput("");
+												setErrors((current) => ({
+													...current,
+													options: undefined,
+												}));
 											}
 										}
 									}}
 									placeholder="Enter option"
-									className="flex-1 px-4 py-3 rounded-lg border border-[#C4CBD5] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]"
+									className={`flex-1 px-4 py-3 rounded-lg border ${
+										errors.options ? "border-[#EF4444]" : "border-[#C4CBD5]"
+									} bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
 								/>
 								<button
 									type="button"
 									onClick={handleAddOption}
-									className="w-11 h-11 bg-[#3A52A6] text-tertiary rounded-lg flex items-center justify-center hover:bg-[#2A4296] transition-colors"
+									className="w-11 h-11 bg-[#3A52A6] text-tertiary rounded-lg flex items-center justify-center hover:bg-[#2A4296] transition-colors cursor-pointer"
 								>
 									<Plus size={20} />
 								</button>
 							</div>
+							{errors.options && (
+								<p className="text-xs text-[#EF4444] mt-1 mb-2">{errors.options}</p>
+							)}
 							{dropdownOptions.length > 0 && (
 								<div className="flex flex-wrap gap-2">
 									{dropdownOptions.map((option, index) => (

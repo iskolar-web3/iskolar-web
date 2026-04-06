@@ -1,4 +1,4 @@
-import { Check, ChevronDown, Plus } from "lucide-react";
+import { Check, ChevronDown, Plus, Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
 	Popover,
@@ -26,6 +26,7 @@ export default function PresetPickerPopover({
 	const [open, setOpen] = useState(false);
 	const [showCustomInput, setShowCustomInput] = useState(false);
 	const [customValue, setCustomValue] = useState("");
+	const [searchTerm, setSearchTerm] = useState("");
 	const customInputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
@@ -53,8 +54,13 @@ export default function PresetPickerPopover({
 		if (!nextOpen) {
 			setShowCustomInput(false);
 			setCustomValue("");
+			setSearchTerm("");
 		}
 	};
+
+	const filteredPresets = presets.filter((preset) =>
+		preset.toLowerCase().includes(searchTerm.trim().toLowerCase()),
+	);
 
 	return (
 		<Popover open={open} onOpenChange={handleOpenChange}>
@@ -76,8 +82,26 @@ export default function PresetPickerPopover({
 				className="w-(--radix-popover-trigger-width) p-0"
 				align="start"
 			>
+				<div className="border-b border-[#E5E7EB] p-2">
+					<div className="relative">
+						<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9CA3AF]" />
+						<input
+							value={searchTerm}
+							onChange={(e) => setSearchTerm(e.target.value)}
+							placeholder="Search options"
+							className="w-full rounded-md border border-[#C4CBD5] bg-transparent py-2 pl-9 pr-3 text-sm text-primary focus:outline-none focus:ring-1 focus:ring-[#3A52A6]"
+						/>
+					</div>
+				</div>
+
 				<div className="max-h-64 overflow-y-auto p-1">
-					{presets.map((preset) => {
+					{filteredPresets.length === 0 && (
+						<p className="px-3 py-2 text-sm text-[#6B7280]">
+							No matching options found.
+						</p>
+					)}
+
+					{filteredPresets.map((preset) => {
 						const isSelected = selectedItems.includes(preset);
 						return (
 							<button
@@ -108,7 +132,7 @@ export default function PresetPickerPopover({
 							className="w-full text-left px-3 py-2 text-sm rounded-md flex items-center gap-2 cursor-pointer hover:bg-[#F3F4F6] text-[#3A52A6]"
 						>
 							<Plus className="h-3.5 w-3.5 shrink-0" />
-							<span>Others (custom entry)</span>
+							<span>Add your own requirement</span>
 						</button>
 					) : (
 						<div className="flex gap-1.5 px-1 py-1">

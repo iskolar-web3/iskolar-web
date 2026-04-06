@@ -23,7 +23,8 @@ async function getMyScholarships(
 	token: string,
 	params?: GetScholarshipQueryParam,
 ): Promise<Scholarship[]> {
-	if (!token) return [];
+	const resolvedToken = token || getCookie(ACCESS_TOKEN_KEY);
+	if (!resolvedToken) return [];
 	const url = new URL(`${BACKEND_URL}/scholarships`);
 	if (params?.sponsorId) {
 		url.searchParams.append("sponsorId", params.sponsorId);
@@ -37,7 +38,7 @@ async function getMyScholarships(
 
 	const response = await fetch(url.toString(), {
 		method: "GET",
-		headers: { Authorization: `Bearer ${token}` },
+		headers: { Authorization: `Bearer ${resolvedToken}` },
 		credentials: "include",
 	});
 	const result: ApiResponse<Scholarship[]> = await safeResponseJson(response);
@@ -53,8 +54,9 @@ export const getMyScholarshipsQuery = (
 	params?: GetScholarshipQueryParam,
 ) =>
 	queryOptions({
-		queryKey: ["scholarships", params],
+		queryKey: ["scholarships", token || getCookie(ACCESS_TOKEN_KEY) || null, params],
 		queryFn: () => getMyScholarships(token, params),
+		refetchOnMount: true,
 	});
 
 async function getScholarshipById(id: string): Promise<Scholarship> {

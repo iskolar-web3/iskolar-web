@@ -56,14 +56,14 @@ export default function CustomFormFieldsList({
 					<button
 						disabled={disabled}
 						onClick={() => onEdit(index)}
-						className="p-1.5 hover:bg-gray-100 rounded"
+						className="p-1.5 hover:bg-gray-100 rounded cursor-pointer"
 					>
 						<Edit2 size={16} className="text-secondary" />
 					</button>
 					<button
 						disabled={disabled}
 						onClick={() => onRemove(index)}
-						className="p-1.5 hover:bg-gray-100 rounded"
+						className="p-1.5 hover:bg-gray-100 rounded cursor-pointer"
 					>
 						<Trash2 size={16} className="text-[#EF4444]" />
 					</button>
