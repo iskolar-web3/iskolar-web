@@ -5,11 +5,13 @@ import {
   Upload,
   X,
   Plus,
+  Info,
   CalendarIcon,
   Loader2,
 } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   Dialog,
   DialogContent,
@@ -87,8 +89,10 @@ function CreateScholarship() {
   const { toast, showSuccess, showError } = useToast();
   
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
+  const [showFormFieldsDialog, setShowFormFieldsDialog] = useState(false);
   const [showCustomFieldModal, setShowCustomFieldModal] = useState(false);
   const [editingFieldIndex, setEditingFieldIndex] = useState<number | null>(null);
+  const [draftFormFields, setDraftFormFields] = useState<CreateFormFieldRequest[]>([]);
   const [showFullPreview, setShowFullPreview] = useState(false);
   const [loading, setLoading] = useState(false);
   const [amountType, setAmountType] = useState<'fixed' | 'varies' | 'range'>('fixed');
@@ -126,6 +130,24 @@ function CreateScholarship() {
     status: ScholarshipStatus.Draft,
   });
 
+  const openFormFieldsDialog = () => {
+    setDraftFormFields(customFormFields);
+    setShowFormFieldsDialog(true);
+  };
+
+  const closeFormFieldsDialog = () => {
+    setShowFormFieldsDialog(false);
+    setShowCustomFieldModal(false);
+    setEditingFieldIndex(null);
+    setDraftFormFields(customFormFields);
+  };
+
+  const handleSaveFormFields = () => {
+    setValue('formFields', draftFormFields, { shouldValidate: true });
+    setShowFormFieldsDialog(false);
+    setEditingFieldIndex(null);
+  };
+
   const openCustomFormModal = (index?: number) => {
     setEditingFieldIndex(index ?? null);
     setShowCustomFieldModal(true);
@@ -134,18 +156,18 @@ function CreateScholarship() {
   const handleSaveCustomField = (field: CreateFormFieldRequest) => {
       console.log(form.formState.errors)
     if (editingFieldIndex !== null) {
-      const updatedFields = customFormFields.map((f, i) => 
+      const updatedFields = draftFormFields.map((f, i) => 
         i === editingFieldIndex ? field : f
       );
-      setValue('formFields', updatedFields);
+      setDraftFormFields(updatedFields);
     } else {
-      setValue('formFields', [...customFormFields, field]);
+      setDraftFormFields([...draftFormFields, field]);
     }
     setEditingFieldIndex(null);
   };
 
   const removeCustomFormField = (index: number) => {
-    setValue('formFields', customFormFields.filter((_, i) => i !== index));
+    setDraftFormFields(draftFormFields.filter((_, i) => i !== index));
   };
 
   const handleSaveDescription = (desc: string) => {
@@ -635,26 +657,19 @@ function CreateScholarship() {
           <div>
             <div className="mb-3">
               <label className="block text-sm text-[#4A5568] mb-1 ml-0.5">Application Form <span className="text-[#EF4444]">*</span></label>
-              <p className="text-xs text-[#6B7280] ml-0.5">Add custom fields to collect information from applicants.</p>
+              <p className="text-xs text-[#6B7280] ml-0.5">Add questionnaires to collect information from applicants.</p>
             </div>
-
-            <CustomFormFieldsList
-              fields={customFormFields}
-              onEdit={openCustomFormModal}
-              onRemove={removeCustomFormField}
-              disabled={loading}
-            />
 
             <button
               type="button"
               disabled={loading}
-              onClick={() => openCustomFormModal()}
+              onClick={openFormFieldsDialog}
               className={`w-full flex cursor-pointer items-center justify-center gap-2 px-4 py-3.5 border-2 border-dashed ${
                 errors.formFields ? 'border-[#EF4444]' : 'border-[#3A52A6]'
               } bg-[#E0ECFF] text-secondary text-sm rounded-lg hover:bg-[#D0DCFF] transition-colors`}
             >
               <Plus size={20} />
-              {customFormFields.length === 0 ? 'Add Form Field' : 'Add Another Field'}
+              {customFormFields.length === 0 ? 'Add Form Field' : 'Edit Form Field'}
             </button>
             {errors.formFields && <p className="text-xs text-[#EF4444] mt-1">{errors.formFields.message}</p>}
           </div>
@@ -707,8 +722,80 @@ function CreateScholarship() {
           setEditingFieldIndex(null);
         }}
         onSave={handleSaveCustomField}
-        editingField={editingFieldIndex !== null ? customFormFields[editingFieldIndex] : null}
+        editingField={editingFieldIndex !== null ? draftFormFields[editingFieldIndex] : null}
       />
+
+      <Dialog
+        open={showFormFieldsDialog}
+        onOpenChange={(open) => {
+          if (open) {
+            openFormFieldsDialog();
+            return;
+          }
+          closeFormFieldsDialog();
+        }}
+      >
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <div className="flex items-center gap-2">
+              <DialogTitle className="font-normal">Application Form</DialogTitle>
+              <TooltipProvider delayDuration={100}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info size={15} className="text-[#6B7280] cursor-pointer shrink-0" />
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="max-w-59 text-xs bg-[#3A52A6] text-white [--tooltip-arrow-color:#3A52A6]">
+                    Name, gender, email, date of birth, contact number, education level, and school name are already in the student profile - no need to include them here.
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            <DialogDescription className="text-[#6B7280] font-normal">
+              Create and manage questionnaires like essays, personal info, file uploads, and more.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3">
+            <CustomFormFieldsList
+              fields={draftFormFields}
+              onEdit={openCustomFormModal}
+              onRemove={removeCustomFormField}
+              disabled={loading}
+            />
+
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => openCustomFormModal()}
+              className={`w-full flex cursor-pointer items-center justify-center gap-2 px-4 py-3.5 border-2 border-dashed ${
+                errors.formFields ? 'border-[#EF4444]' : 'border-[#3A52A6]'
+              } bg-[#E0ECFF] text-secondary text-sm rounded-lg hover:bg-[#D0DCFF] transition-colors`}
+            >
+              <Plus size={20} />
+              Add Form Field
+            </button>
+
+            <DialogFooter className="pt-3">
+              <button
+                type="button"
+                disabled={loading}
+                onClick={closeFormFieldsDialog}
+                className="cursor-pointer px-4 py-2 rounded-md border border-[#C4CBD5] text-primary text-sm hover:bg-[#F3F4F6] transition-colors"
+              >
+                Discard Changes
+              </button>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={handleSaveFormFields}
+                className="cursor-pointer px-4 py-2 rounded-md bg-[#3A52A6] text-tertiary text-sm hover:bg-[#2A4296] transition-colors"
+              >
+                Save Changes
+              </button>
+            </DialogFooter>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {showFullPreview && (
         <ScholarshipFullPreviewModal

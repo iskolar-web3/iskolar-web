@@ -124,7 +124,7 @@ export const createScholarshipRequestSchema = z.object({
 	sponsorId: z.uuidv4(),
 	formFields: createFormFieldRequestSchema
 		.array()
-		.min(1, "Add at least one application form field"),
+		.min(1, "Add at least one question to the application form"),
 });
 /**
  * Scholarship form data type inferred from Zod schema
