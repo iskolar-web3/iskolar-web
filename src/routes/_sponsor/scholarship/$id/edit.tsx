@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/select";
 import Toast from "@/components/Toast";
 import DescriptionModal from "@/components/sponsor/create-scholarship/DescriptionModal";
-import CustomFormFieldModal from "@/components/sponsor/create-scholarship/CustomFormFieldModal";
+import CustomFormFieldModal from "@/components/sponsor/create-scholarship/application-form/CustomFormFieldModal";
 import PresetPickerPopover from "@/components/sponsor/create-scholarship/PresetPickerPopover";
 import { PRESET_CRITERIA, PRESET_DOCUMENTS } from "@/lib/scholarship/presets";
 import { useToast } from "@/hooks/useToast";

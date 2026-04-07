@@ -2,26 +2,13 @@ import { Edit2, Trash2 } from "lucide-react";
 import type { CreateFormFieldRequest } from "@/lib/scholarship/model";
 import { getFieldTypeLabel, renderFieldTypeIcon } from "@/utils/formField.utils";
 
-/**
- * Props for the CustomFormFieldsList component
- */
 interface CustomFormFieldsListProps {
-	/** Array of custom form fields */
 	fields: CreateFormFieldRequest[];
-	/** Callback when edit button is clicked */
 	onEdit: (index: number) => void;
-	/** Callback when remove button is clicked */
 	onRemove: (index: number) => void;
-	/** Whether the list is disabled */
 	disabled?: boolean;
 }
 
-/**
- * Custom form fields list component
- * Displays a list of custom form fields with edit and remove actions
- * @param props - Component props
- * @returns List of custom form fields or null if empty
- */
 export default function CustomFormFieldsList({
 	fields,
 	onEdit,

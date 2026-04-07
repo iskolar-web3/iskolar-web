@@ -37,20 +37,28 @@ import { normalizeText } from "@/utils/normalize.utils";
  *   - resetForm: Function to reset entire form state
  */
 export function useScholarshipForm(sponsorId: string) {
+	const defaultFormValues: Partial<ScholarshipFormData> = {
+		name: "",
+		description: "",
+		scholarshipType: undefined,
+		status: ScholarshipStatus.Draft,
+		totalAmount: undefined,
+		totalAmountMin: undefined,
+		totalAmountMax: undefined,
+		totalSlots: undefined,
+		applicationDeadline: undefined,
+		imageUrl: undefined,
+		criterias: [],
+		requirements: [],
+		sponsorId,
+		formFields: [],
+	};
+
 	const form = useForm<ScholarshipFormData>({
 		// @ts-expect-error This works fine but it has TS error for some reason
 		resolver: zodResolver(createScholarshipRequestSchema),
 		mode: "onBlur",
-		defaultValues: {
-			criterias: [],
-			formFields: [],
-			imageUrl: undefined,
-			description: "",
-			name: "",
-			requirements: [],
-			sponsorId,
-			status: ScholarshipStatus.Draft,
-		},
+		defaultValues: defaultFormValues,
 	});
 
 	const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -153,11 +161,11 @@ export function useScholarshipForm(sponsorId: string) {
 	);
 
 	const resetForm = useCallback(() => {
-		form.reset();
+		form.reset(defaultFormValues);
 		setImagePreview(null);
 		setCriteriaInput("");
 		setDocumentsInput("");
-	}, [form]);
+	}, [defaultFormValues, form]);
 
 	return {
 		form,

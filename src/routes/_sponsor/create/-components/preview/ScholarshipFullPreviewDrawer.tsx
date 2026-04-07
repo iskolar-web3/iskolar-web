@@ -19,24 +19,12 @@ import { useAuth } from "@/auth";
 import type { AnySponsor } from "@/lib/sponsor/model";
 import { getSponsorName } from "@/lib/sponsor/api";
 
-/**
- * Props for the ScholarshipFullPreviewModal component
- */
 interface ScholarshipFullPreviewModalProps {
-	/** Partial scholarship data to display in preview */
 	scholarship: Partial<ScholarshipFormData>;
-	/** Callback function to close the modal */
 	onClose: () => void;
-	/** Whether this is a preview mode (hides apply button) */
 	isPreview?: boolean;
 }
 
-/**
- * Full scholarship preview modal component
- * Displays comprehensive scholarship details in preview or view mode
- * @param props - Component props
- * @returns Animated side panel modal with full scholarship preview
- */
 export default function ScholarshipFullPreviewModal({
 	scholarship,
 	onClose,
@@ -49,9 +37,6 @@ export default function ScholarshipFullPreviewModal({
 	const isFixed = !isRange && scholarship.totalAmount != null;
 	const isVaries = !isRange && !isFixed;
 
-	/**
-	 * Handles modal close with exit animation
-	 */
 	const handleClose = () => {
 		setIsExiting(true);
 		setTimeout(onClose, 200);
@@ -111,11 +96,15 @@ export default function ScholarshipFullPreviewModal({
 							{scholarship.scholarshipType && (
 								scholarship.scholarshipType === ScholarshipType.Combined ? (
 									<>
-										<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">Merit-Based</span>
-										<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">Need-Based</span>
+										<span className="px-2.5 py-1 bg-transparent text-[#374151] text-xs rounded">
+											Merit-Based
+										</span>
+										<span className="px-2.5 py-1 bg-transparent text-[#374151] text-xs rounded">
+											Skill-Based
+										</span>
 									</>
 								) : (
-									<span className="px-2.5 py-1 bg-[#F3F4F6] text-[#374151] text-xs rounded border border-border">
+									<span className="px-2.5 py-1 bg-transparent text-[#374151] text-xs rounded">
 										{scholarship.scholarshipType === ScholarshipType.NeedBased ? "Need-Based" : "Merit-Based"}
 									</span>
 								)
