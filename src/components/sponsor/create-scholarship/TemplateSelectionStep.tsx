@@ -76,7 +76,7 @@ export default function TemplateSelectionStep({
 				<button
 					type="button"
 					onClick={onStartFromScratch}
-					className="shrink-0 flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-primary cursor-pointer transition-colors border border-[#C4CBD5] hover:border-[#3A52A6] rounded-lg px-3 py-2 whitespace-nowrap mt-1"
+					className="shrink-0 flex items-center gap-1.5 text-sm bg-secondary text-tertiary/90 hover:text-tertiary cursor-pointer transition-colors border border-[#C4CBD5] hover:border-[#3A52A6] rounded-sm px-3 py-2 whitespace-nowrap mt-1"
 				>
 					<Plus size={14} />
 					Start from scratch
@@ -91,7 +91,7 @@ export default function TemplateSelectionStep({
 					value={query}
 					onChange={(e) => setQuery(e.target.value)}
 					placeholder="Search templates..."
-					className="w-full pl-9 pr-4 py-2.5 text-sm border border-[#C4CBD5] rounded-lg bg-[#F8F9FC] focus:outline-none focus:ring-2 focus:ring-[#3A52A6]/20 focus:border-[#3A52A6] transition-all text-primary placeholder:text-[#9CA3AF]"
+					className="w-full pl-9 pr-4 py-2.5 text-sm border border-[#C4CBD5] rounded-sm bg-[#F8F9FC] focus:outline-none focus:ring-2 focus:ring-[#3A52A6]/20 focus:border-[#3A52A6] transition-all text-primary placeholder:text-[#9CA3AF]"
 				/>
 			</div>
 
@@ -106,7 +106,7 @@ export default function TemplateSelectionStep({
 								key={template.id}
 								type="button"
 								onClick={() => onSelectTemplate(template)}
-								className="cursor-pointer text-left bg-[#F8F9FC] rounded-xl p-5 border border-[#D3DCF6] hover:border-[#3A52A6]/30 hover:shadow-md transition-all group"
+								className="cursor-pointer text-left bg-[#F8F9FC] rounded-lg p-5 border border-[#D3DCF6] hover:border-[#3A52A6]/30 hover:shadow-md transition-all group"
 							>
 								<div className="flex items-center gap-3 mb-3">
 									{Icon && (
@@ -144,10 +144,10 @@ export default function TemplateSelectionStep({
 						onClick={onStartFromScratch}
 						className="cursor-pointer text-left rounded-xl p-5 border-2 border-dashed border-[#C4CBD5] hover:border-[#3A52A6] hover:bg-[#F8F9FC] transition-all group flex flex-col items-center justify-center min-h-[200px]"
 					>
-						<div className="w-10 h-10 rounded-lg border border-[#6B7280] bg-transparent flex items-center justify-center text-[#6B7280] group-hover:bg-[#3A52A6] group-hover:border-[#3A52A6] group-hover:text-white transition-colors mb-3">
+						<div className="w-10 h-10 rounded-md border border-[#6B7280] bg-transparent flex items-center justify-center text-[#6B7280] group-hover:bg-[#3A52A6] group-hover:border-[#3A52A6] group-hover:text-white transition-colors mb-3">
 							<Plus size={20} />
 						</div>
-						<h3 className="text-sm font-medium text-primary mb-1">
+						<h3 className="text-sm text-primary mb-1">
 							Start from Scratch
 						</h3>
 						<p className="text-xs text-[#6B7280] text-center">

@@ -136,6 +136,7 @@ function CreateScholarship() {
 	const [step, setStep] = useState<"template" | "form">("template");
 	const [selectedTemplate, setSelectedTemplate] =
 		useState<ScholarshipTemplate | null>(null);
+	const [formResetKey, setFormResetKey] = useState(0);
 
 	const criteria = watch("criterias");
 	const requiredDocuments = watch("requirements");
@@ -167,12 +168,33 @@ function CreateScholarship() {
 		status: ScholarshipStatus.Draft,
 	});
 
+	const resetCreateFormState = ({
+		step: nextStep = "form",
+	}: {
+		step?: "template" | "form";
+	} = {}) => {
+		resetForm();
+		setFormResetKey((prev) => prev + 1);
+		setAmountType("fixed");
+		setUnlimitedSlots(false);
+		setDraftFormFields([]);
+		setPendingFormData(null);
+		setSelectedTemplate(null);
+		setShowConfirmationModal(false);
+		setStep(nextStep);
+	};
+
 	useEffect(() => {
 		if (selectedTemplate) {
 			form.reset({
 				scholarshipType: selectedTemplate.scholarshipType,
 				name: selectedTemplate.suggestedTitle,
 				description: selectedTemplate.suggestedDescription,
+				totalAmount: undefined,
+				totalAmountMin: undefined,
+				totalAmountMax: undefined,
+				totalSlots: undefined,
+				applicationDeadline: undefined,
 				criterias: selectedTemplate.criterias,
 				requirements: selectedTemplate.requirements,
 				formFields: selectedTemplate.formFields,
@@ -180,10 +202,11 @@ function CreateScholarship() {
 				sponsorId: auth.profile.id,
 				status: ScholarshipStatus.Draft,
 			});
+			setUnlimitedSlots(false);
 			setAmountType(selectedTemplate.amountType);
 			setDraftFormFields(selectedTemplate.formFields);
 		}
-	}, [selectedTemplate]);
+	}, [auth.profile.id, form, selectedTemplate]);
 
 	const handleSelectTemplate = (template: ScholarshipTemplate) => {
 		setSelectedTemplate(template);
@@ -191,14 +214,11 @@ function CreateScholarship() {
 	};
 
 	const handleStartFromScratch = () => {
-		setSelectedTemplate(null);
-		setStep("form");
+		resetCreateFormState();
 	};
 
 	const handleBackToTemplates = () => {
-		setStep("template");
-		resetForm();
-		setSelectedTemplate(null);
+		resetCreateFormState({ step: "template" });
 	};
 
 	const openFormFieldsDialog = () => {
@@ -251,7 +271,7 @@ function CreateScholarship() {
 			console.log(res.data);
 			await queryClient.invalidateQueries({ queryKey: ["scholarships"] });
 			showSuccess(`Success`, res.message, 1250);
-			resetForm();
+			resetCreateFormState();
 			setLoading(false);
 		},
 		onError: (err) => {
@@ -362,6 +382,7 @@ function CreateScholarship() {
 										Scholarship Type <span className="text-[#EF4444]">*</span>
 									</label>
 									<Select
+										key={`scholarship-type-${formResetKey}`}
 										value={scholarshipType}
 										onValueChange={(value) =>
 											setValue("scholarshipType", value as ScholarshipType, {
