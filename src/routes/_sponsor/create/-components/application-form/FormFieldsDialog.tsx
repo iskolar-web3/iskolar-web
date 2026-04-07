@@ -14,7 +14,7 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import type { CreateFormFieldRequest } from "@/lib/scholarship/model";
-import CustomFormFieldModal from "./CustomFormFieldModal";
+import CustomFormFieldModal from "@/components/sponsor/create-scholarship/application-form/CustomFormFieldModal";
 import CustomFormFieldsList from "./CustomFormFieldsList";
 
 interface Props {

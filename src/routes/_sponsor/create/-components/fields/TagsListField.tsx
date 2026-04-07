@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import PresetPickerPopover from "../PresetPickerPopover";
+import PresetPickerPopover from "@/components/sponsor/create-scholarship/PresetPickerPopover";
 
 interface Props {
 	label: string;

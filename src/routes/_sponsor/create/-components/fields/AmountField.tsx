@@ -1,8 +1,7 @@
 import type { Control, FieldErrors, UseFormSetValue } from "react-hook-form";
 import { Controller } from "react-hook-form";
 import type { ScholarshipFormData } from "@/lib/scholarship/model";
-
-type AmountType = "fixed" | "varies" | "range";
+import type { AmountType } from "../../-model";
 
 interface Props {
 	amountType: AmountType;

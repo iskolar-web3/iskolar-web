@@ -17,7 +17,6 @@ import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StudentDiscoverRouteImport } from './routes/_student/discover'
 import { Route as SponsorScholarshipsRouteImport } from './routes/_sponsor/scholarships'
-import { Route as SponsorCreateRouteImport } from './routes/_sponsor/create'
 import { Route as OnboardingWelcomeRouteImport } from './routes/_onboarding/welcome'
 import { Route as OnboardingRoleSelectionRouteImport } from './routes/_onboarding/role-selection'
 import { Route as OnboardingProfileSetupRouteImport } from './routes/_onboarding/profile-setup'
@@ -35,6 +34,7 @@ import { Route as AuthConfirmationRouteImport } from './routes/_auth/confirmatio
 import { Route as AdminUsersRouteImport } from './routes/_admin/users'
 import { Route as AdminDashboardRouteImport } from './routes/_admin/dashboard'
 import { Route as StudentHomeIndexRouteImport } from './routes/_student/home/index'
+import { Route as SponsorCreateIndexRouteImport } from './routes/_sponsor/create/index'
 import { Route as LandingAboutIndexRouteImport } from './routes/_landing/about/index'
 import { Route as StudentScholarshipIdApplyRouteImport } from './routes/_student/scholarship/$id/apply'
 import { Route as StudentProfileStudentStudentIdRouteImport } from './routes/_student/profile/student/$studentId'
@@ -75,11 +75,6 @@ const StudentDiscoverRoute = StudentDiscoverRouteImport.update({
 const SponsorScholarshipsRoute = SponsorScholarshipsRouteImport.update({
   id: '/scholarships',
   path: '/scholarships',
-  getParentRoute: () => SponsorRoute,
-} as any)
-const SponsorCreateRoute = SponsorCreateRouteImport.update({
-  id: '/create',
-  path: '/create',
   getParentRoute: () => SponsorRoute,
 } as any)
 const OnboardingWelcomeRoute = OnboardingWelcomeRouteImport.update({
@@ -168,6 +163,11 @@ const StudentHomeIndexRoute = StudentHomeIndexRouteImport.update({
   path: '/home/',
   getParentRoute: () => StudentRoute,
 } as any)
+const SponsorCreateIndexRoute = SponsorCreateIndexRouteImport.update({
+  id: '/create/',
+  path: '/create/',
+  getParentRoute: () => SponsorRoute,
+} as any)
 const LandingAboutIndexRoute = LandingAboutIndexRouteImport.update({
   id: '/_landing/about/',
   path: '/about/',
@@ -222,10 +222,10 @@ export interface FileRoutesByFullPath {
   '/profile-setup': typeof OnboardingProfileSetupRoute
   '/role-selection': typeof OnboardingRoleSelectionRoute
   '/welcome': typeof OnboardingWelcomeRoute
-  '/create': typeof SponsorCreateRoute
   '/scholarships': typeof SponsorScholarshipsRoute
   '/discover': typeof StudentDiscoverRoute
   '/about': typeof LandingAboutIndexRoute
+  '/create': typeof SponsorCreateIndexRoute
   '/home': typeof StudentHomeIndexRoute
   '/profile/sponsor/$sponsorId': typeof SponsorProfileSponsorSponsorIdRoute
   '/scholarship/$id/applicants': typeof SponsorScholarshipIdApplicantsRoute
@@ -251,10 +251,10 @@ export interface FileRoutesByTo {
   '/profile-setup': typeof OnboardingProfileSetupRoute
   '/role-selection': typeof OnboardingRoleSelectionRoute
   '/welcome': typeof OnboardingWelcomeRoute
-  '/create': typeof SponsorCreateRoute
   '/scholarships': typeof SponsorScholarshipsRoute
   '/discover': typeof StudentDiscoverRoute
   '/about': typeof LandingAboutIndexRoute
+  '/create': typeof SponsorCreateIndexRoute
   '/home': typeof StudentHomeIndexRoute
   '/profile/sponsor/$sponsorId': typeof SponsorProfileSponsorSponsorIdRoute
   '/scholarship/$id/applicants': typeof SponsorScholarshipIdApplicantsRoute
@@ -286,10 +286,10 @@ export interface FileRoutesById {
   '/_onboarding/profile-setup': typeof OnboardingProfileSetupRoute
   '/_onboarding/role-selection': typeof OnboardingRoleSelectionRoute
   '/_onboarding/welcome': typeof OnboardingWelcomeRoute
-  '/_sponsor/create': typeof SponsorCreateRoute
   '/_sponsor/scholarships': typeof SponsorScholarshipsRoute
   '/_student/discover': typeof StudentDiscoverRoute
   '/_landing/about/': typeof LandingAboutIndexRoute
+  '/_sponsor/create/': typeof SponsorCreateIndexRoute
   '/_student/home/': typeof StudentHomeIndexRoute
   '/_sponsor/profile/sponsor/$sponsorId': typeof SponsorProfileSponsorSponsorIdRoute
   '/_sponsor/scholarship/$id/applicants': typeof SponsorScholarshipIdApplicantsRoute
@@ -317,10 +317,10 @@ export interface FileRouteTypes {
     | '/profile-setup'
     | '/role-selection'
     | '/welcome'
-    | '/create'
     | '/scholarships'
     | '/discover'
     | '/about'
+    | '/create'
     | '/home'
     | '/profile/sponsor/$sponsorId'
     | '/scholarship/$id/applicants'
@@ -346,10 +346,10 @@ export interface FileRouteTypes {
     | '/profile-setup'
     | '/role-selection'
     | '/welcome'
-    | '/create'
     | '/scholarships'
     | '/discover'
     | '/about'
+    | '/create'
     | '/home'
     | '/profile/sponsor/$sponsorId'
     | '/scholarship/$id/applicants'
@@ -380,10 +380,10 @@ export interface FileRouteTypes {
     | '/_onboarding/profile-setup'
     | '/_onboarding/role-selection'
     | '/_onboarding/welcome'
-    | '/_sponsor/create'
     | '/_sponsor/scholarships'
     | '/_student/discover'
     | '/_landing/about/'
+    | '/_sponsor/create/'
     | '/_student/home/'
     | '/_sponsor/profile/sponsor/$sponsorId'
     | '/_sponsor/scholarship/$id/applicants'
@@ -458,13 +458,6 @@ declare module '@tanstack/react-router' {
       path: '/scholarships'
       fullPath: '/scholarships'
       preLoaderRoute: typeof SponsorScholarshipsRouteImport
-      parentRoute: typeof SponsorRoute
-    }
-    '/_sponsor/create': {
-      id: '/_sponsor/create'
-      path: '/create'
-      fullPath: '/create'
-      preLoaderRoute: typeof SponsorCreateRouteImport
       parentRoute: typeof SponsorRoute
     }
     '/_onboarding/welcome': {
@@ -586,6 +579,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentHomeIndexRouteImport
       parentRoute: typeof StudentRoute
     }
+    '/_sponsor/create/': {
+      id: '/_sponsor/create/'
+      path: '/create'
+      fullPath: '/create'
+      preLoaderRoute: typeof SponsorCreateIndexRouteImport
+      parentRoute: typeof SponsorRoute
+    }
     '/_landing/about/': {
       id: '/_landing/about/'
       path: '/about'
@@ -690,16 +690,16 @@ const OnboardingRouteWithChildren = OnboardingRoute._addFileChildren(
 )
 
 interface SponsorRouteChildren {
-  SponsorCreateRoute: typeof SponsorCreateRoute
   SponsorScholarshipsRoute: typeof SponsorScholarshipsRoute
+  SponsorCreateIndexRoute: typeof SponsorCreateIndexRoute
   SponsorProfileSponsorSponsorIdRoute: typeof SponsorProfileSponsorSponsorIdRoute
   SponsorScholarshipIdApplicantsRoute: typeof SponsorScholarshipIdApplicantsRoute
   SponsorScholarshipIdEditRoute: typeof SponsorScholarshipIdEditRoute
 }
 
 const SponsorRouteChildren: SponsorRouteChildren = {
-  SponsorCreateRoute: SponsorCreateRoute,
   SponsorScholarshipsRoute: SponsorScholarshipsRoute,
+  SponsorCreateIndexRoute: SponsorCreateIndexRoute,
   SponsorProfileSponsorSponsorIdRoute: SponsorProfileSponsorSponsorIdRoute,
   SponsorScholarshipIdApplicantsRoute: SponsorScholarshipIdApplicantsRoute,
   SponsorScholarshipIdEditRoute: SponsorScholarshipIdEditRoute,

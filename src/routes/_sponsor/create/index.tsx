@@ -4,17 +4,7 @@ import { ArrowLeft, Loader2, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/auth";
 import { SEO } from "@/components/SEO";
-import ConfirmationDialog from "@/components/sponsor/create-scholarship/ConfirmationDialog";
 import DescriptionModal from "@/components/sponsor/create-scholarship/DescriptionModal";
-import TemplateSelectionStep from "@/components/sponsor/create-scholarship/TemplateSelectionStep";
-import FormFieldsDialog from "@/components/sponsor/create-scholarship/application-form/FormFieldsDialog";
-import AmountField from "@/components/sponsor/create-scholarship/fields/AmountField";
-import ImageTitleDescriptionSection from "@/components/sponsor/create-scholarship/fields/ImageTitleDescriptionSection";
-import ScholarshipTypeSelect from "@/components/sponsor/create-scholarship/fields/ScholarshipTypeSelect";
-import SlotsDeadlineFields from "@/components/sponsor/create-scholarship/fields/SlotsDeadlineFields";
-import TagsListField from "@/components/sponsor/create-scholarship/fields/TagsListField";
-import ScholarshipFullPreviewModal from "@/components/sponsor/create-scholarship/preview/ScholarshipFullPreviewDrawer";
-import ScholarshipPreviewCard from "@/components/sponsor/create-scholarship/preview/ScholarshipPreviewCard";
 import Toast from "@/components/Toast";
 import { useScholarshipForm } from "@/hooks/useScholarshipForm";
 import { useScholarshipPreview } from "@/hooks/useScholarshipPreview";
@@ -32,8 +22,19 @@ import { PRESET_CRITERIA, PRESET_DOCUMENTS } from "@/lib/scholarship/presets";
 import type { ScholarshipTemplate } from "@/lib/scholarship/templates";
 import type { AnySponsor } from "@/lib/sponsor/model";
 import { ACCESS_TOKEN_KEY } from "@/lib/user/auth";
+import type { AmountType } from "./-model";
+import ConfirmationDialog from "./-components/ConfirmationDialog";
+import TemplateSelectionStep from "./-components/TemplateSelectionStep";
+import FormFieldsDialog from "./-components/application-form/FormFieldsDialog";
+import AmountField from "./-components/fields/AmountField";
+import ImageTitleDescriptionSection from "./-components/fields/ImageTitleDescriptionSection";
+import ScholarshipTypeSelect from "./-components/fields/ScholarshipTypeSelect";
+import SlotsDeadlineFields from "./-components/fields/SlotsDeadlineFields";
+import TagsListField from "./-components/fields/TagsListField";
+import ScholarshipFullPreviewModal from "./-components/preview/ScholarshipFullPreviewDrawer";
+import ScholarshipPreviewCard from "./-components/preview/ScholarshipPreviewCard";
 
-export const Route = createFileRoute("/_sponsor/create")({
+export const Route = createFileRoute("/_sponsor/create/")({
 	component: CreateScholarship,
 });
 
@@ -55,8 +56,6 @@ async function createScholarship(
 }
 
 const DEFAULT_SCHOLARSHIP_IMAGE = "/scholarship-banner-placeholder.png";
-
-type AmountType = "fixed" | "varies" | "range";
 
 function CreateScholarship() {
 	const auth = useAuth<AnySponsor>();
@@ -137,7 +136,7 @@ function CreateScholarship() {
 		setSelectedTemplate(null);
 		setShowConfirmationModal(false);
 		setStep(nextStep);
-	};
+	}
 
 	useEffect(() => {
 		if (!selectedTemplate) return;
@@ -156,7 +155,7 @@ function CreateScholarship() {
 			imageUrl: undefined,
 			sponsorId: auth.profile.id,
 			status: ScholarshipStatus.Draft,
-		});
+		})
 		setUnlimitedSlots(false);
 		setAmountType(selectedTemplate.amountType);
 		setDraftFormFields(selectedTemplate.formFields);
@@ -165,13 +164,13 @@ function CreateScholarship() {
 	const openFormFieldsDialog = () => {
 		setDraftFormFields(customFormFields);
 		setShowFormFieldsDialog(true);
-	};
+	}
 
 	const handleSaveFormFields = () => {
 		setValue("formFields", draftFormFields, { shouldValidate: true });
 		setShowFormFieldsDialog(false);
 		setEditingFieldIndex(null);
-	};
+	}
 
 	const mutation = useMutation({
 		mutationFn: createScholarship,
@@ -192,25 +191,25 @@ function CreateScholarship() {
 	const onSubmit = async (data: ScholarshipFormData) => {
 		if (amountType === "fixed" && !data.totalAmount) {
 			form.setError("totalAmount", { message: "Please enter a valid amount" });
-			return;
+			return
 		}
 		if (amountType === "range") {
 			if (!data.totalAmountMin) {
 				form.setError("totalAmountMin", { message: "Please enter a minimum amount" });
-				return;
+				return
 			}
 			if (!data.totalAmountMax) {
 				form.setError("totalAmountMax", { message: "Please enter a maximum amount" });
-				return;
+				return
 			}
 			if (data.totalAmountMin >= data.totalAmountMax) {
 				form.setError("totalAmountMax", { message: "Max must be greater than min" });
-				return;
+				return
 			}
 		}
 		if (!unlimitedSlots && !data.totalSlots) {
 			form.setError("totalSlots", { message: "Please enter the number of slots" });
-			return;
+			return
 		}
 
 		const amountPayload: Partial<ScholarshipFormData> =
@@ -225,7 +224,7 @@ function CreateScholarship() {
 
 		setPendingFormData({ ...data, ...amountPayload, ...slotsPayload, imageUrl: imageUrlValue } as ScholarshipFormData);
 		setShowConfirmationModal(true);
-	};
+	}
 
 	const handleConfirmSubmit = () => {
 		if (!pendingFormData) return;
@@ -237,7 +236,7 @@ function CreateScholarship() {
 			showError("Error", err instanceof Error ? err.message : "Something went wrong");
 			setLoading(false);
 		}
-	};
+	}
 
 	return (
 		<div className="max-w-7xl mx-auto">
@@ -248,7 +247,7 @@ function CreateScholarship() {
 				<TemplateSelectionStep
 					onSelectTemplate={(template: ScholarshipTemplate) => {
 						setSelectedTemplate(template);
-						setStep("form");
+						setStep("form")
 					}}
 					onStartFromScratch={() => resetCreateFormState()}
 				/>
@@ -442,5 +441,5 @@ function CreateScholarship() {
 				loading={loading}
 			/>
 		</div>
-	);
+	)
 }
