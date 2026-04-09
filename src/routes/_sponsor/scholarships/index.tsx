@@ -16,10 +16,10 @@ import {
 	Plus,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import FilterSelect from "@/components/sponsor/scholarships/Filters";
-import ScholarshipCard from "@/components/sponsor/scholarships/ScholarshipCard";
+import FilterSelect from "./-components/Filters";
+import ScholarshipCard from "./-components/ScholarshipCard";
 import ScholarshipCardSkeleton from "@/components/ScholarshipCardSkeleton";
-import ScholarshipDetailsModal from "@/components/sponsor/scholarships/ScholarshipDetailsDrawer";
+import ScholarshipDetailsModal from "./-components/ScholarshipDetailsDrawer";
 import { SEO } from "@/components/SEO";
 import Toast from "@/components/Toast";
 import { useToast } from "@/hooks/useToast";
@@ -34,7 +34,7 @@ import {
 	type Scholarship,
 } from "@/lib/scholarship/model";
 
-export const Route = createFileRoute("/_sponsor/scholarships")({
+export const Route = createFileRoute("/_sponsor/scholarships/")({
 	component: Scholarships,
 	validateSearch: getScholarshipQueryParamSchema,
 });
@@ -56,9 +56,7 @@ function Scholarships() {
 		useState<Scholarship | null>(null);
 	const [showFiltersModal, setShowFiltersModal] = useState(false);
 
-	// const { data: scholarships = [], isLoading: loading, error, isError } = useSponsorScholarships();
-
-	const search = useSearch({ from: "/_sponsor/scholarships" });
+	const search = useSearch({ from: "/_sponsor/scholarships/" });
 
 	const auth = useAuth<AnySponsor>();
 	const scholarships = useSuspenseQuery(
@@ -247,7 +245,6 @@ function Scholarships() {
 									onChange={setScholarshipType}
 								/>
 
-
 								<div className="mb-4">
 									<label className="block text-xs text-primary mb-2">
 										Applications
@@ -398,7 +395,6 @@ function Scholarships() {
 										value={scholarshipType}
 										onChange={setScholarshipType}
 									/>
-
 
 									<div className="mb-6">
 										<label className="block text-sm text-primary mb-2">

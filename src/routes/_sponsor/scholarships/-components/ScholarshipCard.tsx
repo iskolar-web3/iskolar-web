@@ -30,9 +30,9 @@ export interface ScholarshipCardProps {
  * @param props - Component props
  * @returns Animated scholarship card with context menu
  */
-export default function ScholarshipCard({ 
-  scholarship, 
-  index, 
+export default function ScholarshipCard({
+  scholarship,
+  index,
   onClick,
   onEdit,
   onDelete,
@@ -54,7 +54,7 @@ export default function ScholarshipCard({
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     const rect = cardRef.current?.getBoundingClientRect();
     if (rect) {
       setContextMenuPosition({
@@ -111,18 +111,18 @@ export default function ScholarshipCard({
     setShowContextMenu(false);
     onViewApplicants?.(scholarship);
   };
-  
+
   return (
     <motion.div
       ref={cardRef}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ 
-        duration: 0.4, 
+      transition={{
+        duration: 0.4,
         delay: index * 0.05,
         ease: [0.25, 0.1, 0.25, 1]
       }}
-      whileHover={{ 
+      whileHover={{
         scale: 0.99,
         transition: { duration: 0.2 }
       }}
@@ -177,7 +177,7 @@ export default function ScholarshipCard({
       <div className="bg-[#3A52A6] rounded-lg rounded-bl-none rounded-br-none">
         <div className="flex">
           {/* Image */}
-          <motion.div 
+          <motion.div
             transition={{ duration: 0.3 }}
             className="w-32 h-32 bg-white/10 shrink-0 overflow-hidden rounded-tl-lg"
           >
@@ -191,7 +191,7 @@ export default function ScholarshipCard({
           {/* Info */}
           <div className="flex-1 text-tertiary px-4 py-2">
             <h3 className="text-lg mb-1 line-clamp-1">{scholarship.name}</h3>
-            
+
             {/* Badges */}
             <div className="flex flex-wrap gap-2 mb-3">
               {scholarship.scholarshipType.code === ScholarshipType.Combined ? (
