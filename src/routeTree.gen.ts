@@ -15,7 +15,6 @@ import { Route as OnboardingRouteImport } from './routes/_onboarding'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as StudentDiscoverRouteImport } from './routes/_student/discover'
 import { Route as SponsorScholarshipsRouteImport } from './routes/_sponsor/scholarships'
 import { Route as OnboardingWelcomeRouteImport } from './routes/_onboarding/welcome'
 import { Route as OnboardingRoleSelectionRouteImport } from './routes/_onboarding/role-selection'
@@ -34,6 +33,7 @@ import { Route as AuthConfirmationRouteImport } from './routes/_auth/confirmatio
 import { Route as AdminUsersRouteImport } from './routes/_admin/users'
 import { Route as AdminDashboardRouteImport } from './routes/_admin/dashboard'
 import { Route as StudentHomeIndexRouteImport } from './routes/_student/home/index'
+import { Route as StudentDiscoverIndexRouteImport } from './routes/_student/discover/index'
 import { Route as SponsorCreateIndexRouteImport } from './routes/_sponsor/create/index'
 import { Route as LandingAboutIndexRouteImport } from './routes/_landing/about/index'
 import { Route as StudentScholarshipIdApplyRouteImport } from './routes/_student/scholarship/$id/apply'
@@ -67,11 +67,6 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
-} as any)
-const StudentDiscoverRoute = StudentDiscoverRouteImport.update({
-  id: '/discover',
-  path: '/discover',
-  getParentRoute: () => StudentRoute,
 } as any)
 const SponsorScholarshipsRoute = SponsorScholarshipsRouteImport.update({
   id: '/scholarships',
@@ -164,6 +159,11 @@ const StudentHomeIndexRoute = StudentHomeIndexRouteImport.update({
   path: '/home/',
   getParentRoute: () => StudentRoute,
 } as any)
+const StudentDiscoverIndexRoute = StudentDiscoverIndexRouteImport.update({
+  id: '/discover/',
+  path: '/discover/',
+  getParentRoute: () => StudentRoute,
+} as any)
 const SponsorCreateIndexRoute = SponsorCreateIndexRouteImport.update({
   id: '/create/',
   path: '/create/',
@@ -230,9 +230,9 @@ export interface FileRoutesByFullPath {
   '/role-selection': typeof OnboardingRoleSelectionRoute
   '/welcome': typeof OnboardingWelcomeRoute
   '/scholarships': typeof SponsorScholarshipsRoute
-  '/discover': typeof StudentDiscoverRoute
   '/about': typeof LandingAboutIndexRoute
   '/create': typeof SponsorCreateIndexRoute
+  '/discover': typeof StudentDiscoverIndexRoute
   '/home': typeof StudentHomeIndexRoute
   '/scholarship/$id/applicants': typeof SponsorScholarshipIdApplicantsRoute
   '/scholarship/$id/apply': typeof StudentScholarshipIdApplyRouteWithChildren
@@ -260,9 +260,9 @@ export interface FileRoutesByTo {
   '/role-selection': typeof OnboardingRoleSelectionRoute
   '/welcome': typeof OnboardingWelcomeRoute
   '/scholarships': typeof SponsorScholarshipsRoute
-  '/discover': typeof StudentDiscoverRoute
   '/about': typeof LandingAboutIndexRoute
   '/create': typeof SponsorCreateIndexRoute
+  '/discover': typeof StudentDiscoverIndexRoute
   '/home': typeof StudentHomeIndexRoute
   '/scholarship/$id/applicants': typeof SponsorScholarshipIdApplicantsRoute
   '/profile/sponsor/$sponsorId': typeof SponsorProfileSponsorSponsorIdIndexRoute
@@ -295,9 +295,9 @@ export interface FileRoutesById {
   '/_onboarding/role-selection': typeof OnboardingRoleSelectionRoute
   '/_onboarding/welcome': typeof OnboardingWelcomeRoute
   '/_sponsor/scholarships': typeof SponsorScholarshipsRoute
-  '/_student/discover': typeof StudentDiscoverRoute
   '/_landing/about/': typeof LandingAboutIndexRoute
   '/_sponsor/create/': typeof SponsorCreateIndexRoute
+  '/_student/discover/': typeof StudentDiscoverIndexRoute
   '/_student/home/': typeof StudentHomeIndexRoute
   '/_sponsor/scholarship/$id/applicants': typeof SponsorScholarshipIdApplicantsRoute
   '/_student/scholarship/$id/apply': typeof StudentScholarshipIdApplyRouteWithChildren
@@ -327,9 +327,9 @@ export interface FileRouteTypes {
     | '/role-selection'
     | '/welcome'
     | '/scholarships'
-    | '/discover'
     | '/about'
     | '/create'
+    | '/discover'
     | '/home'
     | '/scholarship/$id/applicants'
     | '/scholarship/$id/apply'
@@ -357,9 +357,9 @@ export interface FileRouteTypes {
     | '/role-selection'
     | '/welcome'
     | '/scholarships'
-    | '/discover'
     | '/about'
     | '/create'
+    | '/discover'
     | '/home'
     | '/scholarship/$id/applicants'
     | '/profile/sponsor/$sponsorId'
@@ -391,9 +391,9 @@ export interface FileRouteTypes {
     | '/_onboarding/role-selection'
     | '/_onboarding/welcome'
     | '/_sponsor/scholarships'
-    | '/_student/discover'
     | '/_landing/about/'
     | '/_sponsor/create/'
+    | '/_student/discover/'
     | '/_student/home/'
     | '/_sponsor/scholarship/$id/applicants'
     | '/_student/scholarship/$id/apply'
@@ -456,13 +456,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_student/discover': {
-      id: '/_student/discover'
-      path: '/discover'
-      fullPath: '/discover'
-      preLoaderRoute: typeof StudentDiscoverRouteImport
-      parentRoute: typeof StudentRoute
     }
     '/_sponsor/scholarships': {
       id: '/_sponsor/scholarships'
@@ -588,6 +581,13 @@ declare module '@tanstack/react-router' {
       path: '/home'
       fullPath: '/home'
       preLoaderRoute: typeof StudentHomeIndexRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/_student/discover/': {
+      id: '/_student/discover/'
+      path: '/discover'
+      fullPath: '/discover'
+      preLoaderRoute: typeof StudentDiscoverIndexRouteImport
       parentRoute: typeof StudentRoute
     }
     '/_sponsor/create/': {
@@ -742,14 +742,14 @@ const StudentScholarshipIdApplyRouteWithChildren =
   )
 
 interface StudentRouteChildren {
-  StudentDiscoverRoute: typeof StudentDiscoverRoute
+  StudentDiscoverIndexRoute: typeof StudentDiscoverIndexRoute
   StudentHomeIndexRoute: typeof StudentHomeIndexRoute
   StudentScholarshipIdApplyRoute: typeof StudentScholarshipIdApplyRouteWithChildren
   StudentProfileStudentStudentIdIndexRoute: typeof StudentProfileStudentStudentIdIndexRoute
 }
 
 const StudentRouteChildren: StudentRouteChildren = {
-  StudentDiscoverRoute: StudentDiscoverRoute,
+  StudentDiscoverIndexRoute: StudentDiscoverIndexRoute,
   StudentHomeIndexRoute: StudentHomeIndexRoute,
   StudentScholarshipIdApplyRoute: StudentScholarshipIdApplyRouteWithChildren,
   StudentProfileStudentStudentIdIndexRoute:

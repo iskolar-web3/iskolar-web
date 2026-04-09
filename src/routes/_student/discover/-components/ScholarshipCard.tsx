@@ -26,17 +26,17 @@ export default function ScholarshipCard({ scholarship, index, onClick }: Scholar
   const isRange = scholarship.totalAmountMin != null || scholarship.totalAmountMax != null;
   const isFixed = !isRange && scholarship.totalAmount != null;
   const isVaries = !isRange && !isFixed;
-  
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ 
-        duration: 0.4, 
+      transition={{
+        duration: 0.4,
         delay: index * 0.05,
         ease: [0.25, 0.1, 0.25, 1]
       }}
-      whileHover={{ 
+      whileHover={{
         scale: 0.99,
         transition: { duration: 0.2 }
       }}
@@ -47,7 +47,7 @@ export default function ScholarshipCard({ scholarship, index, onClick }: Scholar
       <div className="bg-[#3A52A6]">
         <div className="flex">
           {/* Image */}
-          <motion.div 
+          <motion.div
             transition={{ duration: 0.3 }}
             className="w-32 h-32 bg-white/10 shrink-0 overflow-hidden"
           >
@@ -61,7 +61,7 @@ export default function ScholarshipCard({ scholarship, index, onClick }: Scholar
           {/* Info */}
           <div className="flex-1 text-tertiary px-4 py-2">
             <h3 className="text-xl mb-1 line-clamp-1">{scholarship.name}</h3>
-            
+
             {/* Badges */}
             <div className="flex flex-wrap gap-2 mb-3">
               {scholarship.scholarshipType.code === ScholarshipType.Combined ? (

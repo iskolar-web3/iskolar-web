@@ -1,13 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import ScholarshipCard from "@/components/student/discover/ScholarshipCard";
+import ScholarshipCard from "./-components/ScholarshipCard";
 import ScholarshipCardSkeleton from "@/components/ScholarshipCardSkeleton";
-import Filters from "@/components/student/discover/Filters";
+import Filters from "./-components/Filters";
 import { Filter, X, GraduationCap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Toast from "@/components/Toast";
 import { useToast } from "@/hooks/useToast";
-import ScholarshipDetailsModal from "@/components/student/discover/ScholarshipDetailsDrawer";
+import ScholarshipDetailsModal from "./-components/ScholarshipDetailsDrawer";
 import { SEO } from "@/components/SEO";
 import {
 	ScholarshipType,
@@ -19,7 +19,7 @@ import type { Student } from "@/lib/student/model";
 import { useAuth } from "@/auth";
 import { getMyScholarshipsQuery } from "@/lib/scholarship/api";
 
-export const Route = createFileRoute("/_student/discover")({
+export const Route = createFileRoute("/_student/discover/")({
 	component: DiscoverScholarship,
 });
 

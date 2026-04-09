@@ -42,7 +42,7 @@ export default function Filters({ title, options, value, onChange }: FilterProps
             <ChevronDown size={16} />
           </motion.div>
         </motion.button>
-        
+
         <AnimatePresence>
           {isOpen && (
             <motion.div
@@ -55,7 +55,7 @@ export default function Filters({ title, options, value, onChange }: FilterProps
             {options.map((option, i) => {
              const opt = option as string
               // Format the display text
-            const displayText = opt 
+            const displayText = opt
                 ? opt.toLowerCase().replace(/(^|[\s-])\w/g, (match) => match.toUpperCase())
                 : "All";
 

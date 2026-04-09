@@ -16,7 +16,7 @@ import { getSponsorName } from '@/lib/sponsor/api';
  * @param props.onClose - Callback function to close the modal
  * @returns Animated side panel modal with scholarship details and apply button
  */
-export default function ScholarshipDetailsModal({ scholarship, onClose }: { scholarship: Scholarship; onClose: () => void }) {4
+export default function ScholarshipDetailsModal({ scholarship, onClose }: { scholarship: Scholarship; onClose: () => void }) {
   const navigate = useNavigate();
 
   const [isExiting, setIsExiting] = useState(false);
@@ -39,22 +39,22 @@ export default function ScholarshipDetailsModal({ scholarship, onClose }: { scho
    */
   const handleClose = () => {
     setIsExiting(true);
-    setTimeout(onClose, 200); 
+    setTimeout(onClose, 200);
   };
 
   /**
    * Handles scholarship application
    * Checks if user has already applied and navigates to application form
    */
-  const handleApply = () => navigate({ 
-      to: '/scholarship/$id/apply', 
+  const handleApply = () => navigate({
+      to: '/scholarship/$id/apply',
       params: { id: scholarship.id }
     });
 
   return (
     <AnimatePresence>
       {toast && <Toast {...toast} />}
-      
+
       <div className="fixed inset-0 z-50 flex items-center justify-end p-2">
         {/* Backdrop */}
         <motion.div
@@ -68,9 +68,9 @@ export default function ScholarshipDetailsModal({ scholarship, onClose }: { scho
         <motion.div
           initial={{ x: '100%' }}
           animate={{ x: isExiting ? '100%' : 0 }}
-          transition={{ 
-            type: 'spring', 
-            damping: 35, 
+          transition={{
+            type: 'spring',
+            damping: 35,
             stiffness: 300,
             duration: 0.1
           }}
@@ -222,7 +222,7 @@ export default function ScholarshipDetailsModal({ scholarship, onClose }: { scho
               </div>
             ) : (
               <button
-                onClick={handleApply} 
+                onClick={handleApply}
                 className="w-full bg-[#3A52A6] cursor-pointer text-tertiary py-3.5 rounded-lg text-sm flex items-center justify-center gap-2 transition-all duration-100 hover:bg-[#2F4189] hover:shadow-lg hover:shadow-[#3A52A6]/30 active:scale-[0.98] shadow-md mt-1.5 mb-2"
               >
                 Apply Now
