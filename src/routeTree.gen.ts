@@ -14,6 +14,7 @@ import { Route as SponsorRouteImport } from './routes/_sponsor'
 import { Route as OnboardingRouteImport } from './routes/_onboarding'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AdminRouteImport } from './routes/_admin'
+import { Route as _404RouteImport } from './routes/__404'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OnboardingWelcomeRouteImport } from './routes/_onboarding/welcome'
 import { Route as OnboardingRoleSelectionRouteImport } from './routes/_onboarding/role-selection'
@@ -60,6 +61,10 @@ const AuthRoute = AuthRouteImport.update({
 } as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/_admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const _404Route = _404RouteImport.update({
+  id: '/__404',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -266,6 +271,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/__404': typeof _404Route
   '/_admin': typeof AdminRouteWithChildren
   '/_auth': typeof AuthRouteWithChildren
   '/_onboarding': typeof OnboardingRouteWithChildren
@@ -360,6 +366,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/__404'
     | '/_admin'
     | '/_auth'
     | '/_onboarding'
@@ -395,6 +402,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  _404Route: typeof _404Route
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   OnboardingRoute: typeof OnboardingRouteWithChildren
@@ -438,6 +446,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: ''
       preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/__404': {
+      id: '/__404'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof _404RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -730,6 +745,7 @@ const StudentRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  _404Route: _404Route,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   OnboardingRoute: OnboardingRouteWithChildren,
