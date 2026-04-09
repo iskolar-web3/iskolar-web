@@ -38,9 +38,9 @@ import { Route as SponsorCreateIndexRouteImport } from './routes/_sponsor/create
 import { Route as LandingAboutIndexRouteImport } from './routes/_landing/about/index'
 import { Route as StudentScholarshipIdApplyRouteImport } from './routes/_student/scholarship/$id/apply'
 import { Route as StudentProfileStudentStudentIdRouteImport } from './routes/_student/profile/student/$studentId'
-import { Route as SponsorScholarshipIdEditRouteImport } from './routes/_sponsor/scholarship/$id/edit'
 import { Route as SponsorScholarshipIdApplicantsRouteImport } from './routes/_sponsor/scholarship/$id/applicants'
-import { Route as SponsorProfileSponsorSponsorIdRouteImport } from './routes/_sponsor/profile/sponsor/$sponsorId'
+import { Route as SponsorScholarshipIdEditIndexRouteImport } from './routes/_sponsor/scholarship/$id/edit/index'
+import { Route as SponsorProfileSponsorSponsorIdIndexRouteImport } from './routes/_sponsor/profile/sponsor/$sponsorId/index'
 
 const StudentRoute = StudentRouteImport.update({
   id: '/_student',
@@ -185,22 +185,22 @@ const StudentProfileStudentStudentIdRoute =
     path: '/profile/student/$studentId',
     getParentRoute: () => StudentRoute,
   } as any)
-const SponsorScholarshipIdEditRoute =
-  SponsorScholarshipIdEditRouteImport.update({
-    id: '/scholarship/$id/edit',
-    path: '/scholarship/$id/edit',
-    getParentRoute: () => SponsorRoute,
-  } as any)
 const SponsorScholarshipIdApplicantsRoute =
   SponsorScholarshipIdApplicantsRouteImport.update({
     id: '/scholarship/$id/applicants',
     path: '/scholarship/$id/applicants',
     getParentRoute: () => SponsorRoute,
   } as any)
-const SponsorProfileSponsorSponsorIdRoute =
-  SponsorProfileSponsorSponsorIdRouteImport.update({
-    id: '/profile/sponsor/$sponsorId',
-    path: '/profile/sponsor/$sponsorId',
+const SponsorScholarshipIdEditIndexRoute =
+  SponsorScholarshipIdEditIndexRouteImport.update({
+    id: '/scholarship/$id/edit/',
+    path: '/scholarship/$id/edit/',
+    getParentRoute: () => SponsorRoute,
+  } as any)
+const SponsorProfileSponsorSponsorIdIndexRoute =
+  SponsorProfileSponsorSponsorIdIndexRouteImport.update({
+    id: '/profile/sponsor/$sponsorId/',
+    path: '/profile/sponsor/$sponsorId/',
     getParentRoute: () => SponsorRoute,
   } as any)
 
@@ -227,11 +227,11 @@ export interface FileRoutesByFullPath {
   '/about': typeof LandingAboutIndexRoute
   '/create': typeof SponsorCreateIndexRoute
   '/home': typeof StudentHomeIndexRoute
-  '/profile/sponsor/$sponsorId': typeof SponsorProfileSponsorSponsorIdRoute
   '/scholarship/$id/applicants': typeof SponsorScholarshipIdApplicantsRoute
-  '/scholarship/$id/edit': typeof SponsorScholarshipIdEditRoute
   '/profile/student/$studentId': typeof StudentProfileStudentStudentIdRoute
   '/scholarship/$id/apply': typeof StudentScholarshipIdApplyRoute
+  '/profile/sponsor/$sponsorId': typeof SponsorProfileSponsorSponsorIdIndexRoute
+  '/scholarship/$id/edit': typeof SponsorScholarshipIdEditIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -256,11 +256,11 @@ export interface FileRoutesByTo {
   '/about': typeof LandingAboutIndexRoute
   '/create': typeof SponsorCreateIndexRoute
   '/home': typeof StudentHomeIndexRoute
-  '/profile/sponsor/$sponsorId': typeof SponsorProfileSponsorSponsorIdRoute
   '/scholarship/$id/applicants': typeof SponsorScholarshipIdApplicantsRoute
-  '/scholarship/$id/edit': typeof SponsorScholarshipIdEditRoute
   '/profile/student/$studentId': typeof StudentProfileStudentStudentIdRoute
   '/scholarship/$id/apply': typeof StudentScholarshipIdApplyRoute
+  '/profile/sponsor/$sponsorId': typeof SponsorProfileSponsorSponsorIdIndexRoute
+  '/scholarship/$id/edit': typeof SponsorScholarshipIdEditIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -291,11 +291,11 @@ export interface FileRoutesById {
   '/_landing/about/': typeof LandingAboutIndexRoute
   '/_sponsor/create/': typeof SponsorCreateIndexRoute
   '/_student/home/': typeof StudentHomeIndexRoute
-  '/_sponsor/profile/sponsor/$sponsorId': typeof SponsorProfileSponsorSponsorIdRoute
   '/_sponsor/scholarship/$id/applicants': typeof SponsorScholarshipIdApplicantsRoute
-  '/_sponsor/scholarship/$id/edit': typeof SponsorScholarshipIdEditRoute
   '/_student/profile/student/$studentId': typeof StudentProfileStudentStudentIdRoute
   '/_student/scholarship/$id/apply': typeof StudentScholarshipIdApplyRoute
+  '/_sponsor/profile/sponsor/$sponsorId/': typeof SponsorProfileSponsorSponsorIdIndexRoute
+  '/_sponsor/scholarship/$id/edit/': typeof SponsorScholarshipIdEditIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -322,11 +322,11 @@ export interface FileRouteTypes {
     | '/about'
     | '/create'
     | '/home'
-    | '/profile/sponsor/$sponsorId'
     | '/scholarship/$id/applicants'
-    | '/scholarship/$id/edit'
     | '/profile/student/$studentId'
     | '/scholarship/$id/apply'
+    | '/profile/sponsor/$sponsorId'
+    | '/scholarship/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -351,11 +351,11 @@ export interface FileRouteTypes {
     | '/about'
     | '/create'
     | '/home'
-    | '/profile/sponsor/$sponsorId'
     | '/scholarship/$id/applicants'
-    | '/scholarship/$id/edit'
     | '/profile/student/$studentId'
     | '/scholarship/$id/apply'
+    | '/profile/sponsor/$sponsorId'
+    | '/scholarship/$id/edit'
   id:
     | '__root__'
     | '/'
@@ -385,11 +385,11 @@ export interface FileRouteTypes {
     | '/_landing/about/'
     | '/_sponsor/create/'
     | '/_student/home/'
-    | '/_sponsor/profile/sponsor/$sponsorId'
     | '/_sponsor/scholarship/$id/applicants'
-    | '/_sponsor/scholarship/$id/edit'
     | '/_student/profile/student/$studentId'
     | '/_student/scholarship/$id/apply'
+    | '/_sponsor/profile/sponsor/$sponsorId/'
+    | '/_sponsor/scholarship/$id/edit/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -607,13 +607,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentProfileStudentStudentIdRouteImport
       parentRoute: typeof StudentRoute
     }
-    '/_sponsor/scholarship/$id/edit': {
-      id: '/_sponsor/scholarship/$id/edit'
-      path: '/scholarship/$id/edit'
-      fullPath: '/scholarship/$id/edit'
-      preLoaderRoute: typeof SponsorScholarshipIdEditRouteImport
-      parentRoute: typeof SponsorRoute
-    }
     '/_sponsor/scholarship/$id/applicants': {
       id: '/_sponsor/scholarship/$id/applicants'
       path: '/scholarship/$id/applicants'
@@ -621,11 +614,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SponsorScholarshipIdApplicantsRouteImport
       parentRoute: typeof SponsorRoute
     }
-    '/_sponsor/profile/sponsor/$sponsorId': {
-      id: '/_sponsor/profile/sponsor/$sponsorId'
+    '/_sponsor/scholarship/$id/edit/': {
+      id: '/_sponsor/scholarship/$id/edit/'
+      path: '/scholarship/$id/edit'
+      fullPath: '/scholarship/$id/edit'
+      preLoaderRoute: typeof SponsorScholarshipIdEditIndexRouteImport
+      parentRoute: typeof SponsorRoute
+    }
+    '/_sponsor/profile/sponsor/$sponsorId/': {
+      id: '/_sponsor/profile/sponsor/$sponsorId/'
       path: '/profile/sponsor/$sponsorId'
       fullPath: '/profile/sponsor/$sponsorId'
-      preLoaderRoute: typeof SponsorProfileSponsorSponsorIdRouteImport
+      preLoaderRoute: typeof SponsorProfileSponsorSponsorIdIndexRouteImport
       parentRoute: typeof SponsorRoute
     }
   }
@@ -692,17 +692,18 @@ const OnboardingRouteWithChildren = OnboardingRoute._addFileChildren(
 interface SponsorRouteChildren {
   SponsorScholarshipsRoute: typeof SponsorScholarshipsRoute
   SponsorCreateIndexRoute: typeof SponsorCreateIndexRoute
-  SponsorProfileSponsorSponsorIdRoute: typeof SponsorProfileSponsorSponsorIdRoute
   SponsorScholarshipIdApplicantsRoute: typeof SponsorScholarshipIdApplicantsRoute
-  SponsorScholarshipIdEditRoute: typeof SponsorScholarshipIdEditRoute
+  SponsorProfileSponsorSponsorIdIndexRoute: typeof SponsorProfileSponsorSponsorIdIndexRoute
+  SponsorScholarshipIdEditIndexRoute: typeof SponsorScholarshipIdEditIndexRoute
 }
 
 const SponsorRouteChildren: SponsorRouteChildren = {
   SponsorScholarshipsRoute: SponsorScholarshipsRoute,
   SponsorCreateIndexRoute: SponsorCreateIndexRoute,
-  SponsorProfileSponsorSponsorIdRoute: SponsorProfileSponsorSponsorIdRoute,
   SponsorScholarshipIdApplicantsRoute: SponsorScholarshipIdApplicantsRoute,
-  SponsorScholarshipIdEditRoute: SponsorScholarshipIdEditRoute,
+  SponsorProfileSponsorSponsorIdIndexRoute:
+    SponsorProfileSponsorSponsorIdIndexRoute,
+  SponsorScholarshipIdEditIndexRoute: SponsorScholarshipIdEditIndexRoute,
 }
 
 const SponsorRouteWithChildren =
