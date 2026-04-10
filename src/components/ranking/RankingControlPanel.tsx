@@ -242,10 +242,10 @@ export function RankingControlPanel({
 				>
 					<div className="flex items-center gap-2 mb-2">
 						<GitBranch className="w-5 h-5 text-[#3A52A6]" />
-						<span className="font-medium text-primary">Decision Tree</span>
+						<span className="font-medium text-primary">Basic Ranking</span>
 					</div>
 					<p className="text-xs text-[#6B7280] leading-relaxed">
-						Fast algorithmic ranking based on criteria matching. Uses form data only - does not analyze document content.
+						Quick automatic ranking based on your criteria. Only checks form answers, not document content.
 					</p>
 				</button>
 
@@ -260,10 +260,10 @@ export function RankingControlPanel({
 				>
 					<div className="flex items-center gap-2 mb-2">
 						<Sparkles className="w-5 h-5 text-[#8B5CF6]" />
-						<span className="font-medium text-primary">AI Powered</span>
+						<span className="font-medium text-primary">Smart AI Ranking</span>
 					</div>
 					<p className="text-xs text-[#6B7280] leading-relaxed">
-						Intelligent analysis using Gemini AI. Can read and verify document content (OCR text).
+						AI reviews top candidates and reads their documents to give detailed insights and recommendations.
 					</p>
 				</button>
 
@@ -278,10 +278,10 @@ export function RankingControlPanel({
 				>
 					<div className="flex items-center gap-2 mb-2">
 						<Zap className="w-5 h-5 text-[#EFA508]" />
-						<span className="font-medium text-primary">Hybrid</span>
+						<span className="font-medium text-primary">Balanced Ranking</span>
 					</div>
 					<p className="text-xs text-[#6B7280] leading-relaxed">
-						Combines algorithmic + AI analysis. Can read document content (OCR text) for verification.
+						Combines automatic ranking with AI insights. You control how much weight to give each method.
 					</p>
 				</button>
 			</div>
@@ -289,9 +289,17 @@ export function RankingControlPanel({
 			{/* AI Mode - Top N Selector */}
 			{selectedMode === RankingMode.AI && (
 				<div className="mb-4 p-3 bg-[#F5F3FF] rounded-lg border border-[#8B5CF6]">
-					<label className="block text-sm font-medium text-primary mb-2">
-						Analyze Top {aiTopN} Candidates with AI
-					</label>
+					<div className="flex items-start justify-between mb-2">
+						<div>
+							<label className="block text-sm font-medium text-primary mb-1">
+								How many top candidates should AI review?
+							</label>
+							<p className="text-xs text-[#6B7280]">
+								AI will give detailed analysis for your top {aiTopN} candidates. Others will be ranked automatically.
+							</p>
+						</div>
+						<span className="text-lg font-bold text-[#8B5CF6] ml-3">{aiTopN}</span>
+					</div>
 					<input
 						type="range"
 						min="3"
@@ -301,18 +309,27 @@ export function RankingControlPanel({
 						disabled={isRanking}
 						className="w-full"
 					/>
-					<p className="text-xs text-[#6B7280] mt-2">
-						Decision Tree will rank all applicants first, then AI will provide detailed analysis for the top {aiTopN} candidates only.
-					</p>
+					<div className="flex justify-between text-xs text-[#6B7280] mt-1">
+						<span>Review fewer (faster)</span>
+						<span>Review more (slower)</span>
+					</div>
 				</div>
 			)}
 
 			{/* Hybrid Weight Slider */}
 			{selectedMode === RankingMode.Hybrid && (
-				<div className="mb-4 p-3 bg-[#FFFBEB] rounded-lg">
-					<label className="block text-sm font-medium text-primary mb-2">
-						AI Weight: {aiWeight}%
-					</label>
+				<div className="mb-4 p-3 bg-[#FFFBEB] rounded-lg border border-[#EFA508]">
+					<div className="flex items-start justify-between mb-2">
+						<div>
+							<label className="block text-sm font-medium text-primary mb-1">
+								How much should AI influence the ranking?
+							</label>
+							<p className="text-xs text-[#6B7280]">
+								Slide left for faster automatic ranking, or right to let AI have more say in the results.
+							</p>
+						</div>
+						<span className="text-lg font-bold text-[#EFA508] ml-3">{aiWeight}%</span>
+					</div>
 					<input
 						type="range"
 						min="0"
@@ -323,8 +340,8 @@ export function RankingControlPanel({
 						className="w-full"
 					/>
 					<div className="flex justify-between text-xs text-[#6B7280] mt-1">
-						<span>More Algorithmic</span>
-						<span>More AI</span>
+						<span>More automatic</span>
+						<span>More AI-driven</span>
 					</div>
 				</div>
 			)}
@@ -335,14 +352,19 @@ export function RankingControlPanel({
 					<div className="flex items-center justify-between mb-3">
 						<div className="flex items-center gap-2">
 							<Sliders className="w-4 h-4 text-[#6B7280]" />
-							<h4 className="text-sm font-medium text-primary">
-								Criteria Weights
-							</h4>
+							<div>
+								<h4 className="text-sm font-medium text-primary">
+									Criteria Importance
+								</h4>
+								<p className="text-xs text-[#6B7280] mt-0.5">
+									Adjust how important each requirement is. Total must equal 100%.
+								</p>
+							</div>
 						</div>
 						<button
 							onClick={resetWeights}
 							disabled={isRanking}
-							className="text-xs text-[#3A52A6] hover:text-[#2A4296] disabled:opacity-50"
+							className="text-xs text-[#3A52A6] hover:text-[#2A4296] disabled:opacity-50 whitespace-nowrap"
 						>
 							Reset to Equal
 						</button>
@@ -393,6 +415,11 @@ export function RankingControlPanel({
 								)}
 							</span>
 						</div>
+						{totalWeight !== 100 && (
+							<p className="text-xs text-[#EF4444] mt-1">
+								Please adjust the sliders so the total equals 100%
+							</p>
+						)}
 					</div>
 				</div>
 			)}
