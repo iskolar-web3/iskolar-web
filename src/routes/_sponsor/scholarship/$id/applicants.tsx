@@ -44,6 +44,9 @@ import {
 	getScholarshipByIdQuery,
 	updateApplication,
 } from "@/lib/scholarship/api";
+import { RankingControlPanel } from "@/components/ranking/RankingControlPanel";
+import { RankedApplicationsTable } from "@/components/ranking/RankedApplicationsTable";
+import type { RankingResult } from "@/lib/ranking/model";
 
 type FilterStatus = ScholarshipApplicationStatus | "all";
 
@@ -108,6 +111,10 @@ function ApplicantsListPage() {
 	>(null);
 	const [bulkRemarks, setBulkRemarks] = useState("");
 	const [isBulkUpdating, setIsBulkUpdating] = useState(false);
+
+	// Ranking state
+	const [showRanking, setShowRanking] = useState(false);
+	const [rankingResult, setRankingResult] = useState<RankingResult | null>(null);
 
 	const { toast, showSuccess, showError } = useToast();
 
@@ -428,17 +435,11 @@ function ApplicantsListPage() {
 						{/* Rank Applicants Button */}
 						{!bulkMode && (
 							<button
-								onClick={() => {
-									showError(
-										"Feature Unavailable",
-										"This feature is not available yet.",
-										2500,
-									);
-								}}
+								onClick={() => setShowRanking(!showRanking)}
 								className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-[#EFA508] text-tertiary rounded-md hover:bg-[#D89407] transition-colors text-[11px] md:text-xs"
 							>
 								<Trophy className="w-3.5 h-3.5" />
-								Rank Applicants
+								{showRanking ? "Hide Ranking" : "Rank Applicants"}
 							</button>
 						)}
 
@@ -498,6 +499,43 @@ function ApplicantsListPage() {
 						</div>
 					</div>
 
+					{/* Ranking Panel */}
+					{showRanking && scholarship && (
+						<RankingControlPanel
+							scholarship={scholarship}
+							applicants={filteredApplicants}
+							onRankingComplete={(result) => {
+								setRankingResult(result);
+							}}
+							onShowSuccess={(title, message) => showSuccess(title, message, 2000)}
+							onShowError={(title, message) => showError(title, message, 2500)}
+						/>
+					)}
+
+					{/* Ranking Results */}
+					{rankingResult && (
+						<div className="mb-6">
+							<div className="mb-4">
+								<button
+									onClick={() => setRankingResult(null)}
+									className="flex items-center gap-2 px-4 py-2 text-sm text-[#6B7280] hover:text-[#3A52A6] transition-colors"
+								>
+									<ChevronDown className="w-4 h-4 rotate-90" />
+									Back to Applicants
+								</button>
+							</div>
+							<RankedApplicationsTable
+								results={rankingResult.rankedApplicants}
+								onApplicationClick={(applicationId) => {
+									const applicant = applicants.find((a) => a.id === applicationId);
+									if (applicant) {
+										openApplicantModal(applicant);
+									}
+								}}
+							/>
+						</div>
+					)}
+
 					{/* Bulk Action Buttons */}
 					{bulkMode && selectedApplicantIds.size > 0 && (
 						<div className="flex items-center justify-between gap-4 mb-4 bg-card rounded-md shadow-sm p-4">
@@ -556,12 +594,12 @@ function ApplicantsListPage() {
 					)}
 
 					{/* Applicants List */}
-					{filteredApplicants.length === 0 ? (
+					{!rankingResult && filteredApplicants.length === 0 ? (
 						<div className="flex flex-col items-center justify-center py-16 bg-card rounded-lg shadow-sm">
 							<Users className="w-14 h-14 text-[#D1D5DB]" />
 							<p className="mt-4 text-[#9CA3AF]">No applicants found</p>
 						</div>
-					) : (
+					) : !rankingResult ? (
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							{filteredApplicants.map((applicant) => {
 								if (!applicant.student) return null;
@@ -639,7 +677,7 @@ function ApplicantsListPage() {
 								);
 							})}
 						</div>
-					)}
+					) : null}
 				</div>
 			)}
 
@@ -785,66 +823,131 @@ function ApplicantsListPage() {
 																			{field?.label}
 																		</span>
 																	</div>
-																	{Array.isArray(item.value) &&
-																	item.value.length > 0 &&
-																	typeof item.value[0] === "string" &&
-																	item.value[0].startsWith("http") ? (
-																		<div className="space-y-2 mt-2">
-																			{item.value.map(
-																				(url: string, idx: number) => (
-																					<div
-																						key={idx}
-																						className="flex items-center justify-between bg-[#F3F4F6] px-4 py-3 rounded-lg border-l-4 border-[#3A52A6]"
+																	{(() => {
+																		// Handle different value formats
+																		const value = item.value;
+																		
+																		// Check if it's an object with url property
+																		if (value && typeof value === "object" && !Array.isArray(value) && (value as any).url) {
+																			const docData = value as any;
+																			const isPlaceholder = docData.url.includes('example.com');
+																			
+																			return (
+																				<div className="space-y-2 mt-2">
+																					{isPlaceholder ? (
+																						<div className="bg-[#FEF3C7] px-4 py-3 rounded-lg border-l-4 border-[#F59E0B]">
+																							<div className="flex items-center gap-3">
+																								<FileText className="w-5 h-5 text-[#F59E0B] shrink-0" />
+																								<div className="flex-1">
+																									<p className="text-[11px] text-[#92400E] font-medium">
+																										📄 {docData.url.split("/").pop() || "Document"} (Test Data)
+																									</p>
+																									{docData.extractedText && (
+																										<p className="text-[10px] text-[#10B981] mt-1">
+																											✓ Contains extracted text for AI analysis
+																										</p>
+																									)}
+																									<p className="text-[10px] text-[#92400E] mt-1 italic">
+																										This is placeholder test data. In production, this would link to the actual uploaded file.
+																									</p>
+																								</div>
+																							</div>
+																						</div>
+																					) : (
+																						<a
+																							href={docData.url}
+																							rel="noreferrer"
+																							target="_blank"
+																							className="flex items-center justify-between bg-[#F3F4F6] px-4 py-3 rounded-lg border-l-4 border-[#3A52A6] hover:bg-[#E5E7EB] transition-colors"
+																						>
+																							<div className="flex items-center gap-3 flex-1 min-w-0">
+																								<FileText className="w-5 h-5 text-secondary shrink-0" />
+																								<div className="flex-1 min-w-0">
+																									<p className="text-[11px] text-primary truncate">
+																										{docData.url.split("/").pop() || "Document"}
+																									</p>
+																									{docData.extractedText && (
+																										<p className="text-[10px] text-[#10B981] mt-0.5">
+																											✓ Text extracted ({docData.extractedText.length} chars)
+																										</p>
+																									)}
+																								</div>
+																							</div>
+																							<ExternalLink className="w-4 h-4 text-primary shrink-0" />
+																						</a>
+																					)}
+																				</div>
+																			);
+																		}
+																		
+																		// Handle array of URLs (strings)
+																		if (Array.isArray(value) && value.length > 0 && typeof value[0] === "string" && value[0].startsWith("http")) {
+																			return (
+																				<div className="space-y-2 mt-2">
+																					{value.map((url: string, idx: number) => (
+																						<div
+																							key={idx}
+																							className="flex items-center justify-between bg-[#F3F4F6] px-4 py-3 rounded-lg border-l-4 border-[#3A52A6]"
+																						>
+																							<div className="flex items-center gap-3 flex-1 min-w-0">
+																								<FileText className="w-5 h-5 text-secondary shrink-0" />
+																								<p className="text-[11px] text-primary truncate">
+																									{url.split("/").pop() || "Document"}
+																								</p>
+																							</div>
+																							<button
+																								onClick={(e) => {
+																									e.stopPropagation();
+																									handleFileOpen(url);
+																								}}
+																								className="p-2 hover:bg-[#E0ECFF] rounded-lg transition-colors shrink-0"
+																							>
+																								<ExternalLink className="w-4 h-4 text-primary" />
+																							</button>
+																						</div>
+																					))}
+																				</div>
+																			);
+																		}
+																		
+																		// Handle single string URL
+																		if (typeof value === "string" && value.startsWith("http")) {
+																			return (
+																				<div className="space-y-2 mt-2">
+																					<a
+																						href={value}
+																						rel="noreferrer"
+																						target="_blank"
+																						className="flex items-center justify-between bg-[#F3F4F6] px-4 py-3 rounded-lg border-l-4 border-[#3A52A6] hover:bg-[#E5E7EB] transition-colors"
 																					>
 																						<div className="flex items-center gap-3 flex-1 min-w-0">
 																							<FileText className="w-5 h-5 text-secondary shrink-0" />
 																							<p className="text-[11px] text-primary truncate">
-																								{item.formFieldId}
+																								{value.split("/").pop() || "Document"}
 																							</p>
 																						</div>
-																						<button
-																							onClick={(e) => {
-																								e.stopPropagation();
-																								handleFileOpen(url);
-																							}}
-																							className="p-2 hover:bg-[#E0ECFF] rounded-lg transition-colors shrink-0"
-																						>
-																							<ExternalLink className="w-4 h-4 text-primary" />
-																						</button>
-																					</div>
-																				),
-																			)}
-																		</div>
-																	) : typeof item.value === "string" &&
-																		item.value.startsWith("http") ? (
-																		<div className="space-y-2 mt-2">
-																			<a
-																				href={item.value}
-																				rel="noreferrer"
-																				target="_blank"
-																				className="flex items-center justify-between bg-[#F3F4F6] px-4 py-3 rounded-lg border-l-4 border-[#3A52A6]"
-																			>
-																				<div className="flex items-center gap-3 flex-1 min-w-0">
-																					<FileText className="w-5 h-5 text-secondary shrink-0" />
-																					<p className="text-[11px] text-primary truncate">
-																						{item.value}
-																					</p>
+																						<ExternalLink className="w-4 h-4 text-primary" />
+																					</a>
 																				</div>
-																				<ExternalLink className="size-4 text-primary" />
-																			</a>
-																		</div>
-																	) : item.value === null ||
-																		item.value === "" ? (
-																		<p className="text-xs text-[#9CA3AF] italic mt-1">
-																			No response provided
-																		</p>
-																	) : (
-																		<p className="text-xs text-[#6B7280] leading-relaxed mt-1">
-																			{Array.isArray(item.value)
-																				? item.value.join(", ")
-																				: String(item.value)}
-																		</p>
-																	)}
+																			);
+																		}
+																		
+																		// Handle null or empty
+																		if (value === null || value === "") {
+																			return (
+																				<p className="text-xs text-[#9CA3AF] italic mt-1">
+																					No response provided
+																				</p>
+																			);
+																		}
+																		
+																		// Handle other values (text, etc.)
+																		return (
+																			<p className="text-xs text-[#6B7280] leading-relaxed mt-1">
+																				{Array.isArray(value) ? value.join(", ") : String(value)}
+																			</p>
+																		);
+																	})()}
 																</div>
 															);
 														},
