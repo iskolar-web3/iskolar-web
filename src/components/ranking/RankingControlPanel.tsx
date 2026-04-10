@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { AlertCircle, Sparkles, GitBranch, Zap, Clock, Sliders } from "lucide-react";
+import { AlertCircle, Sparkles, GitBranch, Zap, Clock, Sliders, CheckCircle, Star } from "lucide-react";
 import type { Applicant, Scholarship } from "@/lib/scholarship/model";
 import type { RankingCriteria, RankingResult } from "@/lib/ranking/model";
 import { RankingMode } from "@/lib/ranking/model";
@@ -35,6 +35,9 @@ export function RankingControlPanel({
 	const [criteriaWeights, setCriteriaWeights] = useState<Record<string, number>>(
 		{},
 	);
+	const [criteriaStars, setCriteriaStars] = useState<Record<string, number>>(
+		{},
+	);
 	const [aiTopN, setAiTopN] = useState(5); // Only analyze top N candidates with AI
 
 	// Initialize criteria weights when scholarship changes
@@ -42,10 +45,13 @@ export function RankingControlPanel({
 		if (scholarship.criterias.length > 0) {
 			const equalWeight = 100 / scholarship.criterias.length;
 			const weights: Record<string, number> = {};
+			const stars: Record<string, number> = {};
 			scholarship.criterias.forEach((criteria) => {
 				weights[criteria] = Math.round(equalWeight);
+				stars[criteria] = 3; // Default to 3 stars (medium importance)
 			});
 			setCriteriaWeights(weights);
+			setCriteriaStars(stars);
 		}
 	}, [scholarship.criterias]);
 
@@ -202,20 +208,111 @@ export function RankingControlPanel({
 
 	const canRank = applicants.length > 0 && !isRanking && cooldownRemaining === 0;
 
+	const handleStarChange = (criteriaName: string, stars: number) => {
+		// Update stars
+		const newStars = { ...criteriaStars, [criteriaName]: stars };
+		setCriteriaStars(newStars);
+		
+		// Convert stars to weights (1-5 stars)
+		// Calculate total stars
+		const totalStars = Object.values(newStars).reduce((sum, s) => sum + s, 0);
+		
+		if (totalStars === 0) {
+			// All are 0 stars, reset to equal
+			const equalWeight = 100 / scholarship.criterias.length;
+			const weights: Record<string, number> = {};
+			scholarship.criterias.forEach((criteria) => {
+				weights[criteria] = Math.round(equalWeight);
+			});
+			setCriteriaWeights(weights);
+			return;
+		}
+		
+		// Convert stars to percentage weights
+		const newWeights: Record<string, number> = {};
+		scholarship.criterias.forEach((criteria) => {
+			const criteriaStars = newStars[criteria] || 0;
+			newWeights[criteria] = Math.round((criteriaStars / totalStars) * 100);
+		});
+		
+		// Fix rounding errors to ensure total is exactly 100
+		const currentTotal = Object.values(newWeights).reduce((sum, w) => sum + w, 0);
+		if (currentTotal !== 100) {
+			// Find the criterion with the most stars and adjust it
+			const maxStarCriteria = scholarship.criterias.reduce((max, c) => 
+				newStars[c] > newStars[max] ? c : max
+			, scholarship.criterias[0]);
+			newWeights[maxStarCriteria] += (100 - currentTotal);
+		}
+		
+		setCriteriaWeights(newWeights);
+	};
+
 	const handleWeightChange = (criteriaName: string, newWeight: number) => {
-		setCriteriaWeights((prev) => ({
-			...prev,
-			[criteriaName]: newWeight,
-		}));
+		const oldWeight = criteriaWeights[criteriaName] || 0;
+		const difference = newWeight - oldWeight;
+		
+		// Get other criteria (excluding the one being changed)
+		const otherCriteria = scholarship.criterias.filter(c => c !== criteriaName);
+		
+		if (otherCriteria.length === 0) {
+			// Only one criterion, just set it
+			setCriteriaWeights({ [criteriaName]: newWeight });
+			return;
+		}
+		
+		// Calculate total weight of other criteria
+		const otherWeightsTotal = otherCriteria.reduce(
+			(sum, c) => sum + (criteriaWeights[c] || 0),
+			0
+		);
+		
+		// Auto-adjust other criteria proportionally
+		const newWeights: Record<string, number> = { [criteriaName]: newWeight };
+		
+		if (otherWeightsTotal > 0) {
+			// Distribute the difference proportionally among other criteria
+			const targetTotal = 100 - newWeight;
+			otherCriteria.forEach(c => {
+				const currentWeight = criteriaWeights[c] || 0;
+				const proportion = currentWeight / otherWeightsTotal;
+				const adjustedWeight = Math.round(targetTotal * proportion);
+				newWeights[c] = Math.max(0, Math.min(100, adjustedWeight));
+			});
+			
+			// Fix rounding errors - adjust the largest weight
+			const calculatedTotal = Object.values(newWeights).reduce((sum, w) => sum + w, 0);
+			if (calculatedTotal !== 100) {
+				const largestOther = otherCriteria.reduce((max, c) => 
+					newWeights[c] > newWeights[max] ? c : max
+				, otherCriteria[0]);
+				newWeights[largestOther] += (100 - calculatedTotal);
+				newWeights[largestOther] = Math.max(0, Math.min(100, newWeights[largestOther]));
+			}
+		} else {
+			// Other criteria are all 0, distribute remaining weight equally
+			const remaining = 100 - newWeight;
+			const equalWeight = Math.floor(remaining / otherCriteria.length);
+			const remainder = remaining % otherCriteria.length;
+			
+			otherCriteria.forEach((c, idx) => {
+				newWeights[c] = equalWeight + (idx < remainder ? 1 : 0);
+			});
+		}
+		
+		setCriteriaWeights(newWeights);
 	};
 
 	const resetWeights = () => {
 		const equalWeight = 100 / scholarship.criterias.length;
 		const weights: Record<string, number> = {};
+		const stars: Record<string, number> = {};
 		scholarship.criterias.forEach((criteria) => {
 			weights[criteria] = Math.round(equalWeight);
+			stars[criteria] = 3; // Reset to 3 stars
 		});
 		setCriteriaWeights(weights);
+		setCriteriaStars(stars);
 	};
 
 	const totalWeight = Object.values(criteriaWeights).reduce(
@@ -350,76 +447,81 @@ export function RankingControlPanel({
 			{scholarship.criterias.length > 0 && (
 				<div className="mb-4 p-4 bg-[#F9FAFB] rounded-lg border border-[#E5E7EB]">
 					<div className="flex items-center justify-between mb-3">
-						<div className="flex items-center gap-2">
-							<Sliders className="w-4 h-4 text-[#6B7280]" />
-							<div>
-								<h4 className="text-sm font-medium text-primary">
-									Criteria Importance
-								</h4>
-								<p className="text-xs text-[#6B7280] mt-0.5">
-									Adjust how important each requirement is. Total must equal 100%.
-								</p>
-							</div>
+						<div>
+							<h4 className="text-sm font-medium text-primary flex items-center gap-2">
+								<Star className="w-4 h-4 text-[#F59E0B]" />
+								Rate Importance
+							</h4>
+							<p className="text-xs text-[#6B7280] mt-0.5">
+								Click stars to show how important each requirement is. More stars = more important.
+							</p>
 						</div>
 						<button
 							onClick={resetWeights}
 							disabled={isRanking}
-							className="text-xs text-[#3A52A6] hover:text-[#2A4296] disabled:opacity-50 whitespace-nowrap"
+							className="text-xs text-[#3A52A6] hover:text-[#2A4296] disabled:opacity-50 whitespace-nowrap ml-3"
 						>
-							Reset to Equal
+							Reset All
 						</button>
 					</div>
 
 					<div className="space-y-3">
-						{scholarship.criterias.map((criteria) => (
-							<div key={criteria} className="space-y-1">
-								<div className="flex items-center justify-between">
-									<label className="text-xs text-[#6B7280]">{criteria}</label>
-									<span className="text-xs font-medium text-primary">
-										{criteriaWeights[criteria] || 0}%
-									</span>
+						{scholarship.criterias.map((criteria) => {
+							const stars = criteriaStars[criteria] || 3;
+							const weight = criteriaWeights[criteria] || 0;
+							
+							return (
+								<div key={criteria} className="p-3 bg-white rounded-lg border border-[#E5E7EB]">
+									<div className="flex items-start justify-between gap-3 mb-2">
+										<label className="text-sm text-[#374151] font-medium flex-1">
+											{criteria}
+										</label>
+										<span className="text-sm font-bold text-[#3A52A6] whitespace-nowrap">
+											{weight}%
+										</span>
+									</div>
+									
+									<div className="flex items-center gap-1">
+										{[1, 2, 3, 4, 5].map((starValue) => (
+											<button
+												key={starValue}
+												type="button"
+												onClick={() => handleStarChange(criteria, starValue)}
+												disabled={isRanking}
+												className="p-1 hover:scale-110 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+											>
+												<Star
+													className={`w-6 h-6 ${
+														starValue <= stars
+															? "fill-[#F59E0B] text-[#F59E0B]"
+															: "text-[#D1D5DB]"
+													}`}
+												/>
+											</button>
+										))}
+										<span className="ml-2 text-xs text-[#6B7280]">
+											{stars === 1 && "Low"}
+											{stars === 2 && "Medium-Low"}
+											{stars === 3 && "Medium"}
+											{stars === 4 && "High"}
+											{stars === 5 && "Very High"}
+										</span>
+									</div>
 								</div>
-								<input
-									type="range"
-									min="0"
-									max="100"
-									value={criteriaWeights[criteria] || 0}
-									onChange={(e) =>
-										handleWeightChange(criteria, parseInt(e.target.value))
-									}
-									disabled={isRanking}
-									className="w-full h-2 bg-[#E5E7EB] rounded-lg appearance-none cursor-pointer disabled:opacity-50 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#3A52A6] [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[#3A52A6] [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
-								/>
-							</div>
-						))}
+							);
+						})}
 					</div>
 
-					<div className="mt-3 pt-3 border-t border-[#E5E7EB]">
-						<div className="flex items-center justify-between text-xs">
-							<span className="text-[#6B7280]">Total Weight:</span>
-							<span
-								className={`font-medium ${
-									totalWeight === 100
-										? "text-[#10B981]"
-										: totalWeight > 100
-											? "text-[#EF4444]"
-											: "text-[#F59E0B]"
-								}`}
-							>
-								{totalWeight}%
-								{totalWeight !== 100 && (
-									<span className="ml-1">
-										({totalWeight > 100 ? "over" : "under"} by{" "}
-										{Math.abs(100 - totalWeight)}%)
-									</span>
-								)}
+					<div className="mt-3 pt-3 border-t border-[#E5E7EB] flex items-center justify-between">
+						<span className="text-xs text-[#6B7280]">
+							Weights are calculated automatically based on your star ratings
+						</span>
+						<div className="flex items-center gap-2">
+							<CheckCircle className="w-4 h-4 text-[#10B981]" />
+							<span className="text-sm font-medium text-[#10B981]">
+								Total: {totalWeight}%
 							</span>
 						</div>
-						{totalWeight !== 100 && (
-							<p className="text-xs text-[#EF4444] mt-1">
-								Please adjust the sliders so the total equals 100%
-							</p>
-						)}
 					</div>
 				</div>
 			)}
