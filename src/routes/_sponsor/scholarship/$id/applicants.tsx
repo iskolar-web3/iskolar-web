@@ -115,6 +115,7 @@ function ApplicantsListPage() {
 	// Ranking state
 	const [showRanking, setShowRanking] = useState(false);
 	const [rankingResult, setRankingResult] = useState<RankingResult | null>(null);
+	const [showPremiumModal, setShowPremiumModal] = useState(false); // Premium modal state
 
 	const { toast, showSuccess, showError } = useToast();
 
@@ -531,6 +532,10 @@ function ApplicantsListPage() {
 									if (applicant) {
 										openApplicantModal(applicant);
 									}
+								}}
+								onUpgradePremium={() => {
+									// Show the premium modal
+									setShowPremiumModal(true);
 								}}
 							/>
 						</div>
@@ -1214,6 +1219,79 @@ function ApplicantsListPage() {
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
+
+			{/* Premium Modal */}
+			{showPremiumModal && (
+				<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+					<div className="bg-white rounded-lg p-6 max-w-md mx-4">
+						<div className="flex items-center gap-3 mb-4">
+							<div className="p-2 bg-[#F5F3FF] rounded-lg">
+								<Sparkles className="w-6 h-6 text-[#8B5CF6]" />
+							</div>
+							<h4 className="text-lg text-primary">
+								Upgrade to Premium
+							</h4>
+						</div>
+						
+						<div className="mb-4">
+							<p className="text-sm text-[#6B7280] mb-4">
+								Unlock AI-powered ranking for all {applicants.length} applicants with detailed document analysis and insights.
+							</p>
+							
+							<div className="bg-[#F9FAFB] rounded-lg p-4 mb-4">
+								<div className="text-sm text-[#374151] mb-3">Premium Features:</div>
+								<ul className="text-sm text-[#6B7280] space-y-2">
+									<li className="flex items-center gap-2">
+										<CheckCircle2 className="w-4 h-4 text-[#10B981]" />
+										<span>Rank unlimited applicants with AI</span>
+									</li>
+									<li className="flex items-center gap-2">
+										<CheckCircle2 className="w-4 h-4 text-[#10B981]" />
+										<span>Full document reading and analysis</span>
+									</li>
+									<li className="flex items-center gap-2">
+										<CheckCircle2 className="w-4 h-4 text-[#10B981]" />
+										<span>Detailed AI recommendations</span>
+									</li>
+									<li className="flex items-center gap-2">
+										<CheckCircle2 className="w-4 h-4 text-[#10B981]" />
+										<span>Priority support</span>
+									</li>
+								</ul>
+							</div>
+							
+							<div className="bg-[#EFF6FF] border border-[#3A52A6] rounded-lg p-4 text-center">
+								<div className="text-2xl text-[#3A52A6] mb-1">Contact Sales</div>
+								<div className="text-sm text-[#6B7280]">
+									Premium pricing available on request
+								</div>
+							</div>
+						</div>
+						
+						<div className="flex gap-3">
+							<button
+								onClick={() => setShowPremiumModal(false)}
+								className="flex-1 py-2 px-4 border border-[#E5E7EB] rounded-lg text-[#6B7280] hover:bg-[#F9FAFB]"
+							>
+								Maybe Later
+							</button>
+							<button
+								onClick={() => {
+									// TODO: Integrate with payment system
+									// For now, show success message and close modal
+									setShowPremiumModal(false);
+									showSuccess("Contact Sales", "Please contact our sales team to upgrade to premium");
+									// Optionally, show the ranking panel to use premium features
+									setShowRanking(true);
+								}}
+								className="flex-1 py-2 px-4 bg-[#8B5CF6] text-white rounded-lg hover:bg-[#7C3AED]"
+							>
+								Contact Sales
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }

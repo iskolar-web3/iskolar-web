@@ -3,7 +3,6 @@ import type { Applicant } from "@/lib/scholarship/model";
 export enum RankingMode {
 	DecisionTree = "decision-tree",
 	AI = "ai",
-	Hybrid = "hybrid",
 }
 
 export interface RankingCriteria {
