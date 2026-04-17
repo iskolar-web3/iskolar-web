@@ -289,6 +289,7 @@ function ApplyScholarshipPage() {
 								"application-files",
 							)
 
+							// Store the full response object (url, mimeType, extractedText)
 							return {
 								...answer,
 								value: uploadRes.data.url,
