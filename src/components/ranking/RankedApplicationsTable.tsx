@@ -1,4 +1,4 @@
-import { Trophy, Medal, Award, CheckCircle, XCircle, Download, FileText, ExternalLink, Sparkles, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
+import { CheckCircle, XCircle, Download, FileText, ExternalLink, Sparkles, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import type { RankedApplicant } from "@/lib/ranking/model";
 
@@ -12,7 +12,6 @@ interface RankedApplicationsTableProps {
 export function RankedApplicationsTable({
 	results,
 	onApplicationClick,
-	aiReviewedCount = 0,
 	onUpgradePremium,
 }: RankedApplicationsTableProps) {
 	const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
@@ -41,15 +40,6 @@ export function RankedApplicationsTable({
 			}
 			return newSet;
 		});
-	};
-	const getRankIcon = (rank: number) => {
-		if (rank === 1)
-			return <Trophy className="w-5 h-5 text-[#FFD700]" />;
-		if (rank === 2)
-			return <Medal className="w-5 h-5 text-[#C0C0C0]" />;
-		if (rank === 3)
-			return <Medal className="w-5 h-5 text-[#CD7F32]" />;
-		return <Award className="w-5 h-5 text-[#9CA3AF]" />;
 	};
 
 	const getScoreLabel = (score: number) => {
@@ -182,7 +172,6 @@ export function RankedApplicationsTable({
 				{displayResults.map((result) => {
 					const score = result.score;
 					const scoreColor = score >= 80 ? "text-[#10B981]" : score >= 60 ? "text-[#F59E0B]" : "text-[#EF4444]";
-					const scoreBg = score >= 80 ? "bg-[#10B981]" : score >= 60 ? "bg-[#F59E0B]" : "bg-[#EF4444]";
 					const scoreBgLight = score >= 80 ? "bg-[#D1FAE5]" : score >= 60 ? "bg-[#FEF3C7]" : "bg-[#FEE2E2]";
 					
 					return (

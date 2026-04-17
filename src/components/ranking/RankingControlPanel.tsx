@@ -242,61 +242,6 @@ export function RankingControlPanel({
 		setCriteriaWeights(newWeights);
 	};
 
-	const handleWeightChange = (criteriaName: string, newWeight: number) => {
-		const oldWeight = criteriaWeights[criteriaName] || 0;
-		const difference = newWeight - oldWeight;
-		
-		// Get other criteria (excluding the one being changed)
-		const otherCriteria = scholarship.criterias.filter(c => c !== criteriaName);
-		
-		if (otherCriteria.length === 0) {
-			// Only one criterion, just set it
-			setCriteriaWeights({ [criteriaName]: newWeight });
-			return;
-		}
-		
-		// Calculate total weight of other criteria
-		const otherWeightsTotal = otherCriteria.reduce(
-			(sum, c) => sum + (criteriaWeights[c] || 0),
-			0
-		);
-		
-		// Auto-adjust other criteria proportionally
-		const newWeights: Record<string, number> = { [criteriaName]: newWeight };
-		
-		if (otherWeightsTotal > 0) {
-			// Distribute the difference proportionally among other criteria
-			const targetTotal = 100 - newWeight;
-			otherCriteria.forEach(c => {
-				const currentWeight = criteriaWeights[c] || 0;
-				const proportion = currentWeight / otherWeightsTotal;
-				const adjustedWeight = Math.round(targetTotal * proportion);
-				newWeights[c] = Math.max(0, Math.min(100, adjustedWeight));
-			});
-			
-			// Fix rounding errors - adjust the largest weight
-			const calculatedTotal = Object.values(newWeights).reduce((sum, w) => sum + w, 0);
-			if (calculatedTotal !== 100) {
-				const largestOther = otherCriteria.reduce((max, c) => 
-					newWeights[c] > newWeights[max] ? c : max
-				, otherCriteria[0]);
-				newWeights[largestOther] += (100 - calculatedTotal);
-				newWeights[largestOther] = Math.max(0, Math.min(100, newWeights[largestOther]));
-			}
-		} else {
-			// Other criteria are all 0, distribute remaining weight equally
-			const remaining = 100 - newWeight;
-			const equalWeight = Math.floor(remaining / otherCriteria.length);
-			const remainder = remaining % otherCriteria.length;
-			
-			otherCriteria.forEach((c, idx) => {
-				newWeights[c] = equalWeight + (idx < remainder ? 1 : 0);
-			});
-		}
-		
-		setCriteriaWeights(newWeights);
-	};
-
 	const resetWeights = () => {
 		const equalWeight = 100 / scholarship.criterias.length;
 		const weights: Record<string, number> = {};

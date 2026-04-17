@@ -26,7 +26,6 @@ export class DocumentAnalyzer {
 	 * 2. Then analyze the extracted text
 	 */
 	async analyzeDocument(
-		documentUrl: string,
 		extractedText: string,
 		criteriaToCheck: string[],
 		applicantInfo: {
@@ -136,7 +135,6 @@ Respond in this exact JSON format:
 
 		for (const doc of documents) {
 			const result = await this.analyzeDocument(
-				doc.url,
 				doc.extractedText,
 				criteriaToCheck,
 				applicantInfo,
