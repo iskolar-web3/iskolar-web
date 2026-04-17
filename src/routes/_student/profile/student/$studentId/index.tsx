@@ -17,6 +17,7 @@ import { UserRole } from "@/lib/user/model";
 import { updateStudent } from "@/lib/student/api";
 import { useMutation } from "@tanstack/react-query";
 import StudentProfileForm from "@/components/student/profile/ProfileForm";
+import VerificationStatus from "@/components/verification/VerificationStatus";
 import ProfileAvatar from "./-components/ProfileAvatar";
 
 export const Route = createFileRoute("/_student/profile/student/$studentId/")({
@@ -122,6 +123,8 @@ function StudentProfilePage() {
 						</div>
 					</div>
 				</motion.div>
+
+				<VerificationStatus role="students" />
 
 				{/* Personal Information */}
 				<motion.div

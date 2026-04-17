@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as _404RouteImport } from './routes/__404'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VerificationCallbackRouteImport } from './routes/verification/callback'
 import { Route as OnboardingWelcomeRouteImport } from './routes/_onboarding/welcome'
 import { Route as OnboardingRoleSelectionRouteImport } from './routes/_onboarding/role-selection'
 import { Route as OnboardingProfileSetupRouteImport } from './routes/_onboarding/profile-setup'
@@ -70,6 +71,11 @@ const _404Route = _404RouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerificationCallbackRoute = VerificationCallbackRouteImport.update({
+  id: '/verification/callback',
+  path: '/verification/callback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardingWelcomeRoute = OnboardingWelcomeRouteImport.update({
@@ -228,6 +234,7 @@ export interface FileRoutesByFullPath {
   '/profile-setup': typeof OnboardingProfileSetupRoute
   '/role-selection': typeof OnboardingRoleSelectionRoute
   '/welcome': typeof OnboardingWelcomeRoute
+  '/verification/callback': typeof VerificationCallbackRoute
   '/about': typeof LandingAboutIndexRoute
   '/create': typeof SponsorCreateIndexRoute
   '/scholarships': typeof SponsorScholarshipsIndexRoute
@@ -257,6 +264,7 @@ export interface FileRoutesByTo {
   '/profile-setup': typeof OnboardingProfileSetupRoute
   '/role-selection': typeof OnboardingRoleSelectionRoute
   '/welcome': typeof OnboardingWelcomeRoute
+  '/verification/callback': typeof VerificationCallbackRoute
   '/about': typeof LandingAboutIndexRoute
   '/create': typeof SponsorCreateIndexRoute
   '/scholarships': typeof SponsorScholarshipsIndexRoute
@@ -293,6 +301,7 @@ export interface FileRoutesById {
   '/_onboarding/profile-setup': typeof OnboardingProfileSetupRoute
   '/_onboarding/role-selection': typeof OnboardingRoleSelectionRoute
   '/_onboarding/welcome': typeof OnboardingWelcomeRoute
+  '/verification/callback': typeof VerificationCallbackRoute
   '/_landing/about/': typeof LandingAboutIndexRoute
   '/_sponsor/create/': typeof SponsorCreateIndexRoute
   '/_sponsor/scholarships/': typeof SponsorScholarshipsIndexRoute
@@ -324,6 +333,7 @@ export interface FileRouteTypes {
     | '/profile-setup'
     | '/role-selection'
     | '/welcome'
+    | '/verification/callback'
     | '/about'
     | '/create'
     | '/scholarships'
@@ -353,6 +363,7 @@ export interface FileRouteTypes {
     | '/profile-setup'
     | '/role-selection'
     | '/welcome'
+    | '/verification/callback'
     | '/about'
     | '/create'
     | '/scholarships'
@@ -388,6 +399,7 @@ export interface FileRouteTypes {
     | '/_onboarding/profile-setup'
     | '/_onboarding/role-selection'
     | '/_onboarding/welcome'
+    | '/verification/callback'
     | '/_landing/about/'
     | '/_sponsor/create/'
     | '/_sponsor/scholarships/'
@@ -408,6 +420,7 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRouteWithChildren
   SponsorRoute: typeof SponsorRouteWithChildren
   StudentRoute: typeof StudentRouteWithChildren
+  VerificationCallbackRoute: typeof VerificationCallbackRoute
   LandingAboutIndexRoute: typeof LandingAboutIndexRoute
 }
 
@@ -460,6 +473,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verification/callback': {
+      id: '/verification/callback'
+      path: '/verification/callback'
+      fullPath: '/verification/callback'
+      preLoaderRoute: typeof VerificationCallbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_onboarding/welcome': {
@@ -751,6 +771,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRouteWithChildren,
   SponsorRoute: SponsorRouteWithChildren,
   StudentRoute: StudentRouteWithChildren,
+  VerificationCallbackRoute: VerificationCallbackRoute,
   LandingAboutIndexRoute: LandingAboutIndexRoute,
 }
 export const routeTree = rootRouteImport
