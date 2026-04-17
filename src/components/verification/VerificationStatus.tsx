@@ -30,6 +30,7 @@ export default function VerificationStatus({
 	const [record, setRecord] = useState<VerificationRecord | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [starting, setStarting] = useState(false);
+	const [error, setError] = useState("");
 	const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const pollCountRef = useRef(0);
 
@@ -79,6 +80,8 @@ export default function VerificationStatus({
 	}, [isReturningFromDidit, record?.status]);
 
 	async function handleVerify() {
+		setError("");
+
 		// Org/gov sponsors need the pre-form dialog
 		if (
 			role === "sponsors" &&
@@ -92,7 +95,12 @@ export default function VerificationStatus({
 		try {
 			const result = await startVerification(role);
 			window.location.href = result.verificationUrl;
-		} catch {
+		} catch (err) {
+			setError(
+				err instanceof Error
+					? err.message
+					: "Failed to start verification.",
+			);
 			setStarting(false);
 		}
 	}
@@ -133,6 +141,7 @@ export default function VerificationStatus({
 						"Verify Now"
 					)}
 				</Button>
+				{error && <p className="text-sm text-red-600">{error}</p>}
 			</div>
 		);
 	}
@@ -222,6 +231,7 @@ export default function VerificationStatus({
 						"Retry"
 					)}
 				</Button>
+				{error && <p className="text-sm text-red-600">{error}</p>}
 			</div>
 		);
 	}
@@ -250,8 +260,9 @@ export default function VerificationStatus({
 					<Loader2 className="w-4 h-4 animate-spin" />
 				) : (
 					"Start Again"
-				)}
-			</Button>
-		</div>
-	);
+			)}
+		</Button>
+		{error && <p className="text-sm text-red-600">{error}</p>}
+	</div>
+);
 }
