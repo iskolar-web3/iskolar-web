@@ -21,19 +21,22 @@ function VerificationCallback() {
 	const auth = useAuth();
 
 	useEffect(() => {
+		if (auth.isLoading) return;
+
 		const profile = auth.profile;
 		const role = auth.user?.role?.code;
+		const profileId = profile?.id;
 
-		if (!profile?.id) return;
+		if (!profileId || typeof profileId !== "string") return;
 
 		if (role === UserRole.Student) {
-			window.location.href = `/profile/student/${profile.id}?verified=1`;
+			window.location.href = `/profile/student/${profileId}?verified=1`;
 		} else if (role === UserRole.Sponsor) {
-			window.location.href = `/profile/sponsor/${profile.id}?verified=1`;
+			window.location.href = `/profile/sponsor/${profileId}?verified=1`;
 		} else {
 			window.location.href = "/";
 		}
-	}, [auth.profile, auth.user]);
+	}, [auth.isLoading, auth.profile, auth.user]);
 
 	return (
 		<div className="min-h-screen flex items-center justify-center">
