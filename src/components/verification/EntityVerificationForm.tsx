@@ -93,13 +93,14 @@ export default function EntityVerificationForm({
 							variant="outline"
 							onClick={() => onOpenChange(false)}
 							disabled={submitting}
+							className="cursor-pointer"
 						>
 							Cancel
 						</Button>
 						<Button
 							type="submit"
 							disabled={submitting}
-							className="bg-[#3B5AA8] hover:bg-[#2f4389] text-white"
+							className="cursor-pointer bg-[#3B5AA8] hover:bg-[#2f4389] text-white"
 						>
 							{submitting ? (
 								<>

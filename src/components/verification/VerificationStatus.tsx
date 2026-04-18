@@ -133,7 +133,7 @@ export default function VerificationStatus({
 					onClick={handleVerify}
 					disabled={starting}
 					size="sm"
-					className="bg-[#3B5AA8] hover:bg-[#2f4389] text-white"
+					className="cursor-pointer bg-[#3B5AA8] hover:bg-[#2f4389] text-white"
 				>
 					{starting ? (
 						<Loader2 className="w-4 h-4 animate-spin" />
@@ -190,7 +190,7 @@ export default function VerificationStatus({
 						onClick={handleResume}
 						disabled={starting}
 						size="sm"
-						className="bg-[#3B5AA8] hover:bg-[#2f4389] text-white"
+						className="cursor-pointer bg-[#3B5AA8] hover:bg-[#2f4389] text-white"
 					>
 						{starting ? (
 							<Loader2 className="w-4 h-4 animate-spin" />
@@ -257,7 +257,7 @@ export default function VerificationStatus({
 					disabled={starting || !!cooldownActive}
 					size="sm"
 					variant="outline"
-					className="border-red-300 text-red-700 hover:bg-red-100"
+					className="cursor-pointer border-red-300 text-red-700 hover:bg-red-100"
 				>
 					{starting ? (
 						<Loader2 className="w-4 h-4 animate-spin" />
@@ -288,7 +288,7 @@ export default function VerificationStatus({
 				onClick={handleVerify}
 				disabled={starting}
 				size="sm"
-				className="bg-[#3B5AA8] hover:bg-[#2f4389] text-white"
+				className="cursor-pointer bg-[#3B5AA8] hover:bg-[#2f4389] text-white"
 			>
 				{starting ? (
 					<Loader2 className="w-4 h-4 animate-spin" />
