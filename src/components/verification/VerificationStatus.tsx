@@ -148,6 +148,24 @@ export default function VerificationStatus({
 
 	// Pending
 	if (record.status === Status.Pending) {
+		const hasActiveSession = !!record.diditSessionUrl;
+
+		async function handleResume() {
+			if (!record) return;
+			setStarting(true);
+			try {
+				const result = await startVerification(role);
+				window.location.href = result.verificationUrl;
+			} catch (err) {
+				setError(
+					err instanceof Error
+						? err.message
+						: "Failed to resume verification.",
+				);
+				setStarting(false);
+			}
+		}
+
 		return (
 			<div className="flex items-center justify-between rounded-lg border border-blue-200 bg-blue-50 p-4">
 				<div className="flex items-center gap-3">
@@ -159,13 +177,29 @@ export default function VerificationStatus({
 						<p className="text-xs text-blue-600">
 							{isReturningFromDidit && pollCountRef.current < 12
 								? "Waiting for confirmation..."
-								: "Your verification is being processed. Check back shortly."}
+								: hasActiveSession
+									? "Your session is still active. Continue where you left off."
+									: "Your verification is being processed. Check back shortly."}
 						</p>
 					</div>
 				</div>
-				{isReturningFromDidit && pollCountRef.current < 12 && (
+				{isReturningFromDidit && pollCountRef.current < 12 ? (
 					<Loader2 className="w-4 h-4 animate-spin text-blue-600" />
-				)}
+				) : hasActiveSession ? (
+					<Button
+						onClick={handleResume}
+						disabled={starting}
+						size="sm"
+						className="bg-[#3B5AA8] hover:bg-[#2f4389] text-white"
+					>
+						{starting ? (
+							<Loader2 className="w-4 h-4 animate-spin" />
+						) : (
+							"Continue"
+						)}
+					</Button>
+				) : null}
+				{error && <p className="text-sm text-red-600 mt-1">{error}</p>}
 			</div>
 		);
 	}
