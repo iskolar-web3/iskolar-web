@@ -91,20 +91,22 @@ export default function ScholarshipDetailsModal({ scholarship, onClose }: { scho
 
           <div className="p-5">
             {/* Status Badge */}
-            <div className="flex items-center gap-2 mb-4">
-              <div
-                className={`w-2 h-2 rounded-full ${
-                  scholarship.status.code === ScholarshipStatus.Closed ? 'bg-[#EF4444]' : 'bg-[#31D0AA]'
-                }`}
-              />
-              <span
-                className={`text-sm font-medium capitalize ${
-                  scholarship.status.code === ScholarshipStatus.Closed ? 'text-[#EF4444]' : 'text-[#31D0AA]'
-                }`}
-              >
-                {scholarship.status.name}
-              </span>
-            </div>
+            {scholarship.status.code !== ScholarshipStatus.Active && (
+              <div className="flex items-center gap-2 mb-4">
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    scholarship.status.code === ScholarshipStatus.Closed ? 'bg-[#EF4444]' : 'bg-[#31D0AA]'
+                  }`}
+                />
+                <span
+                  className={`text-sm font-medium capitalize ${
+                    scholarship.status.code === ScholarshipStatus.Closed ? 'text-[#EF4444]' : 'text-[#31D0AA]'
+                  }`}
+                >
+                  {scholarship.status.name}
+                </span>
+              </div>
+            )}
 
             {/* Image Banner */}
             <div className="relative w-full aspect-square mb-5 rounded-lg overflow-hidden shadow-[0_0_20px_2px_rgba(0,0,0,0.2)]">

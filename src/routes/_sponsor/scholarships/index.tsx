@@ -14,7 +14,16 @@ import {
 	X,
 	GraduationCap,
 	Plus,
+	AlertCircle,
+	Loader2,
 } from "lucide-react";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
 import FilterSelect from "./-components/Filters";
 import ScholarshipCard from "./-components/ScholarshipCard";
@@ -55,6 +64,11 @@ function Scholarships() {
 	const [selectedScholarship, setSelectedScholarship] =
 		useState<Scholarship | null>(null);
 	const [showFiltersModal, setShowFiltersModal] = useState(false);
+	const [scholarshipToDelete, setScholarshipToDelete] = useState<Scholarship | null>(null);
+	const [showDeleteModal, setShowDeleteModal] = useState(false);
+	const [showTitleModal, setShowTitleModal] = useState(false);
+	const [titleInput, setTitleInput] = useState("");
+	const [loading, setLoading] = useState(false);
 
 	const search = useSearch({ from: "/_sponsor/scholarships/" });
 
@@ -82,6 +96,36 @@ function Scholarships() {
 		});
 	};
 
+	const handleDeleteClick = (scholarship: Scholarship) => {
+		setScholarshipToDelete(scholarship);
+		setShowDeleteModal(true);
+	};
+
+	const proceedToTitleConfirm = () => {
+		setShowDeleteModal(false);
+		setTitleInput("");
+		setShowTitleModal(true);
+	};
+
+	const confirmDelete = async () => {
+		try {
+			setLoading(true);
+			if (scholarshipToDelete) {
+				deleteMutation.mutate(scholarshipToDelete.id);
+			}
+			setShowTitleModal(false);
+		} catch (error) {
+			console.error("Delete error:", error);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const handleDeleteFromModal = (scholarship: Scholarship) => {
+		deleteMutation.mutate(scholarship.id);
+		setSelectedScholarship(null);
+	};
+
 	const deleteMutation = useMutation({
 		mutationFn: deleteScholarship,
 		onSuccess: () => {
@@ -93,13 +137,6 @@ function Scholarships() {
 			console.error(err);
 		},
 	});
-
-	function confirmDelete(): void {
-		if (!selectedScholarship) return;
-
-		deleteMutation.mutate(selectedScholarship.id);
-		setSelectedScholarship(null);
-	}
 
 	useEffect(() => {
 		if (scholarships.isError) {
@@ -544,6 +581,7 @@ function Scholarships() {
 										index={index}
 										onClick={() => setSelectedScholarship(scholarship)}
 										onEdit={handleEdit}
+										onDelete={handleDeleteClick}
 										onViewApplicants={handleViewApplicants}
 									/>
 								))
@@ -558,10 +596,104 @@ function Scholarships() {
 					scholarship={selectedScholarship}
 					onClose={() => setSelectedScholarship(null)}
 					onEdit={handleEdit}
-					onDelete={confirmDelete}
+					onDelete={handleDeleteFromModal}
 					onViewApplicants={handleViewApplicants}
 				/>
 			)}
+
+			{/* Delete Confirmation Modal */}
+			<Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+				<DialogContent
+					className="bg-tertiary border-0 py-4 px-6 w-[400px]"
+					showCloseButton={true}
+				>
+					<DialogHeader>
+						<div className="text-center">
+							<div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-1 text-[#EF4444]">
+								<AlertCircle size={38} />
+							</div>
+							<h3 className="text-lg text-primary mb-2">Delete Scholarship</h3>
+							<p className="text-sm text-[#6B7280] mb-6">
+								Are you sure you want to delete{" "}
+								<span className="text-primary font-medium">"{scholarshipToDelete?.name}"</span>?
+								This action cannot be undone.
+							</p>
+						</div>
+					</DialogHeader>
+					<DialogFooter className="flex gap-3">
+						<button
+							onClick={() => setShowDeleteModal(false)}
+							className="flex-1 px-4 py-2 cursor-pointer text-sm bg-tertiary border border-[#D1D5DB] text-[#374151] rounded-md hover:bg-gray-50 transition-colors"
+						>
+							Cancel
+						</button>
+						<button
+							onClick={proceedToTitleConfirm}
+							className="flex-1 px-4 py-2 cursor-pointer text-sm text-tertiary bg-[#EF4444] rounded-md transition-colors hover:bg-[#DC2626]"
+						>
+							Continue
+						</button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+
+			{/* Title Confirmation Modal */}
+			<Dialog open={showTitleModal} onOpenChange={(open) => { if (!open) { setShowTitleModal(false); setTitleInput(""); } }}>
+				<DialogContent
+					className="bg-tertiary border-0 py-4 px-6 w-[400px]"
+					showCloseButton={true}
+				>
+					<DialogHeader>
+						<div className="text-center">
+							<div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-1 text-[#EF4444]">
+								<AlertCircle size={38} />
+							</div>
+							<h3 className="text-lg text-primary mb-2">Confirm Deletion</h3>
+							<p className="text-sm text-[#374151] font-medium mb-4">
+								Type this to confirm deletion:
+							</p>
+							<p
+								onClick={() => {
+									if (scholarshipToDelete?.name) {
+										navigator.clipboard.writeText(scholarshipToDelete.name);
+										showSuccess("Copied", "Scholarship name copied to clipboard", 1500);
+									}
+								}}
+								className="text-xs font-medium text-primary mb-4 bg-[#F9FAFB] border border-border rounded px-3 py-2 select-none cursor-pointer hover:bg-[#F0F4FF] transition-colors"
+							>
+								{scholarshipToDelete?.name}
+							</p>
+							<Input
+								value={titleInput}
+								onChange={(e) => setTitleInput(e.target.value)}
+								placeholder="Type here"
+								className="text-sm placeholder:text-[#9CA3AF]"
+								autoFocus
+							/>
+						</div>
+					</DialogHeader>
+					<DialogFooter className="flex gap-3 mt-4">
+						<button
+							onClick={() => { setShowTitleModal(false); setTitleInput(""); }}
+							disabled={loading}
+							className="flex-1 px-4 py-2 cursor-pointer text-sm bg-tertiary border border-[#D1D5DB] text-[#374151] rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
+						>
+							Cancel
+						</button>
+						<button
+							onClick={confirmDelete}
+							disabled={loading || titleInput !== scholarshipToDelete?.name}
+							className="flex-1 px-4 py-2 cursor-pointer text-sm text-tertiary bg-[#EF4444] rounded-md transition-colors flex items-center justify-center gap-2 hover:bg-[#DC2626] disabled:opacity-50 disabled:cursor-not-allowed"
+						>
+							{loading ? (
+								<Loader2 className="w-4 h-4 animate-spin" />
+							) : (
+								"Delete"
+							)}
+						</button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }

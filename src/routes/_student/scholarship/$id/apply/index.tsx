@@ -10,6 +10,7 @@ import {
 	AlertCircle,
 	CalendarDays,
 	UserIcon,
+	ArrowLeft,
 } from "lucide-react";
 import { Calendar as CalendarPicker } from "@/components/ui/calendar";
 import {
@@ -691,7 +692,16 @@ function ApplyScholarshipPage() {
 			<SEO title="Apply" noindex={true} />
 			{toast && <Toast {...toast} />}
 
-			<div className="max-w-[40rem] mx-auto space-y-4">
+			<div className="max-w-160 mx-auto space-y-4">
+				{/* Back Button */}
+				<button
+					onClick={() => navigate({ to: "/discover" })}
+					className="flex items-center gap-1 py-2 text-primary cursor-pointer"
+				>
+					<ArrowLeft size={16} />
+					<span className="text-xs md:text-sm">Back</span>
+				</button>
+
 				{/* Scholarship Details */}
 				<div className="bg-white rounded-lg p-4 md:p-6 shadow-sm border border-[#E0ECFF]">
 					<h1 className="text-xl md:text-2xl text-primary mb-3">
