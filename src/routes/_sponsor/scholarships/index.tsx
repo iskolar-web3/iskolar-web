@@ -614,7 +614,9 @@ function Scholarships() {
 							</div>
 							<h3 className="text-lg text-primary mb-2">Delete Scholarship</h3>
 							<p className="text-sm text-[#6B7280] mb-6">
-								{scholarshipToDelete ? `Are you sure you want to delete "${scholarshipToDelete.name}"? This action cannot be undone.` : ""}
+								Are you sure you want to delete{" "}
+								<span className="text-primary font-medium">"{scholarshipToDelete?.name}"</span>?
+								This action cannot be undone.
 							</p>
 						</div>
 					</DialogHeader>
@@ -650,7 +652,15 @@ function Scholarships() {
 							<p className="text-sm text-[#374151] font-medium mb-4">
 								Type this to confirm deletion:
 							</p>
-							<p className="text-xs font-medium text-primary mb-4 bg-[#F9FAFB] border border-border rounded px-3 py-2 select-none">
+							<p
+								onClick={() => {
+									if (scholarshipToDelete?.name) {
+										navigator.clipboard.writeText(scholarshipToDelete.name);
+										showSuccess("Copied", "Scholarship name copied to clipboard", 1500);
+									}
+								}}
+								className="text-xs font-medium text-primary mb-4 bg-[#F9FAFB] border border-border rounded px-3 py-2 select-none cursor-pointer hover:bg-[#F0F4FF] transition-colors"
+							>
 								{scholarshipToDelete?.name}
 							</p>
 							<Input
