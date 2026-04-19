@@ -50,10 +50,11 @@ export default function VerificationStatus({
 	}, []);
 
 	useEffect(() => {
-		if (!isReturningFromDidit) return;
-		if (record && record.status !== Status.Pending) return;
-		// Don't restart if already polling
+		if (record?.status !== Status.Pending) return;
 		if (pollRef.current) return;
+
+		const interval = isReturningFromDidit ? 5000 : 10000;
+		const maxCount = isReturningFromDidit ? 12 : 18; // 60s fast, 3min slow
 
 		pollCountRef.current = 0;
 		pollRef.current = setInterval(async () => {
@@ -62,14 +63,14 @@ export default function VerificationStatus({
 
 			if (
 				(result && result.status !== Status.Pending) ||
-				pollCountRef.current >= 12
+				pollCountRef.current >= maxCount
 			) {
 				if (pollRef.current) {
 					clearInterval(pollRef.current);
 					pollRef.current = null;
 				}
 			}
-		}, 5000);
+		}, interval);
 
 		return () => {
 			if (pollRef.current) {
