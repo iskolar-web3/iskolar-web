@@ -443,7 +443,7 @@ function ApplicantsListPage() {
 						)}
 
 						{/* Rank Applicants Button */}
-						{!bulkMode && (
+						{import.meta.env.VITE_ENABLE_APPLICANT_RANKING === "true" && !bulkMode && (
 							<button
 								onClick={() => setShowRanking(!showRanking)}
 								className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-[#EFA508] text-tertiary rounded-md hover:bg-[#D89407] transition-colors text-[11px] md:text-xs"
@@ -510,7 +510,7 @@ function ApplicantsListPage() {
 					</div>
 
 					{/* Ranking Panel */}
-					{showRanking && scholarship && (
+					{import.meta.env.VITE_ENABLE_APPLICANT_RANKING === "true" && showRanking && scholarship && (
 						<RankingControlPanel
 							scholarship={scholarship}
 							applicants={filteredApplicants}
@@ -523,7 +523,7 @@ function ApplicantsListPage() {
 					)}
 
 					{/* Ranking Results */}
-					{rankingResult && (
+					{import.meta.env.VITE_ENABLE_APPLICANT_RANKING === "true" && rankingResult && (
 						<div className="mb-6">
 							<div className="mb-4">
 								<button
