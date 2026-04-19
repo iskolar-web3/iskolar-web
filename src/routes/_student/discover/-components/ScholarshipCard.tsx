@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import { formatCurrency, formatDate } from '@/utils/formatting.utils';
 import { ScholarshipType, type Scholarship } from '@/lib/scholarship/model';
 import { getSponsorName } from '@/lib/sponsor/api';
+import { useNavigate } from '@tanstack/react-router';
+import { Button } from '@/components/ui/button';
 
 /**
  * Props for the ScholarshipCard component (student view)
@@ -23,9 +25,15 @@ export interface ScholarshipCardProps {
  * @returns Animated scholarship card component
  */
 export default function ScholarshipCard({ scholarship, index, onClick }: ScholarshipCardProps) {
+  const navigate = useNavigate();
   const isRange = scholarship.totalAmountMin != null || scholarship.totalAmountMax != null;
   const isFixed = !isRange && scholarship.totalAmount != null;
   const isVaries = !isRange && !isFixed;
+
+  const handleApplyClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigate({ to: `/scholarship/${scholarship.id}/apply` });
+  };
 
   return (
     <motion.div
@@ -147,6 +155,37 @@ export default function ScholarshipCard({ scholarship, index, onClick }: Scholar
             </div>
             <p className="text-sm md:text-base text-primary">{scholarship.totalSlots ?? "No limit"}</p>
             <p className="text-xs text-[#6B7280]">scholars</p>
+          </motion.div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="grid grid-cols-2 gap-2 pt-1">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.05 + 0.2 }}
+          >
+            <Button
+              variant="outline"
+              size="default"
+              onClick={onClick}
+              className="w-full text-xs md:text-sm border-[#3A52A6] text-[#3A52A6] hover:bg-[#3A52A6] hover:text-white cursor-pointer"
+            >
+              View Details
+            </Button>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.05 + 0.25 }}
+          >
+            <Button
+              size="default"
+              onClick={handleApplyClick}
+              className="w-full text-xs md:text-sm bg-[#3A52A6] text-white hover:bg-[#2f4389] cursor-pointer"
+            >
+              Apply Now
+            </Button>
           </motion.div>
         </div>
       </div>
