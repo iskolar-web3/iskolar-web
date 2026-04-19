@@ -14,9 +14,9 @@ import { Route as SponsorRouteImport } from './routes/_sponsor'
 import { Route as OnboardingRouteImport } from './routes/_onboarding'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AdminRouteImport } from './routes/_admin'
+import { Route as _404RouteImport } from './routes/__404'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as StudentDiscoverRouteImport } from './routes/_student/discover'
-import { Route as SponsorScholarshipsRouteImport } from './routes/_sponsor/scholarships'
+import { Route as VerificationCallbackRouteImport } from './routes/verification/callback'
 import { Route as OnboardingWelcomeRouteImport } from './routes/_onboarding/welcome'
 import { Route as OnboardingRoleSelectionRouteImport } from './routes/_onboarding/role-selection'
 import { Route as OnboardingProfileSetupRouteImport } from './routes/_onboarding/profile-setup'
@@ -34,13 +34,15 @@ import { Route as AuthConfirmationRouteImport } from './routes/_auth/confirmatio
 import { Route as AdminUsersRouteImport } from './routes/_admin/users'
 import { Route as AdminDashboardRouteImport } from './routes/_admin/dashboard'
 import { Route as StudentHomeIndexRouteImport } from './routes/_student/home/index'
+import { Route as StudentDiscoverIndexRouteImport } from './routes/_student/discover/index'
+import { Route as SponsorScholarshipsIndexRouteImport } from './routes/_sponsor/scholarships/index'
 import { Route as SponsorCreateIndexRouteImport } from './routes/_sponsor/create/index'
 import { Route as LandingAboutIndexRouteImport } from './routes/_landing/about/index'
-import { Route as StudentScholarshipIdApplyRouteImport } from './routes/_student/scholarship/$id/apply'
-import { Route as StudentProfileStudentStudentIdRouteImport } from './routes/_student/profile/student/$studentId'
-import { Route as SponsorScholarshipIdEditRouteImport } from './routes/_sponsor/scholarship/$id/edit'
 import { Route as SponsorScholarshipIdApplicantsRouteImport } from './routes/_sponsor/scholarship/$id/applicants'
-import { Route as SponsorProfileSponsorSponsorIdRouteImport } from './routes/_sponsor/profile/sponsor/$sponsorId'
+import { Route as StudentScholarshipIdApplyIndexRouteImport } from './routes/_student/scholarship/$id/apply/index'
+import { Route as StudentProfileStudentStudentIdIndexRouteImport } from './routes/_student/profile/student/$studentId/index'
+import { Route as SponsorScholarshipIdEditIndexRouteImport } from './routes/_sponsor/scholarship/$id/edit/index'
+import { Route as SponsorProfileSponsorSponsorIdIndexRouteImport } from './routes/_sponsor/profile/sponsor/$sponsorId/index'
 
 const StudentRoute = StudentRouteImport.update({
   id: '/_student',
@@ -62,20 +64,19 @@ const AdminRoute = AdminRouteImport.update({
   id: '/_admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const _404Route = _404RouteImport.update({
+  id: '/__404',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const StudentDiscoverRoute = StudentDiscoverRouteImport.update({
-  id: '/discover',
-  path: '/discover',
-  getParentRoute: () => StudentRoute,
-} as any)
-const SponsorScholarshipsRoute = SponsorScholarshipsRouteImport.update({
-  id: '/scholarships',
-  path: '/scholarships',
-  getParentRoute: () => SponsorRoute,
+const VerificationCallbackRoute = VerificationCallbackRouteImport.update({
+  id: '/verification/callback',
+  path: '/verification/callback',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardingWelcomeRoute = OnboardingWelcomeRouteImport.update({
   id: '/welcome',
@@ -163,6 +164,17 @@ const StudentHomeIndexRoute = StudentHomeIndexRouteImport.update({
   path: '/home/',
   getParentRoute: () => StudentRoute,
 } as any)
+const StudentDiscoverIndexRoute = StudentDiscoverIndexRouteImport.update({
+  id: '/discover/',
+  path: '/discover/',
+  getParentRoute: () => StudentRoute,
+} as any)
+const SponsorScholarshipsIndexRoute =
+  SponsorScholarshipsIndexRouteImport.update({
+    id: '/scholarships/',
+    path: '/scholarships/',
+    getParentRoute: () => SponsorRoute,
+  } as any)
 const SponsorCreateIndexRoute = SponsorCreateIndexRouteImport.update({
   id: '/create/',
   path: '/create/',
@@ -173,34 +185,34 @@ const LandingAboutIndexRoute = LandingAboutIndexRouteImport.update({
   path: '/about/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const StudentScholarshipIdApplyRoute =
-  StudentScholarshipIdApplyRouteImport.update({
-    id: '/scholarship/$id/apply',
-    path: '/scholarship/$id/apply',
-    getParentRoute: () => StudentRoute,
-  } as any)
-const StudentProfileStudentStudentIdRoute =
-  StudentProfileStudentStudentIdRouteImport.update({
-    id: '/profile/student/$studentId',
-    path: '/profile/student/$studentId',
-    getParentRoute: () => StudentRoute,
-  } as any)
-const SponsorScholarshipIdEditRoute =
-  SponsorScholarshipIdEditRouteImport.update({
-    id: '/scholarship/$id/edit',
-    path: '/scholarship/$id/edit',
-    getParentRoute: () => SponsorRoute,
-  } as any)
 const SponsorScholarshipIdApplicantsRoute =
   SponsorScholarshipIdApplicantsRouteImport.update({
     id: '/scholarship/$id/applicants',
     path: '/scholarship/$id/applicants',
     getParentRoute: () => SponsorRoute,
   } as any)
-const SponsorProfileSponsorSponsorIdRoute =
-  SponsorProfileSponsorSponsorIdRouteImport.update({
-    id: '/profile/sponsor/$sponsorId',
-    path: '/profile/sponsor/$sponsorId',
+const StudentScholarshipIdApplyIndexRoute =
+  StudentScholarshipIdApplyIndexRouteImport.update({
+    id: '/scholarship/$id/apply/',
+    path: '/scholarship/$id/apply/',
+    getParentRoute: () => StudentRoute,
+  } as any)
+const StudentProfileStudentStudentIdIndexRoute =
+  StudentProfileStudentStudentIdIndexRouteImport.update({
+    id: '/profile/student/$studentId/',
+    path: '/profile/student/$studentId/',
+    getParentRoute: () => StudentRoute,
+  } as any)
+const SponsorScholarshipIdEditIndexRoute =
+  SponsorScholarshipIdEditIndexRouteImport.update({
+    id: '/scholarship/$id/edit/',
+    path: '/scholarship/$id/edit/',
+    getParentRoute: () => SponsorRoute,
+  } as any)
+const SponsorProfileSponsorSponsorIdIndexRoute =
+  SponsorProfileSponsorSponsorIdIndexRouteImport.update({
+    id: '/profile/sponsor/$sponsorId/',
+    path: '/profile/sponsor/$sponsorId/',
     getParentRoute: () => SponsorRoute,
   } as any)
 
@@ -222,16 +234,17 @@ export interface FileRoutesByFullPath {
   '/profile-setup': typeof OnboardingProfileSetupRoute
   '/role-selection': typeof OnboardingRoleSelectionRoute
   '/welcome': typeof OnboardingWelcomeRoute
-  '/scholarships': typeof SponsorScholarshipsRoute
-  '/discover': typeof StudentDiscoverRoute
+  '/verification/callback': typeof VerificationCallbackRoute
   '/about': typeof LandingAboutIndexRoute
   '/create': typeof SponsorCreateIndexRoute
+  '/scholarships': typeof SponsorScholarshipsIndexRoute
+  '/discover': typeof StudentDiscoverIndexRoute
   '/home': typeof StudentHomeIndexRoute
-  '/profile/sponsor/$sponsorId': typeof SponsorProfileSponsorSponsorIdRoute
   '/scholarship/$id/applicants': typeof SponsorScholarshipIdApplicantsRoute
-  '/scholarship/$id/edit': typeof SponsorScholarshipIdEditRoute
-  '/profile/student/$studentId': typeof StudentProfileStudentStudentIdRoute
-  '/scholarship/$id/apply': typeof StudentScholarshipIdApplyRoute
+  '/profile/sponsor/$sponsorId': typeof SponsorProfileSponsorSponsorIdIndexRoute
+  '/scholarship/$id/edit': typeof SponsorScholarshipIdEditIndexRoute
+  '/profile/student/$studentId': typeof StudentProfileStudentStudentIdIndexRoute
+  '/scholarship/$id/apply': typeof StudentScholarshipIdApplyIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -251,20 +264,22 @@ export interface FileRoutesByTo {
   '/profile-setup': typeof OnboardingProfileSetupRoute
   '/role-selection': typeof OnboardingRoleSelectionRoute
   '/welcome': typeof OnboardingWelcomeRoute
-  '/scholarships': typeof SponsorScholarshipsRoute
-  '/discover': typeof StudentDiscoverRoute
+  '/verification/callback': typeof VerificationCallbackRoute
   '/about': typeof LandingAboutIndexRoute
   '/create': typeof SponsorCreateIndexRoute
+  '/scholarships': typeof SponsorScholarshipsIndexRoute
+  '/discover': typeof StudentDiscoverIndexRoute
   '/home': typeof StudentHomeIndexRoute
-  '/profile/sponsor/$sponsorId': typeof SponsorProfileSponsorSponsorIdRoute
   '/scholarship/$id/applicants': typeof SponsorScholarshipIdApplicantsRoute
-  '/scholarship/$id/edit': typeof SponsorScholarshipIdEditRoute
-  '/profile/student/$studentId': typeof StudentProfileStudentStudentIdRoute
-  '/scholarship/$id/apply': typeof StudentScholarshipIdApplyRoute
+  '/profile/sponsor/$sponsorId': typeof SponsorProfileSponsorSponsorIdIndexRoute
+  '/scholarship/$id/edit': typeof SponsorScholarshipIdEditIndexRoute
+  '/profile/student/$studentId': typeof StudentProfileStudentStudentIdIndexRoute
+  '/scholarship/$id/apply': typeof StudentScholarshipIdApplyIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/__404': typeof _404Route
   '/_admin': typeof AdminRouteWithChildren
   '/_auth': typeof AuthRouteWithChildren
   '/_onboarding': typeof OnboardingRouteWithChildren
@@ -286,16 +301,17 @@ export interface FileRoutesById {
   '/_onboarding/profile-setup': typeof OnboardingProfileSetupRoute
   '/_onboarding/role-selection': typeof OnboardingRoleSelectionRoute
   '/_onboarding/welcome': typeof OnboardingWelcomeRoute
-  '/_sponsor/scholarships': typeof SponsorScholarshipsRoute
-  '/_student/discover': typeof StudentDiscoverRoute
+  '/verification/callback': typeof VerificationCallbackRoute
   '/_landing/about/': typeof LandingAboutIndexRoute
   '/_sponsor/create/': typeof SponsorCreateIndexRoute
+  '/_sponsor/scholarships/': typeof SponsorScholarshipsIndexRoute
+  '/_student/discover/': typeof StudentDiscoverIndexRoute
   '/_student/home/': typeof StudentHomeIndexRoute
-  '/_sponsor/profile/sponsor/$sponsorId': typeof SponsorProfileSponsorSponsorIdRoute
   '/_sponsor/scholarship/$id/applicants': typeof SponsorScholarshipIdApplicantsRoute
-  '/_sponsor/scholarship/$id/edit': typeof SponsorScholarshipIdEditRoute
-  '/_student/profile/student/$studentId': typeof StudentProfileStudentStudentIdRoute
-  '/_student/scholarship/$id/apply': typeof StudentScholarshipIdApplyRoute
+  '/_sponsor/profile/sponsor/$sponsorId/': typeof SponsorProfileSponsorSponsorIdIndexRoute
+  '/_sponsor/scholarship/$id/edit/': typeof SponsorScholarshipIdEditIndexRoute
+  '/_student/profile/student/$studentId/': typeof StudentProfileStudentStudentIdIndexRoute
+  '/_student/scholarship/$id/apply/': typeof StudentScholarshipIdApplyIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -317,13 +333,14 @@ export interface FileRouteTypes {
     | '/profile-setup'
     | '/role-selection'
     | '/welcome'
-    | '/scholarships'
-    | '/discover'
+    | '/verification/callback'
     | '/about'
     | '/create'
+    | '/scholarships'
+    | '/discover'
     | '/home'
-    | '/profile/sponsor/$sponsorId'
     | '/scholarship/$id/applicants'
+    | '/profile/sponsor/$sponsorId'
     | '/scholarship/$id/edit'
     | '/profile/student/$studentId'
     | '/scholarship/$id/apply'
@@ -346,19 +363,21 @@ export interface FileRouteTypes {
     | '/profile-setup'
     | '/role-selection'
     | '/welcome'
-    | '/scholarships'
-    | '/discover'
+    | '/verification/callback'
     | '/about'
     | '/create'
+    | '/scholarships'
+    | '/discover'
     | '/home'
-    | '/profile/sponsor/$sponsorId'
     | '/scholarship/$id/applicants'
+    | '/profile/sponsor/$sponsorId'
     | '/scholarship/$id/edit'
     | '/profile/student/$studentId'
     | '/scholarship/$id/apply'
   id:
     | '__root__'
     | '/'
+    | '/__404'
     | '/_admin'
     | '/_auth'
     | '/_onboarding'
@@ -380,25 +399,28 @@ export interface FileRouteTypes {
     | '/_onboarding/profile-setup'
     | '/_onboarding/role-selection'
     | '/_onboarding/welcome'
-    | '/_sponsor/scholarships'
-    | '/_student/discover'
+    | '/verification/callback'
     | '/_landing/about/'
     | '/_sponsor/create/'
+    | '/_sponsor/scholarships/'
+    | '/_student/discover/'
     | '/_student/home/'
-    | '/_sponsor/profile/sponsor/$sponsorId'
     | '/_sponsor/scholarship/$id/applicants'
-    | '/_sponsor/scholarship/$id/edit'
-    | '/_student/profile/student/$studentId'
-    | '/_student/scholarship/$id/apply'
+    | '/_sponsor/profile/sponsor/$sponsorId/'
+    | '/_sponsor/scholarship/$id/edit/'
+    | '/_student/profile/student/$studentId/'
+    | '/_student/scholarship/$id/apply/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  _404Route: typeof _404Route
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   OnboardingRoute: typeof OnboardingRouteWithChildren
   SponsorRoute: typeof SponsorRouteWithChildren
   StudentRoute: typeof StudentRouteWithChildren
+  VerificationCallbackRoute: typeof VerificationCallbackRoute
   LandingAboutIndexRoute: typeof LandingAboutIndexRoute
 }
 
@@ -439,6 +461,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/__404': {
+      id: '/__404'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof _404RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -446,19 +475,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_student/discover': {
-      id: '/_student/discover'
-      path: '/discover'
-      fullPath: '/discover'
-      preLoaderRoute: typeof StudentDiscoverRouteImport
-      parentRoute: typeof StudentRoute
-    }
-    '/_sponsor/scholarships': {
-      id: '/_sponsor/scholarships'
-      path: '/scholarships'
-      fullPath: '/scholarships'
-      preLoaderRoute: typeof SponsorScholarshipsRouteImport
-      parentRoute: typeof SponsorRoute
+    '/verification/callback': {
+      id: '/verification/callback'
+      path: '/verification/callback'
+      fullPath: '/verification/callback'
+      preLoaderRoute: typeof VerificationCallbackRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_onboarding/welcome': {
       id: '/_onboarding/welcome'
@@ -579,6 +601,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentHomeIndexRouteImport
       parentRoute: typeof StudentRoute
     }
+    '/_student/discover/': {
+      id: '/_student/discover/'
+      path: '/discover'
+      fullPath: '/discover'
+      preLoaderRoute: typeof StudentDiscoverIndexRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/_sponsor/scholarships/': {
+      id: '/_sponsor/scholarships/'
+      path: '/scholarships'
+      fullPath: '/scholarships'
+      preLoaderRoute: typeof SponsorScholarshipsIndexRouteImport
+      parentRoute: typeof SponsorRoute
+    }
     '/_sponsor/create/': {
       id: '/_sponsor/create/'
       path: '/create'
@@ -593,27 +629,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LandingAboutIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_student/scholarship/$id/apply': {
-      id: '/_student/scholarship/$id/apply'
-      path: '/scholarship/$id/apply'
-      fullPath: '/scholarship/$id/apply'
-      preLoaderRoute: typeof StudentScholarshipIdApplyRouteImport
-      parentRoute: typeof StudentRoute
-    }
-    '/_student/profile/student/$studentId': {
-      id: '/_student/profile/student/$studentId'
-      path: '/profile/student/$studentId'
-      fullPath: '/profile/student/$studentId'
-      preLoaderRoute: typeof StudentProfileStudentStudentIdRouteImport
-      parentRoute: typeof StudentRoute
-    }
-    '/_sponsor/scholarship/$id/edit': {
-      id: '/_sponsor/scholarship/$id/edit'
-      path: '/scholarship/$id/edit'
-      fullPath: '/scholarship/$id/edit'
-      preLoaderRoute: typeof SponsorScholarshipIdEditRouteImport
-      parentRoute: typeof SponsorRoute
-    }
     '/_sponsor/scholarship/$id/applicants': {
       id: '/_sponsor/scholarship/$id/applicants'
       path: '/scholarship/$id/applicants'
@@ -621,11 +636,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SponsorScholarshipIdApplicantsRouteImport
       parentRoute: typeof SponsorRoute
     }
-    '/_sponsor/profile/sponsor/$sponsorId': {
-      id: '/_sponsor/profile/sponsor/$sponsorId'
+    '/_student/scholarship/$id/apply/': {
+      id: '/_student/scholarship/$id/apply/'
+      path: '/scholarship/$id/apply'
+      fullPath: '/scholarship/$id/apply'
+      preLoaderRoute: typeof StudentScholarshipIdApplyIndexRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/_student/profile/student/$studentId/': {
+      id: '/_student/profile/student/$studentId/'
+      path: '/profile/student/$studentId'
+      fullPath: '/profile/student/$studentId'
+      preLoaderRoute: typeof StudentProfileStudentStudentIdIndexRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/_sponsor/scholarship/$id/edit/': {
+      id: '/_sponsor/scholarship/$id/edit/'
+      path: '/scholarship/$id/edit'
+      fullPath: '/scholarship/$id/edit'
+      preLoaderRoute: typeof SponsorScholarshipIdEditIndexRouteImport
+      parentRoute: typeof SponsorRoute
+    }
+    '/_sponsor/profile/sponsor/$sponsorId/': {
+      id: '/_sponsor/profile/sponsor/$sponsorId/'
       path: '/profile/sponsor/$sponsorId'
       fullPath: '/profile/sponsor/$sponsorId'
-      preLoaderRoute: typeof SponsorProfileSponsorSponsorIdRouteImport
+      preLoaderRoute: typeof SponsorProfileSponsorSponsorIdIndexRouteImport
       parentRoute: typeof SponsorRoute
     }
   }
@@ -690,36 +726,38 @@ const OnboardingRouteWithChildren = OnboardingRoute._addFileChildren(
 )
 
 interface SponsorRouteChildren {
-  SponsorScholarshipsRoute: typeof SponsorScholarshipsRoute
   SponsorCreateIndexRoute: typeof SponsorCreateIndexRoute
-  SponsorProfileSponsorSponsorIdRoute: typeof SponsorProfileSponsorSponsorIdRoute
+  SponsorScholarshipsIndexRoute: typeof SponsorScholarshipsIndexRoute
   SponsorScholarshipIdApplicantsRoute: typeof SponsorScholarshipIdApplicantsRoute
-  SponsorScholarshipIdEditRoute: typeof SponsorScholarshipIdEditRoute
+  SponsorProfileSponsorSponsorIdIndexRoute: typeof SponsorProfileSponsorSponsorIdIndexRoute
+  SponsorScholarshipIdEditIndexRoute: typeof SponsorScholarshipIdEditIndexRoute
 }
 
 const SponsorRouteChildren: SponsorRouteChildren = {
-  SponsorScholarshipsRoute: SponsorScholarshipsRoute,
   SponsorCreateIndexRoute: SponsorCreateIndexRoute,
-  SponsorProfileSponsorSponsorIdRoute: SponsorProfileSponsorSponsorIdRoute,
+  SponsorScholarshipsIndexRoute: SponsorScholarshipsIndexRoute,
   SponsorScholarshipIdApplicantsRoute: SponsorScholarshipIdApplicantsRoute,
-  SponsorScholarshipIdEditRoute: SponsorScholarshipIdEditRoute,
+  SponsorProfileSponsorSponsorIdIndexRoute:
+    SponsorProfileSponsorSponsorIdIndexRoute,
+  SponsorScholarshipIdEditIndexRoute: SponsorScholarshipIdEditIndexRoute,
 }
 
 const SponsorRouteWithChildren =
   SponsorRoute._addFileChildren(SponsorRouteChildren)
 
 interface StudentRouteChildren {
-  StudentDiscoverRoute: typeof StudentDiscoverRoute
+  StudentDiscoverIndexRoute: typeof StudentDiscoverIndexRoute
   StudentHomeIndexRoute: typeof StudentHomeIndexRoute
-  StudentProfileStudentStudentIdRoute: typeof StudentProfileStudentStudentIdRoute
-  StudentScholarshipIdApplyRoute: typeof StudentScholarshipIdApplyRoute
+  StudentProfileStudentStudentIdIndexRoute: typeof StudentProfileStudentStudentIdIndexRoute
+  StudentScholarshipIdApplyIndexRoute: typeof StudentScholarshipIdApplyIndexRoute
 }
 
 const StudentRouteChildren: StudentRouteChildren = {
-  StudentDiscoverRoute: StudentDiscoverRoute,
+  StudentDiscoverIndexRoute: StudentDiscoverIndexRoute,
   StudentHomeIndexRoute: StudentHomeIndexRoute,
-  StudentProfileStudentStudentIdRoute: StudentProfileStudentStudentIdRoute,
-  StudentScholarshipIdApplyRoute: StudentScholarshipIdApplyRoute,
+  StudentProfileStudentStudentIdIndexRoute:
+    StudentProfileStudentStudentIdIndexRoute,
+  StudentScholarshipIdApplyIndexRoute: StudentScholarshipIdApplyIndexRoute,
 }
 
 const StudentRouteWithChildren =
@@ -727,11 +765,13 @@ const StudentRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  _404Route: _404Route,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   OnboardingRoute: OnboardingRouteWithChildren,
   SponsorRoute: SponsorRouteWithChildren,
   StudentRoute: StudentRouteWithChildren,
+  VerificationCallbackRoute: VerificationCallbackRoute,
   LandingAboutIndexRoute: LandingAboutIndexRoute,
 }
 export const routeTree = rootRouteImport

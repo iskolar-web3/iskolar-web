@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { User, Building2, Edit } from "lucide-react";
 import { motion } from "framer-motion";
 import { SEO } from "@/components/SEO";
 import { useRef, useState } from "react";
@@ -31,12 +30,11 @@ import {
 	updateOrganizationSponsor,
 } from "@/lib/sponsor/api";
 import { UserRole } from "@/lib/user/model";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getCookie } from "@/lib/cookie";
-import { ACCESS_TOKEN_KEY } from "@/lib/user/auth";
-import { uploadFile } from "@/lib/api";
+import EntityVerificationForm from "@/components/verification/EntityVerificationForm";
+import VerificationStatus from "@/components/verification/VerificationStatus";
+import ProfileAvatar from "./-components/ProfileAvatar";
 
-export const Route = createFileRoute("/_sponsor/profile/sponsor/$sponsorId")({
+export const Route = createFileRoute("/_sponsor/profile/sponsor/$sponsorId/")({
 	component: SponsorProfile,
 });
 
@@ -51,6 +49,8 @@ function SponsorProfile() {
 
 	const [isEditing, setIsEditing] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
+	const [isEntityVerificationOpen, setIsEntityVerificationOpen] =
+		useState(false);
 
 	const formRef = useRef<HTMLFormElement>(null);
 	const { toast, showSuccess, showError } = useToast();
@@ -150,6 +150,12 @@ function SponsorProfile() {
 		<div className="min-h-screen">
 			<SEO title="Profile" noindex={true} />
 			{toast && <Toast {...toast} />}
+			{import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true" && (
+				<EntityVerificationForm
+					open={isEntityVerificationOpen}
+					onOpenChange={setIsEntityVerificationOpen}
+				/>
+			)}
 			<div className="max-w-176 mx-auto space-y-6">
 				{/* Profile Header */}
 				<motion.div
@@ -176,6 +182,14 @@ function SponsorProfile() {
 						</div>
 					</div>
 				</motion.div>
+
+				{import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true" && (
+					<VerificationStatus
+						role="sponsors"
+						sponsorType={auth.profile.sponsorType.code}
+						onEntityFormOpen={() => setIsEntityVerificationOpen(true)}
+					/>
+				)}
 
 				{/* Information Section */}
 				<motion.div
@@ -234,102 +248,3 @@ function SponsorProfile() {
 	);
 }
 
-type ProfileAvatarProps = {
-	handleIndividualSponsorSubmit: (
-		data: UpdateIndividualSponsorRequest,
-	) => Promise<void>;
-	handleOrganizationSponsorSubmit: (
-		data: UpdateOrganizationSponsorRequest,
-	) => Promise<void>;
-	handleGovernmentSponsorSubmit: (
-		data: UpdateGovernmentSponsorRequest,
-	) => Promise<void>;
-};
-
-function ProfileAvatar(props: ProfileAvatarProps) {
-	const auth = useAuth<AnySponsor>();
-	const fileInputRef = useRef<HTMLInputElement>(null);
-
-	async function handleImageUpload(
-		e: React.ChangeEvent<HTMLInputElement>,
-	): Promise<void> {
-		const file = e.target.files?.[0];
-		if (!file) {
-			return;
-		}
-
-		const token = getCookie(ACCESS_TOKEN_KEY);
-		if (!token) {
-			return;
-		}
-
-		const uploadRes = await uploadFile(file, token, "profile-images");
-
-		switch (auth.profile.sponsorType.code) {
-			case SponsorType.Individual:
-				await props.handleIndividualSponsorSubmit({
-					id: auth.profile.id,
-					userId: auth.user?.id,
-					avatarUrl: uploadRes.data.url,
-				});
-				break;
-
-			case SponsorType.Organization:
-				await props.handleOrganizationSponsorSubmit({
-					id: auth.profile.id,
-					userId: auth.user?.id,
-					avatarUrl: uploadRes.data.url,
-				});
-				break;
-
-			case SponsorType.Government:
-				await props.handleGovernmentSponsorSubmit({
-					id: auth.profile.id,
-					userId: auth.user?.id,
-					avatarUrl: uploadRes.data.url,
-				});
-				break;
-		}
-
-		console.log("New avatar image upload:", uploadRes);
-        // @ts-expect-error this works
-		auth.setUser((prev) => ({ ...prev, avatarUrl: uploadRes.data.url }));
-	}
-
-	function handleClick(): void {
-		fileInputRef.current?.click();
-	}
-
-	return (
-		<div className="relative">
-			<div className="w-24 h-24 md:w-28 md:h-28 rounded-full bg-white p-1 shadow-lg">
-				<Avatar className="size-full">
-					<AvatarImage src={auth.user?.avatarUrl || ""} />
-					<AvatarFallback>
-						{auth.profile.sponsorType.code === SponsorType.Individual ? (
-							<User className="w-12 h-12 md:w-14 md:h-14 text-[#6B7280]" />
-						) : (
-							<Building2 className="w-12 h-12 md:w-14 md:h-14 text-[#6B7280]" />
-						)}
-					</AvatarFallback>
-				</Avatar>
-			</div>
-			<button
-				className="absolute bottom-0 right-0 w-8 h-8 bg-secondary hover:bg-[#2f4389] rounded-full flex items-center justify-center shadow-md transition-colors cursor-pointer"
-				title="Edit profile picture"
-				aria-label="Edit profile picture"
-				onClick={handleClick}
-			>
-				<Edit className="w-4 h-4 text-tertiary" />
-
-				<input
-					type="file"
-					accept="image/*"
-					onChange={handleImageUpload}
-					className="hidden"
-					ref={fileInputRef}
-				/>
-			</button>
-		</div>
-	);
-}

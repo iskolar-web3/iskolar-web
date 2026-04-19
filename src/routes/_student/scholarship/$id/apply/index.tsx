@@ -27,6 +27,7 @@ import {
 import Toast from "@/components/Toast";
 import { useToast } from "@/hooks/useToast";
 import { SEO } from "@/components/SEO";
+import SubmitConfirmationModal from "./-components/SubmitConfirmationModal";
 import { compressFile } from "@/utils/fileCompression.utils";
 import { handleError } from "@/lib/errorHandler";
 import { logger } from "@/lib/logger";
@@ -51,7 +52,7 @@ import { getValidatedApplicationSchema } from "@/lib/scholarship/helper";
 import { uploadFile } from "@/lib/api";
 import type { Student } from "@/lib/student/model";
 
-export const Route = createFileRoute("/_student/scholarship/$id/apply")({
+export const Route = createFileRoute("/_student/scholarship/$id/apply/")({
 	component: ApplyScholarshipPage,
 	beforeLoad: async ({ params }) => {
 		const applicationStatus = await getMyApplicationStatus(params.id);
@@ -100,8 +101,8 @@ function ApplyScholarshipPage() {
 			year: "numeric",
 			month: "long",
 			day: "numeric",
-		});
-	};
+		})
+	}
 
 	const handleFileUpload = async (
 		fieldId: string,
@@ -119,7 +120,7 @@ function ApplyScholarshipPage() {
 		if (file.size > maxSize) {
 			showError("File Too Large", `Maximum file size is 10MB.`, 2500);
 			event.target.value = "";
-			return;
+			return
 		}
 
 		// Validate file type
@@ -128,16 +129,16 @@ function ApplyScholarshipPage() {
 			"image/jpeg",
 			"image/jpg",
 			"image/png",
-		];
+		]
 
 		if (!allowedTypes.includes(file.type)) {
 			showError(
 				"Invalid File Type",
 				"Only PDF and image files are allowed",
 				2500,
-			);
+			)
 			event.target.value = "";
-			return;
+			return
 		}
 
 		const allowedExtensions = [".pdf", ".jpg", ".jpeg", ".png"];
@@ -150,9 +151,9 @@ function ApplyScholarshipPage() {
 				"Invalid File Extension",
 				"File extension does not match allowed types",
 				2500,
-			);
+			)
 			event.target.value = "";
-			return;
+			return
 		}
 
 		try {
@@ -162,12 +163,12 @@ function ApplyScholarshipPage() {
 			setValue(`formFieldAnswers.${index}.value`, compressedFile, {
 				shouldValidate: true,
 				shouldDirty: true,
-			});
+			})
 
 			setCustomFiles((prev) => ({
 				...prev,
 				[fieldId]: [compressedFile],
-			}));
+			}))
 		} catch (error) {
 			logger.error("File compression error:", error);
 			showError("Compression Failed", "Using original file", 2000);
@@ -175,18 +176,18 @@ function ApplyScholarshipPage() {
 			setCustomFiles((prev) => ({
 				...prev,
 				[fieldId]: [file],
-			}));
+			}))
 		}
 
 		event.target.value = "";
-	};
+	}
 
 	const removeFile = (fieldLabel: string, index: number) => {
 		setCustomFiles((prev) => ({
 			...prev,
 			[fieldLabel]: (prev[fieldLabel] || []).filter((_, i) => i !== index),
-		}));
-	};
+		}))
+	}
 
 	const formatFileSize = (bytes: number) => {
 		if (bytes === 0) return "0 Bytes";
@@ -194,7 +195,7 @@ function ApplyScholarshipPage() {
 		const sizes = ["Bytes", "KB", "MB", "GB"];
 		const i = Math.floor(Math.log(bytes) / Math.log(k));
 		return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
-	};
+	}
 
 	// const fileToBase64 = (file: File): Promise<string> => {
 	// 	return new Promise((resolve, reject) => {
@@ -217,11 +218,11 @@ function ApplyScholarshipPage() {
 					fileErrors.push(`${field.label} is required`);
 				}
 			}
-		});
+		})
 
 		if (fileErrors.length > 0) {
 			showError("Missing Required Files", fileErrors.join(", "), 2500);
-			return;
+			return
 		}
 
 		const normalizedData: CreateApplicationRequest = {
@@ -234,15 +235,15 @@ function ApplyScholarshipPage() {
 					return {
 						...answer,
 						value: customFiles[fieldId],
-					};
+					}
 				}
 				return answer;
 			}),
-		};
+		}
 
 		setPendingData(normalizedData);
 		setShowConfirmation(true);
-	};
+	}
 
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
@@ -255,7 +256,7 @@ function ApplyScholarshipPage() {
 			await queryClient.invalidateQueries({
 				queryKey: ["scholarships", "applications"],
 				refetchType: "all",
-			});
+			})
 			await navigate({ to: "/home" });
 		},
 		onError: (err) => {
@@ -274,7 +275,7 @@ function ApplyScholarshipPage() {
 				pendingData.formFieldAnswers.map(async (answer) => {
 					const fieldDef = customFields.find(
 						(f) => f.id === answer.formFieldId,
-					);
+					)
 
 					if (fieldDef?.fieldType.code === FormFieldType.File) {
 						const files = customFiles[fieldDef.id] || [];
@@ -286,22 +287,23 @@ function ApplyScholarshipPage() {
 								file,
 								auth.sessionToken,
 								"application-files",
-							);
+							)
 
+							// Store the full response object (url, mimeType, extractedText)
 							return {
 								...answer,
 								value: uploadRes.data.url,
-							};
+							}
 						}
 					}
-					return answer;
+					return answer
 				}),
-			);
+			)
 
 			const finalData = {
 				...pendingData,
 				formFieldAnswers: updatedAnswers,
-			};
+			}
 
 			mutation.mutate(finalData);
 			showSuccess("Success", "Application submitted successfully", 2000);
@@ -310,7 +312,7 @@ function ApplyScholarshipPage() {
 			logger.error("Submission error:", handled.raw);
 			showError(`Error ${handled.code}`, handled.message, 2500);
 		}
-	};
+	}
 
 	const renderFormField = (field: FormField, index: number) => {
 		const fieldName = `formFieldAnswers.${index}.value` as const;
@@ -512,7 +514,7 @@ function ApplyScholarshipPage() {
 													{option.value}
 												</span>
 											</label>
-										);
+										)
 									})}
 								</div>
 							)}
@@ -540,11 +542,11 @@ function ApplyScholarshipPage() {
 												onChange={() => {
 													const currentValues = Array.isArray(value)
 														? [...value]
-														: [];
+														: []
 													if (isChecked) {
 														onChange(
 															currentValues.filter((v) => v !== option.value),
-														);
+														)
 													} else {
 														onChange([...currentValues, option.value]);
 													}
@@ -555,7 +557,7 @@ function ApplyScholarshipPage() {
 												{option.value}
 											</span>
 										</label>
-									);
+									)
 								})}
 							</div>
 						)}
@@ -607,8 +609,8 @@ function ApplyScholarshipPage() {
 					</p>
 				)}
 			</div>
-		);
-	};
+		)
+	}
 
 	// if (loading) {
 	//   return (
@@ -753,43 +755,12 @@ function ApplyScholarshipPage() {
 				</button>
 			</div>
 
-			{/* Confirmation Modal */}
-			{showConfirmation && (
-				<div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-					<div className="bg-[#F0F7FF] rounded-2xl p-5 max-w-md w-full">
-						<h3 className="text-lg text-primary text-center mb-2">
-							Submit Application?
-						</h3>
-						<p className="text-sm text-[#4B5563] text-center mb-6">
-							Please review your information before submitting. Once submitted,
-							you cannot modify your application.
-						</p>
-
-						<div className="flex gap-3">
-							<button
-								onClick={() => setShowConfirmation(false)}
-								className={`flex-1 py-2.5 text-sm cursor-pointer bg-[#CACDD2] text-[#4B5563] rounded-md hover:bg-[#B8BCC2] transition-colors ${
-									mutation.isPending && "opacity-60 cursor-not-allowed"
-								}`}
-							>
-								Review
-							</button>
-							<button
-								onClick={processSubmission}
-								className={`flex-1 py-2.5 text-sm cursor-pointer bg-[#EFA508] text-tertiary rounded-md hover:bg-[#D89407] transition-colors ${
-									mutation.isPending && "opacity-60 cursor-not-allowed"
-								}`}
-							>
-								{mutation.isPending ? (
-									<Loader2 className="w-5 h-5 animate-spin" />
-								) : (
-									<span>Submit</span>
-								)}
-							</button>
-						</div>
-					</div>
-				</div>
-			)}
+			<SubmitConfirmationModal
+				isOpen={showConfirmation}
+				onCancel={() => setShowConfirmation(false)}
+				onConfirm={processSubmission}
+				isLoading={mutation.isPending}
+			/>
 		</div>
-	);
+	)
 }
