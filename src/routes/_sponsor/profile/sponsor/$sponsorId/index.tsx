@@ -150,10 +150,12 @@ function SponsorProfile() {
 		<div className="min-h-screen">
 			<SEO title="Profile" noindex={true} />
 			{toast && <Toast {...toast} />}
-			<EntityVerificationForm
-				open={isEntityVerificationOpen}
-				onOpenChange={setIsEntityVerificationOpen}
-			/>
+			{import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true" && (
+				<EntityVerificationForm
+					open={isEntityVerificationOpen}
+					onOpenChange={setIsEntityVerificationOpen}
+				/>
+			)}
 			<div className="max-w-176 mx-auto space-y-6">
 				{/* Profile Header */}
 				<motion.div
@@ -181,11 +183,13 @@ function SponsorProfile() {
 					</div>
 				</motion.div>
 
-				<VerificationStatus
-					role="sponsors"
-					sponsorType={auth.profile.sponsorType.code}
-					onEntityFormOpen={() => setIsEntityVerificationOpen(true)}
-				/>
+				{import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true" && (
+					<VerificationStatus
+						role="sponsors"
+						sponsorType={auth.profile.sponsorType.code}
+						onEntityFormOpen={() => setIsEntityVerificationOpen(true)}
+					/>
+				)}
 
 				{/* Information Section */}
 				<motion.div

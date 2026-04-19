@@ -81,6 +81,7 @@ VITE_ENABLE_LUMEN_CREDENTIALS=true
 
 ### Feature Flags
 - **VITE_ENABLE_LUMEN_CREDENTIALS** (true/false) — Controls visibility of student credentials section. Set to `false` to hide in test/staging environments.
+- **VITE_ENABLE_IDENTITY_VERIFICATION** (true/false) — Controls visibility of the Didit identity verification section on student and sponsor profiles. Set to `false` on prod until the feature is ready to launch.
 
 ## Code Style
 
