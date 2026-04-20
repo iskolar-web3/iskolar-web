@@ -31,7 +31,8 @@ import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
 import { Route as AuthEmailVerificationSentRouteImport } from './routes/_auth/email-verification-sent'
 import { Route as AuthConfirmationRouteImport } from './routes/_auth/confirmation'
-import { Route as AdminUsersRouteImport } from './routes/_admin/users'
+import { Route as AdminUsersManagementRouteImport } from './routes/_admin/users-management'
+import { Route as AdminScholarshipsManagementRouteImport } from './routes/_admin/scholarships-management'
 import { Route as AdminDashboardRouteImport } from './routes/_admin/dashboard'
 import { Route as StudentHomeIndexRouteImport } from './routes/_student/home/index'
 import { Route as StudentDiscoverIndexRouteImport } from './routes/_student/discover/index'
@@ -149,11 +150,17 @@ const AuthConfirmationRoute = AuthConfirmationRouteImport.update({
   path: '/confirmation',
   getParentRoute: () => AuthRoute,
 } as any)
-const AdminUsersRoute = AdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
+const AdminUsersManagementRoute = AdminUsersManagementRouteImport.update({
+  id: '/users-management',
+  path: '/users-management',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminScholarshipsManagementRoute =
+  AdminScholarshipsManagementRouteImport.update({
+    id: '/scholarships-management',
+    path: '/scholarships-management',
+    getParentRoute: () => AdminRoute,
+  } as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -219,7 +226,8 @@ const SponsorProfileSponsorSponsorIdIndexRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof AdminDashboardRoute
-  '/users': typeof AdminUsersRoute
+  '/scholarships-management': typeof AdminScholarshipsManagementRoute
+  '/users-management': typeof AdminUsersManagementRoute
   '/confirmation': typeof AuthConfirmationRoute
   '/email-verification-sent': typeof AuthEmailVerificationSentRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
@@ -249,7 +257,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof AdminDashboardRoute
-  '/users': typeof AdminUsersRoute
+  '/scholarships-management': typeof AdminScholarshipsManagementRoute
+  '/users-management': typeof AdminUsersManagementRoute
   '/confirmation': typeof AuthConfirmationRoute
   '/email-verification-sent': typeof AuthEmailVerificationSentRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
@@ -286,7 +295,8 @@ export interface FileRoutesById {
   '/_sponsor': typeof SponsorRouteWithChildren
   '/_student': typeof StudentRouteWithChildren
   '/_admin/dashboard': typeof AdminDashboardRoute
-  '/_admin/users': typeof AdminUsersRoute
+  '/_admin/scholarships-management': typeof AdminScholarshipsManagementRoute
+  '/_admin/users-management': typeof AdminUsersManagementRoute
   '/_auth/confirmation': typeof AuthConfirmationRoute
   '/_auth/email-verification-sent': typeof AuthEmailVerificationSentRoute
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -318,7 +328,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard'
-    | '/users'
+    | '/scholarships-management'
+    | '/users-management'
     | '/confirmation'
     | '/email-verification-sent'
     | '/forgot-password'
@@ -348,7 +359,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/dashboard'
-    | '/users'
+    | '/scholarships-management'
+    | '/users-management'
     | '/confirmation'
     | '/email-verification-sent'
     | '/forgot-password'
@@ -384,7 +396,8 @@ export interface FileRouteTypes {
     | '/_sponsor'
     | '/_student'
     | '/_admin/dashboard'
-    | '/_admin/users'
+    | '/_admin/scholarships-management'
+    | '/_admin/users-management'
     | '/_auth/confirmation'
     | '/_auth/email-verification-sent'
     | '/_auth/forgot-password'
@@ -580,11 +593,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthConfirmationRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_admin/users': {
-      id: '/_admin/users'
-      path: '/users'
-      fullPath: '/users'
-      preLoaderRoute: typeof AdminUsersRouteImport
+    '/_admin/users-management': {
+      id: '/_admin/users-management'
+      path: '/users-management'
+      fullPath: '/users-management'
+      preLoaderRoute: typeof AdminUsersManagementRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_admin/scholarships-management': {
+      id: '/_admin/scholarships-management'
+      path: '/scholarships-management'
+      fullPath: '/scholarships-management'
+      preLoaderRoute: typeof AdminScholarshipsManagementRouteImport
       parentRoute: typeof AdminRoute
     }
     '/_admin/dashboard': {
@@ -669,12 +689,14 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminDashboardRoute: typeof AdminDashboardRoute
-  AdminUsersRoute: typeof AdminUsersRoute
+  AdminScholarshipsManagementRoute: typeof AdminScholarshipsManagementRoute
+  AdminUsersManagementRoute: typeof AdminUsersManagementRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminDashboardRoute: AdminDashboardRoute,
-  AdminUsersRoute: AdminUsersRoute,
+  AdminScholarshipsManagementRoute: AdminScholarshipsManagementRoute,
+  AdminUsersManagementRoute: AdminUsersManagementRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)

@@ -15,7 +15,6 @@ import {
 	GraduationCap,
 	Heart,
 	ShieldCheck,
-	TrendingUp,
 	ArrowUpRight,
 } from "lucide-react";
 
@@ -65,12 +64,6 @@ function AdminDashboard() {
 					value: metrics.adminCount,
 					icon: ShieldCheck,
 					description: "Stewards managing the platform.",
-				},
-				{
-					title: "Sponsor:Student Ratio",
-					value: `${metrics.sponsorToStudentRatio}:1`,
-					icon: TrendingUp,
-					description: "A quick read on support balance.",
 				},
 			]
 		: [];

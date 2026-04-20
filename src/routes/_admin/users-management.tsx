@@ -8,7 +8,7 @@ import { LocalTimeClock } from "@/components/landing/LocalTimeClock";
 import { Search, Users, ShieldCheck, GraduationCap, HeartHandshake } from "lucide-react";
 import type { UserListQuery } from "@/lib/admin/model";
 
-export const Route = createFileRoute("/_admin/users")({
+export const Route = createFileRoute("/_admin/users-management")({
 	component: AdminUsers,
 });
 

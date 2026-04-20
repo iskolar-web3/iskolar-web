@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, Users, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, GraduationCap, LogOut } from "lucide-react";
 import { useAuth } from "@/auth";
 import {
 	Dialog,
@@ -14,7 +14,8 @@ import { Button } from "@/components/ui/button";
 
 const navItems = [
 	{ label: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
-	{ label: "Users", path: "/users", icon: Users },
+	{ label: "Users", path: "/users-management", icon: Users },
+	{ label: "Scholarships", path: "/scholarships-management", icon: GraduationCap },
 ];
 
 interface AdminSidebarProps {
