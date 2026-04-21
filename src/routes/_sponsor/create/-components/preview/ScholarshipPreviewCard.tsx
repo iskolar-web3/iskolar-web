@@ -1,11 +1,13 @@
 import { Calendar, Users, Coins, UserIcon } from "lucide-react";
 import { motion } from "framer-motion";
+import { useState } from "react";
 import { formatCurrency, formatDeadline } from "@/utils/formatting.utils";
 import { ScholarshipType, type ScholarshipFormData } from "@/lib/scholarship/model";
 import { useAuth } from "@/auth";
 import type { AnySponsor } from "@/lib/sponsor/model";
 import { getSponsorName } from "@/lib/sponsor/api";
 import { Button } from "@/components/ui/button";
+import ApplicationFormPreviewPage from "./ApplicationFormPreviewPage";
 import type { AmountType } from "../../-model";
 
 interface ScholarshipPreviewCardProps {
@@ -17,6 +19,7 @@ interface ScholarshipPreviewCardProps {
 
 export default function ScholarshipPreviewCard({ scholarship, amountType = "varies", unlimitedSlots = true, onClick }: ScholarshipPreviewCardProps) {
 	const auth = useAuth<AnySponsor>();
+	const [showFormPreview, setShowFormPreview] = useState(false);
 
 	const isFixed = amountType === "fixed";
 	const isRange = amountType === "range";
@@ -24,7 +27,17 @@ export default function ScholarshipPreviewCard({ scholarship, amountType = "vari
 
 	const handleApplyClick = (e: React.MouseEvent) => {
 		e.stopPropagation();
+		setShowFormPreview(true);
 	};
+
+	if (showFormPreview) {
+		return (
+			<ApplicationFormPreviewPage
+				scholarship={scholarship}
+				onBack={() => setShowFormPreview(false)}
+			/>
+		);
+	}
 
 	return (
 		<motion.div

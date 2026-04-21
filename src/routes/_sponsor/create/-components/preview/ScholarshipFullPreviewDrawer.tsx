@@ -51,7 +51,7 @@ export default function ScholarshipFullPreviewModal({
 					animate={{ opacity: isExiting ? 0 : 1 }}
 					transition={{ duration: 0.1 }}
 					onClick={handleClose}
-					className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"
+					className="absolute inset-0 bg-black/60 backdrop-blur-[3px]"
 				/>
 
 				<motion.div
@@ -70,7 +70,7 @@ export default function ScholarshipFullPreviewModal({
 						<h2 className="text-lg text-primary flex items-center gap-2">
 							<button
 								onClick={handleClose}
-								className="hover:bg-gray-100 rounded-lg transition-colors"
+								className="hover:bg-gray-100 cursor-pointer rounded-lg transition-colors"
 							>
 								<ChevronsRight size={20} className="text-primary" />
 							</button>
