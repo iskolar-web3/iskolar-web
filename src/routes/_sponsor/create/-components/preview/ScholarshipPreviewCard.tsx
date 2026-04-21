@@ -13,7 +13,7 @@ interface ScholarshipPreviewCardProps {
 	onClick?: () => void;
 }
 
-export default function ScholarshipPreviewCard({ scholarship, amountType = "fixed", unlimitedSlots = false, onClick }: ScholarshipPreviewCardProps) {
+export default function ScholarshipPreviewCard({ scholarship, amountType = "varies", unlimitedSlots = true, onClick }: ScholarshipPreviewCardProps) {
 	const auth = useAuth<AnySponsor>();
 
 	const isFixed = amountType === "fixed";
@@ -94,12 +94,10 @@ export default function ScholarshipPreviewCard({ scholarship, amountType = "fixe
 							<Coins size={16} />
 							<span>Amount</span>
 						</div>
-						{isFixed && (
+						{isVaries && (
 							<>
-								<p className="text-base text-primary">
-									{formatCurrency(scholarship.totalAmount ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-								</p>
-								<p className="text-xs text-[#6B7280]">per scholar</p>
+								<p className="text-base text-primary">Varies</p>
+								<p className="text-xs text-[#6B7280]">see details</p>
 							</>
 						)}
 						{isRange && (
@@ -112,10 +110,12 @@ export default function ScholarshipPreviewCard({ scholarship, amountType = "fixe
 								<p className="text-xs text-[#6B7280]">per scholar</p>
 							</>
 						)}
-						{isVaries && (
+						{isFixed && (
 							<>
-								<p className="text-base text-primary">Varies</p>
-								<p className="text-xs text-[#6B7280]">see details</p>
+								<p className="text-base text-primary">
+									{formatCurrency(scholarship.totalAmount ?? 0, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+								</p>
+								<p className="text-xs text-[#6B7280]">per scholar</p>
 							</>
 						)}
 					</div>
@@ -125,7 +125,7 @@ export default function ScholarshipPreviewCard({ scholarship, amountType = "fixe
 							<Users size={16} />
 							<span>Slots</span>
 						</div>
-						<p className="text-base text-primary">{unlimitedSlots ? "No limit" : (scholarship.totalSlots ?? 0)}</p>
+						<p className="text-base text-primary">{unlimitedSlots ? "No limit" : (scholarship.totalSlots ?? "No limit")}</p>
 						<p className="text-xs text-[#6B7280]">scholars</p>
 					</div>
 				</div>

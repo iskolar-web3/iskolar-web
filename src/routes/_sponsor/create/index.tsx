@@ -88,8 +88,10 @@ function CreateScholarship() {
 	const [draftFormFields, setDraftFormFields] = useState<CreateFormFieldRequest[]>([]);
 	const [showFullPreview, setShowFullPreview] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [amountType, setAmountType] = useState<AmountType>("fixed");
-	const [unlimitedSlots, setUnlimitedSlots] = useState(false);
+	const [showAmount, setShowAmount] = useState(false);
+	const [showSlots, setShowSlots] = useState(false);
+	const [amountType, setAmountType] = useState<AmountType>("varies");
+	const [unlimitedSlots, setUnlimitedSlots] = useState(true);
 	const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 	const [pendingFormData, setPendingFormData] = useState<ScholarshipFormData | null>(null);
 	const [step, setStep] = useState<"template" | "form">("template");
@@ -129,8 +131,10 @@ function CreateScholarship() {
 	const resetCreateFormState = ({ step: nextStep = "form" }: { step?: "template" | "form" } = {}) => {
 		resetForm();
 		setFormResetKey((prev) => prev + 1);
-		setAmountType("fixed");
-		setUnlimitedSlots(false);
+		setShowAmount(false);
+		setShowSlots(false);
+		setAmountType("varies");
+		setUnlimitedSlots(true);
 		setDraftFormFields([]);
 		setPendingFormData(null);
 		setSelectedTemplate(null);
@@ -189,37 +193,40 @@ function CreateScholarship() {
 	});
 
 	const onSubmit = async (data: ScholarshipFormData) => {
-		if (amountType === "fixed" && !data.totalAmount) {
-			form.setError("totalAmount", { message: "Please enter a valid amount" });
-			return
+		if (showAmount) {
+			if (amountType === "fixed" && !data.totalAmount) {
+				form.setError("totalAmount", { message: "Please enter a valid amount" });
+				return
+			}
+			if (amountType === "range") {
+				if (!data.totalAmountMin) {
+					form.setError("totalAmountMin", { message: "Please enter a minimum amount" });
+					return
+				}
+				if (!data.totalAmountMax) {
+					form.setError("totalAmountMax", { message: "Please enter a maximum amount" });
+					return
+				}
+				if (data.totalAmountMin >= data.totalAmountMax) {
+					form.setError("totalAmountMax", { message: "Max must be greater than min" });
+					return
+				}
+			}
 		}
-		if (amountType === "range") {
-			if (!data.totalAmountMin) {
-				form.setError("totalAmountMin", { message: "Please enter a minimum amount" });
-				return
-			}
-			if (!data.totalAmountMax) {
-				form.setError("totalAmountMax", { message: "Please enter a maximum amount" });
-				return
-			}
-			if (data.totalAmountMin >= data.totalAmountMax) {
-				form.setError("totalAmountMax", { message: "Max must be greater than min" });
-				return
-			}
-		}
-		if (!unlimitedSlots && !data.totalSlots) {
+		if (showSlots && !unlimitedSlots && !data.totalSlots) {
 			form.setError("totalSlots", { message: "Please enter the number of slots" });
 			return
 		}
 
-		const amountPayload: Partial<ScholarshipFormData> =
-			amountType === "fixed"
+		const amountPayload: Partial<ScholarshipFormData> = !showAmount
+			? { totalAmount: undefined, totalAmountMin: undefined, totalAmountMax: undefined }
+			: amountType === "fixed"
 				? { totalAmountMin: undefined, totalAmountMax: undefined }
 				: amountType === "range"
 					? { totalAmount: undefined }
 					: { totalAmount: undefined, totalAmountMin: undefined, totalAmountMax: undefined };
 
-		const slotsPayload = unlimitedSlots ? { totalSlots: undefined } : {};
+		const slotsPayload = !showSlots || unlimitedSlots ? { totalSlots: undefined } : {};
 		const imageUrlValue = data.imageUrl || DEFAULT_SCHOLARSHIP_IMAGE;
 
 		setPendingFormData({ ...data, ...amountPayload, ...slotsPayload, imageUrl: imageUrlValue } as ScholarshipFormData);
@@ -289,6 +296,16 @@ function CreateScholarship() {
 
 								<div className="space-y-4">
 									<AmountField
+										show={showAmount}
+										onShow={() => { setShowAmount(true); setAmountType("varies"); }}
+										onHide={() => {
+											setShowAmount(false);
+											setAmountType("varies");
+											setValue("totalAmount", undefined);
+											setValue("totalAmountMin", undefined);
+											setValue("totalAmountMax", undefined);
+											form.clearErrors(["totalAmount", "totalAmountMin", "totalAmountMax"]);
+										}}
 										amountType={amountType}
 										onAmountTypeChange={setAmountType}
 										control={control}
@@ -299,6 +316,14 @@ function CreateScholarship() {
 									/>
 
 									<SlotsDeadlineFields
+										showSlots={showSlots}
+										onShowSlots={() => setShowSlots(true)}
+										onHideSlots={() => {
+											setShowSlots(false);
+											setUnlimitedSlots(true);
+											setValue("totalSlots", undefined);
+											form.clearErrors("totalSlots");
+										}}
 										unlimitedSlots={unlimitedSlots}
 										onUnlimitedSlotsChange={setUnlimitedSlots}
 										control={control}
@@ -386,8 +411,8 @@ function CreateScholarship() {
 							</div>
 							<ScholarshipPreviewCard
 								scholarship={previewScholarship}
-								amountType={amountType}
-								unlimitedSlots={unlimitedSlots}
+								amountType={showAmount ? amountType : "varies"}
+								unlimitedSlots={showSlots ? unlimitedSlots : true}
 								onClick={() => setShowFullPreview(true)}
 							/>
 						</div>
