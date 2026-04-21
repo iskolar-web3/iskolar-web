@@ -336,6 +336,9 @@ function EditScholarshipPage() {
 				{/* Amount and Slots/Deadline Section */}
 				<div className="bg-[#F8F9FC] rounded-xl p-3 shadow-sm space-y-4">
 					<AmountField
+						show={true}
+						onShow={() => {}}
+						onHide={() => {}}
 						amountType={amountType}
 						onAmountTypeChange={(type) => {
 							setAmountType(type);
@@ -352,6 +355,9 @@ function EditScholarshipPage() {
 					/>
 
 					<SlotsDeadlineFields
+						showSlots={true}
+						onShowSlots={() => {}}
+						onHideSlots={() => {}}
 						unlimitedSlots={unlimitedSlots}
 						onUnlimitedSlotsChange={(unlimited) => {
 							setUnlimitedSlots(unlimited);

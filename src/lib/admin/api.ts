@@ -1,4 +1,7 @@
 import { BACKEND_URL, safeResponseJson, type ApiResponse } from "@/lib/api";
+import { scholarshipSchema } from "@/lib/scholarship/model";
+import { anySponsorSchema } from "@/lib/sponsor/model";
+import type { Scholarship } from "@/lib/scholarship/model";
 import type {
 	DashboardMetrics,
 	PaginatedResponse,
@@ -43,6 +46,22 @@ export async function getStudentDistribution(
 		credentials: "include",
 	});
 	return safeResponseJson(response);
+}
+
+export async function getAdminScholarships(
+	token: string,
+	params?: { search?: string },
+): Promise<Scholarship[]> {
+	const url = new URL(`${BACKEND_URL}/admin/scholarships`);
+	if (params?.search) url.searchParams.set("search", params.search);
+
+	const response = await fetch(url.toString(), {
+		method: "GET",
+		headers: { Authorization: `Bearer ${token}` },
+		credentials: "include",
+	});
+	const result: ApiResponse<Scholarship[]> = await safeResponseJson(response);
+	return scholarshipSchema(anySponsorSchema).array().default([]).parse(result.data);
 }
 
 export async function getUsers(

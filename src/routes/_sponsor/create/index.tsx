@@ -29,7 +29,8 @@ import FormFieldsDialog from "./-components/application-form/FormFieldsDialog";
 import AmountField from "./-components/fields/AmountField";
 import ImageTitleDescriptionSection from "./-components/fields/ImageTitleDescriptionSection";
 import ScholarshipTypeSelect from "./-components/fields/ScholarshipTypeSelect";
-import SlotsDeadlineFields from "./-components/fields/SlotsDeadlineFields";
+import DeadlineField from "./-components/fields/DeadlineField";
+import SlotsField from "./-components/fields/SlotsField";
 import TagsListField from "./-components/fields/TagsListField";
 import ScholarshipFullPreviewModal from "./-components/preview/ScholarshipFullPreviewDrawer";
 import ScholarshipPreviewCard from "./-components/preview/ScholarshipPreviewCard";
@@ -88,13 +89,16 @@ function CreateScholarship() {
 	const [draftFormFields, setDraftFormFields] = useState<CreateFormFieldRequest[]>([]);
 	const [showFullPreview, setShowFullPreview] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [amountType, setAmountType] = useState<AmountType>("fixed");
-	const [unlimitedSlots, setUnlimitedSlots] = useState(false);
+	const [showAmount, setShowAmount] = useState(false);
+	const [showSlots, setShowSlots] = useState(false);
+	const [amountType, setAmountType] = useState<AmountType>("varies");
+	const [unlimitedSlots, setUnlimitedSlots] = useState(true);
 	const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 	const [pendingFormData, setPendingFormData] = useState<ScholarshipFormData | null>(null);
 	const [step, setStep] = useState<"template" | "form">("template");
 	const [selectedTemplate, setSelectedTemplate] = useState<ScholarshipTemplate | null>(null);
 	const [formResetKey, setFormResetKey] = useState(0);
+	const [showPreview, setShowPreview] = useState(false);
 
 	const criteria = watch("criterias");
 	const requiredDocuments = watch("requirements");
@@ -129,8 +133,10 @@ function CreateScholarship() {
 	const resetCreateFormState = ({ step: nextStep = "form" }: { step?: "template" | "form" } = {}) => {
 		resetForm();
 		setFormResetKey((prev) => prev + 1);
-		setAmountType("fixed");
-		setUnlimitedSlots(false);
+		setShowAmount(false);
+		setShowSlots(false);
+		setAmountType("varies");
+		setUnlimitedSlots(true);
 		setDraftFormFields([]);
 		setPendingFormData(null);
 		setSelectedTemplate(null);
@@ -189,37 +195,40 @@ function CreateScholarship() {
 	});
 
 	const onSubmit = async (data: ScholarshipFormData) => {
-		if (amountType === "fixed" && !data.totalAmount) {
-			form.setError("totalAmount", { message: "Please enter a valid amount" });
-			return
+		if (showAmount) {
+			if (amountType === "fixed" && !data.totalAmount) {
+				form.setError("totalAmount", { message: "Please enter a valid amount" });
+				return
+			}
+			if (amountType === "range") {
+				if (!data.totalAmountMin) {
+					form.setError("totalAmountMin", { message: "Please enter a minimum amount" });
+					return
+				}
+				if (!data.totalAmountMax) {
+					form.setError("totalAmountMax", { message: "Please enter a maximum amount" });
+					return
+				}
+				if (data.totalAmountMin >= data.totalAmountMax) {
+					form.setError("totalAmountMax", { message: "Max must be greater than min" });
+					return
+				}
+			}
 		}
-		if (amountType === "range") {
-			if (!data.totalAmountMin) {
-				form.setError("totalAmountMin", { message: "Please enter a minimum amount" });
-				return
-			}
-			if (!data.totalAmountMax) {
-				form.setError("totalAmountMax", { message: "Please enter a maximum amount" });
-				return
-			}
-			if (data.totalAmountMin >= data.totalAmountMax) {
-				form.setError("totalAmountMax", { message: "Max must be greater than min" });
-				return
-			}
-		}
-		if (!unlimitedSlots && !data.totalSlots) {
+		if (showSlots && !unlimitedSlots && !data.totalSlots) {
 			form.setError("totalSlots", { message: "Please enter the number of slots" });
 			return
 		}
 
-		const amountPayload: Partial<ScholarshipFormData> =
-			amountType === "fixed"
+		const amountPayload: Partial<ScholarshipFormData> = !showAmount
+			? { totalAmount: undefined, totalAmountMin: undefined, totalAmountMax: undefined }
+			: amountType === "fixed"
 				? { totalAmountMin: undefined, totalAmountMax: undefined }
 				: amountType === "range"
 					? { totalAmount: undefined }
 					: { totalAmount: undefined, totalAmountMin: undefined, totalAmountMax: undefined };
 
-		const slotsPayload = unlimitedSlots ? { totalSlots: undefined } : {};
+		const slotsPayload = !showSlots || unlimitedSlots ? { totalSlots: undefined } : {};
 		const imageUrlValue = data.imageUrl || DEFAULT_SCHOLARSHIP_IMAGE;
 
 		setPendingFormData({ ...data, ...amountPayload, ...slotsPayload, imageUrl: imageUrlValue } as ScholarshipFormData);
@@ -239,7 +248,7 @@ function CreateScholarship() {
 	}
 
 	return (
-		<div className="max-w-7xl mx-auto">
+		<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
 			<SEO title="Create Scholarship" noindex={true} />
 			{toast && <Toast {...toast} />}
 
@@ -253,19 +262,34 @@ function CreateScholarship() {
 				/>
 			) : (
 				<>
-					<button
-						type="button"
-						onClick={() => resetCreateFormState({ step: "template" })}
-						className="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-primary mb-4 cursor-pointer transition-colors"
-					>
-						<ArrowLeft size={16} />
-						Back to templates
-					</button>
+					<div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+						<button
+							type="button"
+							onClick={() => resetCreateFormState({ step: "template" })}
+							className="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-primary cursor-pointer transition-colors w-fit"
+						>
+							<ArrowLeft size={16} />
+							Back to templates
+						</button>
 
-					<div className="grid grid-cols-1 lg:grid-cols-15">
+						<div className="flex items-center gap-2">
+							<input
+								type="checkbox"
+								id="preview-toggle"
+								checked={showPreview}
+								onChange={(e) => setShowPreview(e.target.checked)}
+								className="w-4 h-4 rounded border-[#D1D5DB] cursor-pointer"
+							/>
+							<label htmlFor="preview-toggle" className="text-sm text-[#4A5568] cursor-pointer whitespace-nowrap">
+								Show Live Preview
+							</label>
+						</div>
+					</div>
+
+					<div className={`grid grid-cols-1 gap-6 ${showPreview ? "lg:grid-cols-15" : ""}`}>
 						{/* Scholarship Details */}
-						<div className="space-y-4 lg:col-span-8">
-							<div className="bg-[#F8F9FC] rounded-xl p-3 shadow-sm space-y-4">
+						<div className={`space-y-4 ${showPreview ? "lg:col-span-8" : "w-full lg:max-w-2xl lg:mx-auto"}`}>
+							<div className="bg-[#F8F9FC] rounded-xl p-4 sm:p-6 shadow-sm space-y-4">
 								<ScholarshipTypeSelect
 									value={scholarshipType}
 									onValueChange={(v) =>
@@ -288,7 +312,23 @@ function CreateScholarship() {
 								/>
 
 								<div className="space-y-4">
+									<DeadlineField
+										control={control}
+										errors={errors}
+										disabled={loading}
+									/>
+
 									<AmountField
+										show={showAmount}
+										onShow={() => { setShowAmount(true); setAmountType("varies"); }}
+										onHide={() => {
+											setShowAmount(false);
+											setAmountType("varies");
+											setValue("totalAmount", undefined);
+											setValue("totalAmountMin", undefined);
+											setValue("totalAmountMax", undefined);
+											form.clearErrors(["totalAmount", "totalAmountMin", "totalAmountMax"]);
+										}}
 										amountType={amountType}
 										onAmountTypeChange={setAmountType}
 										control={control}
@@ -298,7 +338,15 @@ function CreateScholarship() {
 										disabled={loading}
 									/>
 
-									<SlotsDeadlineFields
+									<SlotsField
+										showSlots={showSlots}
+										onShowSlots={() => setShowSlots(true)}
+										onHideSlots={() => {
+											setShowSlots(false);
+											setUnlimitedSlots(true);
+											setValue("totalSlots", undefined);
+											form.clearErrors("totalSlots");
+										}}
 										unlimitedSlots={unlimitedSlots}
 										onUnlimitedSlotsChange={setUnlimitedSlots}
 										control={control}
@@ -364,7 +412,7 @@ function CreateScholarship() {
 							<button
 								// @ts-expect-error it works but I get type error for some reason
 								onClick={handleSubmit(onSubmit)}
-								className={`w-full mt-2 mb-6 md:mb-0 py-3 bg-[#EFA508] text-tertiary cursor-pointer rounded-lg hover:bg-[#D89407] transition-colors ${
+								className={`w-full mt-4 py-3 font-medium bg-[#EFA508] text-tertiary cursor-pointer rounded-lg hover:bg-[#D89407] transition-colors ${
 									loading && "opacity-60 cursor-not-allowed"
 								}`}
 								disabled={loading}
@@ -379,18 +427,44 @@ function CreateScholarship() {
 							</button>
 						</div>
 
-						{/* Live Preview */}
-						<div className="lg:sticky lg:col-span-7 lg:top-6 h-fit md:ml-24">
-							<div className="flex items-center justify-between mb-2">
-								<h2 className="text-sm text-primary">Live Preview</h2>
-							</div>
-							<ScholarshipPreviewCard
-								scholarship={previewScholarship}
-								amountType={amountType}
-								unlimitedSlots={unlimitedSlots}
-								onClick={() => setShowFullPreview(true)}
-							/>
-						</div>
+						{/* Live Preview - Bottom on mobile/tablet, right side on desktop */}
+						{showPreview && (
+							<>
+								{/* Mobile and tablet preview - shown at bottom */}
+								<div className="col-span-1 lg:hidden">
+									<div className="flex items-center justify-start gap-3 mb-3">
+										<h2 className="text-sm text-primary">Live Preview</h2>
+
+										<p className="text-xs text-[#6B7280]">
+											This is how students see your scholarship.
+										</p>
+									</div>
+									<ScholarshipPreviewCard
+										scholarship={previewScholarship}
+										amountType={showAmount ? amountType : "varies"}
+										unlimitedSlots={showSlots ? unlimitedSlots : true}
+										onClick={() => setShowFullPreview(true)}
+									/>
+								</div>
+
+								{/* Desktop preview - shown on the right side */}
+								<div className="hidden lg:block lg:col-span-7 lg:sticky lg:top-6 h-fit">
+									<div className="flex items-center justify-start gap-3 mb-3">
+										<h2 className="text-sm text-primary">Live Preview</h2>
+
+										<p className="text-xs text-[#6B7280]">
+											This is how students see your scholarship.
+										</p>
+									</div>
+									<ScholarshipPreviewCard
+										scholarship={previewScholarship}
+										amountType={showAmount ? amountType : "varies"}
+										unlimitedSlots={showSlots ? unlimitedSlots : true}
+										onClick={() => setShowFullPreview(true)}
+									/>
+								</div>
+							</>
+						)}
 					</div>
 				</>
 			)}

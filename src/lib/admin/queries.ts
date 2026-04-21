@@ -4,6 +4,7 @@ import {
 	getSignupTimeline,
 	getStudentDistribution,
 	getUsers,
+	getAdminScholarships,
 } from "./api";
 import type { UserListQuery } from "./model";
 
@@ -50,6 +51,17 @@ export function adminUsersQueryOptions(
 			const res = await getUsers(token, params);
 			return res.data;
 		},
+		staleTime: 60 * 1000,
+	});
+}
+
+export function adminScholarshipsQueryOptions(
+	token: string,
+	params?: { search?: string },
+) {
+	return queryOptions({
+		queryKey: ["admin", "scholarships", params],
+		queryFn: () => getAdminScholarships(token, params),
 		staleTime: 60 * 1000,
 	});
 }
