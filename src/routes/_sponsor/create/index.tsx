@@ -98,6 +98,7 @@ function CreateScholarship() {
 	const [step, setStep] = useState<"template" | "form">("template");
 	const [selectedTemplate, setSelectedTemplate] = useState<ScholarshipTemplate | null>(null);
 	const [formResetKey, setFormResetKey] = useState(0);
+	const [showPreview, setShowPreview] = useState(false);
 
 	const criteria = watch("criterias");
 	const requiredDocuments = watch("requirements");
@@ -247,7 +248,7 @@ function CreateScholarship() {
 	}
 
 	return (
-		<div className="max-w-7xl mx-auto">
+		<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
 			<SEO title="Create Scholarship" noindex={true} />
 			{toast && <Toast {...toast} />}
 
@@ -261,19 +262,34 @@ function CreateScholarship() {
 				/>
 			) : (
 				<>
-					<button
-						type="button"
-						onClick={() => resetCreateFormState({ step: "template" })}
-						className="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-primary mb-4 cursor-pointer transition-colors"
-					>
-						<ArrowLeft size={16} />
-						Back to templates
-					</button>
+					<div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+						<button
+							type="button"
+							onClick={() => resetCreateFormState({ step: "template" })}
+							className="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-primary cursor-pointer transition-colors w-fit"
+						>
+							<ArrowLeft size={16} />
+							Back to templates
+						</button>
 
-					<div className="grid grid-cols-1 lg:grid-cols-15">
+						<div className="flex items-center gap-2">
+							<input
+								type="checkbox"
+								id="preview-toggle"
+								checked={showPreview}
+								onChange={(e) => setShowPreview(e.target.checked)}
+								className="w-4 h-4 rounded border-[#D1D5DB] cursor-pointer"
+							/>
+							<label htmlFor="preview-toggle" className="text-sm text-[#4A5568] cursor-pointer whitespace-nowrap">
+								Show Live Preview
+							</label>
+						</div>
+					</div>
+
+					<div className={`grid grid-cols-1 gap-6 ${showPreview ? "lg:grid-cols-15" : ""}`}>
 						{/* Scholarship Details */}
-						<div className="space-y-4 lg:col-span-8">
-							<div className="bg-[#F8F9FC] rounded-xl p-3 shadow-sm space-y-4">
+						<div className={`space-y-4 ${showPreview ? "lg:col-span-8" : "w-full lg:max-w-2xl lg:mx-auto"}`}>
+							<div className="bg-[#F8F9FC] rounded-xl p-4 sm:p-6 shadow-sm space-y-4">
 								<ScholarshipTypeSelect
 									value={scholarshipType}
 									onValueChange={(v) =>
@@ -396,7 +412,7 @@ function CreateScholarship() {
 							<button
 								// @ts-expect-error it works but I get type error for some reason
 								onClick={handleSubmit(onSubmit)}
-								className={`w-full mt-2 mb-6 md:mb-0 py-3 bg-[#EFA508] text-tertiary cursor-pointer rounded-lg hover:bg-[#D89407] transition-colors ${
+								className={`w-full mt-4 py-3 font-medium bg-[#EFA508] text-tertiary cursor-pointer rounded-lg hover:bg-[#D89407] transition-colors ${
 									loading && "opacity-60 cursor-not-allowed"
 								}`}
 								disabled={loading}
@@ -411,22 +427,44 @@ function CreateScholarship() {
 							</button>
 						</div>
 
-						{/* Live Preview */}
-						<div className="lg:sticky lg:col-span-7 lg:top-6 h-fit md:ml-24">
-							<div className="flex items-center justify-start gap-3 mb-3">
-								<h2 className="text-sm text-primary">Live Preview</h2>
+						{/* Live Preview - Bottom on mobile/tablet, right side on desktop */}
+						{showPreview && (
+							<>
+								{/* Mobile and tablet preview - shown at bottom */}
+								<div className="col-span-1 lg:hidden">
+									<div className="flex items-center justify-start gap-3 mb-3">
+										<h2 className="text-sm text-primary">Live Preview</h2>
 
-								<p className="text-xs text-[#6B7280]">
-									This is how students see your scholarship.
-								</p>
-							</div>
-							<ScholarshipPreviewCard
-								scholarship={previewScholarship}
-								amountType={showAmount ? amountType : "varies"}
-								unlimitedSlots={showSlots ? unlimitedSlots : true}
-								onClick={() => setShowFullPreview(true)}
-							/>
-						</div>
+										<p className="text-xs text-[#6B7280]">
+											This is how students see your scholarship.
+										</p>
+									</div>
+									<ScholarshipPreviewCard
+										scholarship={previewScholarship}
+										amountType={showAmount ? amountType : "varies"}
+										unlimitedSlots={showSlots ? unlimitedSlots : true}
+										onClick={() => setShowFullPreview(true)}
+									/>
+								</div>
+
+								{/* Desktop preview - shown on the right side */}
+								<div className="hidden lg:block lg:col-span-7 lg:sticky lg:top-6 h-fit">
+									<div className="flex items-center justify-start gap-3 mb-3">
+										<h2 className="text-sm text-primary">Live Preview</h2>
+
+										<p className="text-xs text-[#6B7280]">
+											This is how students see your scholarship.
+										</p>
+									</div>
+									<ScholarshipPreviewCard
+										scholarship={previewScholarship}
+										amountType={showAmount ? amountType : "varies"}
+										unlimitedSlots={showSlots ? unlimitedSlots : true}
+										onClick={() => setShowFullPreview(true)}
+									/>
+								</div>
+							</>
+						)}
 					</div>
 				</>
 			)}
