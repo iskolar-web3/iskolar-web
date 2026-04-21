@@ -29,7 +29,8 @@ import FormFieldsDialog from "./-components/application-form/FormFieldsDialog";
 import AmountField from "./-components/fields/AmountField";
 import ImageTitleDescriptionSection from "./-components/fields/ImageTitleDescriptionSection";
 import ScholarshipTypeSelect from "./-components/fields/ScholarshipTypeSelect";
-import SlotsDeadlineFields from "./-components/fields/SlotsDeadlineFields";
+import DeadlineField from "./-components/fields/DeadlineField";
+import SlotsField from "./-components/fields/SlotsField";
 import TagsListField from "./-components/fields/TagsListField";
 import ScholarshipFullPreviewModal from "./-components/preview/ScholarshipFullPreviewDrawer";
 import ScholarshipPreviewCard from "./-components/preview/ScholarshipPreviewCard";
@@ -295,6 +296,12 @@ function CreateScholarship() {
 								/>
 
 								<div className="space-y-4">
+									<DeadlineField
+										control={control}
+										errors={errors}
+										disabled={loading}
+									/>
+
 									<AmountField
 										show={showAmount}
 										onShow={() => { setShowAmount(true); setAmountType("varies"); }}
@@ -315,7 +322,7 @@ function CreateScholarship() {
 										disabled={loading}
 									/>
 
-									<SlotsDeadlineFields
+									<SlotsField
 										showSlots={showSlots}
 										onShowSlots={() => setShowSlots(true)}
 										onHideSlots={() => {
@@ -406,8 +413,12 @@ function CreateScholarship() {
 
 						{/* Live Preview */}
 						<div className="lg:sticky lg:col-span-7 lg:top-6 h-fit md:ml-24">
-							<div className="flex items-center justify-between mb-2">
+							<div className="flex items-center justify-start gap-3 mb-3">
 								<h2 className="text-sm text-primary">Live Preview</h2>
+
+								<p className="text-xs text-[#6B7280]">
+									This is how students see your scholarship.
+								</p>
 							</div>
 							<ScholarshipPreviewCard
 								scholarship={previewScholarship}
