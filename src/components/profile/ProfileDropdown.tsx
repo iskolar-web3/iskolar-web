@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
-import { User as UserIcon } from "lucide-react";
+import { User as UserIcon, ShieldCheck, ShieldAlert } from "lucide-react";
 import { handleError } from "@/lib/errorHandler";
 import { logger } from "@/lib/logger";
 import Toast from "@/components/Toast";
@@ -11,6 +11,8 @@ import { UserRole, type User } from "@/lib/user/model";
 import type { Student } from "@/lib/student/model";
 import { getSponsorName } from "@/lib/sponsor/api";
 import type { AnySponsor } from "@/lib/sponsor/model";
+import { useVerificationStatus } from "@/hooks/useVerificationStatus";
+import { VerificationStatus } from "@/lib/verification/model";
 
 // const USE_MOCK_DATA = true;
 
@@ -55,6 +57,15 @@ export default function ProfileDropdown({ onClose }: ProfileDropdownProps) {
 	// const [isLoading, setIsLoading] = useState(true);
 
 	const auth = useAuth<any>();
+
+	const verificationEnabled = import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true";
+	const roleCode = auth.user?.role?.code;
+	const verificationRole: "students" | "sponsors" = roleCode === UserRole.Sponsor ? "sponsors" : "students";
+	const verificationQuery = useVerificationStatus(
+		verificationRole,
+		verificationEnabled && (roleCode === UserRole.Student || roleCode === UserRole.Sponsor),
+	);
+	const isVerified = verificationQuery.isLoading || verificationQuery.data?.status === VerificationStatus.Verified;
 
 	/**
 	 * Fetch user profile on component mount
@@ -183,6 +194,19 @@ export default function ProfileDropdown({ onClose }: ProfileDropdownProps) {
 									{getDisplayName(auth.user, auth.profile)}
 								</p>
 							) : null}
+							{verificationEnabled && !verificationQuery.isLoading && (roleCode === UserRole.Student || roleCode === UserRole.Sponsor) && (
+								isVerified ? (
+									<span className="inline-flex items-center gap-1 text-[10px] text-green-600 mt-0.5">
+										<ShieldCheck className="w-3 h-3" />
+										Verified
+									</span>
+								) : (
+									<span className="inline-flex items-center gap-1 text-[10px] text-amber-600 mt-0.5">
+										<ShieldAlert className="w-3 h-3" />
+										Not Verified
+									</span>
+								)
+							)}
 						</div>
 					</div>
 				</button>

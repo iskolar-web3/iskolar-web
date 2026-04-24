@@ -18,6 +18,8 @@ import { useQuery } from "@tanstack/react-query";
 import type { Student } from "@/lib/student/model";
 import { useAuth } from "@/auth";
 import { getMyScholarshipsQuery } from "@/lib/scholarship/api";
+import { useVerificationStatus } from "@/hooks/useVerificationStatus";
+import { VerificationStatus } from "@/lib/verification/model";
 
 export const Route = createFileRoute("/_student/discover/")({
 	component: DiscoverScholarship,
@@ -37,6 +39,10 @@ function DiscoverScholarship() {
 	const { toast, showError } = useToast();
 
 	const auth = useAuth<Student>();
+	const verificationEnabled = import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true";
+	const verificationQuery = useVerificationStatus("students", verificationEnabled);
+	const isVerified = !verificationEnabled || verificationQuery.isLoading || verificationQuery.data?.status === VerificationStatus.Verified;
+
 	const scholarshipsQuery = useQuery(
 		getMyScholarshipsQuery(auth.sessionToken, {
 			notAppliedBy: auth.profile.id,
@@ -390,6 +396,7 @@ function DiscoverScholarship() {
 									key={`${scholarship.id}-${index}`}
 									scholarship={scholarship}
 									index={index}
+									isVerified={isVerified}
 									onClick={() => setSelectedScholarship(scholarship)}
 								/>
 							))
@@ -402,6 +409,7 @@ function DiscoverScholarship() {
 			{selectedScholarship && (
 				<ScholarshipDetailsModal
 					scholarship={selectedScholarship}
+					isVerified={isVerified}
 					onClose={() => setSelectedScholarship(null)}
 				/>
 			)}
