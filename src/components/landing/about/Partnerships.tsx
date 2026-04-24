@@ -3,6 +3,8 @@ import { MotionContainer, MotionItem } from "@/components/landing/MotionContaine
 const partners = [
 	{ src: "/partnerships/byc-ventures.png", alt: "BYC Ventures" },
 	{ src: "/partnerships/cryptita-plays.png", alt: "Cryptita Plays", size: "h-28" },
+	{ src: "/partnerships/aws-learning-club-heron.png", alt: "AWS Learning Club - Heron", size: "h-28" },
+	{ src: "/partnerships/finsharc.png", alt: "Finsharc", size: "h-28" },
 ]
 
 export function Partnerships() {
