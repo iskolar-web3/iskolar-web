@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus } from "lucide-react";
+import { Plus, ShieldCheck, ShieldAlert } from "lucide-react";
 import { motion } from "framer-motion";
 import { SEO } from "@/components/SEO";
 import { useRef, useState } from "react";
@@ -19,6 +19,8 @@ import { useMutation } from "@tanstack/react-query";
 import StudentProfileForm from "@/components/student/profile/ProfileForm";
 import VerificationStatus from "@/components/verification/VerificationStatus";
 import ProfileAvatar from "./-components/ProfileAvatar";
+import { useVerificationStatus } from "@/hooks/useVerificationStatus";
+import { VerificationStatus as VerStatus } from "@/lib/verification/model";
 
 export const Route = createFileRoute("/_student/profile/student/$studentId/")({
 	component: StudentProfilePage,
@@ -27,6 +29,10 @@ export const Route = createFileRoute("/_student/profile/student/$studentId/")({
 function StudentProfilePage() {
 
 	const auth = useAuth<Student>();
+	const verificationEnabled = import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true";
+	const verificationQuery = useVerificationStatus("students", verificationEnabled);
+	const isVerified = verificationQuery.isLoading || verificationQuery.data?.status === VerStatus.Verified;
+
 	const [isCredentialModalOpen, setIsCredentialModalOpen] = useState(false);
 	const [isEditing, setIsEditing] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
@@ -112,14 +118,31 @@ function StudentProfilePage() {
 					className="bg-card rounded-lg shadow-sm border border-[#E0ECFF] overflow-hidden"
 				>
 					<div className="px-6 pb-6">
-						<div className="flex flex-col md:flex-row items-center md:items-start gap-6 mt-6">
-							<ProfileAvatar onSubmit={handleFormSubmit} />
-							<ProfileHeader
-								name={`${auth.profile.firstName} ${auth.profile.lastName}`}
-								role={UserRole.Student}
-								email={auth.profile.email}
-								contactNumber={auth.profile.contact.value}
-							/>
+						<div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mt-6">
+							<div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+								<ProfileAvatar onSubmit={handleFormSubmit} />
+								<ProfileHeader
+									name={`${auth.profile.firstName} ${auth.profile.lastName}`}
+									role={UserRole.Student}
+									email={auth.profile.email}
+									contactNumber={auth.profile.contact.value}
+								/>
+							</div>
+							{verificationEnabled && !verificationQuery.isLoading && (
+								<div className="flex justify-center md:justify-end shrink-0 md:mt-6">
+									{isVerified ? (
+										<span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-50 border border-green-200 rounded-md text-green-700 text-xs font-medium">
+											<ShieldCheck className="w-3.5 h-3.5" />
+											Verified
+										</span>
+									) : (
+										<span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-md text-amber-700 text-xs font-medium">
+											<ShieldAlert className="w-3.5 h-3.5" />
+											Not Verified
+										</span>
+									)}
+								</div>
+							)}
 						</div>
 					</div>
 				</motion.div>

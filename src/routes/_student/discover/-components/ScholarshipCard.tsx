@@ -1,4 +1,4 @@
-import { Calendar, Users, Coins, UserIcon } from 'lucide-react';
+import { Calendar, Users, Coins, UserIcon, LockKeyhole } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { formatCurrency, formatDate } from '@/utils/formatting.utils';
 import { ScholarshipType, type Scholarship } from '@/lib/scholarship/model';
@@ -14,6 +14,8 @@ export interface ScholarshipCardProps {
   scholarship: Scholarship;
   /** Index for staggered animation delay */
   index: number;
+  /** Whether the student has a verified identity */
+  isVerified?: boolean;
   /** Optional callback when card is clicked */
   onClick?: () => void;
 }
@@ -24,11 +26,12 @@ export interface ScholarshipCardProps {
  * @param props - Component props
  * @returns Animated scholarship card component
  */
-export default function ScholarshipCard({ scholarship, index, onClick }: ScholarshipCardProps) {
+export default function ScholarshipCard({ scholarship, index, onClick, isVerified = true }: ScholarshipCardProps) {
   const navigate = useNavigate();
   const isRange = scholarship.totalAmountMin != null || scholarship.totalAmountMax != null;
   const isFixed = !isRange && scholarship.totalAmount != null;
   const isVaries = !isRange && !isFixed;
+  const applyDisabled = !isVerified;
 
   const handleApplyClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -179,13 +182,20 @@ export default function ScholarshipCard({ scholarship, index, onClick }: Scholar
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 + 0.25 }}
           >
-            <Button
-              size="default"
-              onClick={handleApplyClick}
-              className="w-full text-xs md:text-sm bg-[#3A52A6] text-white hover:bg-[#2f4389] cursor-pointer"
-            >
-              Apply Now
-            </Button>
+            <span title={applyDisabled ? "Verify your identity to apply" : undefined}>
+              <Button
+                size="default"
+                onClick={handleApplyClick}
+                disabled={applyDisabled}
+                className="w-full text-xs md:text-sm bg-[#3A52A6] text-white hover:bg-[#2f4389] cursor-pointer"
+              >
+                {applyDisabled ? (
+                  <><LockKeyhole className="w-3 h-3" /> Apply Now</>
+                ) : (
+                  "Apply Now"
+                )}
+              </Button>
+            </span>
           </motion.div>
         </div>
       </div>

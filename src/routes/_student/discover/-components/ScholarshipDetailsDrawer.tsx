@@ -16,7 +16,7 @@ import { getSponsorName } from '@/lib/sponsor/api';
  * @param props.onClose - Callback function to close the modal
  * @returns Animated side panel modal with scholarship details and apply button
  */
-export default function ScholarshipDetailsModal({ scholarship, onClose }: { scholarship: Scholarship; onClose: () => void }) {
+export default function ScholarshipDetailsModal({ scholarship, onClose, isVerified = true }: { scholarship: Scholarship; onClose: () => void; isVerified?: boolean }) {
   const navigate = useNavigate();
 
   const [isExiting, setIsExiting] = useState(false);
@@ -220,6 +220,13 @@ export default function ScholarshipDetailsModal({ scholarship, onClose }: { scho
                 <LockKeyhole size={16} className="text-[#DC2626] shrink-0" />
                 <p className="text-[11px] md:text-xs text-[#DC2626] leading-relaxed flex-1">
                   This scholarship program is no longer accepting applications.
+                </p>
+              </div>
+            ) : !isVerified ? (
+              <div className="flex items-center gap-2.5 bg-amber-50 border border-amber-200 rounded-md p-3 mt-1.5 mb-2">
+                <LockKeyhole size={16} className="text-amber-600 shrink-0" />
+                <p className="text-[11px] md:text-xs text-amber-700 leading-relaxed flex-1">
+                  Verify your identity on your profile to apply for scholarships.
                 </p>
               </div>
             ) : (
