@@ -1,10 +1,12 @@
 import { MotionContainer, MotionItem } from "@/components/landing/MotionContainer"
 
 const partners = [
-	{ src: "/partnerships/byc-ventures.png", alt: "BYC Ventures" },
+	{ src: "/partnerships/byc-ventures.png", alt: "BYC Ventures", size: "h-20" },
 	{ src: "/partnerships/cryptita-plays.png", alt: "Cryptita Plays", size: "h-28" },
-	{ src: "/partnerships/aws-learning-club-heron.png", alt: "AWS Learning Club - Heron", size: "h-28" },
+	{ src: "/partnerships/tutorials-dojo.png", alt: "Tutorials Dojo", size: "h-24" },
 	{ src: "/partnerships/finsharc.png", alt: "Finsharc", size: "h-28" },
+	{ src: "/partnerships/aws-learning-club-heron.png", alt: "AWS Learning Club - Heron", size: "h-28" },
+	{ src: "/partnerships/tech-kubo.png", alt: "Tech Kubo", size: "h-30" },
 ]
 
 export function Partnerships() {
