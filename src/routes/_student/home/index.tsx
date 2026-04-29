@@ -5,8 +5,6 @@ import { SEO } from "@/components/SEO";
 import ApplicationDetailsModal from "@/components/student/home/ApplicationDetailsDrawer";
 import { useToast } from "@/hooks/useToast";
 import Toast from "@/components/Toast";
-import { useAuth } from "@/auth";
-import type { Student } from "@/lib/student/model";
 import {
 	ScholarshipApplicationStatus,
 	type Application,
