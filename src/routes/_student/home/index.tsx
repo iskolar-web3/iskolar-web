@@ -34,11 +34,9 @@ function Home(): JSX.Element {
 		useState<Application | null>(null);
 	const { toast, showError } = useToast();
 	const search = useSearch({ from: "/_student/home/" });
-	const auth = useAuth<Student>();
 
 	const applicationsQuery = useQuery(
 		getMyApplicationsQuery({
-			studentId: auth.profile.id,
 			status: getEquivalentStatus(search.status),
 		}),
 	);

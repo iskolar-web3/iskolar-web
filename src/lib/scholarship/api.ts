@@ -26,6 +26,9 @@ async function getMyScholarships(
 	const resolvedToken = token || getCookie(ACCESS_TOKEN_KEY);
 	if (!resolvedToken) return [];
 	const url = new URL(`${BACKEND_URL}/scholarships`);
+	if (params?.status) {
+		url.searchParams.append("status", params.status);
+	}
 	if (params?.sponsorId) {
 		url.searchParams.append("sponsorId", params.sponsorId);
 	}
@@ -54,7 +57,11 @@ export const getMyScholarshipsQuery = (
 	params?: GetScholarshipQueryParam,
 ) =>
 	queryOptions({
-		queryKey: ["scholarships", token || getCookie(ACCESS_TOKEN_KEY) || null, params],
+		queryKey: [
+			"scholarships",
+			token || getCookie(ACCESS_TOKEN_KEY) || null,
+			params,
+		],
 		queryFn: () => getMyScholarships(token, params),
 		refetchOnMount: true,
 	});
@@ -140,11 +147,7 @@ async function getMyApplications(
 	if (!token) {
 		throw new Error("Access token not found.");
 	}
-	const url = new URL(`${BACKEND_URL}/scholarships/applications`);
-	if (param.studentId) {
-		url.searchParams.append("studentId", param.studentId);
-	}
-
+	const url = new URL(`${BACKEND_URL}/students/me/applications`);
 	if (param.status) {
 		url.searchParams.append("status", param.status);
 	}
@@ -259,7 +262,8 @@ export async function getMyApplicationStatus(
 		headers: { Authorization: `Bearer ${token}` },
 		credentials: "include",
 	});
-	const result: ApiResponse<ApplicationStatus> = await safeResponseJson(response);
+	const result: ApiResponse<ApplicationStatus> =
+		await safeResponseJson(response);
 
 	return applicationStatusSchema.nullable().parse(result.data);
 }

@@ -19,7 +19,6 @@ export enum ScholarshipStatus {
 	Archived = "archived",
 }
 
-
 export enum FormFieldType {
 	ShortAnswer = "short_answer",
 	Paragraph = "paragraph",
@@ -174,6 +173,7 @@ export const getScholarshipQueryParamSchema = z
 		sponsorId: z.uuidv4(),
 		search: z.string(),
 		notAppliedBy: z.uuidv4(),
+		status: z.enum(ScholarshipStatus),
 	})
 	.partial();
 
@@ -210,7 +210,6 @@ export type Applicant = z.output<typeof applicantSchema>;
 
 export const getApplicationsQueryParam = z
 	.object({
-		studentId: z.uuidv4(),
 		status: z.string(),
 	})
 	.partial();
