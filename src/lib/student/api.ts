@@ -27,7 +27,7 @@ export async function updateStudent(
 	value: UpdateStudentRequest,
 ): Promise<ApiResponse<Student>> {
 	const token = getCookie(ACCESS_TOKEN_KEY);
-	const response = await fetch(`${BACKEND_URL}/students/${value.id}`, {
+	const response = await fetch(`${BACKEND_URL}/students/me`, {
 		method: "PATCH",
 		body: JSON.stringify(value),
 		headers: {
