@@ -13,7 +13,7 @@ const Card = ({ image, name, role, university, link }: { image: string; name: st
       alt=""
       className="w-28 h-28 rounded-full mb-4 overflow-hidden object-cover border-2 border-secondary/20 group-hover:border-secondary/50 transition-colors"
     />
-    <h3 className="text-xl font-bold text-secondary mb-1">{name}</h3>
+    <h3 className="text-lg font-bold text-secondary mb-1">{name}</h3>
     <p className="text-sm text-secondary/85 mb-1">{role}</p>
     <p className="text-[12.5px] text-secondary/60 italic mb-4 flex items-center gap-1">
       {university}
@@ -59,25 +59,31 @@ export default function TeamSection() {
               </div>
             </div>
 
-            {/* Team Members */}
+            {/* Core Team */}
             <div className="flex flex-col items-center gap-20">
               <div className="w-full">
                 <h3 className="text-3xl text-center text-secondary mb-7">Core Team</h3>
-                <div className="flex flex-wrap justify-center gap-8 w-full max-w-5xl mx-auto">
-                  <MotionItem>
-                    <Card image="/team/Research-Lead.jpg" name="Cristian Obida" role="Research Lead" university="Asia Pacific College" link="https://www.linkedin.com/in/cristian-r-obida-96a36b28a/" />
-                  </MotionItem>
-
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full max-w-5xl mx-auto justify-items-center">
+                  {/* Technical */}
                   <MotionItem>
                     <Card image="/team/Tech-Lead.jpg" name="Giordan Nuez" role="Tech Lead" university="University of Makati" link="https://www.linkedin.com/in/giordan-nuez-b8924838b/" />
                   </MotionItem>
 
                   <MotionItem>
-                    <Card image="/team/Community-Manager.jpg" name="Juliet Tariman" role="Community Manager" university="PUP Sta. Mesa" link="https://www.linkedin.com/in/juliet-daphne-e-tariman-2022b1236/" />
+                    <Card image="/team/AI-Lead.jpg" name="John Richie Campo" role="AI Lead" university="University of Makati" link="https://www.linkedin.com/in/john-richie-campo/" />
+                  </MotionItem>
+
+                  <MotionItem>
+                    <Card image="/team/Blockchain-Lead.jpg" name="Karen Pearl  Pabilando" role="Blockchain Lead" university="National University" link="https://www.linkedin.com/in/pabilandokarenpv/" />
                   </MotionItem>
 
                   <MotionItem>
                     <Card image="/team/Cybersecurity-Lead.jpg" name="Emmanuel Mutas" role="Cybersecurity Lead" university="PUP Sta. Mesa" link="https://www.linkedin.com/in/manel04/" />
+                  </MotionItem>
+
+                  {/* Research, Design, Community, Operations */}
+                  <MotionItem>
+                    <Card image="/team/Research-Lead.jpg" name="Cristian Obida" role="Research Lead" university="Asia Pacific College" link="https://www.linkedin.com/in/cristian-r-obida-96a36b28a/" />
                   </MotionItem>
 
                   <MotionItem>
@@ -85,7 +91,11 @@ export default function TeamSection() {
                   </MotionItem>
 
                   <MotionItem>
-                    <Card image="/team/AI-Lead.jpg" name="John Richie Campo" role="AI Lead" university="University of Makati" link="https://www.linkedin.com/in/john-richie-campo/" />
+                    <Card image="/team/Community-Manager.jpg" name="Juliet Tariman" role="Community Manager" university="PUP Sta. Mesa" link="https://www.linkedin.com/in/juliet-daphne-e-tariman-2022b1236/" />
+                  </MotionItem>
+
+                  <MotionItem>
+                    <Card image="/team/Business-Operations-Associate.jpg" name="Aj Goze" role="Business Operations Associate" university="University of Makati" link="https://www.linkedin.com/in/aj-goze-6079ab365/" />
                   </MotionItem>
                 </div>
               </div>

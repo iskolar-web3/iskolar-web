@@ -127,7 +127,7 @@ function CreateScholarship() {
 		requirements: requiredDocuments,
 		formFields: customFormFields,
 		sponsorId: auth.profile.id,
-		status: ScholarshipStatus.Draft,
+		status: ScholarshipStatus.Active,
 	});
 
 	const resetCreateFormState = ({ step: nextStep = "form" }: { step?: "template" | "form" } = {}) => {
@@ -160,7 +160,7 @@ function CreateScholarship() {
 			formFields: selectedTemplate.formFields,
 			imageUrl: undefined,
 			sponsorId: auth.profile.id,
-			status: ScholarshipStatus.Draft,
+			status: ScholarshipStatus.Active,
 		})
 		setUnlimitedSlots(false);
 		setAmountType(selectedTemplate.amountType);

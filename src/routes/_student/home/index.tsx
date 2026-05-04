@@ -5,8 +5,6 @@ import { SEO } from "@/components/SEO";
 import ApplicationDetailsModal from "@/components/student/home/ApplicationDetailsDrawer";
 import { useToast } from "@/hooks/useToast";
 import Toast from "@/components/Toast";
-import { useAuth } from "@/auth";
-import type { Student } from "@/lib/student/model";
 import {
 	ScholarshipApplicationStatus,
 	type Application,
@@ -34,11 +32,9 @@ function Home(): JSX.Element {
 		useState<Application | null>(null);
 	const { toast, showError } = useToast();
 	const search = useSearch({ from: "/_student/home/" });
-	const auth = useAuth<Student>();
 
 	const applicationsQuery = useQuery(
 		getMyApplicationsQuery({
-			studentId: auth.profile.id,
 			status: getEquivalentStatus(search.status),
 		}),
 	);
