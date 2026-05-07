@@ -118,15 +118,10 @@ export const createScholarshipRequestSchema = z.object({
 	totalSlots: z.coerce.number().positive().optional(),
 	applicationDeadline: z.date({ error: "Please set an application deadline" }),
 	imageUrl: z.string().optional(),
-	criterias: z
-		.string()
-		.array()
-		.min(1, "Add at least one eligibility criterion"),
-	requirements: z.string().array().min(1, "Add at least one required document"),
+	criterias: z.string().array().default([]),
+	requirements: z.string().array().default([]),
 	sponsorId: z.uuidv4(),
-	formFields: createFormFieldRequestSchema
-		.array()
-		.min(1, "Add at least one question to the application form"),
+	formFields: createFormFieldRequestSchema.array().default([]),
 });
 /**
  * Scholarship form data type inferred from Zod schema

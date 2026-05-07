@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Edit2, Loader2 } from "lucide-react";
 import EditScholarshipSkeleton from "./-components/EditScholarshipSkeleton";
 import Toast from "@/components/Toast";
-import DescriptionModal from "@/components/sponsor/create-scholarship/DescriptionModal";
 import CustomFormFieldModal from "@/components/sponsor/create-scholarship/application-form/CustomFormFieldModal";
 import FormFieldsDialog from "@/routes/_sponsor/create/-components/application-form/FormFieldsDialog";
 import {
@@ -90,7 +89,6 @@ function EditScholarshipPage() {
 	const [imagePreview, setImagePreview] = useState<string | null>(
 		scholarship.imageUrl,
 	);
-	const [showDescriptionModal, setShowDescriptionModal] = useState(false);
 	const [showCustomFieldModal, setShowCustomFieldModal] = useState(false);
 	const [editingFieldIndex, setEditingFieldIndex] = useState<number | null>(
 		null,
@@ -113,7 +111,6 @@ function EditScholarshipPage() {
 	const criterias = form.watch("criterias") || [];
 	const requiredDocuments = form.watch("requirements") || [];
 	const formFields = form.watch("formFields") || [];
-	const description = form.watch("description");
 	const status = form.watch("status");
 
 	const hydrateForm = useCallback(
@@ -327,18 +324,13 @@ function EditScholarshipPage() {
 						}}
 						control={form.control as any}
 						errors={form.formState.errors as any}
-						description={description}
 						disabled={saving}
-						onOpenDescription={() => setShowDescriptionModal(true)}
 					/>
 				</div>
 
 				{/* Amount and Slots/Deadline Section */}
 				<div className="bg-[#F8F9FC] rounded-xl p-3 shadow-sm space-y-4">
 					<AmountField
-						show={true}
-						onShow={() => {}}
-						onHide={() => {}}
 						amountType={amountType}
 						onAmountTypeChange={(type) => {
 							setAmountType(type);
@@ -446,13 +438,6 @@ function EditScholarshipPage() {
 					)}
 				</button>
 			</div>
-
-			<DescriptionModal
-				isOpen={showDescriptionModal}
-				onClose={() => setShowDescriptionModal(false)}
-				description={description || ""}
-				onSave={(desc) => form.setValue("description", desc)}
-			/>
 
 			<FormFieldsDialog
 				open={showFormFieldsDialog}

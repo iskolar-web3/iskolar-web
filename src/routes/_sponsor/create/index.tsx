@@ -4,9 +4,11 @@ import { ArrowLeft, Loader2, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/auth";
 import { SEO } from "@/components/SEO";
-import DescriptionModal from "@/components/sponsor/create-scholarship/DescriptionModal";
 import Toast from "@/components/Toast";
-import { useScholarshipForm } from "@/hooks/useScholarshipForm";
+import {
+	DEFAULT_APPLICATION_QUESTION,
+	useScholarshipForm,
+} from "@/hooks/useScholarshipForm";
 import { useScholarshipPreview } from "@/hooks/useScholarshipPreview";
 import { useToast } from "@/hooks/useToast";
 import { type ApiResponse, BACKEND_URL } from "@/lib/api";
@@ -82,15 +84,12 @@ function CreateScholarship() {
 	} = form;
 	const { toast, showSuccess, showError } = useToast();
 
-	const [showDescriptionModal, setShowDescriptionModal] = useState(false);
 	const [showFormFieldsDialog, setShowFormFieldsDialog] = useState(false);
 	const [showCustomFieldModal, setShowCustomFieldModal] = useState(false);
 	const [editingFieldIndex, setEditingFieldIndex] = useState<number | null>(null);
 	const [draftFormFields, setDraftFormFields] = useState<CreateFormFieldRequest[]>([]);
 	const [showFullPreview, setShowFullPreview] = useState(false);
 	const [loading, setLoading] = useState(false);
-	const [showAmount, setShowAmount] = useState(false);
-	const [showSlots, setShowSlots] = useState(false);
 	const [amountType, setAmountType] = useState<AmountType>("varies");
 	const [unlimitedSlots, setUnlimitedSlots] = useState(true);
 	const [showConfirmationModal, setShowConfirmationModal] = useState(false);
@@ -133,8 +132,6 @@ function CreateScholarship() {
 	const resetCreateFormState = ({ step: nextStep = "form" }: { step?: "template" | "form" } = {}) => {
 		resetForm();
 		setFormResetKey((prev) => prev + 1);
-		setShowAmount(false);
-		setShowSlots(false);
 		setAmountType("varies");
 		setUnlimitedSlots(true);
 		setDraftFormFields([]);
@@ -195,43 +192,51 @@ function CreateScholarship() {
 	});
 
 	const onSubmit = async (data: ScholarshipFormData) => {
-		if (showAmount) {
-			if (amountType === "fixed" && !data.totalAmount) {
-				form.setError("totalAmount", { message: "Please enter a valid amount" });
+		if (amountType === "fixed" && !data.totalAmount) {
+			form.setError("totalAmount", { message: "Please enter a valid amount" });
+			return
+		}
+		if (amountType === "range") {
+			if (!data.totalAmountMin) {
+				form.setError("totalAmountMin", { message: "Please enter a minimum amount" });
 				return
 			}
-			if (amountType === "range") {
-				if (!data.totalAmountMin) {
-					form.setError("totalAmountMin", { message: "Please enter a minimum amount" });
-					return
-				}
-				if (!data.totalAmountMax) {
-					form.setError("totalAmountMax", { message: "Please enter a maximum amount" });
-					return
-				}
-				if (data.totalAmountMin >= data.totalAmountMax) {
-					form.setError("totalAmountMax", { message: "Max must be greater than min" });
-					return
-				}
+			if (!data.totalAmountMax) {
+				form.setError("totalAmountMax", { message: "Please enter a maximum amount" });
+				return
+			}
+			if (data.totalAmountMin >= data.totalAmountMax) {
+				form.setError("totalAmountMax", { message: "Max must be greater than min" });
+				return
 			}
 		}
-		if (showSlots && !unlimitedSlots && !data.totalSlots) {
+		if (!unlimitedSlots && !data.totalSlots) {
 			form.setError("totalSlots", { message: "Please enter the number of slots" });
 			return
 		}
 
-		const amountPayload: Partial<ScholarshipFormData> = !showAmount
-			? { totalAmount: undefined, totalAmountMin: undefined, totalAmountMax: undefined }
-			: amountType === "fixed"
+		const amountPayload: Partial<ScholarshipFormData> =
+			amountType === "fixed"
 				? { totalAmountMin: undefined, totalAmountMax: undefined }
 				: amountType === "range"
 					? { totalAmount: undefined }
 					: { totalAmount: undefined, totalAmountMin: undefined, totalAmountMax: undefined };
 
-		const slotsPayload = !showSlots || unlimitedSlots ? { totalSlots: undefined } : {};
+		const slotsPayload = unlimitedSlots ? { totalSlots: undefined } : {};
 		const imageUrlValue = data.imageUrl || DEFAULT_SCHOLARSHIP_IMAGE;
 
-		setPendingFormData({ ...data, ...amountPayload, ...slotsPayload, imageUrl: imageUrlValue } as ScholarshipFormData);
+		const formFieldsPayload: CreateFormFieldRequest[] =
+			data.formFields.length > 0
+				? data.formFields
+				: [DEFAULT_APPLICATION_QUESTION];
+
+		setPendingFormData({
+			...data,
+			...amountPayload,
+			...slotsPayload,
+			imageUrl: imageUrlValue,
+			formFields: formFieldsPayload,
+		} as ScholarshipFormData);
 		setShowConfirmationModal(true);
 	}
 
@@ -306,9 +311,7 @@ function CreateScholarship() {
 									removeImage={removeImage}
 									control={control}
 									errors={errors}
-									description={description}
 									disabled={loading}
-									onOpenDescription={() => setShowDescriptionModal(true)}
 								/>
 
 								<div className="space-y-4">
@@ -319,16 +322,6 @@ function CreateScholarship() {
 									/>
 
 									<AmountField
-										show={showAmount}
-										onShow={() => { setShowAmount(true); setAmountType("varies"); }}
-										onHide={() => {
-											setShowAmount(false);
-											setAmountType("varies");
-											setValue("totalAmount", undefined);
-											setValue("totalAmountMin", undefined);
-											setValue("totalAmountMax", undefined);
-											form.clearErrors(["totalAmount", "totalAmountMin", "totalAmountMax"]);
-										}}
 										amountType={amountType}
 										onAmountTypeChange={setAmountType}
 										control={control}
@@ -339,14 +332,6 @@ function CreateScholarship() {
 									/>
 
 									<SlotsField
-										showSlots={showSlots}
-										onShowSlots={() => setShowSlots(true)}
-										onHideSlots={() => {
-											setShowSlots(false);
-											setUnlimitedSlots(true);
-											setValue("totalSlots", undefined);
-											form.clearErrors("totalSlots");
-										}}
 										unlimitedSlots={unlimitedSlots}
 										onUnlimitedSlotsChange={setUnlimitedSlots}
 										control={control}
@@ -365,7 +350,6 @@ function CreateScholarship() {
 								onSelect={addCriterionDirect}
 								onRemove={removeCriterion}
 								disabled={loading}
-								error={errors.criterias?.message}
 								placeholder="Select eligibility criteria"
 							/>
 
@@ -376,7 +360,6 @@ function CreateScholarship() {
 								onSelect={addDocumentDirect}
 								onRemove={removeDocument}
 								disabled={loading}
-								error={errors.requirements?.message}
 								placeholder="Select required documents"
 							/>
 
@@ -384,34 +367,39 @@ function CreateScholarship() {
 							<div>
 								<div className="mb-3">
 									<label className="block text-sm text-[#4A5568] mb-1 ml-0.5">
-										Application Form <span className="text-[#EF4444]">*</span>
+										Application Form
 									</label>
 									<p className="text-xs text-[#6B7280] ml-0.5">
-										Add questionnaires to collect information from applicants.
+										Optional. Add questionnaires to collect information from applicants. If left blank, applicants will be asked why they're applying.
 									</p>
 								</div>
 								<button
 									type="button"
 									disabled={loading}
 									onClick={openFormFieldsDialog}
-									className={`w-full flex cursor-pointer items-center justify-center gap-2 px-4 py-3.5 border-2 border-dashed ${
-										errors.formFields ? "border-[#EF4444]" : "border-[#3A52A6]"
-									} bg-[#E0ECFF] text-secondary text-sm rounded-lg hover:bg-[#D0DCFF] transition-colors`}
+									className="w-full flex cursor-pointer items-center justify-center gap-2 px-4 py-3.5 border-2 border-dashed border-[#3A52A6] bg-[#E0ECFF] text-secondary text-sm rounded-lg hover:bg-[#D0DCFF] transition-colors"
 								>
 									<Plus size={20} />
 									{customFormFields.length === 0 ? "Add Form Field" : "Edit Form Field"}
 								</button>
-								{errors.formFields && (
-									<p className="text-xs text-[#EF4444] mt-1">
-										{errors.formFields.message}
-									</p>
-								)}
 							</div>
 
 							{/* Submit */}
 							<button
-								// @ts-expect-error it works but I get type error for some reason
-								onClick={handleSubmit(onSubmit)}
+								type="button"
+								onClick={handleSubmit(
+									// @ts-expect-error it works but I get type error for some reason
+									onSubmit,
+									(validationErrors) => {
+										const firstMessage = Object.values(validationErrors)
+											.map((e) => e?.message)
+											.find((m): m is string => typeof m === "string" && m.length > 0);
+										showError(
+											"Please complete the required fields",
+											firstMessage ?? "Some fields need attention before you can publish.",
+										);
+									},
+								)}
 								className={`w-full mt-4 py-3 font-medium bg-[#EFA508] text-tertiary cursor-pointer rounded-lg hover:bg-[#D89407] transition-colors ${
 									loading && "opacity-60 cursor-not-allowed"
 								}`}
@@ -441,8 +429,8 @@ function CreateScholarship() {
 									</div>
 									<ScholarshipPreviewCard
 										scholarship={previewScholarship}
-										amountType={showAmount ? amountType : "varies"}
-										unlimitedSlots={showSlots ? unlimitedSlots : true}
+										amountType={amountType}
+										unlimitedSlots={unlimitedSlots}
 										onClick={() => setShowFullPreview(true)}
 									/>
 								</div>
@@ -458,8 +446,8 @@ function CreateScholarship() {
 									</div>
 									<ScholarshipPreviewCard
 										scholarship={previewScholarship}
-										amountType={showAmount ? amountType : "varies"}
-										unlimitedSlots={showSlots ? unlimitedSlots : true}
+										amountType={amountType}
+										unlimitedSlots={unlimitedSlots}
 										onClick={() => setShowFullPreview(true)}
 									/>
 								</div>
@@ -468,13 +456,6 @@ function CreateScholarship() {
 					</div>
 				</>
 			)}
-
-			<DescriptionModal
-				isOpen={showDescriptionModal}
-				onClose={() => setShowDescriptionModal(false)}
-				description={description || ""}
-				onSave={(desc) => setValue("description", desc)}
-			/>
 
 			<FormFieldsDialog
 				open={showFormFieldsDialog}

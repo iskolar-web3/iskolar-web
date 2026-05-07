@@ -11,9 +11,7 @@ interface Props {
 	removeImage: () => void;
 	control: Control<ScholarshipFormData, any, any>;
 	errors: FieldErrors<ScholarshipFormData>;
-	description: string | undefined;
 	disabled: boolean;
-	onOpenDescription: () => void;
 }
 
 export default function ImageTitleDescriptionSection({
@@ -22,9 +20,7 @@ export default function ImageTitleDescriptionSection({
 	removeImage,
 	control,
 	errors,
-	description,
 	disabled,
-	onOpenDescription,
 }: Props) {
 	return (
 		<div className="flex flex-col md:flex-row gap-4 items-stretch">
@@ -99,35 +95,30 @@ export default function ImageTitleDescriptionSection({
 				</div>
 
 				<div className="flex-1">
-					<button
-						type="button"
-						disabled={disabled}
-						onClick={onOpenDescription}
-						className="w-full h-full min-h-[140px] max-h-[140px] cursor-pointer rounded-lg bg-[#F3F4F6] border text-sm hover:bg-muted transition-colors text-left overflow-hidden px-4 py-3"
-					>
-						<div className="flex h-full gap-2 overflow-hidden">
-							<span className="text-[#8B9CB5] mt-0.5 shrink-0">☰</span>
-							<div className="flex-1 min-w-0 overflow-hidden">
-								{description ? (
-									<>
-										<p className="text-[#6B7280] mb-2">Edit Description</p>
-										<p
-											className="text-[#6B7280] whitespace-pre-line wrap-break-word overflow-hidden"
-											style={{
-												display: "-webkit-box",
-												WebkitBoxOrient: "vertical",
-												WebkitLineClamp: 4,
-											}}
-										>
-											{description}
-										</p>
-									</>
-								) : (
-									<p className="text-[#6B7280]">Add Description</p>
-								)}
-							</div>
-						</div>
-					</button>
+					<label className="block text-xs text-[#6B7280] mb-1 ml-0.5">
+						Description
+					</label>
+					<Controller
+						control={control}
+						name="description"
+						render={({ field }) => (
+							<textarea
+								{...field}
+								value={field.value ?? ""}
+								disabled={disabled}
+								maxLength={1000}
+								placeholder="Add details like qualifications, background, or any special notes applicants should know before applying."
+								className={`w-full h-full min-h-[140px] max-h-[140px] resize-none rounded-lg border ${
+									errors.description ? "border-[#EF4444]" : "border-[#C4CBD5]"
+								} bg-[#F8F9FC] px-4 py-3 text-sm text-[#4A5568] focus:outline-none focus:ring-2 focus:ring-[#3A52A6]`}
+							/>
+						)}
+					/>
+					{errors.description && (
+						<p className="text-xs text-[#EF4444] mt-1">
+							{errors.description.message}
+						</p>
+					)}
 				</div>
 			</div>
 		</div>

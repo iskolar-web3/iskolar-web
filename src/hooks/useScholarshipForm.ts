@@ -1,41 +1,58 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-// import { useAuth } from "@/auth";
-// import type { AnySponsor } from "@/lib/sponsor/model";
 import { uploadFile } from "@/lib/api";
 import { getCookie } from "@/lib/cookie";
 import {
+	type CreateFormFieldRequest,
 	createScholarshipRequestSchema,
+	FormFieldType,
 	type ScholarshipFormData,
 	ScholarshipStatus,
 } from "@/lib/scholarship/model";
 import { ACCESS_TOKEN_KEY } from "@/lib/user/auth";
 import { normalizeText } from "@/utils/normalize.utils";
 
-/**
- * Custom hook for managing scholarship creation/edit form
- * Provides form state management, validation, and helper functions for:
- * - Image upload and preview
- * - Dynamic criteria list management
- * - Dynamic required documents list management
- * - Custom form fields management
- *
- * @returns Object containing:
- *   - form: React Hook Form instance with Zod validation
- *   - imagePreview: Current image preview URL
- *   - criteriaInput: Input state for adding criteria
- *   - setCriteriaInput: Setter for criteria input
- *   - documentsInput: Input state for adding documents
- *   - setDocumentsInput: Setter for documents input
- *   - handleImageUpload: Function to handle image file upload
- *   - removeImage: Function to remove uploaded image
- *   - addCriterion: Function to add a new criterion
- *   - removeCriterion: Function to remove a criterion by index
- *   - addDocument: Function to add a new required document
- *   - removeDocument: Function to remove a document by index
- *   - resetForm: Function to reset entire form state
- */
+const DRAFT_STORAGE_KEY_PREFIX = "scholarship-create-draft:";
+
+export const DEFAULT_APPLICATION_QUESTION: CreateFormFieldRequest = {
+	label: "Why are you applying for this scholarship?",
+	fieldType: FormFieldType.Paragraph,
+	isRequired: true,
+	options: [],
+};
+
+function getDraftKey(sponsorId: string) {
+	return `${DRAFT_STORAGE_KEY_PREFIX}${sponsorId}`;
+}
+
+function loadDraft(sponsorId: string): Partial<ScholarshipFormData> | null {
+	if (typeof window === "undefined") return null;
+	try {
+		const raw = window.localStorage.getItem(getDraftKey(sponsorId));
+		if (!raw) return null;
+		const parsed = JSON.parse(raw) as Partial<ScholarshipFormData> & {
+			applicationDeadline?: string | Date;
+		};
+		if (parsed.applicationDeadline) {
+			const d = new Date(parsed.applicationDeadline);
+			parsed.applicationDeadline = Number.isNaN(d.getTime()) ? undefined : d;
+		}
+		return parsed as Partial<ScholarshipFormData>;
+	} catch {
+		return null;
+	}
+}
+
+function clearDraft(sponsorId: string) {
+	if (typeof window === "undefined") return;
+	try {
+		window.localStorage.removeItem(getDraftKey(sponsorId));
+	} catch {
+		// ignore
+	}
+}
+
 export function useScholarshipForm(sponsorId: string) {
 	const defaultFormValues: Partial<ScholarshipFormData> = {
 		name: "",
@@ -57,7 +74,7 @@ export function useScholarshipForm(sponsorId: string) {
 	const form = useForm<ScholarshipFormData>({
 		// @ts-expect-error This works fine but it has TS error for some reason
 		resolver: zodResolver(createScholarshipRequestSchema),
-		mode: "onBlur",
+		mode: "onChange",
 		defaultValues: defaultFormValues,
 	});
 
@@ -67,6 +84,50 @@ export function useScholarshipForm(sponsorId: string) {
 
 	const criteria = form.watch("criterias");
 	const requirements = form.watch("requirements");
+
+	// Restore draft from localStorage on mount.
+	const didRestoreRef = useRef(false);
+	useEffect(() => {
+		if (didRestoreRef.current) return;
+		didRestoreRef.current = true;
+		const draft = loadDraft(sponsorId);
+		if (draft) {
+			form.reset({ ...defaultFormValues, ...draft, sponsorId });
+		}
+		// Intentionally only run once on mount; defaultFormValues is recreated
+		// every render and would cause an infinite loop in the dep array.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [sponsorId]);
+
+	// Debounced autosave to localStorage on any form change.
+	useEffect(() => {
+		let timeout: ReturnType<typeof setTimeout> | null = null;
+		const subscription = form.watch((values) => {
+			if (timeout) clearTimeout(timeout);
+			timeout = setTimeout(() => {
+				if (typeof window === "undefined") return;
+				try {
+					const persisted = { ...values };
+					if (
+						typeof persisted.imageUrl === "string" &&
+						persisted.imageUrl.startsWith("data:")
+					) {
+						persisted.imageUrl = undefined;
+					}
+					window.localStorage.setItem(
+						getDraftKey(sponsorId),
+						JSON.stringify(persisted),
+					);
+				} catch {
+					// ignore quota / serialization errors
+				}
+			}, 500);
+		});
+		return () => {
+			if (timeout) clearTimeout(timeout);
+			subscription.unsubscribe();
+		};
+	}, [form, sponsorId]);
 
 	const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
@@ -165,7 +226,8 @@ export function useScholarshipForm(sponsorId: string) {
 		setImagePreview(null);
 		setCriteriaInput("");
 		setDocumentsInput("");
-	}, [defaultFormValues, form]);
+		clearDraft(sponsorId);
+	}, [defaultFormValues, form, sponsorId]);
 
 	return {
 		form,
