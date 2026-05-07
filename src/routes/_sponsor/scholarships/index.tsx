@@ -16,6 +16,7 @@ import {
 	Plus,
 	AlertCircle,
 	Loader2,
+	LockKeyhole,
 } from "lucide-react";
 import {
 	Dialog,
@@ -37,7 +38,9 @@ import {
 	getMyScholarshipsQuery,
 } from "@/lib/scholarship/api";
 import { useAuth } from "@/auth";
-import type { AnySponsor } from "@/lib/sponsor/model";
+import { SponsorType, type AnySponsor } from "@/lib/sponsor/model";
+import { useVerificationStatus } from "@/hooks/useVerificationStatus";
+import { VerificationStatus } from "@/lib/verification/model";
 import {
 	getScholarshipQueryParamSchema,
 	type Scholarship,
@@ -73,6 +76,16 @@ function Scholarships() {
 	const search = useSearch({ from: "/_sponsor/scholarships/" });
 
 	const auth = useAuth<AnySponsor>();
+
+	const verificationEnabled = import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true";
+	const isIndividualSponsor = auth.profile?.sponsorType?.code === SponsorType.Individual;
+	const verificationQuery = useVerificationStatus("sponsors", verificationEnabled && isIndividualSponsor);
+	const isVerified =
+		!verificationEnabled ||
+		!isIndividualSponsor ||
+		verificationQuery.isLoading ||
+		verificationQuery.data?.status === VerificationStatus.Verified;
+
 	const scholarships = useSuspenseQuery(
 		getMyScholarshipsQuery(auth.sessionToken, {
 			...search,
@@ -565,13 +578,16 @@ function Scholarships() {
 									<p className="max-w-xl text-sm md:text-base text-[#9CA3AF] mt-2 mb-4 md:mb-6">
 										Create scholarship programs to help students succeed.
 									</p>
-									<button
-										onClick={() => navigate({ to: "/create" })}
-										className="inline-flex items-center cursor-pointer gap-2 px-4 py-2.5 bg-[#9CA3AF] text-tertiary text-sm md:text-base rounded-md hover:bg-muted-foreground hover:text-tertiary transition-colors"
-									>
-										<Plus size={18} />
-										Create Scholarship
-									</button>
+									<span title={!isVerified ? "Verify your identity to create a scholarship" : undefined}>
+										<button
+											onClick={() => navigate({ to: "/create" })}
+											disabled={!isVerified}
+											className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#9CA3AF] text-tertiary text-sm md:text-base rounded-md hover:bg-muted-foreground hover:text-tertiary transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+										>
+											{!isVerified ? <LockKeyhole size={18} /> : <Plus size={18} />}
+											Create Scholarship
+										</button>
+									</span>
 								</div>
 							) : (
 								filteredScholarships.map((scholarship, index) => (
