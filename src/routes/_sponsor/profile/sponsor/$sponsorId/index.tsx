@@ -30,7 +30,6 @@ import {
 	updateOrganizationSponsor,
 } from "@/lib/sponsor/api";
 import { UserRole } from "@/lib/user/model";
-import EntityVerificationForm from "@/components/verification/EntityVerificationForm";
 import VerificationStatus from "@/components/verification/VerificationStatus";
 import ProfileAvatar from "./-components/ProfileAvatar";
 
@@ -49,8 +48,6 @@ function SponsorProfile() {
 
 	const [isEditing, setIsEditing] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
-	const [isEntityVerificationOpen, setIsEntityVerificationOpen] =
-		useState(false);
 
 	const formRef = useRef<HTMLFormElement>(null);
 	const { toast, showSuccess, showError } = useToast();
@@ -150,12 +147,6 @@ function SponsorProfile() {
 		<div className="min-h-screen">
 			<SEO title="Profile" noindex={true} />
 			{toast && <Toast {...toast} />}
-			{import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true" && (
-				<EntityVerificationForm
-					open={isEntityVerificationOpen}
-					onOpenChange={setIsEntityVerificationOpen}
-				/>
-			)}
 			<div className="max-w-176 mx-auto space-y-6">
 				{/* Profile Header */}
 				<motion.div
@@ -183,13 +174,8 @@ function SponsorProfile() {
 					</div>
 				</motion.div>
 
-				{import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true" && (
-					<VerificationStatus
-						role="sponsors"
-						sponsorType={auth.profile.sponsorType.code}
-						onEntityFormOpen={() => setIsEntityVerificationOpen(true)}
-					/>
-				)}
+				{import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true" &&
+					isIndividual && <VerificationStatus role="sponsors" />}
 
 				{/* Information Section */}
 				<motion.div

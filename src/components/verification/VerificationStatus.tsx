@@ -20,15 +20,9 @@ import { useToast } from "@/hooks/useToast";
 
 type Props = {
 	role: "students" | "sponsors";
-	sponsorType?: "individual" | "organization" | "government";
-	onEntityFormOpen?: () => void;
 };
 
-export default function VerificationStatus({
-	role,
-	sponsorType,
-	onEntityFormOpen,
-}: Props) {
+export default function VerificationStatus({ role }: Props) {
 	const [record, setRecord] = useState<VerificationRecord | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [starting, setStarting] = useState(false);
@@ -83,15 +77,6 @@ export default function VerificationStatus({
 	}, [isReturningFromDidit, record?.status]);
 
 	async function handleVerify() {
-		// Org/gov sponsors need the pre-form dialog
-		if (
-			role === "sponsors" &&
-			(sponsorType === "organization" || sponsorType === "government")
-		) {
-			onEntityFormOpen?.();
-			return;
-		}
-
 		setStarting(true);
 		try {
 			const result = await startVerification(role);

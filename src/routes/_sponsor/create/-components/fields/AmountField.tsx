@@ -1,13 +1,9 @@
-import { Plus, X } from "lucide-react";
 import type { Control, FieldErrors, UseFormSetValue } from "react-hook-form";
 import { Controller } from "react-hook-form";
 import type { ScholarshipFormData } from "@/lib/scholarship/model";
 import type { AmountType } from "../../-model";
 
 interface Props {
-	show: boolean;
-	onShow: () => void;
-	onHide: () => void;
 	amountType: AmountType;
 	onAmountTypeChange: (type: AmountType) => void;
 	control: Control<ScholarshipFormData, any, any>;
@@ -34,9 +30,6 @@ const fixedInputClass = (hasError: boolean) => `${baseInputClass(hasError)} pr-4
 const rangeInputClass = (hasError: boolean) => `${baseInputClass(hasError)} pr-3`;
 
 export default function AmountField({
-	show,
-	onShow,
-	onHide,
 	amountType,
 	onAmountTypeChange,
 	control,
@@ -53,35 +46,10 @@ export default function AmountField({
 		clearErrors(["totalAmount", "totalAmountMin", "totalAmountMax"]);
 	};
 
-	if (!show) {
-		return (
-			<button
-				type="button"
-				disabled={disabled}
-				onClick={onShow}
-				className="flex items-center gap-1.5 text-xs text-[#3A52A6] hover:text-[#2a3d8a] cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-			>
-				<Plus size={13} />
-				Add Scholarship Amount
-			</button>
-		);
-	}
-
 	return (
 		<div>
 			<div className="flex items-center justify-between mb-1.5">
-				<div className="flex items-center gap-1">
-					<span className="text-xs text-[#6B7280]">Scholarship Amount</span>
-					<button
-						type="button"
-						disabled={disabled}
-						onClick={onHide}
-						className="text-[#9CA3AF] hover:text-[#EF4444] cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-						aria-label="Remove scholarship amount"
-					>
-						<X size={11} />
-					</button>
-				</div>
+				<span className="text-xs text-[#6B7280]">Scholarship Amount</span>
 				<div className="flex rounded-sm overflow-hidden border border-[#C4CBD5] text-xs h-7">
 					{AMOUNT_TYPES.map((t) => (
 						<button

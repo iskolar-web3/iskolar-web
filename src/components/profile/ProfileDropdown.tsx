@@ -10,7 +10,7 @@ import { useAuth } from "@/auth";
 import { UserRole, type User } from "@/lib/user/model";
 import type { Student } from "@/lib/student/model";
 import { getSponsorName } from "@/lib/sponsor/api";
-import type { AnySponsor } from "@/lib/sponsor/model";
+import { SponsorType, type AnySponsor } from "@/lib/sponsor/model";
 import { useVerificationStatus } from "@/hooks/useVerificationStatus";
 import { VerificationStatus } from "@/lib/verification/model";
 
@@ -61,9 +61,12 @@ export default function ProfileDropdown({ onClose }: ProfileDropdownProps) {
 	const verificationEnabled = import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true";
 	const roleCode = auth.user?.role?.code;
 	const verificationRole: "students" | "sponsors" = roleCode === UserRole.Sponsor ? "sponsors" : "students";
+	const isIndividualSponsor =
+		roleCode === UserRole.Sponsor &&
+		auth.profile?.sponsorType?.code === SponsorType.Individual;
 	const verificationQuery = useVerificationStatus(
 		verificationRole,
-		verificationEnabled && (roleCode === UserRole.Student || roleCode === UserRole.Sponsor),
+		verificationEnabled && (roleCode === UserRole.Student || isIndividualSponsor),
 	);
 	const isVerified = verificationQuery.isLoading || verificationQuery.data?.status === VerificationStatus.Verified;
 
@@ -194,7 +197,7 @@ export default function ProfileDropdown({ onClose }: ProfileDropdownProps) {
 									{getDisplayName(auth.user, auth.profile)}
 								</p>
 							) : null}
-							{verificationEnabled && !verificationQuery.isLoading && (roleCode === UserRole.Student || roleCode === UserRole.Sponsor) && (
+							{verificationEnabled && !verificationQuery.isLoading && (roleCode === UserRole.Student || isIndividualSponsor) && (
 								isVerified ? (
 									<span className="inline-flex items-center gap-1 text-[10px] text-green-600 mt-0.5">
 										<ShieldCheck className="w-3 h-3" />
