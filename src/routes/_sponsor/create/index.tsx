@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowLeft, Loader2, Plus } from "lucide-react";
+import { ArrowLeft, Loader2, LockKeyhole, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/auth";
 import { SEO } from "@/components/SEO";
@@ -22,7 +22,9 @@ import {
 } from "@/lib/scholarship/model";
 import { PRESET_CRITERIA, PRESET_DOCUMENTS } from "@/lib/scholarship/presets";
 import type { ScholarshipTemplate } from "@/lib/scholarship/templates";
-import type { AnySponsor } from "@/lib/sponsor/model";
+import { SponsorType, type AnySponsor } from "@/lib/sponsor/model";
+import { useVerificationStatus } from "@/hooks/useVerificationStatus";
+import { VerificationStatus } from "@/lib/verification/model";
 import { ACCESS_TOKEN_KEY } from "@/lib/user/auth";
 import type { AmountType } from "./-model";
 import ConfirmationDialog from "./-components/ConfirmationDialog";
@@ -63,6 +65,15 @@ const DEFAULT_SCHOLARSHIP_IMAGE = "/scholarship-banner-placeholder.png";
 function CreateScholarship() {
 	const auth = useAuth<AnySponsor>();
 	const queryClient = useQueryClient();
+
+	const verificationEnabled = import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true";
+	const isIndividualSponsor = auth.profile?.sponsorType?.code === SponsorType.Individual;
+	const verificationQuery = useVerificationStatus("sponsors", verificationEnabled && isIndividualSponsor);
+	const isVerified =
+		!verificationEnabled ||
+		!isIndividualSponsor ||
+		verificationQuery.isLoading ||
+		verificationQuery.data?.status === VerificationStatus.Verified;
 	const {
 		form,
 		imagePreview,
@@ -291,6 +302,15 @@ function CreateScholarship() {
 						</div>
 					</div>
 
+					{!isVerified && (
+						<div className="flex items-center gap-2.5 bg-amber-50 border border-amber-200 rounded-md p-3 mb-4">
+							<LockKeyhole size={16} className="text-amber-600 shrink-0" />
+							<p className="text-xs text-amber-700 leading-relaxed flex-1">
+								Verify your identity on your profile to create a scholarship.
+							</p>
+						</div>
+					)}
+
 					<div className={`grid grid-cols-1 gap-6 ${showPreview ? "lg:grid-cols-15" : ""}`}>
 						{/* Scholarship Details */}
 						<div className={`space-y-4 ${showPreview ? "lg:col-span-8" : "w-full lg:max-w-2xl lg:mx-auto"}`}>
@@ -401,9 +421,9 @@ function CreateScholarship() {
 									},
 								)}
 								className={`w-full mt-4 py-3 font-medium bg-[#EFA508] text-tertiary cursor-pointer rounded-lg hover:bg-[#D89407] transition-colors ${
-									loading && "opacity-60 cursor-not-allowed"
+									(loading || !isVerified) && "opacity-60 cursor-not-allowed"
 								}`}
-								disabled={loading}
+								disabled={loading || !isVerified}
 							>
 								{loading ? (
 									<span className="flex items-center justify-center">
