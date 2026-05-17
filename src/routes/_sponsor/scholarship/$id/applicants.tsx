@@ -22,6 +22,7 @@ import {
 	Phone,
 	Mail,
 	Sparkles,
+	GraduationCap,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -440,6 +441,36 @@ function ApplicantsListPage() {
 									Deselect
 								</button>
 							</>
+						)}
+
+						{/* Scholars shortcut */}
+						{!bulkMode && statusCounts.approved > 0 && (
+							<button
+								onClick={() =>
+									setFilterStatus(
+										filterStatus === ScholarshipApplicationStatus.Approved
+											? "all"
+											: ScholarshipApplicationStatus.Approved,
+									)
+								}
+								className={`flex items-center cursor-pointer gap-1.5 px-4 py-2 rounded-md border transition-colors text-[11px] md:text-xs ${
+									filterStatus === ScholarshipApplicationStatus.Approved
+										? "bg-[#31D0AA] text-white border-[#31D0AA]"
+										: "bg-white text-[#31D0AA] border-[#31D0AA]"
+								}`}
+							>
+								<GraduationCap className="w-3.5 h-3.5" />
+								Scholars
+								<span
+									className={`px-1 rounded-full text-[9px] md:text-[10px] ${
+										filterStatus === ScholarshipApplicationStatus.Approved
+											? "bg-white/30 text-white"
+											: "bg-[#31D0AA] text-white"
+									}`}
+								>
+									{statusCounts.approved}
+								</span>
+							</button>
 						)}
 
 						{/* Rank Applicants Button */}
