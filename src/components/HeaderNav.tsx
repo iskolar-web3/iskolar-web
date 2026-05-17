@@ -6,12 +6,12 @@ import {
 	Compass,
 	WalletCards,
 	Plus,
-	Repeat,
 	Bell,
 	User,
 	X,
+	GraduationCap,
 } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import ProfileDropdown from "./profile/ProfileDropdown";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/auth";
@@ -47,7 +47,6 @@ interface HeaderNavProps {
 const studentNavItems: NavItem[] = [
 	{ label: "Home", path: "/home", icon: Home },
 	{ label: "Discover", path: "/discover", icon: Compass },
-	{ label: "Transactions", path: "/transactions", icon: Repeat },
 ];
 
 /**
@@ -55,8 +54,8 @@ const studentNavItems: NavItem[] = [
  */
 const sponsorNavItems: NavItem[] = [
 	{ label: "Scholarships", path: "/scholarships", icon: WalletCards },
+	{ label: "Scholars", path: "/scholars", icon: GraduationCap },
 	{ label: "Create", path: "/create", icon: Plus },
-	{ label: "Transactions", path: "/transactions", icon: Repeat },
 ];
 
 /**
@@ -72,7 +71,6 @@ export default function HeaderNav({ role }: HeaderNavProps) {
 	const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-	const [showTransactionsTooltip, setShowTransactionsTooltip] = useState(false);
 	const profileDropdownRef = useRef<HTMLDivElement>(null);
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const searchContainerRef = useRef<HTMLDivElement>(null);
@@ -171,6 +169,9 @@ export default function HeaderNav({ role }: HeaderNavProps) {
 				currentPath === "/scholarships" ||
 				currentPath.startsWith("/scholarship/")
 			);
+		}
+		if (path === "/scholars") {
+			return currentPath === "/scholars";
 		}
 		if (path === "/create") {
 			return currentPath === "/create";
@@ -275,40 +276,6 @@ export default function HeaderNav({ role }: HeaderNavProps) {
 						{navItems.map((item) => {
 							const Icon = item.icon;
 							const isActive = isActiveRoute(item.path);
-							const isTransactions = item.path === "/transactions";
-
-							if (isTransactions) {
-								return (
-									<div
-										key={item.path}
-										className="relative"
-										onMouseEnter={() => setShowTransactionsTooltip(true)}
-										onMouseLeave={() => setShowTransactionsTooltip(false)}
-									>
-										<div className="flex flex-col items-center gap-0.5 md:gap-1 cursor-not-allowed opacity-60">
-											<Icon className="w-4 md:w-5 h-4 md:h-5 text-[#9CA3AF]" />
-											<span className="text-[11px] md:text-xs text-[#9CA3AF]">
-												{item.label}
-											</span>
-										</div>
-
-										<AnimatePresence>
-											{showTransactionsTooltip && (
-												<motion.div
-													initial={{ opacity: 0, y: 5 }}
-													animate={{ opacity: 1, y: 0 }}
-													exit={{ opacity: 0, y: 5 }}
-													transition={{ duration: 0.15 }}
-													className="absolute left-1/2 transform -translate-x-1/2 top-full mt-2 px-3 py-1.5 bg-[#3A52A6] text-tertiary text-[11px] md:text-xs rounded-md whitespace-nowrap z-50"
-												>
-													This feature is not available yet
-													<div className="absolute left-1/2 transform -translate-x-1/2 bottom-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-[#111827]" />
-												</motion.div>
-											)}
-										</AnimatePresence>
-									</div>
-								);
-							}
 
 							return (
 								<Link

@@ -37,6 +37,7 @@ import { Route as AdminDashboardRouteImport } from './routes/_admin/dashboard'
 import { Route as StudentHomeIndexRouteImport } from './routes/_student/home/index'
 import { Route as StudentDiscoverIndexRouteImport } from './routes/_student/discover/index'
 import { Route as SponsorScholarshipsIndexRouteImport } from './routes/_sponsor/scholarships/index'
+import { Route as SponsorScholarsIndexRouteImport } from './routes/_sponsor/scholars/index'
 import { Route as SponsorCreateIndexRouteImport } from './routes/_sponsor/create/index'
 import { Route as LandingAboutIndexRouteImport } from './routes/_landing/about/index'
 import { Route as SponsorScholarshipIdApplicantsRouteImport } from './routes/_sponsor/scholarship/$id/applicants'
@@ -182,6 +183,11 @@ const SponsorScholarshipsIndexRoute =
     path: '/scholarships/',
     getParentRoute: () => SponsorRoute,
   } as any)
+const SponsorScholarsIndexRoute = SponsorScholarsIndexRouteImport.update({
+  id: '/scholars/',
+  path: '/scholars/',
+  getParentRoute: () => SponsorRoute,
+} as any)
 const SponsorCreateIndexRoute = SponsorCreateIndexRouteImport.update({
   id: '/create/',
   path: '/create/',
@@ -245,6 +251,7 @@ export interface FileRoutesByFullPath {
   '/verification/callback': typeof VerificationCallbackRoute
   '/about': typeof LandingAboutIndexRoute
   '/create': typeof SponsorCreateIndexRoute
+  '/scholars': typeof SponsorScholarsIndexRoute
   '/scholarships': typeof SponsorScholarshipsIndexRoute
   '/discover': typeof StudentDiscoverIndexRoute
   '/home': typeof StudentHomeIndexRoute
@@ -276,6 +283,7 @@ export interface FileRoutesByTo {
   '/verification/callback': typeof VerificationCallbackRoute
   '/about': typeof LandingAboutIndexRoute
   '/create': typeof SponsorCreateIndexRoute
+  '/scholars': typeof SponsorScholarsIndexRoute
   '/scholarships': typeof SponsorScholarshipsIndexRoute
   '/discover': typeof StudentDiscoverIndexRoute
   '/home': typeof StudentHomeIndexRoute
@@ -314,6 +322,7 @@ export interface FileRoutesById {
   '/verification/callback': typeof VerificationCallbackRoute
   '/_landing/about/': typeof LandingAboutIndexRoute
   '/_sponsor/create/': typeof SponsorCreateIndexRoute
+  '/_sponsor/scholars/': typeof SponsorScholarsIndexRoute
   '/_sponsor/scholarships/': typeof SponsorScholarshipsIndexRoute
   '/_student/discover/': typeof StudentDiscoverIndexRoute
   '/_student/home/': typeof StudentHomeIndexRoute
@@ -347,6 +356,7 @@ export interface FileRouteTypes {
     | '/verification/callback'
     | '/about'
     | '/create'
+    | '/scholars'
     | '/scholarships'
     | '/discover'
     | '/home'
@@ -378,6 +388,7 @@ export interface FileRouteTypes {
     | '/verification/callback'
     | '/about'
     | '/create'
+    | '/scholars'
     | '/scholarships'
     | '/discover'
     | '/home'
@@ -415,6 +426,7 @@ export interface FileRouteTypes {
     | '/verification/callback'
     | '/_landing/about/'
     | '/_sponsor/create/'
+    | '/_sponsor/scholars/'
     | '/_sponsor/scholarships/'
     | '/_student/discover/'
     | '/_student/home/'
@@ -635,6 +647,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SponsorScholarshipsIndexRouteImport
       parentRoute: typeof SponsorRoute
     }
+    '/_sponsor/scholars/': {
+      id: '/_sponsor/scholars/'
+      path: '/scholars'
+      fullPath: '/scholars'
+      preLoaderRoute: typeof SponsorScholarsIndexRouteImport
+      parentRoute: typeof SponsorRoute
+    }
     '/_sponsor/create/': {
       id: '/_sponsor/create/'
       path: '/create'
@@ -749,6 +768,7 @@ const OnboardingRouteWithChildren = OnboardingRoute._addFileChildren(
 
 interface SponsorRouteChildren {
   SponsorCreateIndexRoute: typeof SponsorCreateIndexRoute
+  SponsorScholarsIndexRoute: typeof SponsorScholarsIndexRoute
   SponsorScholarshipsIndexRoute: typeof SponsorScholarshipsIndexRoute
   SponsorScholarshipIdApplicantsRoute: typeof SponsorScholarshipIdApplicantsRoute
   SponsorProfileSponsorSponsorIdIndexRoute: typeof SponsorProfileSponsorSponsorIdIndexRoute
@@ -757,6 +777,7 @@ interface SponsorRouteChildren {
 
 const SponsorRouteChildren: SponsorRouteChildren = {
   SponsorCreateIndexRoute: SponsorCreateIndexRoute,
+  SponsorScholarsIndexRoute: SponsorScholarsIndexRoute,
   SponsorScholarshipsIndexRoute: SponsorScholarshipsIndexRoute,
   SponsorScholarshipIdApplicantsRoute: SponsorScholarshipIdApplicantsRoute,
   SponsorProfileSponsorSponsorIdIndexRoute:
