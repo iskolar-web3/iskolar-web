@@ -69,6 +69,12 @@ export const statusStyles: Record<
 		text: "text-[#3730A3]",
 		border: "border-[#818CF8]",
 	},
+	withdrawn: {
+		label: "Withdrawn",
+		bg: "bg-[#F3F4F6]",
+		text: "text-[#6B7280]",
+		border: "border-[#D1D5DB]",
+	},
 };
 
 /**
