@@ -40,7 +40,9 @@ export const createStudentRequestSchema = z.object({
 		message: "Date of birth cannot be in the future",
 	}),
 	contact: createContactRequestSchema,
-	educationLevel: z.enum(EducationLevel, { message: "Please select an education level" }),
+	educationLevel: z.enum(EducationLevel, {
+		message: "Please select an education level",
+	}),
 	schoolName: z.string().min(1, "School name is required"),
 });
 
@@ -55,3 +57,27 @@ export const updateStudentRequestSchema = createStudentRequestSchema
 		schoolName: z.string().optional(),
 	});
 export type UpdateStudentRequest = z.infer<typeof updateStudentRequestSchema>;
+
+export enum PaymentMethod {
+	GCash = "gcash",
+	Maya = "maya",
+	Maribank = "maribank",
+	GoTyme = "gotyme",
+}
+
+export const paymentMethodSchema = z.object({
+	method: enumDetailSchema(PaymentMethod),
+	accountName: z.string().nonempty(),
+	accountNumber: z.string().nonempty(),
+});
+export type PaymentMethodDetail = z.infer<typeof paymentMethodSchema>;
+
+export const updatePaymentMethodRequestSchema = z.object({
+	studentId: z.uuidv4(),
+	method: z.enum(PaymentMethod),
+	accountName: z.string().nonempty(),
+	accountNumber: z.string().nonempty(),
+});
+export type UpdatePaymentMethodRequest = z.infer<
+	typeof updatePaymentMethodRequestSchema
+>;
