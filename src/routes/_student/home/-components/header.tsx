@@ -4,6 +4,7 @@ import { Link } from "@tanstack/react-router";
 
 export function HomeHeader(): JSX.Element {
 	const filters: { key: FilterType; label: string }[] = [
+		{ key: FilterType.All, label: "All" },
 		{ key: FilterType.Applied, label: "Applied" },
 		{ key: FilterType.Past, label: "Past" },
 		{ key: FilterType.Granted, label: "Granted" },
