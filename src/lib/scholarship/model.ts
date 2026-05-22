@@ -182,7 +182,6 @@ export enum ScholarshipApplicationStatus {
 	Approved = "approved",
 	Denied = "denied",
 	Granted = "granted",
-	Withdrawn = "withdrawn",
 }
 
 const formFieldAnswerSchema = z.object({

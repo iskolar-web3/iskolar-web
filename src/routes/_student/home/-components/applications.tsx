@@ -1,4 +1,4 @@
-import { useState, type Dispatch, type ElementType, type JSX, type SetStateAction } from "react";
+import { type Dispatch, type ElementType, type JSX, type SetStateAction } from "react";
 import {
 	Calendar,
 	Users,
@@ -19,47 +19,17 @@ import {
 } from "@/utils/formatting.utils";
 import {
 	type Application,
-	ScholarshipApplicationStatus,
 	ScholarshipType,
 } from "@/lib/scholarship/model";
 import { getSponsorName } from "@/lib/sponsor/api";
 import { format } from "date-fns";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { withdrawApplication } from "@/lib/scholarship/api";
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 
 type Props = {
 	applications: Application[];
 	setSelectedApplication: Dispatch<SetStateAction<Application | null>>;
 };
 
-const WITHDRAWABLE_STATUSES = new Set([
-	ScholarshipApplicationStatus.Pending,
-	ScholarshipApplicationStatus.Shortlisted,
-]);
-
 export function HomeApplications(props: Props): JSX.Element {
-	const queryClient = useQueryClient();
-	const [pendingWithdrawId, setPendingWithdrawId] = useState<string | null>(null);
-
-	const withdrawMutation = useMutation({
-		mutationFn: withdrawApplication,
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["scholarships", "applications"] });
-			setPendingWithdrawId(null);
-		},
-		onError: () => {
-			setPendingWithdrawId(null);
-		},
-	});
 
 	return (
 		<>
@@ -262,62 +232,10 @@ export function HomeApplications(props: Props): JSX.Element {
 								</motion.div>
 							</div>
 
-							{WITHDRAWABLE_STATUSES.has(
-								item.application.status.code as ScholarshipApplicationStatus,
-							) && (
-								<div className="flex justify-end mt-1.5">
-									<button
-										type="button"
-										onClick={(e) => {
-											e.stopPropagation();
-											setPendingWithdrawId(item.scholarship.id);
-										}}
-										className="text-xs text-[#9CA3AF] hover:text-red-500 transition-colors"
-									>
-										Withdraw application
-									</button>
-								</div>
-							)}
 						</div>
 					</div>
 				))}
 			</section>
-
-			<Dialog
-				open={pendingWithdrawId !== null}
-				onOpenChange={(open) => {
-					if (!open) setPendingWithdrawId(null);
-				}}
-			>
-				<DialogContent>
-					<DialogHeader>
-						<DialogTitle>Withdraw application?</DialogTitle>
-						<DialogDescription>
-							This will remove your application. You will not be able to re-apply to this scholarship.
-						</DialogDescription>
-					</DialogHeader>
-					<DialogFooter>
-						<Button
-							variant="outline"
-							onClick={() => setPendingWithdrawId(null)}
-							disabled={withdrawMutation.isPending}
-						>
-							Cancel
-						</Button>
-						<Button
-							variant="destructive"
-							disabled={withdrawMutation.isPending}
-							onClick={() => {
-								if (pendingWithdrawId) {
-									withdrawMutation.mutate(pendingWithdrawId);
-								}
-							}}
-						>
-							{withdrawMutation.isPending ? "Withdrawing…" : "Withdraw"}
-						</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
 		</>
 	);
 }
