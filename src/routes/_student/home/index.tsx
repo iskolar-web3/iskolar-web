@@ -19,7 +19,7 @@ import { HomeApplications } from "./-components/applications";
 import { HomeEmpty } from "./-components/empty";
 
 const searchSchema = z.object({
-	status: z.enum(FilterType).default(FilterType.Applied),
+	status: z.enum(FilterType).default(FilterType.All),
 });
 
 export const Route = createFileRoute("/_student/home/")({
@@ -84,6 +84,10 @@ function Home(): JSX.Element {
 }
 
 function getEquivalentStatus(filter: FilterType): string {
+	if (filter === FilterType.All) {
+		return "";
+	}
+
 	if (filter === FilterType.Applied) {
 		return `${ScholarshipApplicationStatus.Pending},${ScholarshipApplicationStatus.Shortlisted}`;
 	}
