@@ -9,6 +9,7 @@ import {
 	Check,
 	Clock,
 	UserIcon,
+	FileText,
 } from "lucide-react";
 import {
 	formatCurrency,
@@ -20,6 +21,7 @@ import type {
 	ScholarshipApplicationStatus,
 } from "@/lib/scholarship/model";
 import { getSponsorName } from "@/lib/sponsor/api";
+import SubmittedFormsModal from "./SubmittedFormsModal";
 
 /**
  * Props for the ApplicationDetailsModal component
@@ -82,6 +84,7 @@ export default function ApplicationDetailsModal({
 	onClose,
 }: ApplicationDetailsModalProps) {
 	const [isExiting, setIsExiting] = useState(false);
+	const [showFormsModal, setShowFormsModal] = useState(false);
 
 	const statusStyle = statusStyles[application.application.status.code];
 
@@ -311,6 +314,17 @@ export default function ApplicationDetailsModal({
 						</div>
 					</div>
 
+					{/* View Submitted Form */}
+					{application.scholarship.formFields.length > 0 && (
+						<button
+							onClick={() => setShowFormsModal(true)}
+							className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-border bg-[#F9FAFB] px-4 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6] transition-colors"
+						>
+							<FileText size={16} className="text-[#6B7280]" />
+							View Submitted Form
+						</button>
+					)}
+
 					{/* Info Footer */}
 					<div className="flex items-start gap-2 rounded-md bg-[#FEF3C7] p-3 text-xs text-[#78350F]">
 						<Info size={17} className="shrink-0 mt-0.5" />
@@ -320,6 +334,13 @@ export default function ApplicationDetailsModal({
 					</div>
 				</div>
 			</motion.div>
+
+			{showFormsModal && (
+				<SubmittedFormsModal
+					application={application}
+					onClose={() => setShowFormsModal(false)}
+				/>
+			)}
 		</div>
 	);
 }
