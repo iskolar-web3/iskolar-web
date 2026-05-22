@@ -1,4 +1,4 @@
-import { type Dispatch, type ElementType, type JSX, type SetStateAction } from "react";
+import { type Dispatch, type ElementType, type JSX, type SetStateAction, useState } from "react";
 import {
 	Calendar,
 	Users,
@@ -23,6 +23,7 @@ import {
 } from "@/lib/scholarship/model";
 import { getSponsorName } from "@/lib/sponsor/api";
 import { format } from "date-fns";
+import SubmittedFormsModal from "@/components/student/home/SubmittedFormsModal";
 
 type Props = {
 	applications: Application[];
@@ -30,6 +31,7 @@ type Props = {
 };
 
 export function HomeApplications(props: Props): JSX.Element {
+	const [formsModalApplication, setFormsModalApplication] = useState<Application | null>(null);
 
 	return (
 		<>
@@ -200,7 +202,7 @@ export function HomeApplications(props: Props): JSX.Element {
 									</div>
 
 									{/* Body */}
-									<div className="p-4">
+									<div className="p-4 space-y-2">
 										<div className="grid grid-cols-2 gap-2">
 											<div className="rounded-lg border border-border bg-[#F9FAFB] p-3">
 												<div className="mb-1 flex items-center gap-1.5 text-xs text-[#6B7280]">
@@ -228,6 +230,30 @@ export function HomeApplications(props: Props): JSX.Element {
 												<p className="text-xs text-[#6B7280]">scholars</p>
 											</div>
 										</div>
+
+										<div className="flex gap-2">
+											<button
+												onClick={(e) => {
+													e.stopPropagation();
+													props.setSelectedApplication(item);
+												}}
+												className="flex flex-1 cursor-pointer items-center justify-center rounded-lg border border-border bg-[#F9FAFB] px-4 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6] transition-colors"
+											>
+												View Details
+											</button>
+
+											{item.scholarship.formFields.length > 0 && (
+												<button
+													onClick={(e) => {
+														e.stopPropagation();
+														setFormsModalApplication(item);
+													}}
+													className="flex flex-1 cursor-pointer items-center justify-center rounded-lg border border-border bg-[#F9FAFB] px-4 py-2.5 text-sm text-[#374151] hover:bg-[#F3F4F6] transition-colors"
+												>
+													View Submitted Form
+												</button>
+											)}
+										</div>
 									</div>
 								</motion.div>
 							</div>
@@ -236,6 +262,13 @@ export function HomeApplications(props: Props): JSX.Element {
 					</div>
 				))}
 			</section>
+
+			{formsModalApplication && (
+				<SubmittedFormsModal
+					application={formsModalApplication}
+					onClose={() => setFormsModalApplication(null)}
+				/>
+			)}
 		</>
 	);
 }
