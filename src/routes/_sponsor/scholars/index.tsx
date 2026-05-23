@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { GraduationCap, Search, Mail, Phone } from "lucide-react";
+import { GraduationCap, Search, Mail, Phone, HandCoins } from "lucide-react";
 import { SEO } from "@/components/SEO";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,6 +11,13 @@ import { getMyScholarshipsQuery, getApplicantsQuery } from "@/lib/scholarship/ap
 import { ScholarshipApplicationStatus, type Applicant } from "@/lib/scholarship/model";
 import type { AnySponsor } from "@/lib/sponsor/model";
 import type { Scholarship } from "@/lib/scholarship/model";
+import { getSponsorDisbursementsQuery } from "@/lib/disbursement/api";
+import type { Disbursement } from "@/lib/disbursement/model";
+import { DisbursementStatusBadge } from "@/components/disbursement/DisbursementShared";
+import {
+	DisbursementDialog,
+	type ScholarInfo,
+} from "./-components/DisbursementDialog";
 
 export const Route = createFileRoute("/_sponsor/scholars/")({
 	component: ScholarsPage,
@@ -53,7 +60,17 @@ function ScholarCardSkeleton({ index }: { index: number }) {
 	);
 }
 
-function ScholarCard({ scholar, index }: { scholar: Scholar; index: number }) {
+function ScholarCard({
+	scholar,
+	index,
+	disbursement,
+	onDisburse,
+}: {
+	scholar: Scholar;
+	index: number;
+	disbursement?: Disbursement;
+	onDisburse: (scholar: Scholar) => void;
+}) {
 	const { student } = scholar;
 	const initials = `${student.firstName[0]}${student.lastName[0]}`.toUpperCase();
 
@@ -104,6 +121,22 @@ function ScholarCard({ scholar, index }: { scholar: Scholar; index: number }) {
 					</span>
 				</div>
 			</div>
+
+			<div className="mt-3 flex items-center justify-between gap-2">
+				{disbursement ? (
+					<DisbursementStatusBadge status={disbursement.status} />
+				) : (
+					<span className="text-xs text-[#9CA3AF]">Not disbursed</span>
+				)}
+				<button
+					type="button"
+					onClick={() => onDisburse(scholar)}
+					className="inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs text-white transition-opacity hover:opacity-90"
+				>
+					<HandCoins className="h-3.5 w-3.5" />
+					{disbursement ? "View Disbursement" : "Disburse Funds"}
+				</button>
+			</div>
 		</motion.div>
 	);
 }
@@ -112,12 +145,22 @@ function ScholarsPage() {
 	const auth = useAuth<AnySponsor>();
 	const [search, setSearch] = useState("");
 	const [filterScholarshipId, setFilterScholarshipId] = useState("all");
+	const [activeScholar, setActiveScholar] = useState<ScholarInfo | null>(null);
 
 	const scholarshipsQuery = useQuery(
 		getMyScholarshipsQuery(auth.sessionToken, {
 			sponsorId: auth.profile?.id ?? "",
 		}),
 	);
+
+	const disbursementsQuery = useQuery(getSponsorDisbursementsQuery());
+	const disbursementsByApplication = useMemo(() => {
+		const map = new Map<string, Disbursement>();
+		for (const d of disbursementsQuery.data ?? []) {
+			map.set(d.scholarshipApplicationId, d);
+		}
+		return map;
+	}, [disbursementsQuery.data]);
 
 	const scholarships: Scholarship[] = scholarshipsQuery.data ?? [];
 
@@ -130,7 +173,9 @@ function ScholarsPage() {
 			data: results.flatMap((result, index) =>
 				(result.data ?? [])
 					.filter(
-						(a) => a.status.code === ScholarshipApplicationStatus.Approved,
+						(a) =>
+							a.status.code === ScholarshipApplicationStatus.Approved ||
+							a.status.code === ScholarshipApplicationStatus.Granted,
 					)
 					.map(
 						(a): Scholar => ({
@@ -180,7 +225,7 @@ function ScholarsPage() {
 					{!isLoading && (
 						<p className="text-xs text-[#6B7280] mt-0.5">
 							{scholars.length}{" "}
-							{scholars.length === 1 ? "scholar" : "scholars"} approved
+							{scholars.length === 1 ? "scholar" : "scholars"}
 						</p>
 					)}
 				</motion.div>
@@ -241,11 +286,35 @@ function ScholarsPage() {
 								key={`${scholar.scholarshipId}-${scholar.id}`}
 								scholar={scholar}
 								index={index}
+								disbursement={disbursementsByApplication.get(scholar.id)}
+								onDisburse={(s) =>
+									setActiveScholar({
+										applicationId: s.id,
+										studentId: s.student.id,
+										studentName: `${s.student.firstName} ${s.student.lastName}`,
+										scholarshipName: s.scholarshipName,
+									})
+								}
 							/>
 						))
 					)}
 				</div>
 			</div>
+
+			<DisbursementDialog
+				open={!!activeScholar}
+				onOpenChange={(next) => {
+					if (!next) {
+						setActiveScholar(null);
+					}
+				}}
+				scholar={activeScholar}
+				existing={
+					activeScholar
+						? disbursementsByApplication.get(activeScholar.applicationId)
+						: undefined
+				}
+			/>
 		</div>
 	);
 }
