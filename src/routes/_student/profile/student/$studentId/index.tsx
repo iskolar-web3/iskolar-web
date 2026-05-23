@@ -256,6 +256,7 @@ function StudentProfilePage() {
 						title="Payment Method"
 						isEditing={isEditing}
 						isSaving={isSaving}
+						isEmpty={!paymentMethod.data}
 						onEdit={handleEditClick}
 						onCancel={handleCancelEdit}
 						onSave={handleSaveEdit}

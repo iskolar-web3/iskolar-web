@@ -80,22 +80,35 @@ const PaymentMethodForm = forwardRef<HTMLFormElement, PaymentMethodFormProps>(
 			}
 		}, [payment]);
 
+		useEffect(() => {
+			if (!isEditing && !payment) {
+				reset({
+					studentId: profile.id,
+					method: undefined,
+					accountName: undefined,
+					accountNumber: undefined,
+				});
+			}
+		}, [isEditing]);
+
 		if (!isEditing) {
-			// View mode
+			if (!payment) return <></>;
+
+			// View mode — payment is set
+			const methodLabel =
+				[
+					{ value: PaymentMethod.GCash, label: "GCash" },
+					{ value: PaymentMethod.Maya, label: "Maya" },
+					{ value: PaymentMethod.Maribank, label: "Maribank" },
+					{ value: PaymentMethod.GoTyme, label: "GoTyme" },
+				].find((opt) => opt.value === payment.method.code)?.label ||
+				payment.method.name;
+
 			return (
 				<div className="grid grid-cols-1 gap-4 md:gap-6">
 					<div>
 						<div className="min-h-10 px-4 bg-[#F9FAFB] border border-border rounded-sm flex items-center gap-2">
-							<p className="text-sm md:text-sm text-primary">
-								{[
-									{ value: PaymentMethod.GCash, label: "GCash" },
-									{ value: PaymentMethod.Maya, label: "Maya" },
-									{ value: PaymentMethod.Maribank, label: "Maribank" },
-									{ value: PaymentMethod.GoTyme, label: "GoTyme" },
-								].find((opt) => opt.value === payment?.method.code)?.label ||
-									payment?.method.name ||
-									"—"}
-							</p>
+							<p className="text-sm md:text-sm text-primary">{methodLabel}</p>
 						</div>
 					</div>
 
@@ -104,8 +117,8 @@ const PaymentMethodForm = forwardRef<HTMLFormElement, PaymentMethodFormProps>(
 							Account Name
 						</label>
 						<div className="min-h-10 px-4 bg-[#F9FAFB] border border-border rounded-sm flex items-center gap-2">
-							<p className="text-sm md:text-sm text-primary">
-								{payment?.accountName || "—"}
+							<p className="text-sm md:text-sm text-primary uppercase">
+								{payment.accountName}
 							</p>
 						</div>
 					</div>
@@ -116,7 +129,7 @@ const PaymentMethodForm = forwardRef<HTMLFormElement, PaymentMethodFormProps>(
 						</label>
 						<div className="min-h-10 px-4 bg-[#F9FAFB] border border-border rounded-sm flex items-center gap-2">
 							<p className="text-sm md:text-sm text-primary">
-								{payment?.accountNumber || "—"}
+								{payment.accountNumber}
 							</p>
 						</div>
 					</div>
@@ -143,7 +156,7 @@ const PaymentMethodForm = forwardRef<HTMLFormElement, PaymentMethodFormProps>(
 									disabled={isSaving}
 								>
 									<SelectTrigger
-										className={`min-h-10 h-auto w-full px-4 bg-[#F9FAFB] border-border rounded-sm text-sm md:text-sm ${
+										className={`min-h-10 h-auto w-full px-4 bg-[#F9FAFB] border-border rounded-sm text-sm md:text-sm cursor-pointer ${
 											errors.method
 												? "border-[#EF4444] focus:ring-[#EF4444]/20"
 												: ""
@@ -169,59 +182,64 @@ const PaymentMethodForm = forwardRef<HTMLFormElement, PaymentMethodFormProps>(
 						)}
 					/>
 
-					<Controller
-						name="accountName"
-						control={control}
-						render={({ field }) => (
-							<div>
-								<label className="block text-xs text-[#6B7280] mb-1.5">
-									Account Name
-								</label>
-								<Input
-									{...field}
-									disabled={isSaving}
-									className={`min-h-10 h-auto px-4 bg-[#F9FAFB] border-border rounded-sm text-sm md:text-sm ${
-										errors.accountName
-											? "border-[#EF4444] focus-visible:ring-[#EF4444]/20"
-											: ""
-									}`}
-									placeholder="Enter your account name"
-								/>
-								{errors.accountName && (
-									<p className="mt-1 text-xs text-[#EF4444]">
-										{errors.accountName.message}
-									</p>
+					{(payment || selectedMethod) && (
+						<>
+							<Controller
+								name="accountName"
+								control={control}
+								render={({ field }) => (
+									<div>
+										<label className="block text-xs text-[#6B7280] mb-1.5">
+											Account Name
+										</label>
+										<Input
+											{...field}
+											onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+											disabled={isSaving}
+											className={`min-h-10 h-auto px-4 bg-[#F9FAFB] border-border rounded-sm text-sm md:text-sm uppercase ${
+												errors.accountName
+													? "border-[#EF4444] focus-visible:ring-[#EF4444]/20"
+													: ""
+											}`}
+											placeholder="ENTER YOUR ACCOUNT NAME"
+										/>
+										{errors.accountName && (
+											<p className="mt-1 text-xs text-[#EF4444]">
+												{errors.accountName.message}
+											</p>
+										)}
+									</div>
 								)}
-							</div>
-						)}
-					/>
+							/>
 
-					<Controller
-						name="accountNumber"
-						control={control}
-						render={({ field }) => (
-							<div>
-								<label className="block text-xs text-[#6B7280] mb-1.5">
-									{accountNumberLabel}
-								</label>
-								<Input
-									{...field}
-									disabled={isSaving}
-									className={`min-h-10 h-auto px-4 bg-[#F9FAFB] border-border rounded-sm text-sm md:text-sm ${
-										errors.accountNumber
-											? "border-[#EF4444] focus-visible:ring-[#EF4444]/20"
-											: ""
-									}`}
-									placeholder="Enter your account number"
-								/>
-								{errors.accountNumber && (
-									<p className="mt-1 text-xs text-[#EF4444]">
-										{errors.accountNumber.message}
-									</p>
+							<Controller
+								name="accountNumber"
+								control={control}
+								render={({ field }) => (
+									<div>
+										<label className="block text-xs text-[#6B7280] mb-1.5">
+											{accountNumberLabel}
+										</label>
+										<Input
+											{...field}
+											disabled={isSaving}
+											className={`min-h-10 h-auto px-4 bg-[#F9FAFB] border-border rounded-sm text-sm md:text-sm ${
+												errors.accountNumber
+													? "border-[#EF4444] focus-visible:ring-[#EF4444]/20"
+													: ""
+											}`}
+											placeholder="Enter your account number"
+										/>
+										{errors.accountNumber && (
+											<p className="mt-1 text-xs text-[#EF4444]">
+												{errors.accountNumber.message}
+											</p>
+										)}
+									</div>
 								)}
-							</div>
-						)}
-					/>
+							/>
+						</>
+					)}
 				</div>
 
 				{/* Form submit button is handled by parent component via EditHeader */}
