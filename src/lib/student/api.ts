@@ -1,7 +1,15 @@
+import { queryOptions } from "@tanstack/react-query";
 import { BACKEND_URL, safeResponseJson, type ApiResponse } from "../api";
 import { getCookie } from "../cookie";
 import { ACCESS_TOKEN_KEY } from "../user/auth";
-import { studentSchema, type Student, type UpdateStudentRequest } from "./model";
+import {
+	paymentMethodSchema,
+	studentSchema,
+	type PaymentMethodDetail,
+	type Student,
+	type UpdateStudentRequest,
+	type UpsertPaymentMethodRequest,
+} from "./model";
 
 export async function getMyStudentProfile(
 	token: string,
@@ -16,11 +24,11 @@ export async function getMyStudentProfile(
 	}
 
 	const result: ApiResponse<Student | null> = await safeResponseJson(response);
-    if(!result.data){
-        return null;
-    }
+	if (!result.data) {
+		return null;
+	}
 
-    return studentSchema.parse(result.data)
+	return studentSchema.parse(result.data);
 }
 
 export async function updateStudent(
@@ -42,3 +50,51 @@ export async function updateStudent(
 
 	return result;
 }
+
+export async function upsertPaymentMethod(
+	value: UpsertPaymentMethodRequest,
+): Promise<ApiResponse<PaymentMethodDetail>> {
+	const token = getCookie(ACCESS_TOKEN_KEY);
+	const response = await fetch(`${BACKEND_URL}/students/me/payment`, {
+		method: "PUT",
+		body: JSON.stringify(value),
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${token}`,
+		},
+	});
+	const result: ApiResponse<PaymentMethodDetail> =
+		await safeResponseJson(response);
+	if (!response.ok) {
+		throw new Error(result.message);
+	}
+
+	return result;
+}
+
+async function getPaymentMethod(
+	studentId: string,
+): Promise<PaymentMethodDetail | null> {
+	const token = getCookie(ACCESS_TOKEN_KEY);
+	if (!token) {
+		throw new Error("Access token not found.");
+	}
+
+	const url = new URL(`${BACKEND_URL}/students/${studentId}/payment`);
+
+	const response = await fetch(url.toString(), {
+		method: "GET",
+		headers: { Authorization: `Bearer ${token}` },
+		credentials: "include",
+	});
+	const result: ApiResponse<PaymentMethodDetail | null> =
+		await safeResponseJson(response);
+
+	return paymentMethodSchema.nullable().parse(result.data);
+}
+
+export const getPaymentMethodQuery = (studentId: string) =>
+	queryOptions({
+		queryKey: ["students", "payment", studentId],
+		queryFn: () => getPaymentMethod(studentId),
+	});

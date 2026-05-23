@@ -72,12 +72,12 @@ export const paymentMethodSchema = z.object({
 });
 export type PaymentMethodDetail = z.infer<typeof paymentMethodSchema>;
 
-export const updatePaymentMethodRequestSchema = z.object({
+export const upsertPaymentMethodRequestSchema = z.object({
 	studentId: z.uuidv4(),
 	method: z.enum(PaymentMethod),
 	accountName: z.string().nonempty(),
 	accountNumber: z.string().nonempty(),
 });
-export type UpdatePaymentMethodRequest = z.infer<
-	typeof updatePaymentMethodRequestSchema
+export type UpsertPaymentMethodRequest = z.infer<
+	typeof upsertPaymentMethodRequestSchema
 >;

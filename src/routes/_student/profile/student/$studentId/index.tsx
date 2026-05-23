@@ -14,12 +14,16 @@ import LumenFilesList from "@/components/student/profile/credentials/LumenFilesL
 import { useAuth } from "@/auth";
 import type {
 	Student,
-	UpdatePaymentMethodRequest,
+	UpsertPaymentMethodRequest,
 	UpdateStudentRequest,
 } from "@/lib/student/model";
 import { UserRole } from "@/lib/user/model";
-import { updateStudent } from "@/lib/student/api";
-import { useMutation } from "@tanstack/react-query";
+import {
+	getPaymentMethodQuery,
+	updateStudent,
+	upsertPaymentMethod,
+} from "@/lib/student/api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import StudentProfileForm from "@/components/student/profile/ProfileForm";
 import VerificationStatus from "@/components/verification/VerificationStatus";
 import ProfileAvatar from "./-components/ProfileAvatar";
@@ -32,6 +36,7 @@ export const Route = createFileRoute("/_student/profile/student/$studentId/")({
 });
 
 function StudentProfilePage() {
+	const queryClient = useQueryClient();
 	const auth = useAuth<Student>();
 	const verificationEnabled =
 		import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true";
@@ -42,6 +47,8 @@ function StudentProfilePage() {
 	const isVerified =
 		verificationQuery.isLoading ||
 		verificationQuery.data?.status === VerStatus.Verified;
+
+	const paymentMethod = useQuery(getPaymentMethodQuery(auth.profile.id));
 
 	const [isCredentialModalOpen, setIsCredentialModalOpen] = useState(false);
 	const [isEditing, setIsEditing] = useState(false);
@@ -57,6 +64,23 @@ function StudentProfilePage() {
 			auth.setProfile(res.data);
 			// @ts-expect-error this works
 			auth.setUser((prev) => ({ ...prev, avatarUrl: res.data.avatarUrl }));
+			setIsEditing(false);
+			setIsSaving(false);
+			showSuccess(`Success`, res.message, 1250);
+		},
+		onError: (err) => {
+			showError("Error", err.message);
+			console.error(err);
+			setIsSaving(false);
+		},
+	});
+
+	const paymentMutation = useMutation({
+		mutationFn: upsertPaymentMethod,
+		onSuccess: async (res) => {
+			await queryClient.invalidateQueries(
+				getPaymentMethodQuery(auth.profile.id),
+			);
 			setIsEditing(false);
 			setIsSaving(false);
 			showSuccess(`Success`, res.message, 1250);
@@ -100,10 +124,10 @@ function StudentProfilePage() {
 	};
 
 	const handlePaymentMethodFormSubmit = async (
-		data: UpdatePaymentMethodRequest,
+		data: UpsertPaymentMethodRequest,
 	) => {
 		setIsSaving(true);
-		// TODO: Save updated payment method
+		paymentMutation.mutate(data);
 	};
 
 	const handleCredentialSuccess = () => {
@@ -243,6 +267,7 @@ function StudentProfilePage() {
 						isEditing={isEditing}
 						isSaving={isSaving}
 						onSubmit={handlePaymentMethodFormSubmit}
+						payment={paymentMethod.data || undefined}
 					/>
 				</motion.div>
 			</div>

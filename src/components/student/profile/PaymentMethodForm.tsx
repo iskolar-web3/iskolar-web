@@ -1,6 +1,6 @@
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { forwardRef } from "react";
+import { forwardRef, useEffect } from "react";
 import type { JSX } from "react";
 import {
 	Select,
@@ -11,10 +11,10 @@ import {
 } from "@/components/ui/select";
 import {
 	PaymentMethod,
-	updatePaymentMethodRequestSchema,
+	upsertPaymentMethodRequestSchema,
 	type PaymentMethodDetail,
 	type Student,
-	type UpdatePaymentMethodRequest,
+	type UpsertPaymentMethodRequest,
 } from "@/lib/student/model";
 import { Input } from "@/components/ui/input";
 
@@ -30,7 +30,7 @@ interface PaymentMethodFormProps {
 	/** Whether the form is currently submitting */
 	isSaving: boolean;
 	/** Callback when form is submitted */
-	onSubmit: (data: UpdatePaymentMethodRequest) => Promise<void>;
+	onSubmit: (data: UpsertPaymentMethodRequest) => Promise<void>;
 }
 
 /**
@@ -49,8 +49,10 @@ const PaymentMethodForm = forwardRef<HTMLFormElement, PaymentMethodFormProps>(
 			control,
 			handleSubmit,
 			formState: { errors },
-		} = useForm<UpdatePaymentMethodRequest>({
-			resolver: zodResolver(updatePaymentMethodRequestSchema),
+			reset,
+			watch,
+		} = useForm<UpsertPaymentMethodRequest>({
+			resolver: zodResolver(upsertPaymentMethodRequestSchema),
 			mode: "onBlur",
 			defaultValues: {
 				studentId: profile.id,
@@ -60,14 +62,29 @@ const PaymentMethodForm = forwardRef<HTMLFormElement, PaymentMethodFormProps>(
 			},
 		});
 
+		const selectedMethod = watch("method");
+		const accountNumberLabel =
+			selectedMethod === PaymentMethod.GCash ||
+			selectedMethod === PaymentMethod.Maya
+				? "Phone Number"
+				: "Account Number";
+
+		useEffect(() => {
+			if (payment) {
+				reset({
+					studentId: profile.id,
+					method: payment.method.code,
+					accountName: payment.accountName,
+					accountNumber: payment.accountNumber,
+				});
+			}
+		}, [payment]);
+
 		if (!isEditing) {
 			// View mode
 			return (
 				<div className="grid grid-cols-1 gap-4 md:gap-6">
 					<div>
-						{/* <label className="block text-xs text-[#6B7280] mb-1.5"> */}
-						{/* 	Payment Method */}
-						{/* </label> */}
 						<div className="min-h-10 px-4 bg-[#F9FAFB] border border-border rounded-sm flex items-center gap-2">
 							<p className="text-sm md:text-sm text-primary">
 								{[
@@ -95,7 +112,7 @@ const PaymentMethodForm = forwardRef<HTMLFormElement, PaymentMethodFormProps>(
 
 					<div>
 						<label className="block text-xs text-[#6B7280] mb-1.5">
-							Account Number
+							{accountNumberLabel}
 						</label>
 						<div className="min-h-10 px-4 bg-[#F9FAFB] border border-border rounded-sm flex items-center gap-2">
 							<p className="text-sm md:text-sm text-primary">
@@ -120,9 +137,6 @@ const PaymentMethodForm = forwardRef<HTMLFormElement, PaymentMethodFormProps>(
 						control={control}
 						render={({ field }) => (
 							<div>
-								{/* <label className="block text-xs text-[#6B7280] mb-1.5"> */}
-								{/* 	Gender */}
-								{/* </label> */}
 								<Select
 									onValueChange={field.onChange}
 									defaultValue={field.value}
@@ -188,7 +202,7 @@ const PaymentMethodForm = forwardRef<HTMLFormElement, PaymentMethodFormProps>(
 						render={({ field }) => (
 							<div>
 								<label className="block text-xs text-[#6B7280] mb-1.5">
-									Account Number
+									{accountNumberLabel}
 								</label>
 								<Input
 									{...field}
