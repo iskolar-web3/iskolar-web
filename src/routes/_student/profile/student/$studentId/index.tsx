@@ -12,26 +12,43 @@ import EditHeader from "@/components/profile/EditHeader";
 import LumenUploadModal from "@/components/student/profile/credentials/LumenUploadModal";
 import LumenFilesList from "@/components/student/profile/credentials/LumenFilesList";
 import { useAuth } from "@/auth";
-import type { Student, UpdateStudentRequest } from "@/lib/student/model";
+import type {
+	Student,
+	UpsertPaymentMethodRequest,
+	UpdateStudentRequest,
+} from "@/lib/student/model";
 import { UserRole } from "@/lib/user/model";
-import { updateStudent } from "@/lib/student/api";
-import { useMutation } from "@tanstack/react-query";
+import {
+	getPaymentMethodQuery,
+	updateStudent,
+	upsertPaymentMethod,
+} from "@/lib/student/api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import StudentProfileForm from "@/components/student/profile/ProfileForm";
 import VerificationStatus from "@/components/verification/VerificationStatus";
 import ProfileAvatar from "./-components/ProfileAvatar";
 import { useVerificationStatus } from "@/hooks/useVerificationStatus";
 import { VerificationStatus as VerStatus } from "@/lib/verification/model";
+import PaymentMethodForm from "@/components/student/profile/PaymentMethodForm";
 
 export const Route = createFileRoute("/_student/profile/student/$studentId/")({
 	component: StudentProfilePage,
 });
 
 function StudentProfilePage() {
-
+	const queryClient = useQueryClient();
 	const auth = useAuth<Student>();
-	const verificationEnabled = import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true";
-	const verificationQuery = useVerificationStatus("students", verificationEnabled);
-	const isVerified = verificationQuery.isLoading || verificationQuery.data?.status === VerStatus.Verified;
+	const verificationEnabled =
+		import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true";
+	const verificationQuery = useVerificationStatus(
+		"students",
+		verificationEnabled,
+	);
+	const isVerified =
+		verificationQuery.isLoading ||
+		verificationQuery.data?.status === VerStatus.Verified;
+
+	const paymentMethod = useQuery(getPaymentMethodQuery(auth.profile.id));
 
 	const [isCredentialModalOpen, setIsCredentialModalOpen] = useState(false);
 	const [isEditing, setIsEditing] = useState(false);
@@ -58,6 +75,23 @@ function StudentProfilePage() {
 		},
 	});
 
+	const paymentMutation = useMutation({
+		mutationFn: upsertPaymentMethod,
+		onSuccess: async (res) => {
+			await queryClient.invalidateQueries(
+				getPaymentMethodQuery(auth.profile.id),
+			);
+			setIsEditing(false);
+			setIsSaving(false);
+			showSuccess(`Success`, res.message, 1250);
+		},
+		onError: (err) => {
+			showError("Error", err.message);
+			console.error(err);
+			setIsSaving(false);
+		},
+	});
+
 	if (auth.isLoading) {
 		return <ProfileSkeleton />;
 	}
@@ -65,34 +99,41 @@ function StudentProfilePage() {
 	if (auth.error) {
 		return (
 			<ProfileError error={auth.error.message || "Failed to load profile"} />
-		)
+		);
 	}
 
 	const handleEditClick = () => {
 		setIsEditing(true);
-	}
+	};
 
 	const handleCancelEdit = () => {
 		setIsEditing(false);
-	}
+	};
 
 	const handleSaveEdit = async () => {
 		if (formRef.current) {
 			formRef.current.dispatchEvent(
 				new Event("submit", { bubbles: true, cancelable: true }),
-			)
+			);
 		}
-	}
+	};
 
 	const handleFormSubmit = async (data: UpdateStudentRequest) => {
 		setIsSaving(true);
 		mutation.mutate(data);
-	}
+	};
+
+	const handlePaymentMethodFormSubmit = async (
+		data: UpsertPaymentMethodRequest,
+	) => {
+		setIsSaving(true);
+		paymentMutation.mutate(data);
+	};
 
 	const handleCredentialSuccess = () => {
 		setCredentialRefreshKey((k) => k + 1);
 		showSuccess("Success", "Your credential has been saved.", 2500);
-	}
+	};
 
 	return (
 		<div className="min-h-screen">
@@ -197,11 +238,40 @@ function StudentProfilePage() {
 							</button>
 						</div>
 
-						<LumenFilesList userId={auth.profile.id} refreshKey={credentialRefreshKey} />
+						<LumenFilesList
+							userId={auth.profile.id}
+							refreshKey={credentialRefreshKey}
+						/>
 					</motion.div>
 				)}
+
+				{/* Payment Method */}
+				<motion.div
+					initial={{ opacity: 0, y: 20 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.3, delay: 0.2 }}
+					className="bg-white rounded-lg shadow-sm border border-[#E0ECFF] p-6"
+				>
+					<EditHeader
+						title="Payment Method"
+						isEditing={isEditing}
+						isSaving={isSaving}
+						isEmpty={!paymentMethod.data}
+						onEdit={handleEditClick}
+						onCancel={handleCancelEdit}
+						onSave={handleSaveEdit}
+					/>
+
+					<PaymentMethodForm
+						ref={formRef}
+						profile={auth.profile}
+						isEditing={isEditing}
+						isSaving={isSaving}
+						onSubmit={handlePaymentMethodFormSubmit}
+						payment={paymentMethod.data || undefined}
+					/>
+				</motion.div>
 			</div>
 		</div>
-	)
+	);
 }
-

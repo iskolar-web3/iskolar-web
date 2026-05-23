@@ -36,6 +36,7 @@ import { Route as AdminScholarshipsManagementRouteImport } from './routes/_admin
 import { Route as AdminDashboardRouteImport } from './routes/_admin/dashboard'
 import { Route as StudentHomeIndexRouteImport } from './routes/_student/home/index'
 import { Route as StudentDiscoverIndexRouteImport } from './routes/_student/discover/index'
+import { Route as StudentDisbursementsIndexRouteImport } from './routes/_student/disbursements/index'
 import { Route as SponsorScholarshipsIndexRouteImport } from './routes/_sponsor/scholarships/index'
 import { Route as SponsorScholarsIndexRouteImport } from './routes/_sponsor/scholars/index'
 import { Route as SponsorCreateIndexRouteImport } from './routes/_sponsor/create/index'
@@ -177,6 +178,12 @@ const StudentDiscoverIndexRoute = StudentDiscoverIndexRouteImport.update({
   path: '/discover/',
   getParentRoute: () => StudentRoute,
 } as any)
+const StudentDisbursementsIndexRoute =
+  StudentDisbursementsIndexRouteImport.update({
+    id: '/disbursements/',
+    path: '/disbursements/',
+    getParentRoute: () => StudentRoute,
+  } as any)
 const SponsorScholarshipsIndexRoute =
   SponsorScholarshipsIndexRouteImport.update({
     id: '/scholarships/',
@@ -253,6 +260,7 @@ export interface FileRoutesByFullPath {
   '/create': typeof SponsorCreateIndexRoute
   '/scholars': typeof SponsorScholarsIndexRoute
   '/scholarships': typeof SponsorScholarshipsIndexRoute
+  '/disbursements': typeof StudentDisbursementsIndexRoute
   '/discover': typeof StudentDiscoverIndexRoute
   '/home': typeof StudentHomeIndexRoute
   '/scholarship/$id/applicants': typeof SponsorScholarshipIdApplicantsRoute
@@ -285,6 +293,7 @@ export interface FileRoutesByTo {
   '/create': typeof SponsorCreateIndexRoute
   '/scholars': typeof SponsorScholarsIndexRoute
   '/scholarships': typeof SponsorScholarshipsIndexRoute
+  '/disbursements': typeof StudentDisbursementsIndexRoute
   '/discover': typeof StudentDiscoverIndexRoute
   '/home': typeof StudentHomeIndexRoute
   '/scholarship/$id/applicants': typeof SponsorScholarshipIdApplicantsRoute
@@ -324,6 +333,7 @@ export interface FileRoutesById {
   '/_sponsor/create/': typeof SponsorCreateIndexRoute
   '/_sponsor/scholars/': typeof SponsorScholarsIndexRoute
   '/_sponsor/scholarships/': typeof SponsorScholarshipsIndexRoute
+  '/_student/disbursements/': typeof StudentDisbursementsIndexRoute
   '/_student/discover/': typeof StudentDiscoverIndexRoute
   '/_student/home/': typeof StudentHomeIndexRoute
   '/_sponsor/scholarship/$id/applicants': typeof SponsorScholarshipIdApplicantsRoute
@@ -358,6 +368,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/scholars'
     | '/scholarships'
+    | '/disbursements'
     | '/discover'
     | '/home'
     | '/scholarship/$id/applicants'
@@ -390,6 +401,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/scholars'
     | '/scholarships'
+    | '/disbursements'
     | '/discover'
     | '/home'
     | '/scholarship/$id/applicants'
@@ -428,6 +440,7 @@ export interface FileRouteTypes {
     | '/_sponsor/create/'
     | '/_sponsor/scholars/'
     | '/_sponsor/scholarships/'
+    | '/_student/disbursements/'
     | '/_student/discover/'
     | '/_student/home/'
     | '/_sponsor/scholarship/$id/applicants'
@@ -640,6 +653,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentDiscoverIndexRouteImport
       parentRoute: typeof StudentRoute
     }
+    '/_student/disbursements/': {
+      id: '/_student/disbursements/'
+      path: '/disbursements'
+      fullPath: '/disbursements'
+      preLoaderRoute: typeof StudentDisbursementsIndexRouteImport
+      parentRoute: typeof StudentRoute
+    }
     '/_sponsor/scholarships/': {
       id: '/_sponsor/scholarships/'
       path: '/scholarships'
@@ -789,6 +809,7 @@ const SponsorRouteWithChildren =
   SponsorRoute._addFileChildren(SponsorRouteChildren)
 
 interface StudentRouteChildren {
+  StudentDisbursementsIndexRoute: typeof StudentDisbursementsIndexRoute
   StudentDiscoverIndexRoute: typeof StudentDiscoverIndexRoute
   StudentHomeIndexRoute: typeof StudentHomeIndexRoute
   StudentProfileStudentStudentIdIndexRoute: typeof StudentProfileStudentStudentIdIndexRoute
@@ -796,6 +817,7 @@ interface StudentRouteChildren {
 }
 
 const StudentRouteChildren: StudentRouteChildren = {
+  StudentDisbursementsIndexRoute: StudentDisbursementsIndexRoute,
   StudentDiscoverIndexRoute: StudentDiscoverIndexRoute,
   StudentHomeIndexRoute: StudentHomeIndexRoute,
   StudentProfileStudentStudentIdIndexRoute:

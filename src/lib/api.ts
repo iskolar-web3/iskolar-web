@@ -33,7 +33,11 @@ export function enumDetailSchema<T extends EnumLike>(code: T) {
 export async function uploadFile(
     file: File,
     token: string,
-    type: "profile-images" | "scholarship-images" | "application-files" = "profile-images",
+    type:
+        | "profile-images"
+        | "scholarship-images"
+        | "application-files"
+        | "disbursement-files" = "profile-images",
 ): Promise<ApiResponse<FileDataResponse>> {
     const formData = new FormData();
     formData.append("file", file);

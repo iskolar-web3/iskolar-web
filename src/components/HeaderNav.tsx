@@ -10,11 +10,15 @@ import {
 	User,
 	X,
 	GraduationCap,
+	HandCoins,
 } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 import ProfileDropdown from "./profile/ProfileDropdown";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/auth";
+import { getStudentDisbursementsQuery } from "@/lib/disbursement/api";
+import { DisbursementStatus } from "@/lib/disbursement/model";
 
 /**
  * User role type for navigation context
@@ -47,6 +51,7 @@ interface HeaderNavProps {
 const studentNavItems: NavItem[] = [
 	{ label: "Home", path: "/home", icon: Home },
 	{ label: "Discover", path: "/discover", icon: Compass },
+	{ label: "Funds", path: "/disbursements", icon: HandCoins },
 ];
 
 /**
@@ -176,6 +181,9 @@ export default function HeaderNav({ role }: HeaderNavProps) {
 		if (path === "/create") {
 			return currentPath === "/create";
 		}
+		if (path === "/disbursements") {
+			return currentPath === "/disbursements";
+		}
 		if (path === "/transactions") {
 			return currentPath === "/transactions";
 		}
@@ -183,6 +191,13 @@ export default function HeaderNav({ role }: HeaderNavProps) {
 	};
 
 	const auth = useAuth();
+
+	const studentDisbursementsQuery = useQuery(
+		getStudentDisbursementsQuery(role === "student"),
+	);
+	const pendingDisbursementCount = (
+		studentDisbursementsQuery.data ?? []
+	).filter((d) => d.status === DisbursementStatus.Sent).length;
 
 	return (
 		<header className="fixed top-0 left-0 right-0 w-full bg-white border-b border-[#E0ECFF] z-50">
@@ -283,11 +298,19 @@ export default function HeaderNav({ role }: HeaderNavProps) {
 									to={item.path}
 									className="flex flex-col items-center gap-0.5 md:gap-1 transition-colors"
 								>
-									<Icon
-										className={`w-4 md:w-5 h-4 md:h-5 ${
-											isActive ? "text-primary" : "text-[#9CA3AF]"
-										}`}
-									/>
+									<span className="relative">
+										<Icon
+											className={`w-4 md:w-5 h-4 md:h-5 ${
+												isActive ? "text-primary" : "text-[#9CA3AF]"
+											}`}
+										/>
+										{item.path === "/disbursements" &&
+											pendingDisbursementCount > 0 && (
+												<span className="absolute -top-1.5 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] text-white">
+													{pendingDisbursementCount}
+												</span>
+											)}
+									</span>
 									<span
 										className={`text-[11px] md:text-xs ${
 											isActive ? "text-primary" : "text-inactive"
