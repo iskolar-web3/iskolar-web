@@ -1,10 +1,16 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import type { JSX } from "react";
+import { useEffect, type JSX } from "react";
 import HeaderNav from "@/components/HeaderNav";
 import { UserRole } from "@/lib/user/model";
-import { getDefaultPathOfRole } from "@/lib/api";
+import { BACKEND_URL, getDefaultPathOfRole } from "@/lib/api";
 import { BetaNoticeModal } from "@/components/student/BetaNotice";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
+import { useToast } from "@/hooks/useToast";
+import {
+	ScholarshipEvent,
+	type ScholarshipCreatedEvent,
+} from "@/lib/scholarship/event";
+import Toast from "@/components/Toast";
 
 export const Route = createFileRoute("/_student")({
 	component: StudentLayout,
@@ -28,8 +34,26 @@ export const Route = createFileRoute("/_student")({
 });
 
 function StudentLayout(): JSX.Element {
+	const { toast, showSuccess } = useToast();
+
+	useEffect(() => {
+		const es = new EventSource(`${BACKEND_URL}/sse/scholarships`, {
+			withCredentials: true,
+		});
+
+		es.addEventListener(ScholarshipEvent.Created, (e) => {
+			const data = JSON.parse(e.data) as ScholarshipCreatedEvent;
+			showSuccess("New Scholarship", data.name, 10000);
+			console.log(data);
+		});
+
+		return () => es.close();
+	}, []);
+
 	return (
 		<div className="min-h-screen bg-background">
+			{toast && <Toast {...toast} />}
+
 			<HeaderNav role="student" />
 			<div className="w-full px-4 md:px-14 pt-21 md:pt-24 pb-6">
 				<Outlet />
