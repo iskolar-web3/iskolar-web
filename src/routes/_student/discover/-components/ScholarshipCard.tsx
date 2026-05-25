@@ -1,10 +1,12 @@
 import { Calendar, Users, Coins, UserIcon, LockKeyhole } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { formatCurrency, formatDate } from '@/utils/formatting.utils';
 import { ScholarshipType, type Scholarship } from '@/lib/scholarship/model';
 import { getSponsorName } from '@/lib/sponsor/api';
 import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
+import { isLightColor } from '@/routes/_sponsor/create/-components/fields/CardColorPicker';
 
 /**
  * Props for the ScholarshipCard component (student view)
@@ -32,6 +34,13 @@ export default function ScholarshipCard({ scholarship, index, onClick, isVerifie
   const isFixed = !isRange && scholarship.totalAmount != null;
   const isVaries = !isRange && !isFixed;
   const applyDisabled = !isVerified;
+  const cardColor = scholarship.cardColor ?? "#3A52A6";
+  const isLight = isLightColor(cardColor);
+  const headerTextColor = isLight ? "#111827" : undefined;
+  const onHoverTextColor = isLight ? "#111827" : "white";
+  const [cardHovered, setCardHovered] = useState(false);
+  const [viewHovered, setViewHovered] = useState(false);
+  const [applyHovered, setApplyHovered] = useState(false);
 
   const handleApplyClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -52,10 +61,13 @@ export default function ScholarshipCard({ scholarship, index, onClick, isVerifie
         transition: { duration: 0.2 }
       }}
       onClick={onClick}
-      className="bg-card cursor-pointer rounded-md overflow-hidden border border-[#D3DCF6] hover:border-[#3A52A6] transition-colors"
+      onMouseEnter={() => setCardHovered(true)}
+      onMouseLeave={() => setCardHovered(false)}
+      className="bg-card cursor-pointer rounded-md overflow-hidden border transition-colors"
+      style={{ borderColor: cardHovered ? cardColor : "#D3DCF6" }}
     >
       {/* Header */}
-      <div className="bg-[#3A52A6]">
+      <div style={{ backgroundColor: scholarship.cardColor ?? "#3A52A6" }}>
         <div className="flex">
           {/* Image */}
           <motion.div
@@ -70,8 +82,16 @@ export default function ScholarshipCard({ scholarship, index, onClick, isVerifie
           </motion.div>
 
           {/* Info */}
-          <div className="flex-1 text-tertiary px-4 py-2">
-            <h3 className="text-xl mb-1 line-clamp-1">{scholarship.name}</h3>
+          <div className="flex-1 text-tertiary px-4 py-2" style={{ color: headerTextColor }}>
+            <div className="flex items-start justify-between gap-2 mb-1">
+              <h3 className="text-xl line-clamp-1">{scholarship.name}</h3>
+              {scholarship.applicationCount > 0 && (
+                <div className="flex items-center gap-1 shrink-0 bg-white/20 rounded px-2 py-0.5 text-[11px] whitespace-nowrap">
+                  <Users size={11} />
+                  <span>{scholarship.applicationCount} {scholarship.applicationCount === 1 ? "applicant" : "applicants"}</span>
+                </div>
+              )}
+            </div>
 
             {/* Badges */}
             <div className="flex flex-wrap gap-2 mb-3">
@@ -172,7 +192,14 @@ export default function ScholarshipCard({ scholarship, index, onClick, isVerifie
               variant="outline"
               size="default"
               onClick={onClick}
-              className="w-full text-xs md:text-sm border-[#3A52A6] text-[#3A52A6] hover:bg-[#3A52A6] hover:text-white cursor-pointer"
+              className="w-full text-xs md:text-sm cursor-pointer"
+              onMouseEnter={() => setViewHovered(true)}
+              onMouseLeave={() => setViewHovered(false)}
+              style={{
+                borderColor: cardColor,
+                color: viewHovered ? onHoverTextColor : cardColor,
+                backgroundColor: viewHovered ? cardColor : "transparent",
+              }}
             >
               View Details
             </Button>
@@ -187,7 +214,14 @@ export default function ScholarshipCard({ scholarship, index, onClick, isVerifie
                 size="default"
                 onClick={handleApplyClick}
                 disabled={applyDisabled}
-                className="w-full text-xs md:text-sm bg-[#3A52A6] text-white hover:bg-[#2f4389] cursor-pointer"
+                className="w-full text-xs md:text-sm cursor-pointer"
+                onMouseEnter={() => setApplyHovered(true)}
+                onMouseLeave={() => setApplyHovered(false)}
+                style={{
+                  backgroundColor: applyDisabled ? undefined : cardColor,
+                  color: applyDisabled ? undefined : onHoverTextColor,
+                  filter: applyHovered && !applyDisabled ? "brightness(0.88)" : "none",
+                }}
               >
                 {applyDisabled ? (
                   <><LockKeyhole className="w-3 h-3" /> Apply Now</>

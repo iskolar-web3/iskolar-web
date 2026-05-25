@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft, Loader2, LockKeyhole, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Controller } from "react-hook-form";
 import { useAuth } from "@/auth";
 import { SEO } from "@/components/SEO";
 import Toast from "@/components/Toast";
@@ -31,6 +32,7 @@ import ConfirmationDialog from "./-components/ConfirmationDialog";
 import TemplateSelectionStep from "./-components/TemplateSelectionStep";
 import FormFieldsDialog from "./-components/application-form/FormFieldsDialog";
 import AmountField from "./-components/fields/AmountField";
+import CardColorPicker from "./-components/fields/CardColorPicker";
 import ImageTitleDescriptionSection from "./-components/fields/ImageTitleDescriptionSection";
 import ScholarshipTypeSelect from "./-components/fields/ScholarshipTypeSelect";
 import DeadlineField from "./-components/fields/DeadlineField";
@@ -122,6 +124,7 @@ function CreateScholarship() {
 	const applicationDeadline = watch("applicationDeadline");
 	const scholarshipType = watch("scholarshipType");
 	const imageUrl = watch("imageUrl");
+	const cardColor = watch("cardColor");
 
 	const { previewScholarship } = useScholarshipPreview({
 		scholarshipType,
@@ -138,6 +141,7 @@ function CreateScholarship() {
 		formFields: customFormFields,
 		sponsorId: auth.profile.id,
 		status: ScholarshipStatus.Active,
+		cardColor: cardColor ?? "#3A52A6",
 	});
 
 	const resetCreateFormState = ({ step: nextStep = "form" }: { step?: "template" | "form" } = {}) => {
@@ -315,6 +319,18 @@ function CreateScholarship() {
 						{/* Scholarship Details */}
 						<div className={`space-y-4 ${showPreview ? "lg:col-span-8" : "w-full lg:max-w-2xl lg:mx-auto"}`}>
 							<div className="bg-[#F8F9FC] rounded-xl p-4 sm:p-6 shadow-sm space-y-4">
+								<Controller
+									control={control}
+									name="cardColor"
+									render={({ field }) => (
+										<CardColorPicker
+											value={field.value ?? "#3A52A6"}
+											onChange={field.onChange}
+											disabled={loading}
+										/>
+									)}
+								/>
+
 								<ScholarshipTypeSelect
 									value={scholarshipType}
 									onValueChange={(v) =>

@@ -1,10 +1,17 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import type { JSX } from "react";
+import { useEffect, type JSX } from "react";
 import HeaderNav from "@/components/HeaderNav";
 import { UserRole } from "@/lib/user/model";
-import { getDefaultPathOfRole } from "@/lib/api";
+import { BACKEND_URL, getDefaultPathOfRole } from "@/lib/api";
 import { BetaNoticeModal } from "@/components/student/BetaNotice";
+import { PaymentMethodBanner } from "@/components/student/PaymentMethodBanner";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
+import {
+	ScholarshipEvent,
+	type ScholarshipCreatedEvent,
+} from "@/lib/scholarship/event";
+import { getMyNotificationsQuery } from "@/lib/notification/api";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_student")({
 	component: StudentLayout,
@@ -28,10 +35,28 @@ export const Route = createFileRoute("/_student")({
 });
 
 function StudentLayout(): JSX.Element {
+	const notifications = useQuery(getMyNotificationsQuery());
+	const queryClient = useQueryClient();
+
+	useEffect(() => {
+		const es = new EventSource(`${BACKEND_URL}/sse/scholarships`, {
+			withCredentials: true,
+		});
+
+		es.addEventListener(ScholarshipEvent.Created, (e) => {
+			const data = JSON.parse(e.data) as ScholarshipCreatedEvent;
+			queryClient.invalidateQueries(getMyNotificationsQuery());
+			console.log(data);
+		});
+
+		return () => es.close();
+	}, []);
+
 	return (
 		<div className="min-h-screen bg-background">
-			<HeaderNav role="student" />
+			<HeaderNav role="student" notifications={notifications.data || []} />
 			<div className="w-full px-4 md:px-14 pt-21 md:pt-24 pb-6">
+				<PaymentMethodBanner />
 				<Outlet />
 			</div>
 			<BetaNoticeModal />

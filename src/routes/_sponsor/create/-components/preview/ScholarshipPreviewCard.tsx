@@ -9,6 +9,7 @@ import { getSponsorName } from "@/lib/sponsor/api";
 import { Button } from "@/components/ui/button";
 import ApplicationFormPreviewPage from "./ApplicationFormPreviewPage";
 import type { AmountType } from "../../-model";
+import { isLightColor } from "../fields/CardColorPicker";
 
 interface ScholarshipPreviewCardProps {
 	scholarship: Partial<ScholarshipFormData>;
@@ -29,6 +30,14 @@ export default function ScholarshipPreviewCard({ scholarship, amountType = "vari
 		e.stopPropagation();
 		setShowFormPreview(true);
 	};
+
+	const cardColor = scholarship.cardColor ?? "#3A52A6";
+	const isLight = isLightColor(cardColor);
+	const headerTextColor = isLight ? "#111827" : undefined;
+	const onHoverTextColor = isLight ? "#111827" : "white";
+	const [cardHovered, setCardHovered] = useState(false);
+	const [viewHovered, setViewHovered] = useState(false);
+	const [applyHovered, setApplyHovered] = useState(false);
 
 	if (showFormPreview) {
 		return (
@@ -52,10 +61,13 @@ export default function ScholarshipPreviewCard({ scholarship, amountType = "vari
 				transition: { duration: 0.2 }
 			}}
 			onClick={onClick}
-			className="bg-card cursor-pointer rounded-md overflow-hidden border border-[#D3DCF6] hover:border-[#3A52A6] transition-colors"
+			onMouseEnter={() => setCardHovered(true)}
+			onMouseLeave={() => setCardHovered(false)}
+			className="bg-card cursor-pointer rounded-md overflow-hidden border transition-colors"
+			style={{ borderColor: cardHovered ? cardColor : "#D3DCF6" }}
 		>
 			{/* Header */}
-			<div className="bg-[#3A52A6]">
+			<div style={{ backgroundColor: scholarship.cardColor ?? "#3A52A6" }}>
 				<div className="flex">
 					{/* Image */}
 					<motion.div
@@ -70,7 +82,7 @@ export default function ScholarshipPreviewCard({ scholarship, amountType = "vari
 					</motion.div>
 
 					{/* Info */}
-					<div className="flex-1 text-tertiary px-4 py-2">
+					<div className="flex-1 text-tertiary px-4 py-2" style={{ color: headerTextColor }}>
 						<h3 className="text-xl mb-1 line-clamp-1">{scholarship.name || "Scholarship Title"}</h3>
 
 						{/* Badges */}
@@ -174,7 +186,14 @@ export default function ScholarshipPreviewCard({ scholarship, amountType = "vari
 							variant="outline"
 							size="default"
 							onClick={onClick}
-							className="w-full text-xs md:text-sm border-[#3A52A6] text-[#3A52A6] hover:bg-[#3A52A6] hover:text-white cursor-pointer"
+							className="w-full text-xs md:text-sm cursor-pointer"
+							onMouseEnter={() => setViewHovered(true)}
+							onMouseLeave={() => setViewHovered(false)}
+							style={{
+								borderColor: cardColor,
+								color: viewHovered ? onHoverTextColor : cardColor,
+								backgroundColor: viewHovered ? cardColor : "transparent",
+							}}
 						>
 							View Details
 						</Button>
@@ -187,7 +206,14 @@ export default function ScholarshipPreviewCard({ scholarship, amountType = "vari
 						<Button
 							size="default"
 							onClick={handleApplyClick}
-							className="w-full text-xs md:text-sm bg-[#3A52A6] text-white hover:bg-[#2f4389] cursor-pointer"
+							className="w-full text-xs md:text-sm cursor-pointer"
+							onMouseEnter={() => setApplyHovered(true)}
+							onMouseLeave={() => setApplyHovered(false)}
+							style={{
+								backgroundColor: cardColor,
+								color: onHoverTextColor,
+								filter: applyHovered ? "brightness(0.88)" : "none",
+							}}
 						>
 							Apply Now
 						</Button>

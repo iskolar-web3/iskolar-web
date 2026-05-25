@@ -6,6 +6,7 @@ import { ScholarshipType, type Scholarship } from '@/lib/scholarship/model';
 import { getSponsorName } from '@/lib/sponsor/api';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
+import { isLightColor } from '@/routes/_sponsor/create/-components/fields/CardColorPicker';
 
 /**
  * Props for the ScholarshipCard component (sponsor view)
@@ -47,6 +48,13 @@ export default function ScholarshipCard({
   const isRange = scholarship.totalAmountMin != null || scholarship.totalAmountMax != null;
   const isFixed = !isRange && scholarship.totalAmount != null;
   const isVaries = !isRange && !isFixed;
+  const cardColor = scholarship.cardColor ?? "#3A52A6";
+  const isLight = isLightColor(cardColor);
+  const headerTextColor = isLight ? "#111827" : undefined;
+  const onHoverTextColor = isLight ? "#111827" : "white";
+  const [cardHovered, setCardHovered] = useState(false);
+  const [viewApplicantsHovered, setViewApplicantsHovered] = useState(false);
+  const [editHovered, setEditHovered] = useState(false);
 
   /**
    * Handles right-click context menu
@@ -129,7 +137,10 @@ export default function ScholarshipCard({
       }}
       onClick={onClick}
       onContextMenu={handleContextMenu}
-      className="bg-white cursor-pointer rounded-md border border-border hover:border-[#3A52A6] transition-colors relative shadow-sm"
+      onMouseEnter={() => setCardHovered(true)}
+      onMouseLeave={() => setCardHovered(false)}
+      className="bg-white cursor-pointer rounded-md border transition-colors relative shadow-sm"
+      style={{ borderColor: cardHovered ? cardColor : undefined }}
     >
       {/* Context Menu */}
       <AnimatePresence>
@@ -175,7 +186,7 @@ export default function ScholarshipCard({
       </AnimatePresence>
 
       {/* Header */}
-      <div className="bg-[#3A52A6] rounded-lg rounded-bl-none rounded-br-none">
+      <div className="rounded-lg rounded-bl-none rounded-br-none" style={{ backgroundColor: scholarship.cardColor ?? "#3A52A6" }}>
         <div className="flex">
           {/* Image */}
           <motion.div
@@ -190,7 +201,7 @@ export default function ScholarshipCard({
           </motion.div>
 
           {/* Info */}
-          <div className="flex-1 text-tertiary px-4 py-2">
+          <div className="flex-1 text-tertiary px-4 py-2" style={{ color: headerTextColor }}>
             <h3 className="text-lg mb-1 line-clamp-1">{scholarship.name}</h3>
 
             {/* Badges */}
@@ -304,7 +315,14 @@ export default function ScholarshipCard({
               variant="outline"
               size="default"
               onClick={handleViewApplicants}
-              className="w-full text-xs md:text-sm font-medium border-[#3A52A6] text-[#3A52A6] hover:bg-[#3A52A6] hover:text-white cursor-pointer"
+              className="w-full text-xs md:text-sm font-medium cursor-pointer"
+              onMouseEnter={() => setViewApplicantsHovered(true)}
+              onMouseLeave={() => setViewApplicantsHovered(false)}
+              style={{
+                borderColor: cardColor,
+                color: viewApplicantsHovered ? onHoverTextColor : cardColor,
+                backgroundColor: viewApplicantsHovered ? cardColor : "transparent",
+              }}
             >
               <Users size={16} />
               View Applicants
@@ -319,7 +337,14 @@ export default function ScholarshipCard({
               variant="outline"
               size="default"
               onClick={handleEdit}
-              className="w-full text-xs md:text-sm font-medium border-[#3A52A6] text-[#3A52A6] hover:bg-[#3A52A6] hover:text-white cursor-pointer"
+              className="w-full text-xs md:text-sm font-medium cursor-pointer"
+              onMouseEnter={() => setEditHovered(true)}
+              onMouseLeave={() => setEditHovered(false)}
+              style={{
+                borderColor: cardColor,
+                color: editHovered ? onHoverTextColor : cardColor,
+                backgroundColor: editHovered ? cardColor : "transparent",
+              }}
             >
               <Edit2 size={16} />
               Edit
