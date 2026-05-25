@@ -85,7 +85,7 @@ const sponsorNavItems: NavItem[] = [
  * @param props - Component props
  * @returns Header navigation component
  */
-export default function HeaderNav({ role, notifications = [] }: HeaderNavProps) {
+export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 	const router = useRouterState();
 	const navigate = useNavigate();
 	const currentPath = router.location.pathname;
