@@ -5,12 +5,12 @@ import { UserRole } from "@/lib/user/model";
 import { BACKEND_URL, getDefaultPathOfRole } from "@/lib/api";
 import { BetaNoticeModal } from "@/components/student/BetaNotice";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
-import { useToast } from "@/hooks/useToast";
 import {
 	ScholarshipEvent,
 	type ScholarshipCreatedEvent,
 } from "@/lib/scholarship/event";
-import Toast from "@/components/Toast";
+import { getMyNotificationsQuery } from "@/lib/notification/api";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/_student")({
 	component: StudentLayout,
@@ -34,7 +34,8 @@ export const Route = createFileRoute("/_student")({
 });
 
 function StudentLayout(): JSX.Element {
-	const { toast, showSuccess } = useToast();
+	const notifications = useQuery(getMyNotificationsQuery());
+	const queryClient = useQueryClient();
 
 	useEffect(() => {
 		const es = new EventSource(`${BACKEND_URL}/sse/scholarships`, {
@@ -43,7 +44,7 @@ function StudentLayout(): JSX.Element {
 
 		es.addEventListener(ScholarshipEvent.Created, (e) => {
 			const data = JSON.parse(e.data) as ScholarshipCreatedEvent;
-			showSuccess("New Scholarship", data.name, 10000);
+			queryClient.invalidateQueries(getMyNotificationsQuery());
 			console.log(data);
 		});
 
@@ -52,9 +53,7 @@ function StudentLayout(): JSX.Element {
 
 	return (
 		<div className="min-h-screen bg-background">
-			{toast && <Toast {...toast} />}
-
-			<HeaderNav role="student" />
+			<HeaderNav role="student" notifications={notifications.data || []} />
 			<div className="w-full px-4 md:px-14 pt-21 md:pt-24 pb-6">
 				<Outlet />
 			</div>

@@ -19,6 +19,21 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/auth";
 import { getStudentDisbursementsQuery } from "@/lib/disbursement/api";
 import { DisbursementStatus } from "@/lib/disbursement/model";
+import {
+	Popover,
+	PopoverContent,
+	PopoverHeader,
+	PopoverTitle,
+	PopoverTrigger,
+} from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import type { Notification } from "@/lib/notification/model";
+import {
+	formatTimeAgo,
+	getNotificationMessage,
+	getNotificationMetadata,
+} from "@/lib/notification/helper";
+import { Button } from "./ui/button";
 
 /**
  * User role type for navigation context
@@ -43,6 +58,7 @@ interface NavItem {
 interface HeaderNavProps {
 	/** Current user's role (student or sponsor) */
 	role: UserRole;
+	notifications: Notification[];
 }
 
 /**
@@ -69,7 +85,7 @@ const sponsorNavItems: NavItem[] = [
  * @param props - Component props
  * @returns Header navigation component
  */
-export default function HeaderNav({ role }: HeaderNavProps) {
+export default function HeaderNav({ role, notifications = [] }: HeaderNavProps) {
 	const router = useRouterState();
 	const navigate = useNavigate();
 	const currentPath = router.location.pathname;
@@ -325,15 +341,53 @@ export default function HeaderNav({ role }: HeaderNavProps) {
 
 					{/* Notifications and Profile */}
 					<div className="flex items-center gap-1 md:gap-2 shrink-0">
-						{/* Notification Bell */}
-						<button
-							type="button"
-							className="relative p-2 cursor-pointer text-[#9CA3AF] hover:text-primary transition-colors"
-							aria-label="Notifications"
-						>
-							<Bell className="w-4 md:w-5 h-4 md:h-5" />
-							{/* TODO: Add notification badge if there are unread notifications */}
-						</button>
+						<Popover>
+							<PopoverTrigger asChild>
+								{/* Notification Bell */}
+								<button
+									type="button"
+									className="relative p-2 cursor-pointer text-[#9CA3AF] hover:text-primary transition-colors"
+									aria-label="Notifications"
+								>
+									<Bell className="w-4 md:w-5 h-4 md:h-5" />
+
+									{notifications.length > 0 ? (
+										<span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] text-white">
+											{notifications.length}
+										</span>
+									) : null}
+								</button>
+							</PopoverTrigger>
+							<PopoverContent align="end" className="h-[85vh] p-0 overflow-clip border-0">
+								<PopoverHeader className="p-3 bg-secondary">
+									<PopoverTitle className="text-xl text-secondary-foreground">Notifications</PopoverTitle>
+								</PopoverHeader>
+
+								<ScrollArea className="h-full space-y-2 ">
+									{notifications.map((notif) => {
+										const metadata = getNotificationMetadata(notif);
+										const message = getNotificationMessage(notif);
+										return (
+											<Button
+												variant="ghost"
+												className="border-y border-muted flex-1 flex flex-col items-start gap-0 w-full py-2 px-3 h-auto space-y-2 whitespace-normal text-start rounded-none"
+											>
+												<div>
+													<h1>{message}</h1>
+													<p className="text-muted-foreground">
+														{metadata?.name}
+													</p>
+												</div>
+
+												<p className="text-secondary text-xs">
+													{formatTimeAgo(metadata?.createdAt)}
+												</p>
+											</Button>
+										);
+									})}
+								</ScrollArea>
+							</PopoverContent>
+						</Popover>
 
 						{/* Profile Circle */}
 						<div className="relative" ref={profileDropdownRef}>
