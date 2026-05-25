@@ -14,7 +14,20 @@ export const CARD_COLORS = [
 	{ value: "#0891B2", label: "Cyan" },
 	{ value: "#0F766E", label: "Teal" },
 	{ value: "#475569", label: "Slate" },
+	{ value: "#1C1917", label: "Charcoal" },
+	{ value: "#FFFFFF", label: "White" },
 ];
+
+export function isLightColor(hex: string): boolean {
+	const r = parseInt(hex.slice(1, 3), 16) / 255;
+	const g = parseInt(hex.slice(3, 5), 16) / 255;
+	const b = parseInt(hex.slice(5, 7), 16) / 255;
+	const toLinear = (c: number) =>
+		c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+	const L =
+		0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+	return L > 0.179;
+}
 
 interface CardColorPickerProps {
 	value: string;
@@ -33,21 +46,31 @@ export default function CardColorPicker({
 				Card Color
 			</label>
 			<div className="flex flex-wrap gap-2">
-				{CARD_COLORS.map((color) => (
-					<button
-						key={color.value}
-						type="button"
-						disabled={disabled}
-						title={color.label}
-						onClick={() => onChange(color.value)}
-						className="w-7 h-7 rounded-full flex items-center justify-center transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#3A52A6] disabled:cursor-not-allowed"
-						style={{ backgroundColor: color.value }}
-					>
-						{value === color.value && (
-							<Check size={14} className="text-white" strokeWidth={3} />
-						)}
-					</button>
-				))}
+				{CARD_COLORS.map((color) => {
+					const isLight = isLightColor(color.value);
+					return (
+						<button
+							key={color.value}
+							type="button"
+							disabled={disabled}
+							title={color.label}
+							onClick={() => onChange(color.value)}
+							className="w-7 h-7 rounded-full flex items-center justify-center transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-[#3A52A6] disabled:cursor-not-allowed"
+							style={{
+								backgroundColor: color.value,
+								boxShadow: isLight ? "inset 0 0 0 1.5px #D1D5DB" : undefined,
+							}}
+						>
+							{value === color.value && (
+								<Check
+									size={14}
+									strokeWidth={3}
+									style={{ color: isLight ? "#374151" : "white" }}
+								/>
+							)}
+						</button>
+					);
+				})}
 			</div>
 		</div>
 	);

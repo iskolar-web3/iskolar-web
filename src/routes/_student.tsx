@@ -4,6 +4,7 @@ import HeaderNav from "@/components/HeaderNav";
 import { UserRole } from "@/lib/user/model";
 import { BACKEND_URL, getDefaultPathOfRole } from "@/lib/api";
 import { BetaNoticeModal } from "@/components/student/BetaNotice";
+import { PaymentMethodBanner } from "@/components/student/PaymentMethodBanner";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { useToast } from "@/hooks/useToast";
 import {
@@ -56,6 +57,7 @@ function StudentLayout(): JSX.Element {
 
 			<HeaderNav role="student" />
 			<div className="w-full px-4 md:px-14 pt-21 md:pt-24 pb-6">
+				<PaymentMethodBanner />
 				<Outlet />
 			</div>
 			<BetaNoticeModal />
