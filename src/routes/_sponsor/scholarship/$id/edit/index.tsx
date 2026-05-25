@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Edit2, Loader2 } from "lucide-react";
 import EditScholarshipSkeleton from "./-components/EditScholarshipSkeleton";
@@ -18,6 +18,7 @@ import {
 import { PRESET_CRITERIA, PRESET_DOCUMENTS } from "@/lib/scholarship/presets";
 import TagsListField from "@/routes/_sponsor/create/-components/fields/TagsListField";
 import ImageTitleDescriptionSection from "@/routes/_sponsor/create/-components/fields/ImageTitleDescriptionSection";
+import CardColorPicker from "@/routes/_sponsor/create/-components/fields/CardColorPicker";
 import AmountField from "@/routes/_sponsor/create/-components/fields/AmountField";
 import SlotsDeadlineFields from "@/routes/_sponsor/create/-components/fields/SlotsDeadlineFields";
 import type { AmountType } from "@/routes/_sponsor/create/-model";
@@ -83,6 +84,7 @@ function EditScholarshipPage() {
 			totalSlots: scholarship.totalSlots ?? undefined,
 			scholarshipType: scholarship.scholarshipType.code,
 			applicationDeadline: scholarship.applicationDeadline,
+			cardColor: scholarship.cardColor ?? "#3A52A6",
 		},
 	});
 
@@ -296,6 +298,21 @@ function EditScholarshipPage() {
 			</button>
 
 			<div className="space-y-4 lg:col-span-8">
+				{/* Card Color */}
+				<div className="bg-[#F8F9FC] rounded-xl p-3 shadow-sm">
+					<Controller
+						control={form.control as any}
+						name="cardColor"
+						render={({ field }) => (
+							<CardColorPicker
+								value={field.value ?? "#3A52A6"}
+								onChange={field.onChange}
+								disabled={saving}
+							/>
+						)}
+					/>
+				</div>
+
 				{/* Close Button */}
 				{status === "active" && (
 					<button

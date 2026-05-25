@@ -175,7 +175,7 @@ export default function ScholarshipCard({
       </AnimatePresence>
 
       {/* Header */}
-      <div className="bg-[#3A52A6] rounded-lg rounded-bl-none rounded-br-none">
+      <div className="rounded-lg rounded-bl-none rounded-br-none" style={{ backgroundColor: scholarship.cardColor ?? "#3A52A6" }}>
         <div className="flex">
           {/* Image */}
           <motion.div

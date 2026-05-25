@@ -55,7 +55,7 @@ export default function ScholarshipCard({ scholarship, index, onClick, isVerifie
       className="bg-card cursor-pointer rounded-md overflow-hidden border border-[#D3DCF6] hover:border-[#3A52A6] transition-colors"
     >
       {/* Header */}
-      <div className="bg-[#3A52A6]">
+      <div style={{ backgroundColor: scholarship.cardColor ?? "#3A52A6" }}>
         <div className="flex">
           {/* Image */}
           <motion.div

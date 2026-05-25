@@ -120,7 +120,8 @@ export default function ImageTitleDescriptionSection({
 						</p>
 					)}
 				</div>
-			</div>
+
+		</div>
 		</div>
 	);
 }
