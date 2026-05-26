@@ -248,3 +248,9 @@ export const applicationStatusSchema = z.object({
 	status: enumDetailSchema(ScholarshipApplicationStatus),
 });
 export type ApplicationStatus = z.output<typeof applicationStatusSchema>;
+
+export type ScholarshipCreatedEvent = {
+	id: string;
+	createdAt: Date;
+	name: string;
+};
