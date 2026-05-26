@@ -10,7 +10,6 @@ import { deleteCookie, getCookie, setCookie } from "./lib/cookie";
 import { UserRole, type AuthSession, type User } from "./lib/user/model";
 import {
 	ACCESS_TOKEN_KEY,
-	REFRESH_TOKEN_KEY,
 	validateSession,
 } from "./lib/user/auth";
 import { getMyStudentProfile } from "./lib/student/api";
@@ -85,7 +84,6 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 				session = await validateSession(oldToken);
 			} catch {
 				deleteCookie(ACCESS_TOKEN_KEY);
-				deleteCookie(REFRESH_TOKEN_KEY);
 				clearAuthCache();
 				setUser(null);
 				setProfile(null);
@@ -94,7 +92,6 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 
 			if (!session.data) {
 				deleteCookie(ACCESS_TOKEN_KEY);
-				deleteCookie(REFRESH_TOKEN_KEY);
 				clearAuthCache();
 				setUser(null);
 				setProfile(null);
@@ -143,7 +140,6 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 		setSessionToken("");
 		setError(null);
 		deleteCookie(ACCESS_TOKEN_KEY);
-		deleteCookie(REFRESH_TOKEN_KEY);
 		clearAuthCache();
 	}
 

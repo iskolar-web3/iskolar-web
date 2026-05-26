@@ -15,7 +15,7 @@ import { BACKEND_URL, type ApiResponse } from "@/lib/api";
 import { useMutation } from "@tanstack/react-query";
 import { setCookie } from "@/lib/cookie";
 import { UserRole, type AuthSession } from "@/lib/user/model";
-import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/lib/user/auth";
+import { ACCESS_TOKEN_KEY } from "@/lib/user/auth";
 import { useAuth } from "@/auth";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 

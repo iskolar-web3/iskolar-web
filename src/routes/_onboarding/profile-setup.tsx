@@ -233,7 +233,7 @@ function ProfileSetup() {
 	const [roleValidationError, setRoleValidationError] = useState(false);
 
 	const [loading, setLoading] = useState(false);
-	const [showPreloader, setShowPreloader] = useState(false);
+	const [showPreloader, _] = useState(false);
 	const { toast, showSuccess, showError } = useToast();
 
 	// const [isSchoolUnavailable, setIsSchoolUnavailable] = useState(false)
