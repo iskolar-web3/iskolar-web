@@ -110,7 +110,6 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 			setUser(session.data.user);
 			setSessionToken(session.data.token);
 			setCookie(ACCESS_TOKEN_KEY, session.data.token, { expires });
-			setCookie(REFRESH_TOKEN_KEY, session.data.refreshToken, { expires });
 
 			let resolvedProfile: unknown = null;
 			switch (session.data.user.role?.code) {

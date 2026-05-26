@@ -29,7 +29,6 @@ export type User = z.output<typeof userSchema>;
 export type AuthSession = {
 	user: User;
 	token: string;
-	refreshToken: string;
 };
 
 export enum ContactType {

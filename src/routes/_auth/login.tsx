@@ -81,7 +81,6 @@ function LoginPage(): JSX.Element {
 
         showSuccess(`Success`, 'Login successful', 1250);
         setCookie(ACCESS_TOKEN_KEY, res.token);
-        setCookie(REFRESH_TOKEN_KEY, res.refreshToken);
 
         // Validate the user session, account, and profile
         await auth.getSession()
