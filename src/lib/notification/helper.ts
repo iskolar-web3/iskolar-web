@@ -1,12 +1,9 @@
-import {
-	ScholarshipEvent,
-	type ScholarshipCreatedEvent,
-} from "../scholarship/event";
-import type { Notification } from "./model";
+import type { ScholarshipCreatedEvent } from "../scholarship/model";
+import { NotificationType, type Notification } from "./model";
 
 export function getNotificationMetadata(notif: Notification) {
 	switch (notif.notificationType.code) {
-		case ScholarshipEvent.Created:
+		case NotificationType.ScholarshipCreated:
 			return notif.metadata as ScholarshipCreatedEvent;
 		default:
 			break;
@@ -31,7 +28,7 @@ export function formatTimeAgo(date: string | Date | undefined): string {
 
 export function getNotificationMessage(notif: Notification): string {
 	switch (notif.notificationType.code) {
-		case ScholarshipEvent.Created:
+		case NotificationType.ScholarshipCreated:
 			return `New scholarship available`;
 		default:
 			break;

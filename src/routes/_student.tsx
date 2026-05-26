@@ -6,12 +6,10 @@ import { BACKEND_URL, getDefaultPathOfRole } from "@/lib/api";
 import { BetaNoticeModal } from "@/components/student/BetaNotice";
 import { PaymentMethodBanner } from "@/components/student/PaymentMethodBanner";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
-import {
-	ScholarshipEvent,
-	type ScholarshipCreatedEvent,
-} from "@/lib/scholarship/event";
 import { getMyNotificationsQuery } from "@/lib/notification/api";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { NotificationType } from "@/lib/notification/model";
+import type { ScholarshipCreatedEvent } from "@/lib/scholarship/model";
 
 export const Route = createFileRoute("/_student")({
 	component: StudentLayout,
@@ -43,7 +41,7 @@ function StudentLayout(): JSX.Element {
 			withCredentials: true,
 		});
 
-		es.addEventListener(ScholarshipEvent.Created, (e) => {
+		es.addEventListener(NotificationType.ScholarshipCreated, (e) => {
 			const data = JSON.parse(e.data) as ScholarshipCreatedEvent;
 			queryClient.invalidateQueries(getMyNotificationsQuery());
 			console.log(data);
