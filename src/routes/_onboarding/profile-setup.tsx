@@ -86,7 +86,9 @@ const createStudentSchema = z.object({
 	}),
 	contact: createContactRequestSchema,
 	schoolName: z.string().min(1, "School name is required"),
-	educationLevel: z.enum(EducationLevel, { message: "Please select an education level" }),
+	educationLevel: z.enum(EducationLevel, {
+		message: "Please select an education level",
+	}),
 });
 
 // individual Sponsor validation
@@ -440,55 +442,8 @@ function ProfileSetup() {
 				const governmentSponsorData = value as GovernmentSponsorFormData;
 				governmentSponsorMutation.mutate(governmentSponsorData);
 			} else if (selectedRole === "school") {
-				// const schoolData = data as SchoolFormData;
-
 				showError("Unavailable", "The school role is not available yet.", 2450);
-				// setIsSchoolUnavailable(true);
-
-				setTimeout(() => {
-					navigate({ to: "/role-selection" });
-				}, 2500);
-
 				return;
-
-				// const result = await profileService.setupSchoolProfile({
-				//   role: selectedRole
-				//   school_name: schoolData.schoolName,
-				//   school_type: schoolData.schoolType,
-				//   official_email: schoolData.emailAddress,
-				//   contact_number: schoolData.contactNumber,
-				// });
-
-				// if (result.success) {
-				//   setToastConfig({
-				//     type: 'success',
-				//     title: 'Profile Created',
-				//     message: 'Your profile has been set up successfully!',
-				//   })
-				//   setShowToast(true);
-				//   setTimeout(() => {
-				//     setShowToast(false)
-				//     // Show preloader after successful profile setup
-				//     setShowPreloader(true);
-				//   }, 1250);
-				// } else {
-				//   setToastConfig({
-				//     type: 'error',
-				//     title: 'Error',
-				//     message: result.message,
-				//   })
-				//   setShowToast(true);
-				//   setTimeout(() => setShowToast(false), 2000);
-				// }
-
-				showSuccess(
-					"Profile Created",
-					"Your profile has been set up successfully",
-					2000,
-				);
-				setTimeout(() => {
-					setShowPreloader(true);
-				}, 1250);
 			}
 		} catch (error) {
 			const handled = handleError(error, "Failed to connect to server.");
@@ -502,16 +457,6 @@ function ProfileSetup() {
 	const handlePreloaderComplete = async () => {
 		await auth.getSession();
 		// After preloader completes, navigate to appropriate page based on role
-		// TODO: Uncomment when backend is ready
-		// if (selectedRole === 'student') {
-		//   navigate({ to: '/home', replace: true });
-		// } else if (selectedRole === 'individual_sponsor' || selectedRole === 'organization_sponsor' || selectedRole === 'government_sponsor') {
-		//   navigate({ to: '/my-scholarships', replace: true });
-		// } else if (selectedRole === 'school') {
-		//   navigate({ to: '/dashboard', replace: true });
-		// }
-
-		// For now, navigate based on role
 		if (selectedRole === "student") {
 			navigate({ to: "/home", replace: true });
 		} else if (
