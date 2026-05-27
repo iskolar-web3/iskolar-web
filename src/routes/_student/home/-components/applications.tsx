@@ -22,6 +22,7 @@ import {
 	ScholarshipType,
 } from "@/lib/scholarship/model";
 import { getSponsorName } from "@/lib/sponsor/api";
+import { isLightColor } from "@/routes/_sponsor/create/-components/fields/CardColorPicker";
 import { format } from "date-fns";
 import SubmittedFormsModal from "@/components/student/home/SubmittedFormsModal";
 
@@ -36,7 +37,11 @@ export function HomeApplications(props: Props): JSX.Element {
 	return (
 		<>
 			<section>
-				{props.applications.map((item, index) => (
+				{props.applications.map((item, index) => {
+					const cardColor = item.scholarship.cardColor ?? "#3A52A6";
+					const isLight = isLightColor(cardColor);
+					const headerTextColor = isLight ? "#111827" : "#F9FAFB";
+					return (
 					<div key={item.application.id} className="flex gap-4 md:gap-6">
 						{/* Desktop: Date/Time */}
 						<div className="hidden md:flex gap-4">
@@ -106,8 +111,8 @@ export function HomeApplications(props: Props): JSX.Element {
 									className="overflow-hidden rounded-lg bg-white hover:border-[#3A52A6] shadow-sm border border-[#E0ECFF] hover:shadow-md transition-colors"
 								>
 									{/* Header */}
-									<div className="flex bg-[#3A52A6]">
-										<div className="relative w-32 h-32 shrink-0 bg-[#1D2A5B]">
+									<div className="flex" style={{ backgroundColor: cardColor }}>
+										<div className="relative w-32 h-32 shrink-0" style={{ backgroundColor: `color-mix(in srgb, ${cardColor} 70%, black)` }}>
 											<img
 												src={item.scholarship.imageUrl || "/scholarship-banner-placeholder.png"}
 												alt={item.scholarship.name}
@@ -115,7 +120,7 @@ export function HomeApplications(props: Props): JSX.Element {
 											/>
 										</div>
 
-										<div className="flex-1 px-3 py-2 text-[#F9FAFB]">
+										<div className="flex-1 px-3 py-2" style={{ color: headerTextColor }}>
 											<div className="flex items-start justify-between gap-2">
 												<div className="space-y-1 flex-1 min-w-0">
 													<h3 className="text-lg md:text-xl line-clamp-1 pr-2">
@@ -260,7 +265,7 @@ export function HomeApplications(props: Props): JSX.Element {
 
 						</div>
 					</div>
-				))}
+				);})}
 			</section>
 
 			{formsModalApplication && (
