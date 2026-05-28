@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { SEO } from "@/components/SEO";
 import {
   HiAcademicCap,
@@ -18,6 +18,7 @@ import { Loader2 } from "lucide-react";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { UserRole } from "@/lib/user/model";
 import { SponsorType } from "@/lib/sponsor/model";
+import { cn } from "@/lib/utils";
 // import { profileService } from '@/services/profile.service';
 
 export const Route = createFileRoute("/_onboarding/role-selection")({
@@ -253,31 +254,30 @@ function RoleSelection() {
           </p>
         </motion.div>
 
-        <AnimatePresence mode="wait">
+        <section>
           {!showSponsorTypes ? (
             /* Main Role Selection */
-            <motion.div
+            <div
               key="main-roles"
               className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-4xl mx-auto mb-8 sm:mb-10 md:mb-12"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
             >
               {roles.map((role, index) => {
                 const IconComponent = role.icon;
                 return (
-                  <motion.button
+                  <button
                     key={role.id}
-                    initial={{ opacity: 0, scale: 0.8, y: 20 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{ duration: 0.2, delay: 0.1 + index * 0.15 }}
                     onClick={() => handleRoleSelect(role.id as UserRole)}
-                    className={`${selectedRole === role.id ? role.color.replace("border-", "bg-") : role.bgColor} ${role.color} border-4 rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 transition-all duration-500 hover:shadow-xl ${
-                      selectedRole === role.id ? "shadow-2xl scale-105" : "shadow-lg"
-                    }`}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    className={cn(
+                      selectedRole === role.id
+                        ? role.color.replace("border-", "bg-")
+                        : role.bgColor,
+                      role.color,
+                      "border-4 rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 transition-all duration-500 hover:shadow-xl",
+                      selectedRole === role.id ? "shadow-2xl scale-105" : "shadow-lg",
+                      "cursor-pointer",
+                      "role-card hover:scale-105 active:scale-95"
+                    )}
+                      style={{ animationDelay: `${0.1 + index * 0.15}s` }}
                   >
                     {/* Icon */}
                     <div
@@ -306,34 +306,30 @@ function RoleSelection() {
                     >
                       {role.description}
                     </p>
-                  </motion.button>
+                  </button>
                 );
               })}
-            </motion.div>
+            </div>
           ) : (
             /* Sponsor Sub-Role Selection */
-            <motion.div
+            <div
               key="sponsor-roles"
               className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-4xl mx-auto mb-8 sm:mb-10 md:mb-12"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
             >
               {sponsorSubRoles.map((subRole, index) => {
                 const IconComponent = subRole.icon;
                 return (
-                  <motion.button
+                  <button
                     key={subRole.id}
-                    initial={{ opacity: 0, scale: 0.8, y: 20 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{ duration: 0.2, delay: 0.1 + index * 0.15 }}
                     onClick={() => setSponsorType(subRole.id)}
-                    className={`${selectedSponsorType === subRole.id ? subRole.selectedBgColor : subRole.bgColor} ${subRole.color} border-4 rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 transition-all duration-500 hover:shadow-xl ${
-                      selectedSponsorType === subRole.id ? "shadow-2xl scale-105" : "shadow-lg"
-                    }`}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    className={cn(selectedSponsorType === subRole.id ? subRole.selectedBgColor : subRole.bgColor,
+                        subRole.color,
+                        `border-4 rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 transition-all duration-500 hover:shadow-xl `,
+                         selectedSponsorType === subRole.id ? "shadow-2xl scale-105" : "shadow-lg" ,
+                      "cursor-pointer",
+                      "role-card hover:scale-105 active:scale-95"
+                    )}
+                      style={{ animationDelay: `${0.1 + index * 0.15}s` }}
                   >
                     {/* Icon */}
                     <div
@@ -362,12 +358,12 @@ function RoleSelection() {
                     >
                       {subRole.description}
                     </p>
-                  </motion.button>
+                  </button>
                 );
               })}
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
+        </section>
 
         {/* Select Button */}
         <motion.div
