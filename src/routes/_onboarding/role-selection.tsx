@@ -49,7 +49,7 @@ function RoleSelection() {
       iconColor: 'text-[#EFA508]',
       titleColor: 'text-[#EFA508]',
       subtitleColor: 'text-[#EFA508]',
-      bgColor: 'bg-[#F0F7FF]'
+      bgColor: 'bg-background'
     },
     {
       id: 'sponsor',
@@ -58,11 +58,11 @@ function RoleSelection() {
       subtitle: 'Scholarship Provider',
       description: 'Create scholarship programs, support deserving students, and make a positive impact on education.',
       icon: HiHeart,
-      color: 'border-[#31D0AA]',
-      iconColor: 'text-[#31D0AA]',
-      titleColor: 'text-[#31D0AA]',
-      subtitleColor: 'text-[#31D0AA]',
-      bgColor: 'bg-[#F0F7FF]'
+      color: 'border-success',
+      iconColor: 'text-success',
+      titleColor: 'text-success',
+      subtitleColor: 'text-success',
+      bgColor: 'bg-background'
     },
     {
       id: 'school',
@@ -75,7 +75,7 @@ function RoleSelection() {
       iconColor: 'text-[#607EF2]',
       titleColor: 'text-[#607EF2]',
       subtitleColor: 'text-[#607EF2]',
-      bgColor: 'bg-[#F0F7FF]'
+      bgColor: 'bg-background'
     }
   ];
 
@@ -87,12 +87,12 @@ function RoleSelection() {
       subtitle: 'Independent Sponsor',
       description: 'Personally support deserving students by funding their studies and helping them achieve academic success.',
       icon: HiUser,
-      color: 'border-[#31D0AA]',
-      selectedBgColor: 'bg-[#31D0AA]',
-      iconColor: 'text-[#31D0AA]',
-      titleColor: 'text-[#31D0AA]',
-      subtitleColor: 'text-[#31D0AA]',
-      bgColor: 'bg-[#F0F7FF]'
+      color: 'border-success',
+      selectedBgColor: 'bg-success',
+      iconColor: 'text-success',
+      titleColor: 'text-success',
+      subtitleColor: 'text-success',
+      bgColor: 'bg-background'
     },
     {
       id: 'organization',
@@ -101,12 +101,12 @@ function RoleSelection() {
       subtitle: 'Scholarship Organization',
       description: 'Provide scholarships as an institution, foundation, or non-profit to empower students and strengthen educational opportunities.',
       icon: HiUserGroup,
-      color: 'border-[#31D0AA]',
-      selectedBgColor: 'bg-[#31D0AA]',
-      iconColor: 'text-[#31D0AA]',
-      titleColor: 'text-[#31D0AA]',
-      subtitleColor: 'text-[#31D0AA]',
-      bgColor: 'bg-[#F0F7FF]'
+      color: 'border-success',
+      selectedBgColor: 'bg-success',
+      iconColor: 'text-success',
+      titleColor: 'text-success',
+      subtitleColor: 'text-success',
+      bgColor: 'bg-background'
     },
     {
       id: 'government',
@@ -115,12 +115,12 @@ function RoleSelection() {
       subtitle: 'Government Agency',
       description: "Offer government-funded scholarships to promote equal access to education and invest in the nation's future workforce.",
       icon: HiBuildingLibrary,
-      color: 'border-[#31D0AA]',
-      selectedBgColor: 'bg-[#31D0AA]',
-      iconColor: 'text-[#31D0AA]',
-      titleColor: 'text-[#31D0AA]',
-      subtitleColor: 'text-[#31D0AA]',
-      bgColor: 'bg-[#F0F7FF]'
+      color: 'border-success',
+      selectedBgColor: 'bg-success',
+      iconColor: 'text-success',
+      titleColor: 'text-success',
+      subtitleColor: 'text-success',
+      bgColor: 'bg-background'
     }
   ];
 
