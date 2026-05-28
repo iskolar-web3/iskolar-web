@@ -40,7 +40,13 @@ import { Route as StudentDisbursementsIndexRouteImport } from './routes/_student
 import { Route as SponsorScholarshipsIndexRouteImport } from './routes/_sponsor/scholarships/index'
 import { Route as SponsorScholarsIndexRouteImport } from './routes/_sponsor/scholars/index'
 import { Route as SponsorCreateIndexRouteImport } from './routes/_sponsor/create/index'
+import { Route as OnboardingProfileSetupIndexRouteImport } from './routes/_onboarding/profile-setup/index'
 import { Route as LandingAboutIndexRouteImport } from './routes/_landing/about/index'
+import { Route as OnboardingProfileSetupStudentRouteImport } from './routes/_onboarding/profile-setup/student'
+import { Route as OnboardingProfileSetupSchoolRouteImport } from './routes/_onboarding/profile-setup/school'
+import { Route as OnboardingProfileSetupOrganizationSponsorRouteImport } from './routes/_onboarding/profile-setup/organization-sponsor'
+import { Route as OnboardingProfileSetupIndividualSponsorRouteImport } from './routes/_onboarding/profile-setup/individual-sponsor'
+import { Route as OnboardingProfileSetupGovernmentSponsorRouteImport } from './routes/_onboarding/profile-setup/government-sponsor'
 import { Route as SponsorScholarshipIdApplicantsRouteImport } from './routes/_sponsor/scholarship/$id/applicants'
 import { Route as StudentScholarshipIdApplyIndexRouteImport } from './routes/_student/scholarship/$id/apply/index'
 import { Route as StudentProfileStudentStudentIdIndexRouteImport } from './routes/_student/profile/student/$studentId/index'
@@ -200,11 +206,47 @@ const SponsorCreateIndexRoute = SponsorCreateIndexRouteImport.update({
   path: '/create/',
   getParentRoute: () => SponsorRoute,
 } as any)
+const OnboardingProfileSetupIndexRoute =
+  OnboardingProfileSetupIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => OnboardingProfileSetupRoute,
+  } as any)
 const LandingAboutIndexRoute = LandingAboutIndexRouteImport.update({
   id: '/_landing/about/',
   path: '/about/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OnboardingProfileSetupStudentRoute =
+  OnboardingProfileSetupStudentRouteImport.update({
+    id: '/student',
+    path: '/student',
+    getParentRoute: () => OnboardingProfileSetupRoute,
+  } as any)
+const OnboardingProfileSetupSchoolRoute =
+  OnboardingProfileSetupSchoolRouteImport.update({
+    id: '/school',
+    path: '/school',
+    getParentRoute: () => OnboardingProfileSetupRoute,
+  } as any)
+const OnboardingProfileSetupOrganizationSponsorRoute =
+  OnboardingProfileSetupOrganizationSponsorRouteImport.update({
+    id: '/organization-sponsor',
+    path: '/organization-sponsor',
+    getParentRoute: () => OnboardingProfileSetupRoute,
+  } as any)
+const OnboardingProfileSetupIndividualSponsorRoute =
+  OnboardingProfileSetupIndividualSponsorRouteImport.update({
+    id: '/individual-sponsor',
+    path: '/individual-sponsor',
+    getParentRoute: () => OnboardingProfileSetupRoute,
+  } as any)
+const OnboardingProfileSetupGovernmentSponsorRoute =
+  OnboardingProfileSetupGovernmentSponsorRouteImport.update({
+    id: '/government-sponsor',
+    path: '/government-sponsor',
+    getParentRoute: () => OnboardingProfileSetupRoute,
+  } as any)
 const SponsorScholarshipIdApplicantsRoute =
   SponsorScholarshipIdApplicantsRouteImport.update({
     id: '/scholarship/$id/applicants',
@@ -252,11 +294,17 @@ export interface FileRoutesByFullPath {
   '/terms-conditions': typeof AuthTermsConditionsRoute
   '/verify': typeof AuthVerifyRoute
   '/verify-email': typeof AuthVerifyEmailRoute
-  '/profile-setup': typeof OnboardingProfileSetupRoute
+  '/profile-setup': typeof OnboardingProfileSetupRouteWithChildren
   '/role-selection': typeof OnboardingRoleSelectionRoute
   '/welcome': typeof OnboardingWelcomeRoute
   '/verification/callback': typeof VerificationCallbackRoute
+  '/profile-setup/government-sponsor': typeof OnboardingProfileSetupGovernmentSponsorRoute
+  '/profile-setup/individual-sponsor': typeof OnboardingProfileSetupIndividualSponsorRoute
+  '/profile-setup/organization-sponsor': typeof OnboardingProfileSetupOrganizationSponsorRoute
+  '/profile-setup/school': typeof OnboardingProfileSetupSchoolRoute
+  '/profile-setup/student': typeof OnboardingProfileSetupStudentRoute
   '/about': typeof LandingAboutIndexRoute
+  '/profile-setup/': typeof OnboardingProfileSetupIndexRoute
   '/create': typeof SponsorCreateIndexRoute
   '/scholars': typeof SponsorScholarsIndexRoute
   '/scholarships': typeof SponsorScholarshipsIndexRoute
@@ -285,11 +333,16 @@ export interface FileRoutesByTo {
   '/terms-conditions': typeof AuthTermsConditionsRoute
   '/verify': typeof AuthVerifyRoute
   '/verify-email': typeof AuthVerifyEmailRoute
-  '/profile-setup': typeof OnboardingProfileSetupRoute
   '/role-selection': typeof OnboardingRoleSelectionRoute
   '/welcome': typeof OnboardingWelcomeRoute
   '/verification/callback': typeof VerificationCallbackRoute
+  '/profile-setup/government-sponsor': typeof OnboardingProfileSetupGovernmentSponsorRoute
+  '/profile-setup/individual-sponsor': typeof OnboardingProfileSetupIndividualSponsorRoute
+  '/profile-setup/organization-sponsor': typeof OnboardingProfileSetupOrganizationSponsorRoute
+  '/profile-setup/school': typeof OnboardingProfileSetupSchoolRoute
+  '/profile-setup/student': typeof OnboardingProfileSetupStudentRoute
   '/about': typeof LandingAboutIndexRoute
+  '/profile-setup': typeof OnboardingProfileSetupIndexRoute
   '/create': typeof SponsorCreateIndexRoute
   '/scholars': typeof SponsorScholarsIndexRoute
   '/scholarships': typeof SponsorScholarshipsIndexRoute
@@ -325,11 +378,17 @@ export interface FileRoutesById {
   '/_auth/terms-conditions': typeof AuthTermsConditionsRoute
   '/_auth/verify': typeof AuthVerifyRoute
   '/_auth/verify-email': typeof AuthVerifyEmailRoute
-  '/_onboarding/profile-setup': typeof OnboardingProfileSetupRoute
+  '/_onboarding/profile-setup': typeof OnboardingProfileSetupRouteWithChildren
   '/_onboarding/role-selection': typeof OnboardingRoleSelectionRoute
   '/_onboarding/welcome': typeof OnboardingWelcomeRoute
   '/verification/callback': typeof VerificationCallbackRoute
+  '/_onboarding/profile-setup/government-sponsor': typeof OnboardingProfileSetupGovernmentSponsorRoute
+  '/_onboarding/profile-setup/individual-sponsor': typeof OnboardingProfileSetupIndividualSponsorRoute
+  '/_onboarding/profile-setup/organization-sponsor': typeof OnboardingProfileSetupOrganizationSponsorRoute
+  '/_onboarding/profile-setup/school': typeof OnboardingProfileSetupSchoolRoute
+  '/_onboarding/profile-setup/student': typeof OnboardingProfileSetupStudentRoute
   '/_landing/about/': typeof LandingAboutIndexRoute
+  '/_onboarding/profile-setup/': typeof OnboardingProfileSetupIndexRoute
   '/_sponsor/create/': typeof SponsorCreateIndexRoute
   '/_sponsor/scholars/': typeof SponsorScholarsIndexRoute
   '/_sponsor/scholarships/': typeof SponsorScholarshipsIndexRoute
@@ -364,7 +423,13 @@ export interface FileRouteTypes {
     | '/role-selection'
     | '/welcome'
     | '/verification/callback'
+    | '/profile-setup/government-sponsor'
+    | '/profile-setup/individual-sponsor'
+    | '/profile-setup/organization-sponsor'
+    | '/profile-setup/school'
+    | '/profile-setup/student'
     | '/about'
+    | '/profile-setup/'
     | '/create'
     | '/scholars'
     | '/scholarships'
@@ -393,11 +458,16 @@ export interface FileRouteTypes {
     | '/terms-conditions'
     | '/verify'
     | '/verify-email'
-    | '/profile-setup'
     | '/role-selection'
     | '/welcome'
     | '/verification/callback'
+    | '/profile-setup/government-sponsor'
+    | '/profile-setup/individual-sponsor'
+    | '/profile-setup/organization-sponsor'
+    | '/profile-setup/school'
+    | '/profile-setup/student'
     | '/about'
+    | '/profile-setup'
     | '/create'
     | '/scholars'
     | '/scholarships'
@@ -436,7 +506,13 @@ export interface FileRouteTypes {
     | '/_onboarding/role-selection'
     | '/_onboarding/welcome'
     | '/verification/callback'
+    | '/_onboarding/profile-setup/government-sponsor'
+    | '/_onboarding/profile-setup/individual-sponsor'
+    | '/_onboarding/profile-setup/organization-sponsor'
+    | '/_onboarding/profile-setup/school'
+    | '/_onboarding/profile-setup/student'
     | '/_landing/about/'
+    | '/_onboarding/profile-setup/'
     | '/_sponsor/create/'
     | '/_sponsor/scholars/'
     | '/_sponsor/scholarships/'
@@ -681,12 +757,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SponsorCreateIndexRouteImport
       parentRoute: typeof SponsorRoute
     }
+    '/_onboarding/profile-setup/': {
+      id: '/_onboarding/profile-setup/'
+      path: '/'
+      fullPath: '/profile-setup/'
+      preLoaderRoute: typeof OnboardingProfileSetupIndexRouteImport
+      parentRoute: typeof OnboardingProfileSetupRoute
+    }
     '/_landing/about/': {
       id: '/_landing/about/'
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof LandingAboutIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_onboarding/profile-setup/student': {
+      id: '/_onboarding/profile-setup/student'
+      path: '/student'
+      fullPath: '/profile-setup/student'
+      preLoaderRoute: typeof OnboardingProfileSetupStudentRouteImport
+      parentRoute: typeof OnboardingProfileSetupRoute
+    }
+    '/_onboarding/profile-setup/school': {
+      id: '/_onboarding/profile-setup/school'
+      path: '/school'
+      fullPath: '/profile-setup/school'
+      preLoaderRoute: typeof OnboardingProfileSetupSchoolRouteImport
+      parentRoute: typeof OnboardingProfileSetupRoute
+    }
+    '/_onboarding/profile-setup/organization-sponsor': {
+      id: '/_onboarding/profile-setup/organization-sponsor'
+      path: '/organization-sponsor'
+      fullPath: '/profile-setup/organization-sponsor'
+      preLoaderRoute: typeof OnboardingProfileSetupOrganizationSponsorRouteImport
+      parentRoute: typeof OnboardingProfileSetupRoute
+    }
+    '/_onboarding/profile-setup/individual-sponsor': {
+      id: '/_onboarding/profile-setup/individual-sponsor'
+      path: '/individual-sponsor'
+      fullPath: '/profile-setup/individual-sponsor'
+      preLoaderRoute: typeof OnboardingProfileSetupIndividualSponsorRouteImport
+      parentRoute: typeof OnboardingProfileSetupRoute
+    }
+    '/_onboarding/profile-setup/government-sponsor': {
+      id: '/_onboarding/profile-setup/government-sponsor'
+      path: '/government-sponsor'
+      fullPath: '/profile-setup/government-sponsor'
+      preLoaderRoute: typeof OnboardingProfileSetupGovernmentSponsorRouteImport
+      parentRoute: typeof OnboardingProfileSetupRoute
     }
     '/_sponsor/scholarship/$id/applicants': {
       id: '/_sponsor/scholarship/$id/applicants'
@@ -770,14 +888,41 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface OnboardingProfileSetupRouteChildren {
+  OnboardingProfileSetupGovernmentSponsorRoute: typeof OnboardingProfileSetupGovernmentSponsorRoute
+  OnboardingProfileSetupIndividualSponsorRoute: typeof OnboardingProfileSetupIndividualSponsorRoute
+  OnboardingProfileSetupOrganizationSponsorRoute: typeof OnboardingProfileSetupOrganizationSponsorRoute
+  OnboardingProfileSetupSchoolRoute: typeof OnboardingProfileSetupSchoolRoute
+  OnboardingProfileSetupStudentRoute: typeof OnboardingProfileSetupStudentRoute
+  OnboardingProfileSetupIndexRoute: typeof OnboardingProfileSetupIndexRoute
+}
+
+const OnboardingProfileSetupRouteChildren: OnboardingProfileSetupRouteChildren =
+  {
+    OnboardingProfileSetupGovernmentSponsorRoute:
+      OnboardingProfileSetupGovernmentSponsorRoute,
+    OnboardingProfileSetupIndividualSponsorRoute:
+      OnboardingProfileSetupIndividualSponsorRoute,
+    OnboardingProfileSetupOrganizationSponsorRoute:
+      OnboardingProfileSetupOrganizationSponsorRoute,
+    OnboardingProfileSetupSchoolRoute: OnboardingProfileSetupSchoolRoute,
+    OnboardingProfileSetupStudentRoute: OnboardingProfileSetupStudentRoute,
+    OnboardingProfileSetupIndexRoute: OnboardingProfileSetupIndexRoute,
+  }
+
+const OnboardingProfileSetupRouteWithChildren =
+  OnboardingProfileSetupRoute._addFileChildren(
+    OnboardingProfileSetupRouteChildren,
+  )
+
 interface OnboardingRouteChildren {
-  OnboardingProfileSetupRoute: typeof OnboardingProfileSetupRoute
+  OnboardingProfileSetupRoute: typeof OnboardingProfileSetupRouteWithChildren
   OnboardingRoleSelectionRoute: typeof OnboardingRoleSelectionRoute
   OnboardingWelcomeRoute: typeof OnboardingWelcomeRoute
 }
 
 const OnboardingRouteChildren: OnboardingRouteChildren = {
-  OnboardingProfileSetupRoute: OnboardingProfileSetupRoute,
+  OnboardingProfileSetupRoute: OnboardingProfileSetupRouteWithChildren,
   OnboardingRoleSelectionRoute: OnboardingRoleSelectionRoute,
   OnboardingWelcomeRoute: OnboardingWelcomeRoute,
 }

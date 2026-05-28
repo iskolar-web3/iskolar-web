@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import Toast from "@/components/Toast";
-import { useToast } from "@/hooks/useToast";
+import { toast } from "@/lib/toast";
 import type { JSX } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -44,8 +43,6 @@ type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 function ResetPasswordPage(): JSX.Element {
 	const navigate = useNavigate();
 	const { token } = Route.useSearch();
-	const { toast, showError } = useToast();
-
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const [isSuccess, setIsSuccess] = useState(false);
@@ -72,7 +69,7 @@ function ResetPasswordPage(): JSX.Element {
 			setIsSuccess(true);
 		},
 		onError: (err) => {
-			showError("Error", err.message);
+			toast.error("Error", err.message);
 			console.error(err);
 		},
 	});
@@ -138,7 +135,6 @@ function ResetPasswordPage(): JSX.Element {
 	return (
 		<>
 			<SEO title="Reset Password" noindex={true} />
-			{toast && <Toast {...toast} />}
 			<FeedbackWidget />
 
 			<motion.div

@@ -1,15 +1,35 @@
 import { queryOptions } from "@tanstack/react-query";
-import { BACKEND_URL, safeResponseJson, type ApiResponse } from "../api";
+import { type ApiResponse, BACKEND_URL, safeResponseJson } from "../api";
 import { getCookie } from "../cookie";
 import { ACCESS_TOKEN_KEY } from "../user/auth";
 import {
-	paymentMethodSchema,
-	studentSchema,
+	type CreateStudentRequest,
 	type PaymentMethodDetail,
+	paymentMethodSchema,
 	type Student,
+	studentSchema,
 	type UpdateStudentRequest,
 	type UpsertPaymentMethodRequest,
 } from "./model";
+
+export async function createStudent(
+	value: CreateStudentRequest,
+): Promise<Student> {
+	const token = getCookie(ACCESS_TOKEN_KEY);
+	const response = await fetch(`${BACKEND_URL}/students`, {
+		method: "POST",
+		body: JSON.stringify(value),
+		headers: {
+			"Content-Type": "application/json",
+			Authorization: `Bearer ${token}`,
+		},
+	});
+	const result: ApiResponse<Student> = await safeResponseJson(response);
+	if (!response.ok) {
+		throw new Error(result.message || "Failed to create profile.");
+	}
+	return result.data;
+}
 
 export async function getMyStudentProfile(
 	token: string,

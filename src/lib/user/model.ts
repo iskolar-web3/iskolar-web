@@ -6,6 +6,7 @@ export enum UserRole {
 	Student = "student",
 	Sponsor = "sponsor",
 	Admin = "admin",
+	School = "school",
 }
 
 export enum UserStatus {

@@ -1,7 +1,7 @@
 import z from "zod";
 import { enumDetailSchema } from "../api";
-import { contactDetailSchema, createContactRequestSchema } from "../user/model";
 import { schoolSchema } from "../school/model";
+import { contactDetailSchema, createContactRequestSchema } from "../user/model";
 
 export enum Gender {
 	Male = "male",
@@ -45,6 +45,8 @@ export const createStudentRequestSchema = z.object({
 	}),
 	schoolName: z.string().min(1, "School name is required"),
 });
+
+export type CreateStudentRequest = z.infer<typeof createStudentRequestSchema>;
 
 export const updateStudentRequestSchema = createStudentRequestSchema
 	.extend({

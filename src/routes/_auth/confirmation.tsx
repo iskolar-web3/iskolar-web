@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import Toast from "@/components/Toast";
-import { useToast } from "@/hooks/useToast";
+import { toast } from "@/lib/toast";
 import type { JSX } from "react";
 import { Loader2, MailCheck, ArrowLeft, RefreshCw } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
@@ -32,8 +31,6 @@ function maskEmail(email: string): string {
 function ConfirmationPage(): JSX.Element {
 	const navigate = useNavigate();
 	const { email } = Route.useSearch();
-	const { toast, showSuccess, showError } = useToast();
-
 	const [resendCooldown, setResendCooldown] = useState(0);
 
 	const resendMutation = useMutation({
@@ -42,7 +39,7 @@ function ConfirmationPage(): JSX.Element {
 			return requestPasswordReset(email);
 		},
 		onSuccess: () => {
-			showSuccess("Sent", "Reset link sent again. Please check your inbox.", 3000);
+			toast.success("Sent", "Reset link sent again. Please check your inbox.", 3000);
 			// 60-second cooldown to prevent spam
 			setResendCooldown(60);
 			const interval = setInterval(() => {
@@ -56,7 +53,7 @@ function ConfirmationPage(): JSX.Element {
 			}, 1000);
 		},
 		onError: (err) => {
-			showError("Error", err.message);
+			toast.error("Error", err.message);
 			console.error(err);
 		},
 	});
@@ -68,8 +65,6 @@ function ConfirmationPage(): JSX.Element {
 	return (
 		<>
 			<SEO title="Confirmation" noindex={true} />
-			{toast && <Toast {...toast} />}
-
 			<motion.div
 				className="rounded-xl py-8 px-10 md:py-10 md:px-12 lg:py-8 lg:px-10 sm:py-6 sm:px-6 shadow-[1px_1px_4px_1px_rgba(96,126,242,0.5)] bg-[#F0F7FF] w-full max-w-md mx-auto text-center"
 				initial={{ opacity: 0, scale: 0.97 }}

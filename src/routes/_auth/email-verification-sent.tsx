@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import Toast from "@/components/Toast";
-import { useToast } from "@/hooks/useToast";
+import { toast } from "@/lib/toast";
 import type { JSX } from "react";
 import { Loader2, MailCheck, ArrowLeft, RefreshCw } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
@@ -32,7 +31,6 @@ function maskEmail(email: string): string {
 function EmailVerificationSentPage(): JSX.Element {
 	const navigate = useNavigate();
 	const { email } = Route.useSearch();
-	const { toast, showSuccess, showError } = useToast();
 	const [resendCooldown, setResendCooldown] = useState(0);
 
 	const resendMutation = useMutation({
@@ -41,7 +39,7 @@ function EmailVerificationSentPage(): JSX.Element {
 			return resendVerificationEmail(email);
 		},
 		onSuccess: () => {
-			showSuccess("Sent", "Verification link sent again. Please check your inbox.", 3000);
+			toast.success("Sent", "Verification link sent again. Please check your inbox.", 3000);
 			setResendCooldown(60);
 			const interval = setInterval(() => {
 				setResendCooldown((prev) => {
@@ -54,7 +52,7 @@ function EmailVerificationSentPage(): JSX.Element {
 			}, 1000);
 		},
 		onError: (err) => {
-			showError("Error", err.message);
+			toast.error("Error", err.message);
 			console.error(err);
 		},
 	});
@@ -66,7 +64,6 @@ function EmailVerificationSentPage(): JSX.Element {
 	return (
 		<>
 			<SEO title="Verify Your Email" noindex={true} />
-			{toast && <Toast {...toast} />}
 			<FeedbackWidget />
 
 			<motion.div

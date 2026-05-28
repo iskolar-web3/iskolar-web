@@ -4,7 +4,7 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Edit2, Loader2 } from "lucide-react";
 import EditScholarshipSkeleton from "./-components/EditScholarshipSkeleton";
-import Toast from "@/components/Toast";
+import { toast } from "@/lib/toast";
 import CustomFormFieldModal from "@/components/sponsor/create-scholarship/application-form/CustomFormFieldModal";
 import FormFieldsDialog from "@/routes/_sponsor/create/-components/application-form/FormFieldsDialog";
 import {
@@ -22,7 +22,6 @@ import CardColorPicker from "@/routes/_sponsor/create/-components/fields/CardCol
 import AmountField from "@/routes/_sponsor/create/-components/fields/AmountField";
 import SlotsDeadlineFields from "@/routes/_sponsor/create/-components/fields/SlotsDeadlineFields";
 import type { AmountType } from "@/routes/_sponsor/create/-model";
-import { useToast } from "@/hooks/useToast";
 import { SEO } from "@/components/SEO";
 import { handleError } from "@/lib/errorHandler";
 import { logger } from "@/lib/logger";
@@ -108,7 +107,6 @@ function EditScholarshipPage() {
 		return 'varies';
 	});
 	const [unlimitedSlots, setUnlimitedSlots] = useState(scholarship.totalSlots == null);
-	const { toast, showSuccess, showError } = useToast();
 
 	const criterias = form.watch("criterias") || [];
 	const requiredDocuments = form.watch("requirements") || [];
@@ -129,11 +127,11 @@ function EditScholarshipPage() {
 		} catch (error) {
 			const handled = handleError(error, "Unable to load scholarship details.");
 			logger.error("Failed to load scholarship:", handled.raw);
-			showError(`Error ${handled.code}`, handled.message);
+			toast.error(`Error ${handled.code}`, handled.message);
 		} finally {
 			setLoading(false);
 		}
-	}, [params.id, hydrateForm, showSuccess, showError]);
+	}, [params.id, hydrateForm]);
 
 	useEffect(() => {
 		loadScholarshipDetails();
@@ -228,7 +226,7 @@ function EditScholarshipPage() {
 			await queryClient.invalidateQueries({
 				queryKey: ["scholarships"],
 			});
-			showSuccess(`Success`, res.message, 1250);
+			toast.success(`Success`, res.message, 1250);
 			setLoading(false);
 			setSaving(false);
 			if (showCloseConfirmation) {
@@ -240,7 +238,7 @@ function EditScholarshipPage() {
 			}, 1500);
 		},
 		onError: (err) => {
-			showError("Error", err.message);
+			toast.error("Error", err.message);
 			console.error(err);
 			setSaving(false);
 		},
@@ -285,8 +283,6 @@ function EditScholarshipPage() {
 	return (
 		<div className="max-w-2xl mx-auto">
 			<SEO title="Edit Scholarship" noindex={true} />
-			{toast && <Toast {...toast} />}
-
 			{/* Go Back Button */}
 			<button
 				type="button"

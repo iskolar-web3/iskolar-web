@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import Toast from "@/components/Toast";
-import { useToast } from "@/hooks/useToast";
+import { toast } from "@/lib/toast";
 import type { JSX } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,8 +32,6 @@ type VerifyEmailFormData = z.infer<typeof verifyEmailSchema>;
 function VerifyEmailPage(): JSX.Element {
 	const navigate = useNavigate();
 	const { email: prefillEmail } = Route.useSearch();
-	const { toast, showError } = useToast();
-
 	const form = useForm<VerifyEmailFormData>({
 		resolver: zodResolver(verifyEmailSchema),
 		mode: "onBlur",
@@ -53,7 +50,7 @@ function VerifyEmailPage(): JSX.Element {
 			});
 		},
 		onError: (err) => {
-			showError("Error", err.message);
+			toast.error("Error", err.message);
 			console.error(err);
 		},
 	});
@@ -65,7 +62,6 @@ function VerifyEmailPage(): JSX.Element {
 	return (
 		<>
 			<SEO title="Verify Your Email" noindex={true} />
-			{toast && <Toast {...toast} />}
 			<FeedbackWidget />
 
 			<motion.div

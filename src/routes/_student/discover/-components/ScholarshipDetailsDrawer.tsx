@@ -2,8 +2,6 @@ import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from "@tanstack/react-router";
 import { Calendar, Users, Coins, ChevronsRight, LockKeyhole, UserIcon } from 'lucide-react';
-import Toast from '@/components/Toast';
-import { useToast } from '@/hooks/useToast';
 import { formatCurrency, formatDate } from '@/utils/formatting.utils';
 import { ScholarshipStatus, ScholarshipType, type Scholarship } from '@/lib/scholarship/model';
 import { getSponsorName } from '@/lib/sponsor/api';
@@ -20,8 +18,6 @@ export default function ScholarshipDetailsModal({ scholarship, onClose, isVerifi
   const navigate = useNavigate();
 
   const [isExiting, setIsExiting] = useState(false);
-  const { toast } = useToast();
-
   const isRange = scholarship.totalAmountMin != null || scholarship.totalAmountMax != null;
   const isFixed = !isRange && scholarship.totalAmount != null;
   const isVaries = !isRange && !isFixed;
@@ -53,8 +49,6 @@ export default function ScholarshipDetailsModal({ scholarship, onClose, isVerifi
 
   return (
     <AnimatePresence>
-      {toast && <Toast {...toast} />}
-
       <div className="fixed inset-0 z-50 flex items-center justify-end p-2">
         {/* Backdrop */}
         <motion.div

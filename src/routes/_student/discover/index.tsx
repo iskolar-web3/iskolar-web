@@ -5,8 +5,7 @@ import ScholarshipCardSkeleton from "@/components/ScholarshipCardSkeleton";
 import Filters from "./-components/Filters";
 import { Filter, X, GraduationCap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import Toast from "@/components/Toast";
-import { useToast } from "@/hooks/useToast";
+import { toast } from "@/lib/toast";
 import ScholarshipDetailsModal from "./-components/ScholarshipDetailsDrawer";
 import { SEO } from "@/components/SEO";
 import {
@@ -36,7 +35,6 @@ function DiscoverScholarship() {
 		useState<Scholarship | null>(null);
 	const [showFiltersModal, setShowFiltersModal] = useState(false);
 
-	const { toast, showError } = useToast();
 
 	const auth = useAuth<Student>();
 	const verificationEnabled = import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true";
@@ -52,9 +50,9 @@ function DiscoverScholarship() {
 
 	useEffect(() => {
 		if (scholarshipsQuery.isError) {
-			showError("Error", scholarshipsQuery.error.message, 2500);
+			toast.error("Error", scholarshipsQuery.error.message, 2500);
 		}
-	}, [scholarshipsQuery.isError, scholarshipsQuery.error, showError]);
+	}, [scholarshipsQuery.isError, scholarshipsQuery.error]);
 
 	const filteredScholarships = useMemo(() => {
 		return scholarships.filter((scholarship) => {
@@ -97,8 +95,6 @@ function DiscoverScholarship() {
 	return (
 		<div className="min-h-screen">
 			<SEO title="Discover Scholarships" noindex={true} />
-			{toast && <Toast {...toast} />}
-
 			{/* Mobile/Tablet Layout */}
 			<motion.div
 				initial={{ opacity: 0, y: -20 }}

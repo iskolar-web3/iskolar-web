@@ -2,9 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { SEO } from "@/components/SEO";
 import { useRef, useState } from "react";
-import { useToast } from "@/hooks/useToast";
 import { useMutation } from "@tanstack/react-query";
-import Toast from "@/components/Toast";
+import { toast } from "@/lib/toast";
 import ProfileSkeleton from "@/components/profile/ProfileSkeleton";
 import ProfileError from "@/components/profile/ProfileError";
 import ProfileHeader from "@/components/profile/ProfileHeader";
@@ -50,7 +49,6 @@ function SponsorProfile() {
 	const [isSaving, setIsSaving] = useState(false);
 
 	const formRef = useRef<HTMLFormElement>(null);
-	const { toast, showSuccess, showError } = useToast();
 
 	const individualSponsorMutation = useMutation({
 		mutationFn: updateIndividualSponsor,
@@ -58,10 +56,10 @@ function SponsorProfile() {
 			setIsEditing(false);
 			setIsSaving(false);
 			auth.setProfile(res.data);
-			showSuccess(`Success`, "Profile updated successfully", 1250);
+			toast.success(`Success`, "Profile updated successfully", 1250);
 		},
 		onError: (err: any) => {
-			showError("Error", err.message || "Failed to update profile");
+			toast.error("Error", err.message || "Failed to update profile");
 			console.error(err);
 			setIsSaving(false);
 		},
@@ -74,10 +72,10 @@ function SponsorProfile() {
 			setIsSaving(false);
 			console.log(res.data);
 			auth.setProfile(res.data);
-			showSuccess(`Success`, "Profile updated successfully", 1250);
+			toast.success(`Success`, "Profile updated successfully", 1250);
 		},
 		onError: (err: any) => {
-			showError("Error", err.message || "Failed to update profile");
+			toast.error("Error", err.message || "Failed to update profile");
 			console.error(err);
 			setIsSaving(false);
 		},
@@ -89,10 +87,10 @@ function SponsorProfile() {
 			setIsEditing(false);
 			setIsSaving(false);
 			auth.setProfile(res.data);
-			showSuccess(`Success`, "Profile updated successfully", 1250);
+			toast.success(`Success`, "Profile updated successfully", 1250);
 		},
 		onError: (err: any) => {
-			showError("Error", err.message || "Failed to update profile");
+			toast.error("Error", err.message || "Failed to update profile");
 			console.error(err);
 			setIsSaving(false);
 		},
@@ -146,7 +144,6 @@ function SponsorProfile() {
 	return (
 		<div className="min-h-screen">
 			<SEO title="Profile" noindex={true} />
-			{toast && <Toast {...toast} />}
 			<div className="max-w-176 mx-auto space-y-6">
 				{/* Profile Header */}
 				<motion.div

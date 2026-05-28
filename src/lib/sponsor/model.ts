@@ -39,7 +39,7 @@ export const createIndividualSponsorRequestSchema = z.object({
 	employmentType: z.enum(EmploymentType, {
 		error: "Employment type is required.",
 	}),
-	birthDate: z.coerce.date({ error: "Birth date is required." }),
+	birthDate: z.date({ error: "Birth date is required." }),
 	contact: createContactRequestSchema,
 });
 export type CreateIndividualSponsorRequest = z.infer<

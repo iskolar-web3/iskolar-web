@@ -24,8 +24,7 @@ import {
 import { addStoredCredential, updateStoredCredential } from "@/lib/lumen/storage";
 import { useLumenCredentials } from "@/hooks/useLumenFiles";
 import { formatFileSize } from "@/utils/fileHandling.utils";
-import { useToast } from "@/hooks/useToast";
-import Toast from "@/components/Toast";
+import { toast } from "@/lib/toast";
 import { logger } from "@/lib/logger";
 
 interface LumenUploadModalProps {
@@ -44,7 +43,6 @@ export default function LumenUploadModal({
 	onSuccess,
 	userId,
 }: LumenUploadModalProps) {
-	const { toast, showError } = useToast();
 	const { credentials } = useLumenCredentials(userId);
 
 	const [file, setFile] = useState<File | null>(null);
@@ -74,7 +72,7 @@ export default function LumenUploadModal({
 			// Validate file type
 			const fileExt = selected.name.split(".").pop()?.toLowerCase() ?? "";
 			if (!ALLOWED_FILE_TYPES.includes(fileExt)) {
-				showError(
+				toast.error(
 					"Invalid file type",
 					"Only PNG, JPG, and PDF files are allowed",
 					3000,
@@ -84,13 +82,13 @@ export default function LumenUploadModal({
 
 			// Validate file size
 			if (selected.size > 10 * 1024 * 1024) {
-				showError("File too large", "Maximum file size is 10 MB", 3000);
+				toast.error("File too large", "Maximum file size is 10 MB", 3000);
 				return;
 			}
 
 			setFile(selected);
 		},
-		[showError],
+		[],
 	);
 
 	const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,7 +100,7 @@ export default function LumenUploadModal({
 	const handleUpload = async () => {
 		// Check max credentials limit
 		if (credentials.length >= MAX_CREDENTIALS) {
-			showError(
+			toast.error(
 				"Upload limit reached",
 				"You can only upload 1 credential. Please delete the existing one to upload a new credential.",
 				4000,
@@ -111,19 +109,19 @@ export default function LumenUploadModal({
 		}
 
 		if (!credentialType) {
-			showError("Required", "Please select a credential type", 3000);
+			toast.error("Required", "Please select a credential type", 3000);
 			return;
 		}
 		if (!name.trim()) {
-			showError("Required", "Please enter a credential name", 3000);
+			toast.error("Required", "Please enter a credential name", 3000);
 			return;
 		}
 		if (!institution.trim()) {
-			showError("Required", "Please enter the issuing institution", 3000);
+			toast.error("Required", "Please enter the issuing institution", 3000);
 			return;
 		}
 		if (!file) {
-			showError("Required", "Please select a file to upload", 3000);
+			toast.error("Required", "Please select a file to upload", 3000);
 			return;
 		}
 
@@ -138,7 +136,7 @@ export default function LumenUploadModal({
 				(cred) => cred.name === name.trim(),
 			);
 			if (isDuplicate) {
-				showError(
+				toast.error(
 					"Duplicate credential",
 					`A credential named "${name.trim()}" already exists`,
 					3000,
@@ -192,7 +190,7 @@ export default function LumenUploadModal({
 			}, 1200);
 		} catch (err) {
 			logger.error("Credential upload failed:", err);
-			showError(
+			toast.error(
 				"Upload Failed",
 				err instanceof Error ? err.message : "Could not upload credential",
 				4000,
@@ -213,8 +211,6 @@ export default function LumenUploadModal({
 
 	return (
 		<>
-			{toast && <Toast {...toast} />}
-
 			<Dialog open={isOpen} onOpenChange={handleClose}>
 				<DialogContent className="max-w-lg! p-0" showCloseButton={!isUploading}>
 					<DialogHeader className="px-6 py-4 border-b border-gray-200">
