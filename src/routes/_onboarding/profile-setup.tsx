@@ -47,11 +47,6 @@ import { EducationLevel, Gender, type Student } from "@/lib/student/model";
 
 export const Route = createFileRoute("/_onboarding/profile-setup")({
 	component: ProfileSetup,
-	validateSearch: (search: Record<string, unknown>) => {
-		return {
-			role: (search.role as string) || undefined,
-		};
-	},
 });
 
 type Role =
