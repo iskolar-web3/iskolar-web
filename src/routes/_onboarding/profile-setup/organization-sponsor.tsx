@@ -116,13 +116,13 @@ function OrganizationSponsorProfileSetup(): JSX.Element {
 									{...form.register("name")}
 									className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:text-gray-400 ${
 										form.formState.errors.name
-											? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
-											: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
+											? "border-destructive focus:border-destructive focus:ring-destructive text-primary"
+											: "border-gray-300 focus:border-secondary focus:ring-secondary/20 text-primary"
 									}`}
 									placeholder="What's your organization name?"
 								/>
 								{form.formState.errors.name && (
-									<p className="mt-1 text-xs text-[#EF4444]">
+									<p className="mt-1 text-xs text-destructive">
 										{form.formState.errors.name.message}
 									</p>
 								)}
@@ -143,8 +143,8 @@ function OrganizationSponsorProfileSetup(): JSX.Element {
 									<SelectTrigger
 										className={`w-full text-sm cursor-pointer px-4 border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
 											form.formState.errors.organizationType
-												? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
-												: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
+												? "border-destructive focus:border-destructive focus:ring-destructive text-primary"
+												: "border-gray-300 focus:border-secondary focus:ring-secondary/20 text-primary"
 										}`}
 									>
 										<SelectValue placeholder="Select your organization type" />
@@ -164,7 +164,7 @@ function OrganizationSponsorProfileSetup(): JSX.Element {
 									</SelectContent>
 								</Select>
 								{form.formState.errors.organizationType && (
-									<p className="mt-1 text-xs text-[#EF4444]">
+									<p className="mt-1 text-xs text-destructive">
 										{form.formState.errors.organizationType.message}
 									</p>
 								)}
@@ -177,8 +177,8 @@ function OrganizationSponsorProfileSetup(): JSX.Element {
 									{...form.register("contact.value")}
 									className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:text-gray-400 ${
 										form.formState.errors.contact?.value
-											? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
-											: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
+											? "border-destructive focus:border-destructive focus:ring-destructive text-primary"
+											: "border-gray-300 focus:border-secondary focus:ring-secondary/20 text-primary"
 									}`}
 									placeholder="Enter contact number"
 									inputMode="numeric"
@@ -191,7 +191,7 @@ function OrganizationSponsorProfileSetup(): JSX.Element {
 									}}
 								/>
 								{form.formState.errors.contact?.value && (
-									<p className="mt-1 text-xs text-[#EF4444]">
+									<p className="mt-1 text-xs text-destructive">
 										{form.formState.errors.contact.value.message}
 									</p>
 								)}
@@ -203,7 +203,7 @@ function OrganizationSponsorProfileSetup(): JSX.Element {
 								className={`w-full py-3 sm:py-3.5 px-6 rounded-lg transition-all duration-300 text-tertiary text-xs sm:text-sm mt-3 ${
 									form.formState.isValid && !mutation.isPending
 										? "bg-[#EFA508] hover:bg-[#D89407] shadow-md hover:shadow-lg cursor-pointer"
-										: "bg-[#9CA3AF] cursor-not-allowed"
+										: "bg-muted-foreground cursor-not-allowed"
 								}`}
 								whileHover={form.formState.isValid ? { scale: 1.02 } : {}}
 								whileTap={form.formState.isValid ? { scale: 0.98 } : {}}

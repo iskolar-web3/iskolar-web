@@ -125,13 +125,13 @@ function IndividualSponsorProfileSetup() {
 										{...form.register("firstName")}
 										className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:text-gray-400 ${
 											form.formState.errors.firstName
-												? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
-												: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
+												? "border-destructive focus:border-destructive focus:ring-destructive text-primary"
+												: "border-gray-300 focus:border-secondary focus:ring-secondary/20 text-primary"
 										}`}
 										placeholder="First name"
 									/>
 									{form.formState.errors.firstName && (
-										<p className="mt-1 text-xs text-[#EF4444]">
+										<p className="mt-1 text-xs text-destructive">
 											{form.formState.errors.firstName.message}
 										</p>
 									)}
@@ -144,13 +144,13 @@ function IndividualSponsorProfileSetup() {
 										{...form.register("middleName")}
 										className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:text-gray-400 ${
 											form.formState.errors.middleName
-												? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
-												: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
+												? "border-destructive focus:border-destructive focus:ring-destructive text-primary"
+												: "border-gray-300 focus:border-secondary focus:ring-secondary/20 text-primary"
 										}`}
 										placeholder="Middle name"
 									/>
 									{form.formState.errors.middleName && (
-										<p className="mt-1 text-xs text-[#EF4444]">
+										<p className="mt-1 text-xs text-destructive">
 											{form.formState.errors.middleName.message}
 										</p>
 									)}
@@ -163,13 +163,13 @@ function IndividualSponsorProfileSetup() {
 										{...form.register("lastName")}
 										className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:text-gray-400 ${
 											form.formState.errors.lastName
-												? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
-												: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
+												? "border-destructive focus:border-destructive focus:ring-destructive text-primary"
+												: "border-gray-300 focus:border-secondary focus:ring-secondary/20 text-primary"
 										}`}
 										placeholder="Last name"
 									/>
 									{form.formState.errors.lastName && (
-										<p className="mt-1 text-xs text-[#EF4444]">
+										<p className="mt-1 text-xs text-destructive">
 											{form.formState.errors.lastName.message}
 										</p>
 									)}
@@ -189,8 +189,8 @@ function IndividualSponsorProfileSetup() {
 									<SelectTrigger
 										className={`w-full cursor-pointer text-sm px-4 border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
 											form.formState.errors.employmentType
-												? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
-												: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
+												? "border-destructive focus:border-destructive focus:ring-destructive text-primary"
+												: "border-gray-300 focus:border-secondary focus:ring-secondary/20 text-primary"
 										}`}
 									>
 										<SelectValue placeholder="Select your employment type" />
@@ -211,7 +211,7 @@ function IndividualSponsorProfileSetup() {
 									</SelectContent>
 								</Select>
 								{form.formState.errors.employmentType && (
-									<p className="mt-1 text-xs text-[#EF4444]">
+									<p className="mt-1 text-xs text-destructive">
 										{form.formState.errors.employmentType.message}
 									</p>
 								)}
@@ -228,8 +228,8 @@ function IndividualSponsorProfileSetup() {
 													: "text-gray-400"
 											} ${
 												form.formState.errors.birthDate
-													? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444]"
-													: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20"
+													? "border-destructive focus:border-destructive focus:ring-destructive"
+													: "border-gray-300 focus:border-secondary focus:ring-secondary/20"
 											}`}
 										>
 											<span>
@@ -266,7 +266,7 @@ function IndividualSponsorProfileSetup() {
 									</PopoverContent>
 								</Popover>
 								{form.formState.errors.birthDate && (
-									<p className="mt-1 text-xs text-[#EF4444]">
+									<p className="mt-1 text-xs text-destructive">
 										{form.formState.errors.birthDate.message}
 									</p>
 								)}
@@ -279,8 +279,8 @@ function IndividualSponsorProfileSetup() {
 									{...form.register("contact.value")}
 									className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:text-gray-400 ${
 										form.formState.errors.contact?.value
-											? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
-											: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
+											? "border-destructive focus:border-destructive focus:ring-destructive text-primary"
+											: "border-gray-300 focus:border-secondary focus:ring-secondary/20 text-primary"
 									}`}
 									placeholder="Enter contact number"
 									inputMode="numeric"
@@ -293,7 +293,7 @@ function IndividualSponsorProfileSetup() {
 									}}
 								/>
 								{form.formState.errors.contact?.value && (
-									<p className="mt-1 text-xs text-[#EF4444]">
+									<p className="mt-1 text-xs text-destructive">
 										{form.formState.errors.contact.value.message}
 									</p>
 								)}
@@ -305,7 +305,7 @@ function IndividualSponsorProfileSetup() {
 								className={`w-full py-3 sm:py-3.5 px-6 rounded-lg transition-all duration-300 text-tertiary text-xs sm:text-sm mt-3 ${
 									form.formState.isValid && !mutation.isPending
 										? "bg-[#EFA508] hover:bg-[#D89407] shadow-md hover:shadow-lg cursor-pointer"
-										: "bg-[#9CA3AF] cursor-not-allowed"
+										: "bg-muted-foreground cursor-not-allowed"
 								}`}
 								whileHover={form.formState.isValid ? { scale: 1.02 } : {}}
 								whileTap={form.formState.isValid ? { scale: 0.98 } : {}}

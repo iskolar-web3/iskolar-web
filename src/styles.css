@@ -42,7 +42,7 @@ code {
 	--inactive: #9ca3af;
 	--accent: oklch(0.967 0.001 286.375);
 	--accent-foreground: oklch(0.21 0.006 285.885);
-	--destructive: oklch(0.577 0.245 27.325);
+	--destructive: #EF4444;
 	--destructive-foreground: oklch(0.577 0.245 27.325);
 	--border: #d3dcf6;
 	--input: oklch(0.92 0.004 286.32);

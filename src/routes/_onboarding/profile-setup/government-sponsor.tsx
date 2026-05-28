@@ -115,13 +115,13 @@ function GovernmentSponsorProfileSetup() {
 									{...form.register("name")}
 									className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:text-gray-400 ${
 										form.formState.errors.name
-											? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
-											: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
+											? "border-destructive focus:border-destructive focus:ring-destructive text-primary"
+											: "border-gray-300 focus:border-secondary focus:ring-secondary/20 text-primary"
 									}`}
 									placeholder="What's your agency name?"
 								/>
 								{form.formState.errors.name && (
-									<p className="mt-1 text-xs text-[#EF4444]">
+									<p className="mt-1 text-xs text-destructive">
 										{form.formState.errors.name.message}
 									</p>
 								)}
@@ -140,8 +140,8 @@ function GovernmentSponsorProfileSetup() {
 									<SelectTrigger
 										className={`w-full text-sm px-4 cursor-pointer border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
 											form.formState.errors.agencyType
-												? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
-												: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
+												? "border-destructive focus:border-destructive focus:ring-destructive text-primary"
+												: "border-gray-300 focus:border-secondary focus:ring-secondary/20 text-primary"
 										}`}
 									>
 										<SelectValue placeholder="Select your agency type" />
@@ -161,7 +161,7 @@ function GovernmentSponsorProfileSetup() {
 									</SelectContent>
 								</Select>
 								{form.formState.errors.agencyType && (
-									<p className="mt-1 text-xs text-[#EF4444]">
+									<p className="mt-1 text-xs text-destructive">
 										{form.formState.errors.agencyType.message}
 									</p>
 								)}
@@ -174,8 +174,8 @@ function GovernmentSponsorProfileSetup() {
 									{...form.register("contact.value")}
 									className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:text-gray-400 ${
 										form.formState.errors.contact?.value
-											? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
-											: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
+											? "border-destructive focus:border-destructive focus:ring-destructive text-primary"
+											: "border-gray-300 focus:border-secondary focus:ring-secondary/20 text-primary"
 									}`}
 									placeholder="Enter contact number"
 									inputMode="numeric"
@@ -188,7 +188,7 @@ function GovernmentSponsorProfileSetup() {
 									}}
 								/>
 								{form.formState.errors.contact?.value && (
-									<p className="mt-1 text-xs text-[#EF4444]">
+									<p className="mt-1 text-xs text-destructive">
 										{form.formState.errors.contact.value.message}
 									</p>
 								)}

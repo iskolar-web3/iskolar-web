@@ -124,13 +124,13 @@ function StudentProfileSetup(): JSX.Element {
 										{...form.register("firstName")}
 										className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:text-gray-400 ${
 											form.formState.errors.firstName
-												? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
+												? "border-destructive focus:border-destructive focus:ring-destructive text-primary"
 												: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
 										}`}
 										placeholder="First name"
 									/>
 									{form.formState.errors.firstName && (
-										<p className="mt-1 text-xs text-[#EF4444]">
+										<p className="mt-1 text-xs text-destructive">
 											{form.formState.errors.firstName.message}
 										</p>
 									)}
@@ -142,13 +142,13 @@ function StudentProfileSetup(): JSX.Element {
 										{...form.register("middleName")}
 										className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:text-gray-400 ${
 											form.formState.errors.middleName
-												? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
+												? "border-destructive focus:border-destructive focus:ring-destructive text-primary"
 												: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
 										}`}
 										placeholder="Middle name"
 									/>
 									{form.formState.errors.middleName && (
-										<p className="mt-1 text-xs text-[#EF4444]">
+										<p className="mt-1 text-xs text-destructive">
 											{form.formState.errors.middleName.message}
 										</p>
 									)}
@@ -160,13 +160,13 @@ function StudentProfileSetup(): JSX.Element {
 										{...form.register("lastName")}
 										className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:text-gray-400 ${
 											form.formState.errors.lastName
-												? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
+												? "border-destructive focus:border-destructive focus:ring-destructive text-primary"
 												: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
 										}`}
 										placeholder="Last name"
 									/>
 									{form.formState.errors.lastName && (
-										<p className="mt-1 text-xs text-[#EF4444]">
+										<p className="mt-1 text-xs text-destructive">
 											{form.formState.errors.lastName.message}
 										</p>
 									)}
@@ -185,7 +185,7 @@ function StudentProfileSetup(): JSX.Element {
 									<SelectTrigger
 										className={`w-full px-4 cursor-pointer text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-placeholder:text-gray-400 ${
 											form.formState.errors.gender
-												? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
+												? "border-destructive focus:border-destructive focus:ring-destructive text-primary"
 												: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
 										}`}
 									>
@@ -197,7 +197,7 @@ function StudentProfileSetup(): JSX.Element {
 									</SelectContent>
 								</Select>
 								{form.formState.errors.gender && (
-									<p className="mt-1 text-xs text-[#EF4444]">
+									<p className="mt-1 text-xs text-destructive">
 										{form.formState.errors.gender.message}
 									</p>
 								)}
@@ -214,7 +214,7 @@ function StudentProfileSetup(): JSX.Element {
 													: "text-gray-400"
 											} ${
 												form.formState.errors.birthDate
-													? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444]"
+													? "border-destructive focus:border-destructive focus:ring-destructive"
 													: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20"
 											}`}
 										>
@@ -250,7 +250,7 @@ function StudentProfileSetup(): JSX.Element {
 									</PopoverContent>
 								</Popover>
 								{form.formState.errors.birthDate && (
-									<p className="mt-1 text-xs text-[#EF4444]">
+									<p className="mt-1 text-xs text-destructive">
 										{form.formState.errors.birthDate.message}
 									</p>
 								)}
@@ -262,7 +262,7 @@ function StudentProfileSetup(): JSX.Element {
 									{...form.register("contact.value")}
 									className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:text-gray-400 ${
 										form.formState.errors.contact?.value
-											? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
+											? "border-destructive focus:border-destructive focus:ring-destructive text-primary"
 											: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
 									}`}
 									placeholder="Enter contact number"
@@ -276,7 +276,7 @@ function StudentProfileSetup(): JSX.Element {
 									}}
 								/>
 								{form.formState.errors.contact?.value && (
-									<p className="mt-1 text-xs text-[#EF4444]">
+									<p className="mt-1 text-xs text-destructive">
 										{form.formState.errors.contact.value.message}
 									</p>
 								)}
@@ -294,7 +294,7 @@ function StudentProfileSetup(): JSX.Element {
 									<SelectTrigger
 										className={`w-full px-4 cursor-pointer text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all data-[placeholder]:text-gray-400 ${
 											form.formState.errors.educationLevel
-												? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
+												? "border-destructive focus:border-destructive focus:ring-destructive text-primary"
 												: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
 										}`}
 									>
@@ -310,7 +310,7 @@ function StudentProfileSetup(): JSX.Element {
 									</SelectContent>
 								</Select>
 								{form.formState.errors.educationLevel && (
-									<p className="mt-1 text-xs text-[#EF4444]">
+									<p className="mt-1 text-xs text-destructive">
 										{form.formState.errors.educationLevel.message}
 									</p>
 								)}
@@ -322,13 +322,13 @@ function StudentProfileSetup(): JSX.Element {
 									{...form.register("schoolName")}
 									className={`w-full px-4 py-3 sm:py-3.5 text-sm border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:text-gray-400 ${
 										form.formState.errors.schoolName
-											? "border-[#EF4444] focus:border-[#EF4444] focus:ring-[#EF4444] text-primary"
+											? "border-destructive focus:border-destructive focus:ring-destructive text-primary"
 											: "border-gray-300 focus:border-[#3A52A6] focus:ring-[#3A52A6]/20 text-primary"
 									}`}
 									placeholder="What school are you from?"
 								/>
 								{form.formState.errors.schoolName && (
-									<p className="mt-1 text-xs text-[#EF4444]">
+									<p className="mt-1 text-xs text-destructive">
 										{form.formState.errors.schoolName.message}
 									</p>
 								)}
