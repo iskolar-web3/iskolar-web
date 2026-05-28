@@ -112,11 +112,11 @@ export function HomeApplications(props: Props): JSX.Element {
 								>
 									{/* Header */}
 									<div className="flex" style={{ backgroundColor: cardColor }}>
-										<div className="relative w-32 h-32 shrink-0" style={{ backgroundColor: `color-mix(in srgb, ${cardColor} 70%, black)` }}>
+										<div className="relative w-28 sm:w-32 min-h-28 sm:min-h-32 shrink-0" style={{ backgroundColor: `color-mix(in srgb, ${cardColor} 70%, black)` }}>
 											<img
 												src={item.scholarship.imageUrl || "/scholarship-banner-placeholder.png"}
 												alt={item.scholarship.name}
-												className="h-full w-full object-cover"
+												className="absolute inset-0 h-full w-full object-cover"
 											/>
 										</div>
 
