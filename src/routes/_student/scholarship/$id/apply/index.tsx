@@ -25,8 +25,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import Toast from "@/components/Toast";
-import { useToast } from "@/hooks/useToast";
+import { toast } from "@/lib/toast";
 import { SEO } from "@/components/SEO";
 import SubmitConfirmationModal from "./-components/SubmitConfirmationModal";
 import { compressFile } from "@/utils/fileCompression.utils";
@@ -68,7 +67,6 @@ function ApplyScholarshipPage() {
 	const [showConfirmation, setShowConfirmation] = useState(false);
 	const [pendingData, setPendingData] = useState<CreateApplicationRequest>();
 	const [customFiles, setCustomFiles] = useState<Record<string, File[]>>({});
-	const { toast, showSuccess, showError } = useToast();
 
 	const auth = useAuth<Student>();
 	const params = Route.useParams();
@@ -119,7 +117,7 @@ function ApplyScholarshipPage() {
 		// Validate file size
 		const maxSize = 10 * 1024 * 1024;
 		if (file.size > maxSize) {
-			showError("File Too Large", `Maximum file size is 10MB.`, 2500);
+			toast.error("File Too Large", `Maximum file size is 10MB.`, 2500);
 			event.target.value = "";
 			return
 		}
@@ -133,7 +131,7 @@ function ApplyScholarshipPage() {
 		]
 
 		if (!allowedTypes.includes(file.type)) {
-			showError(
+			toast.error(
 				"Invalid File Type",
 				"Only PDF and image files are allowed",
 				2500,
@@ -148,7 +146,7 @@ function ApplyScholarshipPage() {
 			.substring(file.name.lastIndexOf("."));
 
 		if (!allowedExtensions.includes(fileExtension)) {
-			showError(
+			toast.error(
 				"Invalid File Extension",
 				"File extension does not match allowed types",
 				2500,
@@ -172,7 +170,7 @@ function ApplyScholarshipPage() {
 			}))
 		} catch (error) {
 			logger.error("File compression error:", error);
-			showError("Compression Failed", "Using original file", 2000);
+			toast.error("Compression Failed", "Using original file", 2000);
 
 			setCustomFiles((prev) => ({
 				...prev,
@@ -222,7 +220,7 @@ function ApplyScholarshipPage() {
 		})
 
 		if (fileErrors.length > 0) {
-			showError("Missing Required Files", fileErrors.join(", "), 2500);
+			toast.error("Missing Required Files", fileErrors.join(", "), 2500);
 			return
 		}
 
@@ -253,7 +251,7 @@ function ApplyScholarshipPage() {
 		mutationFn: createApplication,
 		onSuccess: async (res) => {
 			console.log(res);
-			showSuccess(`Success`, res.message, 1250);
+			toast.success(`Success`, res.message, 1250);
 			await queryClient.invalidateQueries({
 				queryKey: ["scholarships", "applications"],
 				refetchType: "all",
@@ -261,7 +259,7 @@ function ApplyScholarshipPage() {
 			await navigate({ to: "/home" });
 		},
 		onError: (err) => {
-			showError("Error", err.message);
+			toast.error("Error", err.message);
 			console.error(err);
 		},
 	});
@@ -307,11 +305,11 @@ function ApplyScholarshipPage() {
 			}
 
 			mutation.mutate(finalData);
-			showSuccess("Success", "Application submitted successfully", 2000);
+			toast.success("Success", "Application submitted successfully", 2000);
 		} catch (error) {
 			const handled = handleError(error, "Failed to submit application.");
 			logger.error("Submission error:", handled.raw);
-			showError(`Error ${handled.code}`, handled.message, 2500);
+			toast.error(`Error ${handled.code}`, handled.message, 2500);
 		}
 	}
 
@@ -690,8 +688,6 @@ function ApplyScholarshipPage() {
 	return (
 		<div className="min-h-screen bg-[#F8F9FC]">
 			<SEO title="Apply" noindex={true} />
-			{toast && <Toast {...toast} />}
-
 			<div className="max-w-160 mx-auto space-y-4">
 				{/* Back Button */}
 				<button

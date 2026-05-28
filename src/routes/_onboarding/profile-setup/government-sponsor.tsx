@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { useAuth } from "@/auth";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { SEO } from "@/components/SEO";
-import Toast from "@/components/Toast";
+import { toast } from "@/lib/toast";
 import {
 	Select,
 	SelectContent,
@@ -15,7 +15,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/hooks/useToast";
 import { getDefaultPathOfRole } from "@/lib/api";
 import { createGovernmentSponsor } from "@/lib/sponsor/api";
 import {
@@ -35,8 +34,6 @@ export const Route = createFileRoute(
 function GovernmentSponsorProfileSetup() {
 	const navigate = useNavigate();
 	const auth = useAuth();
-	const { toast, showSuccess, showError } = useToast();
-
 	const form = useForm<CreateGovernmentSponsorRequest>({
 		resolver: zodResolver(createGovernmentSponsorRequestSchema),
 		mode: "onBlur",
@@ -55,7 +52,7 @@ function GovernmentSponsorProfileSetup() {
 	const mutation = useMutation({
 		mutationFn: createGovernmentSponsor,
 		onSuccess: async () => {
-			showSuccess(
+			toast.success(
 				"Success",
 				"Your profile has been set up successfully!",
 				1250,
@@ -66,7 +63,7 @@ function GovernmentSponsorProfileSetup() {
 			}
 		},
 		onError: (error: Error) => {
-			showError("Error", error.message, 2500);
+			toast.error("Error", error.message, 2500);
 		},
 	});
 
@@ -74,8 +71,6 @@ function GovernmentSponsorProfileSetup() {
 		<>
 			<SEO title="Profile Setup" noindex={true} />
 			<FeedbackWidget />
-			{toast && <Toast {...toast} />}
-
 			<motion.div
 				className="min-h-screen flex items-center justify-center py-8 sm:py-12"
 				initial={{ opacity: 0 }}

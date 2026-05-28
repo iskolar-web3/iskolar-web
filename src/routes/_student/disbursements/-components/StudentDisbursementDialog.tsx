@@ -22,8 +22,7 @@ import {
 	formatDate,
 	formatPeso,
 } from "@/components/disbursement/DisbursementShared";
-import Toast from "@/components/Toast";
-import { useToast } from "@/hooks/useToast";
+import { toast } from "@/lib/toast";
 
 type StudentDisbursementDialogProps = {
 	open: boolean;
@@ -37,7 +36,6 @@ export function StudentDisbursementDialog({
 	disbursement: initial,
 }: StudentDisbursementDialogProps) {
 	const queryClient = useQueryClient();
-	const { toast, showSuccess } = useToast();
 	const [proofUrl, setProofUrl] = useState<string | null>(null);
 	const [note, setNote] = useState("");
 	const [formError, setFormError] = useState<string | null>(null);
@@ -63,7 +61,7 @@ export function StudentDisbursementDialog({
 					queryKey: getDisbursementQuery(id).queryKey,
 				});
 			}
-			showSuccess(
+			toast.success(
 				"Receipt confirmed",
 				"Thanks for confirming you received the funds.",
 			);
@@ -96,7 +94,6 @@ export function StudentDisbursementDialog({
 
 	return (
 		<>
-			{toast && <Toast {...toast} />}
 			<Dialog open={open} onOpenChange={handleOpenChange}>
 				<DialogContent className="max-h-[90vh] gap-0 overflow-y-auto p-0 sm:max-w-2xl">
 					<DialogHeader className="border-b border-[#E0ECFF] p-5">

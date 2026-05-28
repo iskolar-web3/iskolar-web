@@ -2,9 +2,8 @@ import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { SEO } from "@/components/SEO";
-import Toast from "@/components/Toast";
-import { useToast } from '@/hooks/useToast';
 import Preloader from "@/components/Preloader";
+import { toast } from "@/lib/toast";
 // import { SiGoogle } from "react-icons/si";
 import type { JSX } from "react";
 import { useForm } from "react-hook-form";
@@ -57,7 +56,6 @@ function LoginPage(): JSX.Element {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showPreloader, _] = useState(false);
-  const { toast, showSuccess, showError } = useToast();
   const auth = useAuth()
 
   const form = useForm<LoginFormData>({
@@ -79,7 +77,7 @@ function LoginPage(): JSX.Element {
             return;
         }
 
-        showSuccess(`Success`, 'Login successful', 1250);
+        toast.success(`Success`, 'Login successful', 1250);
         setCookie(ACCESS_TOKEN_KEY, res.token);
 
         // Validate the user session, account, and profile
@@ -117,7 +115,7 @@ function LoginPage(): JSX.Element {
               });
               return;
           }
-          showError("Error", err.message)
+          toast.error("Error", err.message)
           console.error(err)
       }
   })
@@ -157,7 +155,6 @@ function LoginPage(): JSX.Element {
         />
       )}
 
-      {toast && <Toast {...toast} />}
       <FeedbackWidget />
       
       {!showPreloader && (

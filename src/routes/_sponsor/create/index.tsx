@@ -5,13 +5,12 @@ import { useEffect, useState } from "react";
 import { Controller } from "react-hook-form";
 import { useAuth } from "@/auth";
 import { SEO } from "@/components/SEO";
-import Toast from "@/components/Toast";
+import { toast } from "@/lib/toast";
 import {
 	DEFAULT_APPLICATION_QUESTION,
 	useScholarshipForm,
 } from "@/hooks/useScholarshipForm";
 import { useScholarshipPreview } from "@/hooks/useScholarshipPreview";
-import { useToast } from "@/hooks/useToast";
 import { type ApiResponse, BACKEND_URL } from "@/lib/api";
 import { getCookie } from "@/lib/cookie";
 import {
@@ -95,7 +94,6 @@ function CreateScholarship() {
 		watch,
 		formState: { errors },
 	} = form;
-	const { toast, showSuccess, showError } = useToast();
 
 	const [showFormFieldsDialog, setShowFormFieldsDialog] = useState(false);
 	const [showCustomFieldModal, setShowCustomFieldModal] = useState(false);
@@ -195,12 +193,12 @@ function CreateScholarship() {
 		onSuccess: async (res) => {
 			console.log(res.data);
 			await queryClient.invalidateQueries({ queryKey: ["scholarships"] });
-			showSuccess("Success", res.message, 1250);
+			toast.success("Success", res.message, 1250);
 			resetCreateFormState();
 			setLoading(false);
 		},
 		onError: (err) => {
-			showError("Error", err.message);
+			toast.error("Error", err.message);
 			console.error(err);
 			setLoading(false);
 		},
@@ -262,7 +260,7 @@ function CreateScholarship() {
 			mutation.mutate(pendingFormData);
 			setShowConfirmationModal(false);
 		} catch (err) {
-			showError("Error", err instanceof Error ? err.message : "Something went wrong");
+			toast.error("Error", err instanceof Error ? err.message : "Something went wrong");
 			setLoading(false);
 		}
 	}
@@ -270,7 +268,7 @@ function CreateScholarship() {
 	return (
 		<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
 			<SEO title="Create Scholarship" noindex={true} />
-			{toast && <Toast {...toast} />}
+
 
 			{step === "template" ? (
 				<TemplateSelectionStep
@@ -430,7 +428,7 @@ function CreateScholarship() {
 										const firstMessage = Object.values(validationErrors)
 											.map((e) => e?.message)
 											.find((m): m is string => typeof m === "string" && m.length > 0);
-										showError(
+										toast.error(
 											"Please complete the required fields",
 											firstMessage ?? "Some fields need attention before you can publish.",
 										);

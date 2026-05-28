@@ -25,8 +25,7 @@ import {
 	formatDate,
 	formatPeso,
 } from "@/components/disbursement/DisbursementShared";
-import Toast from "@/components/Toast";
-import { useToast } from "@/hooks/useToast";
+import { toast } from "@/lib/toast";
 
 export type ScholarInfo = {
 	applicationId: string;
@@ -60,7 +59,6 @@ export function DisbursementDialog({
 	existing,
 }: DisbursementDialogProps) {
 	const queryClient = useQueryClient();
-	const { toast, showSuccess } = useToast();
 	const amountId = useId();
 	const noteId = useId();
 	const [createdId, setCreatedId] = useState<string | null>(null);
@@ -109,7 +107,7 @@ export function DisbursementDialog({
 					queryKey: getDisbursementQuery(activeId).queryKey,
 				});
 			}
-			showSuccess(
+			toast.success(
 				"Funds marked as sent",
 				"The student has been notified to confirm receipt.",
 			);
@@ -172,7 +170,6 @@ export function DisbursementDialog({
 
 	return (
 		<>
-			{toast && <Toast {...toast} />}
 			<Dialog open={open} onOpenChange={handleOpenChange}>
 				<DialogContent className="max-h-[90vh] gap-0 overflow-y-auto p-0 sm:max-w-2xl">
 					<DialogHeader className="border-b border-[#E0ECFF] p-5">

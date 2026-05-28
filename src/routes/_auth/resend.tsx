@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Toast from "@/components/Toast";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/useToast";
+import { toast } from "@/lib/toast";
 import { BACKEND_URL, type ApiResponse } from "@/lib/api";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
@@ -33,8 +32,6 @@ async function resendVerification(value: ResendRequest): Promise<void> {
 }
 
 function RouteComponent() {
-	const { toast, showSuccess, showError } = useToast();
-
 	const form = useForm<ResendRequest>({
 		resolver: zodResolver(resendRequestSchema),
 		mode: "onBlur",
@@ -46,10 +43,10 @@ function RouteComponent() {
 	const mutation = useMutation({
 		mutationFn: resendVerification,
 		onSuccess: async () => {
-			showSuccess(`Success`, "Resent verification link.", 1250);
+			toast.success(`Success`, "Resent verification link.", 1250);
 		},
 		onError: (err) => {
-			showError("Error", err.message);
+			toast.error("Error", err.message);
 			console.error(err);
 		},
 	});
@@ -60,8 +57,6 @@ function RouteComponent() {
 
 	return (
 		<div>
-			{toast && <Toast {...toast} />}
-
 			<form
 				onSubmit={form.handleSubmit(onSubmit)}
 				className="space-y-4 sm:space-y-3"

@@ -1,7 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import Toast from "@/components/Toast";
-import { useToast } from "@/hooks/useToast";
+import { toast } from "@/lib/toast";
 import type { JSX } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -30,8 +29,6 @@ type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 function ForgotPasswordPage(): JSX.Element {
 	const navigate = useNavigate();
-	const { toast, showError } = useToast();
-
 	const form = useForm<ForgotPasswordFormData>({
 		resolver: zodResolver(forgotPasswordSchema),
 		mode: "onBlur",
@@ -47,7 +44,7 @@ function ForgotPasswordPage(): JSX.Element {
 			});
 		},
 		onError: (err) => {
-			showError("Error", err.message);
+			toast.error("Error", err.message);
 			console.error(err);
 		},
 	});
@@ -59,7 +56,6 @@ function ForgotPasswordPage(): JSX.Element {
 	return (
 		<>
 			<SEO title="Forgot Password" noindex={true} />
-			{toast && <Toast {...toast} />}
 			<FeedbackWidget />
 
 			<motion.div

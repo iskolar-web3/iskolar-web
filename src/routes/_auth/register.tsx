@@ -2,8 +2,7 @@ import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { SEO } from "@/components/SEO";
-import Toast from "@/components/Toast";
-import { useToast } from "@/hooks/useToast";
+import { toast } from "@/lib/toast";
 // import { SiGoogle } from "react-icons/si";
 import type { JSX } from "react";
 import { useForm } from "react-hook-form";
@@ -69,8 +68,6 @@ function RegisterPage(): JSX.Element {
 
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-	const { toast, showError } = useToast();
-
 	const form = useForm<RegisterFormData>({
 		resolver: zodResolver(registerSchema),
 		mode: "onBlur",
@@ -88,7 +85,7 @@ function RegisterPage(): JSX.Element {
 			});
 		},
 		onError: (err) => {
-			showError("Error", err.message);
+			toast.error("Error", err.message);
 			console.error(err);
 		},
 	});
@@ -108,7 +105,6 @@ function RegisterPage(): JSX.Element {
 	return (
 		<>
 			<SEO title="Sign Up" noindex={true} />
-			{toast && <Toast {...toast} />}
 			<FeedbackWidget />
 
 			<motion.div

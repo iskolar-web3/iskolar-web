@@ -31,8 +31,7 @@ import {
 	DialogHeader,
 	DialogFooter,
 } from "@/components/ui/dialog";
-import Toast from "@/components/Toast";
-import { useToast } from "@/hooks/useToast";
+import { toast } from "@/lib/toast";
 import { SEO } from "@/components/SEO";
 import { handleError } from "@/lib/errorHandler";
 import { logger } from "@/lib/logger";
@@ -119,7 +118,6 @@ function ApplicantsListPage() {
 	const [rankingResult, setRankingResult] = useState<RankingResult | null>(null);
 	const [showPremiumModal, setShowPremiumModal] = useState(false); // Premium modal state
 
-	const { toast, showSuccess, showError } = useToast();
 
 	// Confirmation modal state
 	const [confirmationModal, setConfirmationModal] = useState(false);
@@ -132,9 +130,9 @@ function ApplicantsListPage() {
 
 	useEffect(() => {
 		if (error) {
-			showError("Error", error, 2500);
+			toast.error("Error", error, 2500);
 		}
-	}, [error, showError]);
+	}, [error]);
 
 	const toggleBulkMode = () => {
 		setBulkMode(!bulkMode);
@@ -162,7 +160,7 @@ function ApplicantsListPage() {
 
 	const handleBulkAction = (action: "shortlisted" | "approved" | "denied") => {
 		if (selectedApplicantIds.size === 0) {
-			showError("Error", "Please select at least one applicant", 2500);
+			toast.error("Error", "Please select at least one applicant", 2500);
 			return;
 		}
 		setBulkAction(action);
@@ -204,7 +202,7 @@ function ApplicantsListPage() {
 		} catch (error) {
 			const handled = handleError(error, "Failed to update applications");
 			logger.error("Bulk update error:", handled.raw);
-			showError(`Error ${handled.code}`, handled.message, 2500);
+			toast.error(`Error ${handled.code}`, handled.message, 2500);
 		} finally {
 			setIsBulkUpdating(false);
 		}
@@ -214,7 +212,7 @@ function ApplicantsListPage() {
 		mutationFn: updateApplication,
 		onSuccess: async (res) => {
 			console.log(res);
-			showSuccess(`Success`, res.message, 1250);
+			toast.success(`Success`, res.message, 1250);
 			queryClient.invalidateQueries({
 				queryKey: ["scholarships", "applicants", params.id],
 			});
@@ -225,7 +223,7 @@ function ApplicantsListPage() {
 			handleCloseModal();
 		},
 		onError: (err) => {
-			showError("Error", err.message);
+			toast.error("Error", err.message);
 			console.error(err);
 			setIsUpdatingStatus(false);
 		},
@@ -340,8 +338,6 @@ function ApplicantsListPage() {
 	return (
 		<div className="min-h-screen bg-[#F8F9FC]">
 			<SEO title="Applicants" noindex={true} />
-			{toast && <Toast {...toast} />}
-
 			{loading ? (
 				<div className="max-w-3xl mx-auto">
 					{/* Scholarship Info Header Skeleton */}
@@ -548,8 +544,8 @@ function ApplicantsListPage() {
 							onRankingComplete={(result) => {
 								setRankingResult(result);
 							}}
-							onShowSuccess={(title, message) => showSuccess(title, message, 2000)}
-							onShowError={(title, message) => showError(title, message, 2500)}
+							onShowSuccess={(title, message) => toast.success(title, message, 2000)}
+							onShowError={(title, message) => toast.error(title, message, 2500)}
 						/>
 					)}
 
@@ -1320,7 +1316,7 @@ function ApplicantsListPage() {
 									// TODO: Integrate with payment system
 									// For now, show success message and close modal
 									setShowPremiumModal(false);
-									showSuccess("Contact Sales", "Please contact our sales team to upgrade to premium");
+									toast.success("Contact Sales", "Please contact our sales team to upgrade to premium");
 									// Optionally, show the ranking panel to use premium features
 									setShowRanking(true);
 								}}

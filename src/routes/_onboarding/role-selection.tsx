@@ -13,8 +13,7 @@ import {
 import { z } from "zod";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { SEO } from "@/components/SEO";
-import Toast from "@/components/Toast";
-import { useToast } from "@/hooks/useToast";
+import { toast } from "@/lib/toast";
 import { SponsorType } from "@/lib/sponsor/model";
 import { UserRole } from "@/lib/user/model";
 import { cn } from "@/lib/utils";
@@ -39,8 +38,6 @@ function RoleSelection() {
 	const [showSponsorTypes, setShowSponsorTypes] = useState(false);
 
 	const [loading, setLoading] = useState(false);
-	const { toast, showSuccess, showError } = useToast();
-
 	const roles = [
 		{
 			id: "student",
@@ -133,7 +130,7 @@ function RoleSelection() {
 
 	const handleRoleSelect = (role: UserRole) => {
 		if (role === UserRole.School) {
-			showError("Unavailable", "The school role is not available yet.");
+			toast.error("Unavailable", "The school role is not available yet.");
 			return;
 		}
 		if (role === UserRole.Sponsor) {
@@ -182,7 +179,7 @@ function RoleSelection() {
 		const validation = validateSelection();
 
 		if (!validation.isValid) {
-			showError(`Validation Error`, "Please make a valid selection", 2500);
+			toast.error(`Validation Error`, "Please make a valid selection", 2500);
 			return;
 		}
 
@@ -208,7 +205,7 @@ function RoleSelection() {
 
 		setLoading(false);
 
-		showSuccess(`Success`, roleMessage, 1250);
+		toast.success(`Success`, roleMessage, 1250);
 
 		if (selectedRole === UserRole.Student) {
 			navigate({ to: "/profile-setup/student" });
@@ -231,7 +228,6 @@ function RoleSelection() {
 	return (
 		<>
 			<SEO title="Role Selection" noindex={true} />
-			{toast && <Toast {...toast} />}
 			<FeedbackWidget />
 
 			<div className="fade-in text-center py-8 sm:py-10 md:py-12 relative">

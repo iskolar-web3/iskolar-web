@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { useAuth } from "@/auth";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { SEO } from "@/components/SEO";
-import Toast from "@/components/Toast";
+import { toast } from "@/lib/toast";
 import { Calendar } from "@/components/ui/calendar";
 import {
 	Popover,
@@ -21,7 +21,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/hooks/useToast";
 import { getDefaultPathOfRole } from "@/lib/api";
 import { createStudent } from "@/lib/student/api";
 import {
@@ -40,8 +39,6 @@ export const Route = createFileRoute("/_onboarding/profile-setup/student")({
 function StudentProfileSetup(): JSX.Element {
 	const navigate = useNavigate();
 	const auth = useAuth();
-	const { toast, showSuccess, showError } = useToast();
-
 	const form = useForm<CreateStudentRequest>({
 		resolver: zodResolver(createStudentRequestSchema),
 		mode: "onBlur",
@@ -64,7 +61,7 @@ function StudentProfileSetup(): JSX.Element {
 	const mutation = useMutation({
 		mutationFn: createStudent,
 		onSuccess: async () => {
-			showSuccess(
+			toast.success(
 				"Success",
 				"Your profile has been set up successfully!",
 				1250,
@@ -75,7 +72,7 @@ function StudentProfileSetup(): JSX.Element {
 			}
 		},
 		onError: (error: Error) => {
-			showError("Error", error.message, 2500);
+			toast.error("Error", error.message, 2500);
 		},
 	});
 
@@ -83,8 +80,6 @@ function StudentProfileSetup(): JSX.Element {
 		<>
 			<SEO title="Profile Setup" noindex={true} />
 			<FeedbackWidget />
-			{toast && <Toast {...toast} />}
-
 			<motion.div
 				className="min-h-screen flex items-center justify-center py-8 sm:py-12"
 				initial={{ opacity: 0 }}

@@ -31,8 +31,7 @@ import ScholarshipCard from "./-components/ScholarshipCard";
 import ScholarshipCardSkeleton from "@/components/ScholarshipCardSkeleton";
 import ScholarshipDetailsModal from "./-components/ScholarshipDetailsDrawer";
 import { SEO } from "@/components/SEO";
-import Toast from "@/components/Toast";
-import { useToast } from "@/hooks/useToast";
+import { toast } from "@/lib/toast";
 import {
 	deleteScholarship,
 	getMyScholarshipsQuery,
@@ -93,7 +92,6 @@ function Scholarships() {
 		}),
 	);
 
-	const { toast, showSuccess, showError } = useToast();
 
 	const handleViewApplicants = (scholarship: Scholarship) => {
 		navigate({
@@ -143,19 +141,19 @@ function Scholarships() {
 		mutationFn: deleteScholarship,
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["scholarships"] });
-			showSuccess("Success", "Scholarship deleted successfully", 2000);
+			toast.success("Success", "Scholarship deleted successfully", 2000);
 		},
 		onError: (err) => {
-			showError("Error", err.message);
+			toast.error("Error", err.message);
 			console.error(err);
 		},
 	});
 
 	useEffect(() => {
 		if (scholarships.isError) {
-			showError("Error", scholarships.error.message, 2500);
+			toast.error("Error", scholarships.error.message, 2500);
 		}
-	}, [scholarships.isError, scholarships.error, showError]);
+	}, [scholarships.isError, scholarships.error]);
 
 	const filteredScholarships = useMemo(() => {
 		return scholarships.data.filter((scholarship) => {
@@ -202,8 +200,6 @@ function Scholarships() {
 	return (
 		<div className="min-h-screen">
 			<SEO title="My Scholarships" noindex={true} />
-			{toast && <Toast {...toast} />}
-
 			{/* Mobile/Tablet Layout */}
 			<div className="lg:hidden space-y-2">
 				<motion.div
@@ -672,7 +668,7 @@ function Scholarships() {
 								onClick={() => {
 									if (scholarshipToDelete?.name) {
 										navigator.clipboard.writeText(scholarshipToDelete.name);
-										showSuccess("Copied", "Scholarship name copied to clipboard", 1500);
+										toast.success("Copied", "Scholarship name copied to clipboard", 1500);
 									}
 								}}
 								className="text-xs font-medium text-primary mb-4 bg-[#F9FAFB] border border-border rounded px-3 py-2 select-none cursor-pointer hover:bg-[#F0F4FF] transition-colors"

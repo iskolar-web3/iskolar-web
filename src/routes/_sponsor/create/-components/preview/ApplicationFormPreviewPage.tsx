@@ -13,8 +13,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import Toast from "@/components/Toast";
-import { useToast } from "@/hooks/useToast";
 import { SEO } from "@/components/SEO";
 import {
 	FormFieldType,
@@ -33,7 +31,6 @@ export default function ApplicationFormPreviewPage({
 	scholarship,
 	onBack,
 }: ApplicationFormPreviewPageProps) {
-	const { toast } = useToast();
 	const auth = useAuth<AnySponsor>();
 
 	const customFields = scholarship?.formFields || [];
@@ -190,8 +187,6 @@ export default function ApplicationFormPreviewPage({
 	return (
 		<div className="min-h-screen bg-[#F8F9FC]">
 			<SEO title="Application Form Preview" noindex={true} />
-			{toast && <Toast {...toast} />}
-
 			<div className="max-w-160 mx-auto space-y-4">
 				{/* Back Button */}
 				<button
