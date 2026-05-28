@@ -169,27 +169,21 @@ function RoleSelection() {
       return;
     }
 
-    let role: string;
     let roleMessage = '';
 
-    if (selectedRole === 'student') {
-      role = 'student';
+    if (selectedRole === UserRole.Student) {
       roleMessage = 'You selected the Student role.';
-    } else if (selectedRole === 'sponsor') {
-      if (selectedSponsorType === 'individual') {
-        role = 'individual_sponsor';
+    } else if (selectedRole === UserRole.Sponsor) {
+      if (selectedSponsorType === SponsorType.Individual) {
         roleMessage = 'You selected the Individual Sponsor role.';
-      } else if (selectedSponsorType === 'organization') {
-        role = 'organization_sponsor';
+      } else if (selectedSponsorType === SponsorType.Organization) {
         roleMessage = 'You selected the Organization Sponsor role.';
-      } else if (selectedSponsorType === 'government') {
-        role = 'government_sponsor';
+      } else if (selectedSponsorType === SponsorType.Government) {
         roleMessage = 'You selected the Government Agency role.';
       } else {
         return; 
       }
     } else if (selectedRole === 'school') {
-      role = 'school';
       roleMessage = 'You selected the School role.';
     } else {
       return; 
@@ -199,11 +193,7 @@ function RoleSelection() {
 
     showSuccess(`Success`, roleMessage, 1250);
 
-    setTimeout(() => {
-      navigate({ 
-        to: '/profile-setup',
-        search: { role: role } })
-    }, 1300)
+      navigate({ to: '/profile-setup' })
   };
 
   const canContinue = selectedRole && (selectedRole !== 'sponsor' || selectedSponsorType);
