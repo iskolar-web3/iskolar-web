@@ -8,6 +8,10 @@
   pointer-events: auto !important;
 }
 
+button {
+  cursor: pointer;
+}
+
 body {
   @apply m-0;
   font-family: 'Bree Serif', serif;
@@ -175,4 +179,44 @@ code {
 @keyframes fadeInUp {
   from { opacity: 1; transform: scale(0.8) translateY(20px); }
   to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease forwards;
+  opacity: 0;
+}
+
+.fade-in-down {
+  animation: fadeInDown 0.3s ease forwards;
+  opacity: 0;
+}
+
+.fade-in-left {
+  animation: fadeInFromLeft 0.3s ease forwards;
+  opacity: 0;
+}
+
+.fade-in-up {
+  animation: fadeInUpSimple 0.2s ease forwards;
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInFromLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInUpSimple {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }

@@ -1,23 +1,22 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { SEO } from "@/components/SEO";
 import {
 	HiAcademicCap,
-	HiHeart,
+	HiArrowLeft,
+	HiBuildingLibrary,
 	HiBuildingOffice2,
+	HiHeart,
 	HiUser,
 	HiUserGroup,
-	HiBuildingLibrary,
-	HiArrowLeft,
 } from "react-icons/hi2";
+import { z } from "zod";
+import { FeedbackWidget } from "@/components/FeedbackWidget";
+import { SEO } from "@/components/SEO";
 import Toast from "@/components/Toast";
 import { useToast } from "@/hooks/useToast";
-import { z } from "zod";
-import { Loader2 } from "lucide-react";
-import { FeedbackWidget } from "@/components/FeedbackWidget";
-import { UserRole } from "@/lib/user/model";
 import { SponsorType } from "@/lib/sponsor/model";
+import { UserRole } from "@/lib/user/model";
 import { cn } from "@/lib/utils";
 // import { profileService } from '@/services/profile.service';
 
@@ -223,41 +222,33 @@ function RoleSelection() {
 			{toast && <Toast {...toast} />}
 			<FeedbackWidget />
 
-			<motion.div
-				className="text-center py-8 sm:py-10 md:py-12 relative"
-				initial={{ opacity: 0 }}
-				animate={{ opacity: 1 }}
-				transition={{ duration: 0.3 }}
-			>
-				{/* Back Button */}
-				{showSponsorTypes && (
-					<motion.button
-						onClick={handleBack}
-						className="absolute top-11 sm:top-13 md:top-16 left-10 sm:left-12 md:left-82 flex items-center gap-2 text-secondary hover:text-[#2A4296] transition-colors duration-300 group"
-						initial={{ opacity: 0, x: -20 }}
-						animate={{ opacity: 1, x: 0 }}
-						transition={{ duration: 0.3 }}
-						whileHover={{ x: -5 }}
-						whileTap={{ scale: 0.95 }}
-					>
-						<HiArrowLeft className="w-5  h-5 sm:w-6 sm:h-6 transition-transform duration-300 group-hover:-translate-x-1" />
-					</motion.button>
-				)}
-
+			<div className="fade-in text-center py-8 sm:py-10 md:py-12 relative">
 				{/* Title and Subtitle */}
-				<motion.div
-					className="mb-8 sm:mb-10 md:mb-12"
-					initial={{ opacity: 0, y: -20 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.3, delay: 0.1 }}
+				<div
+					className="fade-in-down mb-8 sm:mb-10 md:mb-12 max-w-4xl mx-auto"
+					style={{ animationDelay: "0.1s" }}
 				>
-					<h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl text-secondary mb-1 sm:mb-2">
-						Welcome to iSkolar
-					</h1>
+					<div className="grid grid-cols-[1.25rem_1fr_1.25rem] sm:grid-cols-[1.5rem_1fr_1.5rem] items-center mb-1 sm:mb-2">
+						{showSponsorTypes ? (
+							<button
+								type="button"
+								onClick={handleBack}
+								className="flex items-center text-secondary hover:text-[#2A4296] transition-colors duration-300 group active:scale-95"
+							>
+								<HiArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-300 group-hover:-translate-x-1" />
+							</button>
+						) : (
+							<span />
+						)}
+						<h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-5xl text-secondary text-center">
+							Welcome to iSkolar
+						</h1>
+						<span />
+					</div>
 					<p className="text-base sm:text-lg md:text-xl text-secondary">
 						{showSponsorTypes ? "Select your sub-role" : "Select your role"}
 					</p>
-				</motion.div>
+				</div>
 
 				<section>
 					{!showSponsorTypes ? (
@@ -378,22 +369,19 @@ function RoleSelection() {
 				</section>
 
 				{/* Select Button */}
-				<motion.div
-					className="flex justify-center gap-4"
-					initial={{ opacity: 0, y: 20 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.2, delay: 0.6 }}
+				<div
+					className="fade-in-up flex justify-center gap-4"
+					style={{ animationDelay: "0.6s" }}
 				>
-					<motion.button
+					<button
+						type="button"
 						onClick={handleSelect}
 						disabled={!canContinue || loading}
 						className={`px-38 sm:px-40 md:px-22 lg:px-29 py-3 sm:py-3.5 md:py-3 rounded-lg text-sm sm:text-base md:text-base transition-all duration-300 ${
 							canContinue && !loading
-								? "bg-[#EFA508] hover:bg-[#D89407] text-tertiary cursor-pointer shadow-md hover:shadow-lg"
+								? "bg-[#EFA508] hover:bg-[#D89407] text-tertiary cursor-pointer shadow-md hover:shadow-lg hover:scale-105 active:scale-95"
 								: "bg-[#9CA3AF] text-tertiary cursor-not-allowed"
 						}`}
-						whileHover={canContinue && !loading ? { scale: 1.05 } : {}}
-						whileTap={canContinue && !loading ? { scale: 0.95 } : {}}
 					>
 						{loading ? (
 							<span className="flex items-center justify-center">
@@ -402,9 +390,9 @@ function RoleSelection() {
 						) : (
 							<span>Select</span>
 						)}
-					</motion.button>
-				</motion.div>
-			</motion.div>
+					</button>
+				</div>
+			</div>
 		</>
 	);
 }
