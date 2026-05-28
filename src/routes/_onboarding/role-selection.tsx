@@ -8,30 +8,23 @@ import { useToast } from '@/hooks/useToast';
 import { z } from 'zod';
 import { Loader2 } from "lucide-react";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
+import { UserRole } from '@/lib/user/model';
+import { SponsorType } from '@/lib/sponsor/model';
 // import { profileService } from '@/services/profile.service';
 
 export const Route = createFileRoute('/_onboarding/role-selection')({
   component: RoleSelection,
 })
 
-type Role = 'student' | 'sponsor' | 'school' | null;
-type SubRole = 'individual' | 'organization' | 'government' | null;
-
-// Role selection validation schemas
-const roleSchema = z.object({
-  selectedRole: z.enum(['student', 'sponsor', 'school'], { message: 'Please select a role' }),
-});
-
-const sponsorRoleSchema = z.object({
-  selectedRole: z.literal('sponsor'),
-  selectedSubRole: z.enum(['individual', 'organization', 'government'], { message: 'Please select a sub-role' })
-});
+const roleSchema = z.enum(UserRole, { message: 'Please select a role' })
+const sponsorTypeSchema = 
+  z.enum(SponsorType, { message: 'Please select a sub-role' })
 
 function RoleSelection() {
   const navigate = useNavigate();
 
-  const [selectedRole, setSelectedRole] = useState<Role>(null);
-  const [selectedSubRole, setSubRole] = useState<SubRole>(null);
+  const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
+  const [selectedSponsorType, setSponsorType] = useState<SponsorType | null>(null);
   const [showSponsorTypes, setShowSponsorTypes] = useState(false);
 
   const [loading, setLoading] = useState(false);
@@ -81,9 +74,8 @@ function RoleSelection() {
 
   const sponsorSubRoles = [
     {
-      id: 'individual',
+      id: SponsorType.Individual,
       title: 'Individual',
-      value: 'individual_sponsor',
       subtitle: 'Independent Sponsor',
       description: 'Personally support deserving students by funding their studies and helping them achieve academic success.',
       icon: HiUser,
@@ -95,9 +87,8 @@ function RoleSelection() {
       bgColor: 'bg-background'
     },
     {
-      id: 'organization',
+      id: SponsorType.Organization,
       title: 'Organization',
-      value: 'organization_sponsor',
       subtitle: 'Scholarship Organization',
       description: 'Provide scholarships as an institution, foundation, or non-profit to empower students and strengthen educational opportunities.',
       icon: HiUserGroup,
@@ -109,9 +100,8 @@ function RoleSelection() {
       bgColor: 'bg-background'
     },
     {
-      id: 'government',
+      id: SponsorType.Government,
       title: 'Government',
-      value: 'government_sponsor',
       subtitle: 'Government Agency',
       description: "Offer government-funded scholarships to promote equal access to education and invest in the nation's future workforce.",
       icon: HiBuildingLibrary,
@@ -124,25 +114,26 @@ function RoleSelection() {
     }
   ];
 
-  const handleRoleSelect = (role: Role) => {
-    if (role === 'school') {
-      showError('Unavailable', 'The school role is not available yet.', 2450);
+  const handleRoleSelect = (role: UserRole) => {
+    if (role === UserRole.School) {
+      showError('Unavailable', 'The school role is not available yet.');
       return;
     }
-    if (role === 'sponsor') {
+    if (role === UserRole.Sponsor) {
       setSelectedRole(role);
       setShowSponsorTypes(true);
-    } else {
+        return
+    } 
+
       setSelectedRole(role);
       setShowSponsorTypes(false);
-      setSubRole(null);
-    }
+      setSponsorType(null);
   };
 
   const handleBack = () => {
     setShowSponsorTypes(false);
     setSelectedRole(null);
-    setSubRole(null);
+    setSponsorType(null);
   };
 
   const validateSelection = (): { isValid: boolean; errorMessage?: string } => {
@@ -151,18 +142,13 @@ function RoleSelection() {
     }
 
     try {
-      if (selectedRole === 'sponsor') {
-        if (!selectedSubRole) {
+      if (selectedRole === UserRole.Sponsor) {
+        if (!selectedSponsorType) {
           return { isValid: false, errorMessage: 'Please select a sub-role' };
         }
-        sponsorRoleSchema.parse({
-          selectedRole,
-          selectedSubRole
-        });
+        sponsorTypeSchema.parse(selectedSponsorType);
       } else {
-        roleSchema.parse({
-          selectedRole
-        });
+        roleSchema.parse(selectedRole);
       }
       return { isValid: true };
     } catch (error) {
@@ -190,13 +176,13 @@ function RoleSelection() {
       role = 'student';
       roleMessage = 'You selected the Student role.';
     } else if (selectedRole === 'sponsor') {
-      if (selectedSubRole === 'individual') {
+      if (selectedSponsorType === 'individual') {
         role = 'individual_sponsor';
         roleMessage = 'You selected the Individual Sponsor role.';
-      } else if (selectedSubRole === 'organization') {
+      } else if (selectedSponsorType === 'organization') {
         role = 'organization_sponsor';
         roleMessage = 'You selected the Organization Sponsor role.';
-      } else if (selectedSubRole === 'government') {
+      } else if (selectedSponsorType === 'government') {
         role = 'government_sponsor';
         roleMessage = 'You selected the Government Agency role.';
       } else {
@@ -220,7 +206,7 @@ function RoleSelection() {
     }, 1300)
   };
 
-  const canContinue = selectedRole && (selectedRole !== 'sponsor' || selectedSubRole);
+  const canContinue = selectedRole && (selectedRole !== 'sponsor' || selectedSponsorType);
 
   return (
     <>
@@ -283,7 +269,7 @@ function RoleSelection() {
                     initial={{ opacity: 0, scale: 0.8, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     transition={{ duration: 0.2, delay: 0.1 + index * 0.15 }}
-                    onClick={() => handleRoleSelect(role.id as Role)}
+                    onClick={() => handleRoleSelect(role.id as UserRole)}
                     className={`${selectedRole === role.id ? role.color.replace('border-', 'bg-') : role.bgColor} ${role.color} border-4 rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 transition-all duration-500 hover:shadow-xl ${
                       selectedRole === role.id ? 'shadow-2xl scale-105' : 'shadow-lg'
                     }`}
@@ -331,30 +317,30 @@ function RoleSelection() {
                     initial={{ opacity: 0, scale: 0.8, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     transition={{ duration: 0.2, delay: 0.1 + index * 0.15 }}
-                    onClick={() => setSubRole(subRole.id as SubRole)}
-                    className={`${selectedSubRole === subRole.id ? subRole.selectedBgColor : subRole.bgColor} ${subRole.color} border-4 rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 transition-all duration-500 hover:shadow-xl ${
-                      selectedSubRole === subRole.id ? 'shadow-2xl scale-105' : 'shadow-lg'
+                    onClick={() => setSponsorType(subRole.id)}
+                    className={`${selectedSponsorType === subRole.id ? subRole.selectedBgColor : subRole.bgColor} ${subRole.color} border-4 rounded-xl sm:rounded-2xl p-5 sm:p-6 md:p-8 transition-all duration-500 hover:shadow-xl ${
+                      selectedSponsorType === subRole.id ? 'shadow-2xl scale-105' : 'shadow-lg'
                     }`}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
                     {/* Icon */}
-                    <div className={`${selectedSubRole === subRole.id ? 'text-tertiary' : subRole.iconColor} mb-3 sm:mb-4 flex justify-center transition-colors duration-500`}>
+                    <div className={`${selectedSponsorType === subRole.id ? 'text-tertiary' : subRole.iconColor} mb-3 sm:mb-4 flex justify-center transition-colors duration-500`}>
                       <IconComponent className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16" />
                     </div>
 
                     {/* Title */}
-                    <h2 className={`text-xl sm:text-1xl md:text-3xl ${selectedSubRole === subRole.id ? 'text-tertiary' : subRole.titleColor} mb-1 transition-colors duration-500`}>
+                    <h2 className={`text-xl sm:text-1xl md:text-3xl ${selectedSponsorType === subRole.id ? 'text-tertiary' : subRole.titleColor} mb-1 transition-colors duration-500`}>
                       {subRole.title}
                     </h2>
 
                     {/* Subtitle */}
-                    <p className={`text-xs sm:text-sm md:text-base ${selectedSubRole === subRole.id ? 'text-tertiary' : subRole.subtitleColor} mb-4 sm:mb-6 md:mb-8 transition-colors duration-500`}>
+                    <p className={`text-xs sm:text-sm md:text-base ${selectedSponsorType === subRole.id ? 'text-tertiary' : subRole.subtitleColor} mb-4 sm:mb-6 md:mb-8 transition-colors duration-500`}>
                       {subRole.subtitle}
                     </p>
 
                     {/* Description */}
-                    <p className={`text-left text-xs sm:text-sm md:text-md ${selectedSubRole === subRole.id ? 'text-tertiary' : 'text-gray-800'} leading-relaxed transition-colors duration-500`}>
+                    <p className={`text-left text-xs sm:text-sm md:text-md ${selectedSponsorType === subRole.id ? 'text-tertiary' : 'text-gray-800'} leading-relaxed transition-colors duration-500`}>
                       {subRole.description}
                     </p>
                   </motion.button>
