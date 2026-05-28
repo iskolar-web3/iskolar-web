@@ -210,7 +210,19 @@ function RoleSelection() {
 
 		showSuccess(`Success`, roleMessage, 1250);
 
-		navigate({ to: "/profile-setup" });
+		if (selectedRole === UserRole.Student) {
+			navigate({ to: "/profile-setup/student" });
+		} else if (selectedRole === UserRole.Sponsor) {
+			if (selectedSponsorType === SponsorType.Individual) {
+				navigate({ to: "/profile-setup/individual-sponsor" });
+			} else if (selectedSponsorType === SponsorType.Organization) {
+				navigate({ to: "/profile-setup/organization-sponsor" });
+			} else if (selectedSponsorType === SponsorType.Government) {
+				navigate({ to: "/profile-setup/government-sponsor" });
+			}
+		} else if (selectedRole === UserRole.School) {
+			navigate({ to: "/profile-setup/school" });
+		}
 	};
 
 	const canContinue =
