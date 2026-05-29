@@ -4,35 +4,28 @@ import { useState, useRef } from "react";
 import { useAuth } from "@/auth";
 import { adminScholarshipsQueryOptions } from "@/lib/admin/queries";
 import { LocalTimeClock } from "@/components/landing/LocalTimeClock";
-import { Search, GraduationCap, BookOpen, CheckCircle2 } from "lucide-react";
-import { ScholarshipStatus, ScholarshipType } from "@/lib/scholarship/model";
+import { Search, GraduationCap, BookOpen, CheckCircle2, ChevronRight } from "lucide-react";
+import { ScholarshipStatus, ScholarshipType, type Scholarship } from "@/lib/scholarship/model";
 import { getSponsorName } from "@/lib/sponsor/api";
-import type { Scholarship } from "@/lib/scholarship/model";
+import AdminScholarshipDetailDrawer from "./-components/AdminScholarshipDetailDrawer";
 
 export const Route = createFileRoute("/_admin/scholarships-management")({
 	component: AdminScholarships,
 });
 
 const STATUS_STYLES: Record<string, string> = {
-	[ScholarshipStatus.Active]:
-		"bg-emerald-50 text-emerald-700 border border-emerald-200",
+	[ScholarshipStatus.Active]: "bg-emerald-50 text-emerald-700 border border-emerald-200",
 	[ScholarshipStatus.Draft]: "bg-gray-100 text-gray-600 border border-gray-200",
-	[ScholarshipStatus.Inactive]:
-		"bg-yellow-50 text-yellow-700 border border-yellow-200",
+	[ScholarshipStatus.Inactive]: "bg-yellow-50 text-yellow-700 border border-yellow-200",
 	[ScholarshipStatus.Closed]: "bg-red-50 text-red-600 border border-red-200",
-	[ScholarshipStatus.Suspended]:
-		"bg-orange-50 text-orange-700 border border-orange-200",
-	[ScholarshipStatus.Archived]:
-		"bg-slate-100 text-slate-500 border border-slate-200",
+	[ScholarshipStatus.Suspended]: "bg-orange-50 text-orange-700 border border-orange-200",
+	[ScholarshipStatus.Archived]: "bg-slate-100 text-slate-500 border border-slate-200",
 };
 
 const TYPE_STYLES: Record<string, string> = {
-	[ScholarshipType.MeritBased]:
-		"bg-blue-50 text-blue-700 border border-blue-200",
-	[ScholarshipType.NeedBased]:
-		"bg-violet-50 text-violet-700 border border-violet-200",
-	[ScholarshipType.Combined]:
-		"bg-indigo-50 text-indigo-700 border border-indigo-200",
+	[ScholarshipType.MeritBased]: "bg-blue-50 text-blue-700 border border-blue-200",
+	[ScholarshipType.NeedBased]: "bg-violet-50 text-violet-700 border border-violet-200",
+	[ScholarshipType.Combined]: "bg-indigo-50 text-indigo-700 border border-indigo-200",
 };
 
 function formatDeadline(date: Date) {
@@ -57,12 +50,13 @@ function AdminScholarships() {
 	const [search, setSearch] = useState("");
 	const [debouncedSearch, setDebouncedSearch] = useState("");
 	const [statusFilter, setStatusFilter] = useState("all");
+	const [selectedScholarship, setSelectedScholarship] = useState<Scholarship | null>(null);
 
 	const { data, isLoading } = useQuery(
 		adminScholarshipsQueryOptions(token, {
 			search: debouncedSearch || undefined,
 		}),
-	)
+	);
 
 	const searchTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
 	const handleSearchChange = (value: string) => {
@@ -71,7 +65,7 @@ function AdminScholarships() {
 		searchTimeoutRef.current = setTimeout(() => {
 			setDebouncedSearch(value);
 		}, 400);
-	}
+	};
 
 	const filtered =
 		data?.filter(
@@ -148,9 +142,7 @@ function AdminScholarships() {
 				<div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
 					<div>
 						<h2 className="text-base text-primary">Filters</h2>
-						<p className="text-sm text-[#6B7280]">
-							Search and narrow by status.
-						</p>
+						<p className="text-sm text-[#6B7280]">Search and narrow by status.</p>
 					</div>
 					<div className="flex flex-col gap-3 sm:flex-row">
 						<div className="relative flex-1 sm:min-w-[260px]">
@@ -214,13 +206,15 @@ function AdminScholarships() {
 									<th className="px-5 py-3 text-left text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
 										Deadline
 									</th>
+									<th className="px-5 py-3 text-[11px] text-[#8CA2D6]" aria-hidden="true" />
 								</tr>
 							</thead>
 							<tbody className="divide-y divide-[#F0F5FF]">
 								{filtered.map((s) => (
 									<tr
 										key={s.id}
-										className="transition-colors hover:bg-[#F8FBFF]"
+										onClick={() => setSelectedScholarship(s)}
+										className="cursor-pointer transition-colors hover:bg-[#EEF5FF] group"
 									>
 										<td className="px-5 py-3.5">
 											<div className="flex items-center gap-3">
@@ -257,29 +251,35 @@ function AdminScholarships() {
 										</td>
 										<td className="px-5 py-3.5">
 											<span
-												className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${STATUS_STYLES[s.status.code] ?? `bg-gray-100 text-gray-600`}`}
+												className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${STATUS_STYLES[s.status.code] ?? "bg-gray-100 text-gray-600"}`}
 											>
 												{s.status.name}
 											</span>
 										</td>
 										<td className="px-5 py-3.5">
 											<span
-												className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${TYPE_STYLES[s.scholarshipType.code] ?? `bg-gray-100 text-gray-600`}`}
+												className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${TYPE_STYLES[s.scholarshipType.code] ?? "bg-gray-100 text-gray-600"}`}
 											>
 												{s.scholarshipType.name}
 											</span>
 										</td>
 										<td className="px-5 py-3.5 text-primary">
 											{s.applicationCount}
-											{s.totalSlots ? (
+											{s.totalSlots != null ? (
 												<span className="text-[#9CA3AF]">/{s.totalSlots}</span>
-											) : null}
+											) : (
+												<span className="text-[#3A52A6]">/∞</span>
+											)}
 										</td>
-										<td className="px-5 py-3.5 text-primary">
-											{formatAmount(s)}
-										</td>
+										<td className="px-5 py-3.5 text-primary">{formatAmount(s)}</td>
 										<td className="px-5 py-3.5 text-primary">
 											{formatDeadline(s.applicationDeadline)}
+										</td>
+										<td className="px-4 py-3.5">
+											<ChevronRight
+												size={15}
+												className="text-[#C8D9F5] transition-colors group-hover:text-[#3A52A6]"
+											/>
 										</td>
 									</tr>
 								))}
@@ -287,10 +287,19 @@ function AdminScholarships() {
 						</table>
 					</div>
 					<div className="border-t border-[#E0ECFF] px-5 py-3 text-xs text-[#9CA3AF]">
-						Showing {filtered.length} of {data?.length ?? 0} scholarships
+						Showing {filtered.length} of {data?.length ?? 0} scholarships · Click a row to view full details
 					</div>
 				</div>
 			)}
+
+			{/* Detail Drawer */}
+			{selectedScholarship && (
+				<AdminScholarshipDetailDrawer
+					scholarship={selectedScholarship}
+					token={token}
+					onClose={() => setSelectedScholarship(null)}
+				/>
+			)}
 		</div>
-	)
+	);
 }
