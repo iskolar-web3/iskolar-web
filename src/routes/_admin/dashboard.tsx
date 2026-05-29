@@ -16,6 +16,7 @@ import {
 	Heart,
 	ShieldCheck,
 	ArrowUpRight,
+	BookOpen,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_admin/dashboard")({
@@ -64,6 +65,12 @@ function AdminDashboard() {
 					value: metrics.adminCount,
 					icon: ShieldCheck,
 					description: "Stewards managing the platform.",
+				},
+				{
+					title: "Scholarships",
+					value: metrics.scholarshipCount,
+					icon: BookOpen,
+					description: "Active scholarships on the platform.",
 				},
 			]
 		: [];

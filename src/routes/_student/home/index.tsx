@@ -3,8 +3,7 @@ import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { AnimatePresence } from "framer-motion";
 import { SEO } from "@/components/SEO";
 import ApplicationDetailsModal from "@/components/student/home/ApplicationDetailsDrawer";
-import { useToast } from "@/hooks/useToast";
-import Toast from "@/components/Toast";
+import { toast } from "@/lib/toast";
 import {
 	ScholarshipApplicationStatus,
 	type Application,
@@ -30,7 +29,6 @@ export const Route = createFileRoute("/_student/home/")({
 function Home(): JSX.Element {
 	const [selectedApplication, setSelectedApplication] =
 		useState<Application | null>(null);
-	const { toast, showError } = useToast();
 	const search = useSearch({ from: "/_student/home/" });
 
 	const applicationsQuery = useQuery(
@@ -43,15 +41,13 @@ function Home(): JSX.Element {
 
 	useEffect(() => {
 		if (applicationsQuery.isError) {
-			showError("Error", applicationsQuery.error.message, 2500);
+			toast.error("Error", applicationsQuery.error.message, 2500);
 		}
 	}, [applicationsQuery.isError]);
 
 	return (
 		<main className="min-h-screen">
 			<SEO title="Home" noindex={true} />
-			{toast && <Toast {...toast} />}
-
 			<div className="max-w-176 mx-auto space-y-12">
 				<HomeHeader />
 

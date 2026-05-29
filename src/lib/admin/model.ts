@@ -6,6 +6,7 @@ export type DashboardMetrics = {
 	sponsorToStudentRatio: number;
 	activeUsersLast7Days: number;
 	signupsLast7Days: number;
+	scholarshipCount: number;
 };
 
 export type SignupTimelineEntry = {

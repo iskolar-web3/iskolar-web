@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsConditionsRouteImport } from './routes/terms-conditions'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as StudentRouteImport } from './routes/_student'
 import { Route as SponsorRouteImport } from './routes/_sponsor'
 import { Route as OnboardingRouteImport } from './routes/_onboarding'
@@ -22,11 +24,9 @@ import { Route as OnboardingRoleSelectionRouteImport } from './routes/_onboardin
 import { Route as OnboardingProfileSetupRouteImport } from './routes/_onboarding/profile-setup'
 import { Route as AuthVerifyEmailRouteImport } from './routes/_auth/verify-email'
 import { Route as AuthVerifyRouteImport } from './routes/_auth/verify'
-import { Route as AuthTermsConditionsRouteImport } from './routes/_auth/terms-conditions'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
 import { Route as AuthResendRouteImport } from './routes/_auth/resend'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
-import { Route as AuthPrivacyPolicyRouteImport } from './routes/_auth/privacy-policy'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
 import { Route as AuthEmailVerificationSentRouteImport } from './routes/_auth/email-verification-sent'
@@ -40,13 +40,30 @@ import { Route as StudentDisbursementsIndexRouteImport } from './routes/_student
 import { Route as SponsorScholarshipsIndexRouteImport } from './routes/_sponsor/scholarships/index'
 import { Route as SponsorScholarsIndexRouteImport } from './routes/_sponsor/scholars/index'
 import { Route as SponsorCreateIndexRouteImport } from './routes/_sponsor/create/index'
+import { Route as OnboardingProfileSetupIndexRouteImport } from './routes/_onboarding/profile-setup/index'
 import { Route as LandingAboutIndexRouteImport } from './routes/_landing/about/index'
+import { Route as OnboardingProfileSetupStudentRouteImport } from './routes/_onboarding/profile-setup/student'
+import { Route as OnboardingProfileSetupSchoolRouteImport } from './routes/_onboarding/profile-setup/school'
+import { Route as OnboardingProfileSetupOrganizationSponsorRouteImport } from './routes/_onboarding/profile-setup/organization-sponsor'
+import { Route as OnboardingProfileSetupIndividualSponsorRouteImport } from './routes/_onboarding/profile-setup/individual-sponsor'
+import { Route as OnboardingProfileSetupGovernmentSponsorRouteImport } from './routes/_onboarding/profile-setup/government-sponsor'
 import { Route as SponsorScholarshipIdApplicantsRouteImport } from './routes/_sponsor/scholarship/$id/applicants'
 import { Route as StudentScholarshipIdApplyIndexRouteImport } from './routes/_student/scholarship/$id/apply/index'
 import { Route as StudentProfileStudentStudentIdIndexRouteImport } from './routes/_student/profile/student/$studentId/index'
+import { Route as SponsorScholarshipIdScholarsIndexRouteImport } from './routes/_sponsor/scholarship/$id/scholars/index'
 import { Route as SponsorScholarshipIdEditIndexRouteImport } from './routes/_sponsor/scholarship/$id/edit/index'
 import { Route as SponsorProfileSponsorSponsorIdIndexRouteImport } from './routes/_sponsor/profile/sponsor/$sponsorId/index'
 
+const TermsConditionsRoute = TermsConditionsRouteImport.update({
+  id: '/terms-conditions',
+  path: '/terms-conditions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StudentRoute = StudentRouteImport.update({
   id: '/_student',
   getParentRoute: () => rootRouteImport,
@@ -106,11 +123,6 @@ const AuthVerifyRoute = AuthVerifyRouteImport.update({
   path: '/verify',
   getParentRoute: () => AuthRoute,
 } as any)
-const AuthTermsConditionsRoute = AuthTermsConditionsRouteImport.update({
-  id: '/terms-conditions',
-  path: '/terms-conditions',
-  getParentRoute: () => AuthRoute,
-} as any)
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -124,11 +136,6 @@ const AuthResendRoute = AuthResendRouteImport.update({
 const AuthRegisterRoute = AuthRegisterRouteImport.update({
   id: '/register',
   path: '/register',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AuthPrivacyPolicyRoute = AuthPrivacyPolicyRouteImport.update({
-  id: '/privacy-policy',
-  path: '/privacy-policy',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
@@ -200,11 +207,47 @@ const SponsorCreateIndexRoute = SponsorCreateIndexRouteImport.update({
   path: '/create/',
   getParentRoute: () => SponsorRoute,
 } as any)
+const OnboardingProfileSetupIndexRoute =
+  OnboardingProfileSetupIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => OnboardingProfileSetupRoute,
+  } as any)
 const LandingAboutIndexRoute = LandingAboutIndexRouteImport.update({
   id: '/_landing/about/',
   path: '/about/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OnboardingProfileSetupStudentRoute =
+  OnboardingProfileSetupStudentRouteImport.update({
+    id: '/student',
+    path: '/student',
+    getParentRoute: () => OnboardingProfileSetupRoute,
+  } as any)
+const OnboardingProfileSetupSchoolRoute =
+  OnboardingProfileSetupSchoolRouteImport.update({
+    id: '/school',
+    path: '/school',
+    getParentRoute: () => OnboardingProfileSetupRoute,
+  } as any)
+const OnboardingProfileSetupOrganizationSponsorRoute =
+  OnboardingProfileSetupOrganizationSponsorRouteImport.update({
+    id: '/organization-sponsor',
+    path: '/organization-sponsor',
+    getParentRoute: () => OnboardingProfileSetupRoute,
+  } as any)
+const OnboardingProfileSetupIndividualSponsorRoute =
+  OnboardingProfileSetupIndividualSponsorRouteImport.update({
+    id: '/individual-sponsor',
+    path: '/individual-sponsor',
+    getParentRoute: () => OnboardingProfileSetupRoute,
+  } as any)
+const OnboardingProfileSetupGovernmentSponsorRoute =
+  OnboardingProfileSetupGovernmentSponsorRouteImport.update({
+    id: '/government-sponsor',
+    path: '/government-sponsor',
+    getParentRoute: () => OnboardingProfileSetupRoute,
+  } as any)
 const SponsorScholarshipIdApplicantsRoute =
   SponsorScholarshipIdApplicantsRouteImport.update({
     id: '/scholarship/$id/applicants',
@@ -223,6 +266,12 @@ const StudentProfileStudentStudentIdIndexRoute =
     path: '/profile/student/$studentId/',
     getParentRoute: () => StudentRoute,
   } as any)
+const SponsorScholarshipIdScholarsIndexRoute =
+  SponsorScholarshipIdScholarsIndexRouteImport.update({
+    id: '/scholarship/$id/scholars/',
+    path: '/scholarship/$id/scholars/',
+    getParentRoute: () => SponsorRoute,
+  } as any)
 const SponsorScholarshipIdEditIndexRoute =
   SponsorScholarshipIdEditIndexRouteImport.update({
     id: '/scholarship/$id/edit/',
@@ -238,6 +287,8 @@ const SponsorProfileSponsorSponsorIdIndexRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/terms-conditions': typeof TermsConditionsRoute
   '/dashboard': typeof AdminDashboardRoute
   '/scholarships-management': typeof AdminScholarshipsManagementRoute
   '/users-management': typeof AdminUsersManagementRoute
@@ -245,18 +296,22 @@ export interface FileRoutesByFullPath {
   '/email-verification-sent': typeof AuthEmailVerificationSentRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
-  '/privacy-policy': typeof AuthPrivacyPolicyRoute
   '/register': typeof AuthRegisterRoute
   '/resend': typeof AuthResendRoute
   '/reset-password': typeof AuthResetPasswordRoute
-  '/terms-conditions': typeof AuthTermsConditionsRoute
   '/verify': typeof AuthVerifyRoute
   '/verify-email': typeof AuthVerifyEmailRoute
-  '/profile-setup': typeof OnboardingProfileSetupRoute
+  '/profile-setup': typeof OnboardingProfileSetupRouteWithChildren
   '/role-selection': typeof OnboardingRoleSelectionRoute
   '/welcome': typeof OnboardingWelcomeRoute
   '/verification/callback': typeof VerificationCallbackRoute
+  '/profile-setup/government-sponsor': typeof OnboardingProfileSetupGovernmentSponsorRoute
+  '/profile-setup/individual-sponsor': typeof OnboardingProfileSetupIndividualSponsorRoute
+  '/profile-setup/organization-sponsor': typeof OnboardingProfileSetupOrganizationSponsorRoute
+  '/profile-setup/school': typeof OnboardingProfileSetupSchoolRoute
+  '/profile-setup/student': typeof OnboardingProfileSetupStudentRoute
   '/about': typeof LandingAboutIndexRoute
+  '/profile-setup/': typeof OnboardingProfileSetupIndexRoute
   '/create': typeof SponsorCreateIndexRoute
   '/scholars': typeof SponsorScholarsIndexRoute
   '/scholarships': typeof SponsorScholarshipsIndexRoute
@@ -266,11 +321,14 @@ export interface FileRoutesByFullPath {
   '/scholarship/$id/applicants': typeof SponsorScholarshipIdApplicantsRoute
   '/profile/sponsor/$sponsorId': typeof SponsorProfileSponsorSponsorIdIndexRoute
   '/scholarship/$id/edit': typeof SponsorScholarshipIdEditIndexRoute
+  '/scholarship/$id/scholars': typeof SponsorScholarshipIdScholarsIndexRoute
   '/profile/student/$studentId': typeof StudentProfileStudentStudentIdIndexRoute
   '/scholarship/$id/apply': typeof StudentScholarshipIdApplyIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/terms-conditions': typeof TermsConditionsRoute
   '/dashboard': typeof AdminDashboardRoute
   '/scholarships-management': typeof AdminScholarshipsManagementRoute
   '/users-management': typeof AdminUsersManagementRoute
@@ -278,18 +336,21 @@ export interface FileRoutesByTo {
   '/email-verification-sent': typeof AuthEmailVerificationSentRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
-  '/privacy-policy': typeof AuthPrivacyPolicyRoute
   '/register': typeof AuthRegisterRoute
   '/resend': typeof AuthResendRoute
   '/reset-password': typeof AuthResetPasswordRoute
-  '/terms-conditions': typeof AuthTermsConditionsRoute
   '/verify': typeof AuthVerifyRoute
   '/verify-email': typeof AuthVerifyEmailRoute
-  '/profile-setup': typeof OnboardingProfileSetupRoute
   '/role-selection': typeof OnboardingRoleSelectionRoute
   '/welcome': typeof OnboardingWelcomeRoute
   '/verification/callback': typeof VerificationCallbackRoute
+  '/profile-setup/government-sponsor': typeof OnboardingProfileSetupGovernmentSponsorRoute
+  '/profile-setup/individual-sponsor': typeof OnboardingProfileSetupIndividualSponsorRoute
+  '/profile-setup/organization-sponsor': typeof OnboardingProfileSetupOrganizationSponsorRoute
+  '/profile-setup/school': typeof OnboardingProfileSetupSchoolRoute
+  '/profile-setup/student': typeof OnboardingProfileSetupStudentRoute
   '/about': typeof LandingAboutIndexRoute
+  '/profile-setup': typeof OnboardingProfileSetupIndexRoute
   '/create': typeof SponsorCreateIndexRoute
   '/scholars': typeof SponsorScholarsIndexRoute
   '/scholarships': typeof SponsorScholarshipsIndexRoute
@@ -299,6 +360,7 @@ export interface FileRoutesByTo {
   '/scholarship/$id/applicants': typeof SponsorScholarshipIdApplicantsRoute
   '/profile/sponsor/$sponsorId': typeof SponsorProfileSponsorSponsorIdIndexRoute
   '/scholarship/$id/edit': typeof SponsorScholarshipIdEditIndexRoute
+  '/scholarship/$id/scholars': typeof SponsorScholarshipIdScholarsIndexRoute
   '/profile/student/$studentId': typeof StudentProfileStudentStudentIdIndexRoute
   '/scholarship/$id/apply': typeof StudentScholarshipIdApplyIndexRoute
 }
@@ -311,6 +373,8 @@ export interface FileRoutesById {
   '/_onboarding': typeof OnboardingRouteWithChildren
   '/_sponsor': typeof SponsorRouteWithChildren
   '/_student': typeof StudentRouteWithChildren
+  '/privacy-policy': typeof PrivacyPolicyRoute
+  '/terms-conditions': typeof TermsConditionsRoute
   '/_admin/dashboard': typeof AdminDashboardRoute
   '/_admin/scholarships-management': typeof AdminScholarshipsManagementRoute
   '/_admin/users-management': typeof AdminUsersManagementRoute
@@ -318,18 +382,22 @@ export interface FileRoutesById {
   '/_auth/email-verification-sent': typeof AuthEmailVerificationSentRoute
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/login': typeof AuthLoginRoute
-  '/_auth/privacy-policy': typeof AuthPrivacyPolicyRoute
   '/_auth/register': typeof AuthRegisterRoute
   '/_auth/resend': typeof AuthResendRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
-  '/_auth/terms-conditions': typeof AuthTermsConditionsRoute
   '/_auth/verify': typeof AuthVerifyRoute
   '/_auth/verify-email': typeof AuthVerifyEmailRoute
-  '/_onboarding/profile-setup': typeof OnboardingProfileSetupRoute
+  '/_onboarding/profile-setup': typeof OnboardingProfileSetupRouteWithChildren
   '/_onboarding/role-selection': typeof OnboardingRoleSelectionRoute
   '/_onboarding/welcome': typeof OnboardingWelcomeRoute
   '/verification/callback': typeof VerificationCallbackRoute
+  '/_onboarding/profile-setup/government-sponsor': typeof OnboardingProfileSetupGovernmentSponsorRoute
+  '/_onboarding/profile-setup/individual-sponsor': typeof OnboardingProfileSetupIndividualSponsorRoute
+  '/_onboarding/profile-setup/organization-sponsor': typeof OnboardingProfileSetupOrganizationSponsorRoute
+  '/_onboarding/profile-setup/school': typeof OnboardingProfileSetupSchoolRoute
+  '/_onboarding/profile-setup/student': typeof OnboardingProfileSetupStudentRoute
   '/_landing/about/': typeof LandingAboutIndexRoute
+  '/_onboarding/profile-setup/': typeof OnboardingProfileSetupIndexRoute
   '/_sponsor/create/': typeof SponsorCreateIndexRoute
   '/_sponsor/scholars/': typeof SponsorScholarsIndexRoute
   '/_sponsor/scholarships/': typeof SponsorScholarshipsIndexRoute
@@ -339,6 +407,7 @@ export interface FileRoutesById {
   '/_sponsor/scholarship/$id/applicants': typeof SponsorScholarshipIdApplicantsRoute
   '/_sponsor/profile/sponsor/$sponsorId/': typeof SponsorProfileSponsorSponsorIdIndexRoute
   '/_sponsor/scholarship/$id/edit/': typeof SponsorScholarshipIdEditIndexRoute
+  '/_sponsor/scholarship/$id/scholars/': typeof SponsorScholarshipIdScholarsIndexRoute
   '/_student/profile/student/$studentId/': typeof StudentProfileStudentStudentIdIndexRoute
   '/_student/scholarship/$id/apply/': typeof StudentScholarshipIdApplyIndexRoute
 }
@@ -346,6 +415,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/privacy-policy'
+    | '/terms-conditions'
     | '/dashboard'
     | '/scholarships-management'
     | '/users-management'
@@ -353,18 +424,22 @@ export interface FileRouteTypes {
     | '/email-verification-sent'
     | '/forgot-password'
     | '/login'
-    | '/privacy-policy'
     | '/register'
     | '/resend'
     | '/reset-password'
-    | '/terms-conditions'
     | '/verify'
     | '/verify-email'
     | '/profile-setup'
     | '/role-selection'
     | '/welcome'
     | '/verification/callback'
+    | '/profile-setup/government-sponsor'
+    | '/profile-setup/individual-sponsor'
+    | '/profile-setup/organization-sponsor'
+    | '/profile-setup/school'
+    | '/profile-setup/student'
     | '/about'
+    | '/profile-setup/'
     | '/create'
     | '/scholars'
     | '/scholarships'
@@ -374,11 +449,14 @@ export interface FileRouteTypes {
     | '/scholarship/$id/applicants'
     | '/profile/sponsor/$sponsorId'
     | '/scholarship/$id/edit'
+    | '/scholarship/$id/scholars'
     | '/profile/student/$studentId'
     | '/scholarship/$id/apply'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/privacy-policy'
+    | '/terms-conditions'
     | '/dashboard'
     | '/scholarships-management'
     | '/users-management'
@@ -386,18 +464,21 @@ export interface FileRouteTypes {
     | '/email-verification-sent'
     | '/forgot-password'
     | '/login'
-    | '/privacy-policy'
     | '/register'
     | '/resend'
     | '/reset-password'
-    | '/terms-conditions'
     | '/verify'
     | '/verify-email'
-    | '/profile-setup'
     | '/role-selection'
     | '/welcome'
     | '/verification/callback'
+    | '/profile-setup/government-sponsor'
+    | '/profile-setup/individual-sponsor'
+    | '/profile-setup/organization-sponsor'
+    | '/profile-setup/school'
+    | '/profile-setup/student'
     | '/about'
+    | '/profile-setup'
     | '/create'
     | '/scholars'
     | '/scholarships'
@@ -407,6 +488,7 @@ export interface FileRouteTypes {
     | '/scholarship/$id/applicants'
     | '/profile/sponsor/$sponsorId'
     | '/scholarship/$id/edit'
+    | '/scholarship/$id/scholars'
     | '/profile/student/$studentId'
     | '/scholarship/$id/apply'
   id:
@@ -418,6 +500,8 @@ export interface FileRouteTypes {
     | '/_onboarding'
     | '/_sponsor'
     | '/_student'
+    | '/privacy-policy'
+    | '/terms-conditions'
     | '/_admin/dashboard'
     | '/_admin/scholarships-management'
     | '/_admin/users-management'
@@ -425,18 +509,22 @@ export interface FileRouteTypes {
     | '/_auth/email-verification-sent'
     | '/_auth/forgot-password'
     | '/_auth/login'
-    | '/_auth/privacy-policy'
     | '/_auth/register'
     | '/_auth/resend'
     | '/_auth/reset-password'
-    | '/_auth/terms-conditions'
     | '/_auth/verify'
     | '/_auth/verify-email'
     | '/_onboarding/profile-setup'
     | '/_onboarding/role-selection'
     | '/_onboarding/welcome'
     | '/verification/callback'
+    | '/_onboarding/profile-setup/government-sponsor'
+    | '/_onboarding/profile-setup/individual-sponsor'
+    | '/_onboarding/profile-setup/organization-sponsor'
+    | '/_onboarding/profile-setup/school'
+    | '/_onboarding/profile-setup/student'
     | '/_landing/about/'
+    | '/_onboarding/profile-setup/'
     | '/_sponsor/create/'
     | '/_sponsor/scholars/'
     | '/_sponsor/scholarships/'
@@ -446,6 +534,7 @@ export interface FileRouteTypes {
     | '/_sponsor/scholarship/$id/applicants'
     | '/_sponsor/profile/sponsor/$sponsorId/'
     | '/_sponsor/scholarship/$id/edit/'
+    | '/_sponsor/scholarship/$id/scholars/'
     | '/_student/profile/student/$studentId/'
     | '/_student/scholarship/$id/apply/'
   fileRoutesById: FileRoutesById
@@ -458,12 +547,28 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRouteWithChildren
   SponsorRoute: typeof SponsorRouteWithChildren
   StudentRoute: typeof StudentRouteWithChildren
+  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
+  TermsConditionsRoute: typeof TermsConditionsRoute
   VerificationCallbackRoute: typeof VerificationCallbackRoute
   LandingAboutIndexRoute: typeof LandingAboutIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms-conditions': {
+      id: '/terms-conditions'
+      path: '/terms-conditions'
+      fullPath: '/terms-conditions'
+      preLoaderRoute: typeof TermsConditionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_student': {
       id: '/_student'
       path: ''
@@ -555,13 +660,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthVerifyRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/terms-conditions': {
-      id: '/_auth/terms-conditions'
-      path: '/terms-conditions'
-      fullPath: '/terms-conditions'
-      preLoaderRoute: typeof AuthTermsConditionsRouteImport
-      parentRoute: typeof AuthRoute
-    }
     '/_auth/reset-password': {
       id: '/_auth/reset-password'
       path: '/reset-password'
@@ -581,13 +679,6 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof AuthRegisterRouteImport
-      parentRoute: typeof AuthRoute
-    }
-    '/_auth/privacy-policy': {
-      id: '/_auth/privacy-policy'
-      path: '/privacy-policy'
-      fullPath: '/privacy-policy'
-      preLoaderRoute: typeof AuthPrivacyPolicyRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/login': {
@@ -681,12 +772,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SponsorCreateIndexRouteImport
       parentRoute: typeof SponsorRoute
     }
+    '/_onboarding/profile-setup/': {
+      id: '/_onboarding/profile-setup/'
+      path: '/'
+      fullPath: '/profile-setup/'
+      preLoaderRoute: typeof OnboardingProfileSetupIndexRouteImport
+      parentRoute: typeof OnboardingProfileSetupRoute
+    }
     '/_landing/about/': {
       id: '/_landing/about/'
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof LandingAboutIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_onboarding/profile-setup/student': {
+      id: '/_onboarding/profile-setup/student'
+      path: '/student'
+      fullPath: '/profile-setup/student'
+      preLoaderRoute: typeof OnboardingProfileSetupStudentRouteImport
+      parentRoute: typeof OnboardingProfileSetupRoute
+    }
+    '/_onboarding/profile-setup/school': {
+      id: '/_onboarding/profile-setup/school'
+      path: '/school'
+      fullPath: '/profile-setup/school'
+      preLoaderRoute: typeof OnboardingProfileSetupSchoolRouteImport
+      parentRoute: typeof OnboardingProfileSetupRoute
+    }
+    '/_onboarding/profile-setup/organization-sponsor': {
+      id: '/_onboarding/profile-setup/organization-sponsor'
+      path: '/organization-sponsor'
+      fullPath: '/profile-setup/organization-sponsor'
+      preLoaderRoute: typeof OnboardingProfileSetupOrganizationSponsorRouteImport
+      parentRoute: typeof OnboardingProfileSetupRoute
+    }
+    '/_onboarding/profile-setup/individual-sponsor': {
+      id: '/_onboarding/profile-setup/individual-sponsor'
+      path: '/individual-sponsor'
+      fullPath: '/profile-setup/individual-sponsor'
+      preLoaderRoute: typeof OnboardingProfileSetupIndividualSponsorRouteImport
+      parentRoute: typeof OnboardingProfileSetupRoute
+    }
+    '/_onboarding/profile-setup/government-sponsor': {
+      id: '/_onboarding/profile-setup/government-sponsor'
+      path: '/government-sponsor'
+      fullPath: '/profile-setup/government-sponsor'
+      preLoaderRoute: typeof OnboardingProfileSetupGovernmentSponsorRouteImport
+      parentRoute: typeof OnboardingProfileSetupRoute
     }
     '/_sponsor/scholarship/$id/applicants': {
       id: '/_sponsor/scholarship/$id/applicants'
@@ -708,6 +841,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/profile/student/$studentId'
       preLoaderRoute: typeof StudentProfileStudentStudentIdIndexRouteImport
       parentRoute: typeof StudentRoute
+    }
+    '/_sponsor/scholarship/$id/scholars/': {
+      id: '/_sponsor/scholarship/$id/scholars/'
+      path: '/scholarship/$id/scholars'
+      fullPath: '/scholarship/$id/scholars'
+      preLoaderRoute: typeof SponsorScholarshipIdScholarsIndexRouteImport
+      parentRoute: typeof SponsorRoute
     }
     '/_sponsor/scholarship/$id/edit/': {
       id: '/_sponsor/scholarship/$id/edit/'
@@ -745,11 +885,9 @@ interface AuthRouteChildren {
   AuthEmailVerificationSentRoute: typeof AuthEmailVerificationSentRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
-  AuthPrivacyPolicyRoute: typeof AuthPrivacyPolicyRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
   AuthResendRoute: typeof AuthResendRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
-  AuthTermsConditionsRoute: typeof AuthTermsConditionsRoute
   AuthVerifyRoute: typeof AuthVerifyRoute
   AuthVerifyEmailRoute: typeof AuthVerifyEmailRoute
 }
@@ -759,25 +897,50 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthEmailVerificationSentRoute: AuthEmailVerificationSentRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
-  AuthPrivacyPolicyRoute: AuthPrivacyPolicyRoute,
   AuthRegisterRoute: AuthRegisterRoute,
   AuthResendRoute: AuthResendRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
-  AuthTermsConditionsRoute: AuthTermsConditionsRoute,
   AuthVerifyRoute: AuthVerifyRoute,
   AuthVerifyEmailRoute: AuthVerifyEmailRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface OnboardingProfileSetupRouteChildren {
+  OnboardingProfileSetupGovernmentSponsorRoute: typeof OnboardingProfileSetupGovernmentSponsorRoute
+  OnboardingProfileSetupIndividualSponsorRoute: typeof OnboardingProfileSetupIndividualSponsorRoute
+  OnboardingProfileSetupOrganizationSponsorRoute: typeof OnboardingProfileSetupOrganizationSponsorRoute
+  OnboardingProfileSetupSchoolRoute: typeof OnboardingProfileSetupSchoolRoute
+  OnboardingProfileSetupStudentRoute: typeof OnboardingProfileSetupStudentRoute
+  OnboardingProfileSetupIndexRoute: typeof OnboardingProfileSetupIndexRoute
+}
+
+const OnboardingProfileSetupRouteChildren: OnboardingProfileSetupRouteChildren =
+  {
+    OnboardingProfileSetupGovernmentSponsorRoute:
+      OnboardingProfileSetupGovernmentSponsorRoute,
+    OnboardingProfileSetupIndividualSponsorRoute:
+      OnboardingProfileSetupIndividualSponsorRoute,
+    OnboardingProfileSetupOrganizationSponsorRoute:
+      OnboardingProfileSetupOrganizationSponsorRoute,
+    OnboardingProfileSetupSchoolRoute: OnboardingProfileSetupSchoolRoute,
+    OnboardingProfileSetupStudentRoute: OnboardingProfileSetupStudentRoute,
+    OnboardingProfileSetupIndexRoute: OnboardingProfileSetupIndexRoute,
+  }
+
+const OnboardingProfileSetupRouteWithChildren =
+  OnboardingProfileSetupRoute._addFileChildren(
+    OnboardingProfileSetupRouteChildren,
+  )
+
 interface OnboardingRouteChildren {
-  OnboardingProfileSetupRoute: typeof OnboardingProfileSetupRoute
+  OnboardingProfileSetupRoute: typeof OnboardingProfileSetupRouteWithChildren
   OnboardingRoleSelectionRoute: typeof OnboardingRoleSelectionRoute
   OnboardingWelcomeRoute: typeof OnboardingWelcomeRoute
 }
 
 const OnboardingRouteChildren: OnboardingRouteChildren = {
-  OnboardingProfileSetupRoute: OnboardingProfileSetupRoute,
+  OnboardingProfileSetupRoute: OnboardingProfileSetupRouteWithChildren,
   OnboardingRoleSelectionRoute: OnboardingRoleSelectionRoute,
   OnboardingWelcomeRoute: OnboardingWelcomeRoute,
 }
@@ -793,6 +956,7 @@ interface SponsorRouteChildren {
   SponsorScholarshipIdApplicantsRoute: typeof SponsorScholarshipIdApplicantsRoute
   SponsorProfileSponsorSponsorIdIndexRoute: typeof SponsorProfileSponsorSponsorIdIndexRoute
   SponsorScholarshipIdEditIndexRoute: typeof SponsorScholarshipIdEditIndexRoute
+  SponsorScholarshipIdScholarsIndexRoute: typeof SponsorScholarshipIdScholarsIndexRoute
 }
 
 const SponsorRouteChildren: SponsorRouteChildren = {
@@ -803,6 +967,8 @@ const SponsorRouteChildren: SponsorRouteChildren = {
   SponsorProfileSponsorSponsorIdIndexRoute:
     SponsorProfileSponsorSponsorIdIndexRoute,
   SponsorScholarshipIdEditIndexRoute: SponsorScholarshipIdEditIndexRoute,
+  SponsorScholarshipIdScholarsIndexRoute:
+    SponsorScholarshipIdScholarsIndexRoute,
 }
 
 const SponsorRouteWithChildren =
@@ -836,6 +1002,8 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRouteWithChildren,
   SponsorRoute: SponsorRouteWithChildren,
   StudentRoute: StudentRouteWithChildren,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
+  TermsConditionsRoute: TermsConditionsRoute,
   VerificationCallbackRoute: VerificationCallbackRoute,
   LandingAboutIndexRoute: LandingAboutIndexRoute,
 }

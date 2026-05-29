@@ -5,6 +5,7 @@ import {
 	getStudentDistribution,
 	getUsers,
 	getAdminScholarships,
+	getAdminScholarshipApplicants,
 } from "./api";
 import type { UserListQuery } from "./model";
 
@@ -62,6 +63,18 @@ export function adminScholarshipsQueryOptions(
 	return queryOptions({
 		queryKey: ["admin", "scholarships", params],
 		queryFn: () => getAdminScholarships(token, params),
+		staleTime: 60 * 1000,
+	});
+}
+
+export function adminScholarshipApplicantsQueryOptions(
+	token: string,
+	scholarshipId: string | null,
+) {
+	return queryOptions({
+		queryKey: ["admin", "scholarships", scholarshipId, "applicants"],
+		queryFn: () => getAdminScholarshipApplicants(token, scholarshipId!),
+		enabled: !!scholarshipId,
 		staleTime: 60 * 1000,
 	});
 }

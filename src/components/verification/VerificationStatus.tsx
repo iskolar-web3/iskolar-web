@@ -1,12 +1,13 @@
-import { useEffect, useRef, useState } from "react";
 import {
-	ShieldCheck,
-	ShieldX,
-	ShieldAlert,
 	Clock,
 	Loader2,
+	ShieldAlert,
+	ShieldCheck,
+	ShieldX,
 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { toast } from "@/lib/toast";
 import {
 	getVerificationStatus,
 	startVerification,
@@ -15,8 +16,6 @@ import {
 	VerificationStatus as Status,
 	type VerificationRecord,
 } from "@/lib/verification/model";
-import Toast from "@/components/Toast";
-import { useToast } from "@/hooks/useToast";
 
 type Props = {
 	role: "students" | "sponsors";
@@ -26,7 +25,6 @@ export default function VerificationStatus({ role }: Props) {
 	const [record, setRecord] = useState<VerificationRecord | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [starting, setStarting] = useState(false);
-	const { toast, showError } = useToast();
 	const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const pollCountRef = useRef(0);
 
@@ -82,7 +80,7 @@ export default function VerificationStatus({ role }: Props) {
 			const result = await startVerification(role);
 			window.location.href = result.verificationUrl;
 		} catch (err) {
-			showError(
+			toast.error(
 				"Verification Error",
 				err instanceof Error ? err.message : "Failed to start verification.",
 			);
@@ -99,13 +97,10 @@ export default function VerificationStatus({ role }: Props) {
 		);
 	}
 
-	const toastEl = toast && <Toast {...toast} />;
-
 	// No record yet — show CTA
 	if (!record) {
 		return (
 			<>
-				{toastEl}
 				<div className="flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 p-4">
 					<div className="flex items-center gap-3">
 						<ShieldAlert className="w-5 h-5 text-amber-600" />
@@ -146,7 +141,7 @@ export default function VerificationStatus({ role }: Props) {
 				const result = await startVerification(role);
 				window.location.href = result.verificationUrl;
 			} catch (err) {
-				showError(
+				toast.error(
 					"Verification Error",
 					err instanceof Error ? err.message : "Failed to resume verification.",
 				);
@@ -156,7 +151,6 @@ export default function VerificationStatus({ role }: Props) {
 
 		return (
 			<>
-				{toastEl}
 				<div className="flex items-center justify-between rounded-lg border border-blue-200 bg-blue-50 p-4">
 					<div className="flex items-center gap-3">
 						<Clock className="w-5 h-5 text-blue-600" />
@@ -225,7 +219,6 @@ export default function VerificationStatus({ role }: Props) {
 
 		return (
 			<>
-				{toastEl}
 				<div className="flex items-center justify-between rounded-lg border border-red-200 bg-red-50 p-4">
 					<div className="flex items-center gap-3">
 						<ShieldX className="w-5 h-5 text-red-600" />
@@ -251,11 +244,7 @@ export default function VerificationStatus({ role }: Props) {
 						variant="outline"
 						className="cursor-pointer border-red-300 text-red-700 hover:bg-red-100"
 					>
-						{starting ? (
-							<Loader2 className="w-4 h-4 animate-spin" />
-						) : (
-							"Retry"
-						)}
+						{starting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Retry"}
 					</Button>
 				</div>
 			</>
@@ -265,7 +254,6 @@ export default function VerificationStatus({ role }: Props) {
 	// Expired
 	return (
 		<>
-			{toastEl}
 			<div className="flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 p-4">
 				<div className="flex items-center gap-3">
 					<ShieldAlert className="w-5 h-5 text-amber-600" />

@@ -4,8 +4,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { User as UserIcon, ShieldCheck, ShieldAlert } from "lucide-react";
 import { handleError } from "@/lib/errorHandler";
 import { logger } from "@/lib/logger";
-import Toast from "@/components/Toast";
-import { useToast } from "@/hooks/useToast";
 import { useAuth } from "@/auth";
 import { UserRole, type User } from "@/lib/user/model";
 import type { Student } from "@/lib/student/model";
@@ -50,8 +48,6 @@ function getDisplayName(user: User, profile: any): string {
  */
 export default function ProfileDropdown({ onClose }: ProfileDropdownProps) {
 	const navigate = useNavigate();
-	const { toast } = useToast();
-
 	const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
 	// const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 	// const [isLoading, setIsLoading] = useState(true);
@@ -163,8 +159,6 @@ export default function ProfileDropdown({ onClose }: ProfileDropdownProps) {
 
 	return (
 		<>
-			{toast && <Toast {...toast} />}
-
 			<motion.div
 				initial={{ opacity: 0, y: -10 }}
 				animate={{ opacity: 1, y: 0 }}

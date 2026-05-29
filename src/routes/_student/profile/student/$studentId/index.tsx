@@ -3,8 +3,7 @@ import { Plus, ShieldCheck, ShieldAlert } from "lucide-react";
 import { motion } from "framer-motion";
 import { SEO } from "@/components/SEO";
 import { useRef, useState } from "react";
-import { useToast } from "@/hooks/useToast";
-import Toast from "@/components/Toast";
+import { toast } from "@/lib/toast";
 import ProfileSkeleton from "@/components/profile/ProfileSkeleton";
 import ProfileError from "@/components/profile/ProfileError";
 import ProfileHeader from "@/components/profile/ProfileHeader";
@@ -56,7 +55,6 @@ function StudentProfilePage() {
 	const [credentialRefreshKey, setCredentialRefreshKey] = useState(0);
 
 	const formRef = useRef<HTMLFormElement>(null);
-	const { toast, showSuccess, showError } = useToast();
 
 	const mutation = useMutation({
 		mutationFn: updateStudent,
@@ -66,10 +64,10 @@ function StudentProfilePage() {
 			auth.setUser((prev) => ({ ...prev, avatarUrl: res.data.avatarUrl }));
 			setIsEditing(false);
 			setIsSaving(false);
-			showSuccess(`Success`, res.message, 1250);
+			toast.success(`Success`, res.message, 1250);
 		},
 		onError: (err) => {
-			showError("Error", err.message);
+			toast.error("Error", err.message);
 			console.error(err);
 			setIsSaving(false);
 		},
@@ -83,10 +81,10 @@ function StudentProfilePage() {
 			);
 			setIsEditing(false);
 			setIsSaving(false);
-			showSuccess(`Success`, res.message, 1250);
+			toast.success(`Success`, res.message, 1250);
 		},
 		onError: (err) => {
-			showError("Error", err.message);
+			toast.error("Error", err.message);
 			console.error(err);
 			setIsSaving(false);
 		},
@@ -132,14 +130,12 @@ function StudentProfilePage() {
 
 	const handleCredentialSuccess = () => {
 		setCredentialRefreshKey((k) => k + 1);
-		showSuccess("Success", "Your credential has been saved.", 2500);
+		toast.success("Success", "Your credential has been saved.", 2500);
 	};
 
 	return (
 		<div className="min-h-screen">
 			<SEO title="Profile" noindex={true} />
-			{toast && <Toast {...toast} />}
-
 			{/* Credential Upload Modal - Feature Flag */}
 			{import.meta.env.VITE_ENABLE_LUMEN_CREDENTIALS === "true" && (
 				<LumenUploadModal

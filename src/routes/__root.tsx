@@ -1,9 +1,9 @@
-import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
-
 import type { QueryClient } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import type { JSX } from "react";
 import type { AuthContextValue } from "@/auth";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { Toaster } from "@/components/Toast";
 import { NotFoundPage } from "./__404";
 
 type RouterContext = {
@@ -20,7 +20,7 @@ function RouteComponent(): JSX.Element {
 	return (
 		<>
 			<Outlet />
-
+			<Toaster />
 			{import.meta.env.DEV && <ReactQueryDevtools />}
 		</>
 	);
