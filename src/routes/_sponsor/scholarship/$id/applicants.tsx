@@ -23,6 +23,7 @@ import {
 	Mail,
 	Sparkles,
 	GraduationCap,
+	HandCoins,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -48,6 +49,13 @@ import {
 import { RankingControlPanel } from "@/components/ranking/RankingControlPanel";
 import { RankedApplicationsTable } from "@/components/ranking/RankedApplicationsTable";
 import type { RankingResult } from "@/lib/ranking/model";
+import { getSponsorDisbursementsQuery } from "@/lib/disbursement/api";
+import type { Disbursement } from "@/lib/disbursement/model";
+import { DisbursementStatusBadge } from "@/components/disbursement/DisbursementShared";
+import {
+	DisbursementDialog,
+	type ScholarInfo,
+} from "@/routes/_sponsor/scholars/-components/DisbursementDialog";
 
 type FilterStatus = ScholarshipApplicationStatus | "all";
 
@@ -73,6 +81,7 @@ function ApplicantsListPage() {
 
 	const applicantsQuery = useQuery(getApplicantsQuery(params.id));
 	const scholarshipQuery = useQuery(getScholarshipByIdQuery(params.id));
+	const disbursementsQuery = useQuery(getSponsorDisbursementsQuery());
 
 	const {
 		data: applicants = [],
@@ -117,6 +126,17 @@ function ApplicantsListPage() {
 	const [showRanking, setShowRanking] = useState(false);
 	const [rankingResult, setRankingResult] = useState<RankingResult | null>(null);
 	const [showPremiumModal, setShowPremiumModal] = useState(false); // Premium modal state
+
+	// Disbursement state
+	const [activeScholar, setActiveScholar] = useState<ScholarInfo | null>(null);
+
+	const disbursementsByApplication = useMemo(() => {
+		const map = new Map<string, Disbursement>();
+		for (const d of disbursementsQuery.data ?? []) {
+			map.set(d.scholarshipApplicationId, d);
+		}
+		return map;
+	}, [disbursementsQuery.data]);
 
 
 	// Confirmation modal state
@@ -714,6 +734,42 @@ function ApplicantsListPage() {
 												</div>
 											</div>
 										</div>
+
+										{/* Disburse Funds — approved/granted scholars only */}
+										{(applicant.status.code === ScholarshipApplicationStatus.Approved ||
+											applicant.status.code === ScholarshipApplicationStatus.Granted) && (
+											<div
+												className="mt-3 pt-3 border-t border-[#E5E7EB] flex items-center justify-between gap-2"
+												onClick={(e) => e.stopPropagation()}
+											>
+												{(() => {
+													const d = disbursementsByApplication.get(applicant.id);
+													return d ? (
+														<DisbursementStatusBadge status={d.status} />
+													) : (
+														<span className="text-xs text-[#9CA3AF]">Not disbursed</span>
+													);
+												})()}
+												<button
+													type="button"
+													onClick={(e) => {
+														e.stopPropagation();
+														setActiveScholar({
+															applicationId: applicant.id,
+															studentId: applicant.student.id,
+															studentName: applicantName,
+															scholarshipName: scholarship?.name ?? "",
+														});
+													}}
+													className="inline-flex cursor-pointer items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs text-white transition-opacity hover:opacity-90 shrink-0"
+												>
+													<HandCoins className="h-3.5 w-3.5" />
+													{disbursementsByApplication.has(applicant.id)
+														? "View Disbursement"
+														: "Disburse Funds"}
+												</button>
+											</div>
+										)}
 									</motion.div>
 								);
 							})}
@@ -1328,6 +1384,19 @@ function ApplicantsListPage() {
 					</div>
 				</div>
 			)}
+
+			<DisbursementDialog
+				open={!!activeScholar}
+				onOpenChange={(next) => {
+					if (!next) setActiveScholar(null);
+				}}
+				scholar={activeScholar}
+				existing={
+					activeScholar
+						? disbursementsByApplication.get(activeScholar.applicationId)
+						: undefined
+				}
+			/>
 		</div>
 	);
 }
