@@ -12,7 +12,10 @@ import {
 	getStudentDisbursementsQuery,
 	markDisbursementReceived,
 } from "@/lib/disbursement/api";
-import { type Disbursement, DisbursementStatus } from "@/lib/disbursement/model";
+import {
+	type Disbursement,
+	DisbursementStatus,
+} from "@/lib/disbursement/model";
 import {
 	DisbursementSteps,
 	InfoBanner,
@@ -23,6 +26,9 @@ import {
 	formatPeso,
 } from "@/components/disbursement/DisbursementShared";
 import { toast } from "@/lib/toast";
+import { uploadFile } from "@/lib/api";
+import { getCookie } from "@/lib/cookie";
+import { ACCESS_TOKEN_KEY } from "@/lib/user/auth";
 
 type StudentDisbursementDialogProps = {
 	open: boolean;
@@ -36,7 +42,8 @@ export function StudentDisbursementDialog({
 	disbursement: initial,
 }: StudentDisbursementDialogProps) {
 	const queryClient = useQueryClient();
-	const [proofUrl, setProofUrl] = useState<string | null>(null);
+	const [proofFile, setProofFile] = useState<File | null>(null);
+	const [uploading, setUploading] = useState(false);
 	const [note, setNote] = useState("");
 	const [formError, setFormError] = useState<string | null>(null);
 
@@ -69,7 +76,8 @@ export function StudentDisbursementDialog({
 	});
 
 	function reset() {
-		setProofUrl(null);
+		setProofFile(null);
+		setUploading(false);
 		setNote("");
 		setFormError(null);
 		receiveMutation.reset();
@@ -82,14 +90,41 @@ export function StudentDisbursementDialog({
 		onOpenChange(next);
 	}
 
-	function handleConfirm() {
+	async function handleConfirm() {
 		setFormError(null);
-		if (!proofUrl) {
+		if (!proofFile) {
 			setFormError("Upload a proof image before confirming receipt.");
 			return;
 		}
 
-		receiveMutation.mutate({ proofUrl, note: note.trim() || undefined });
+		const token = getCookie(ACCESS_TOKEN_KEY);
+		if (!token) {
+			setFormError("Session expired. Please refresh.");
+			return;
+		}
+
+		setUploading(true);
+		try {
+			const uploadRes = await uploadFile(
+				proofFile,
+				token,
+				"disbursement-files",
+			);
+			if (!uploadRes.data?.url) {
+				setFormError(uploadRes.message || "Failed to upload proof.");
+				return;
+			}
+			receiveMutation.mutate({
+				proofUrl: uploadRes.data.url,
+				note: note.trim() || undefined,
+			});
+		} catch (err) {
+			setFormError(
+				err instanceof Error ? err.message : "Failed to upload proof.",
+			);
+		} finally {
+			setUploading(false);
+		}
 	}
 
 	return (
@@ -101,11 +136,11 @@ export function StudentDisbursementDialog({
 							{disbursement?.scholarshipName ?? ""}
 						</DialogTitle>
 					</DialogHeader>
-	
+
 					{disbursement && (
 						<div className="space-y-5 p-5">
 							<DisbursementSteps current={disbursement.status} />
-	
+
 							<div className="space-y-4">
 								<div className="flex items-baseline justify-between rounded-lg border border-[#E0ECFF] bg-white px-4 py-3">
 									<span className="text-[11px] uppercase tracking-wide text-[#9CA3AF]">
@@ -115,21 +150,21 @@ export function StudentDisbursementDialog({
 										{formatPeso(disbursement.amount)}
 									</span>
 								</div>
-	
+
 								<PaymentDetailsCard
 									title="Paid to your account"
 									method={disbursement.paymentMethod.method.name}
 									accountName={disbursement.paymentMethod.accountName}
 									accountNumber={disbursement.paymentMethod.accountNumber}
 								/>
-	
+
 								{disbursement.status === DisbursementStatus.Initiated && (
 									<InfoBanner variant="neutral">
 										Your sponsor is preparing this disbursement. You'll be
 										notified once the funds are sent.
 									</InfoBanner>
 								)}
-	
+
 								{disbursement.status === DisbursementStatus.Sent && (
 									<div className="space-y-3">
 										<ProofImageLink
@@ -145,7 +180,10 @@ export function StudentDisbursementDialog({
 												then confirm.
 											</p>
 										</div>
-										<ProofUploadField value={proofUrl} onChange={setProofUrl} />
+										<ProofUploadField
+											value={null}
+											onFileChange={setProofFile}
+										/>
 										<textarea
 											value={note}
 											onChange={(e) => setNote(e.target.value)}
@@ -164,16 +202,20 @@ export function StudentDisbursementDialog({
 										<Button
 											type="button"
 											className="w-full cursor-pointer"
-											disabled={!proofUrl || receiveMutation.isPending}
+											disabled={
+												!proofFile || uploading || receiveMutation.isPending
+											}
 											onClick={handleConfirm}
 										>
-											{receiveMutation.isPending
-												? "Confirming..."
-												: "Confirm Receipt"}
+											{uploading
+												? "Uploading..."
+												: receiveMutation.isPending
+													? "Confirming..."
+													: "Confirm Receipt"}
 										</Button>
 									</div>
 								)}
-	
+
 								{disbursement.status === DisbursementStatus.Received && (
 									<div className="space-y-3">
 										<InfoBanner variant="success">
