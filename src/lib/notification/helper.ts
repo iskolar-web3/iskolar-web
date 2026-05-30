@@ -26,13 +26,31 @@ export function formatTimeAgo(date: string | Date | undefined): string {
 	return `${Math.floor(seconds / 29030400)}y`;
 }
 
+export function getNotificationTitle(notif: Notification): string {
+	switch (notif.notificationType.code) {
+		case NotificationType.ScholarshipCreated:
+			return "New scholarship available";
+		default:
+			return "Notification";
+	}
+}
+
+export function getNotificationSubtitle(notif: Notification): string {
+	switch (notif.notificationType.code) {
+		case NotificationType.ScholarshipCreated: {
+			const meta = notif.metadata as ScholarshipCreatedEvent | null;
+			return meta?.name ?? "";
+		}
+		default:
+			return "";
+	}
+}
+
 export function getNotificationMessage(notif: Notification): string {
 	switch (notif.notificationType.code) {
 		case NotificationType.ScholarshipCreated:
-			return `New scholarship available`;
+			return "New scholarship available";
 		default:
-			break;
+			return "";
 	}
-
-	return "";
 }
