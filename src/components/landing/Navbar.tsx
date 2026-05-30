@@ -104,9 +104,6 @@ export default function Navbar() {
 								className="w-full h-full object-cover"
 							/>
 						</div>
-						<span className="text-sm px-2 py-1 bg-none border-2 border-secondary text-secondary rounded-sm">
-							Beta
-						</span>
 					</a>
 
 					{/* Desktop Navigation */}

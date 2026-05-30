@@ -3,7 +3,6 @@ import { useEffect, type JSX } from "react";
 import HeaderNav from "@/components/HeaderNav";
 import { UserRole } from "@/lib/user/model";
 import { BACKEND_URL, getDefaultPathOfRole } from "@/lib/api";
-import { BetaNoticeModal } from "@/components/student/BetaNotice";
 import { PaymentMethodBanner } from "@/components/student/PaymentMethodBanner";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { getMyNotificationsQuery } from "@/lib/notification/api";
@@ -57,7 +56,6 @@ function StudentLayout(): JSX.Element {
 				<PaymentMethodBanner />
 				<Outlet />
 			</div>
-			<BetaNoticeModal />
 			<FeedbackWidget />
 		</div>
 	);
