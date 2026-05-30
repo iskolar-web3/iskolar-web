@@ -26,13 +26,19 @@ import { SEO } from "@/components/SEO";
 import { handleError } from "@/lib/errorHandler";
 import { logger } from "@/lib/logger";
 import {
+	FormFieldType,
 	ScholarshipStatus,
 	updateScholarshipRequestSchema,
 	type CreateFormFieldRequest,
 	type EditScholarshipFormData,
 	type Scholarship,
+	type ScholarshipFormData,
 } from "@/lib/scholarship/model";
-import { useMutation, useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
+import {
+	useMutation,
+	useSuspenseQuery,
+	useQueryClient,
+} from "@tanstack/react-query";
 import {
 	endScholarship,
 	getScholarshipByIdQuery,
@@ -40,13 +46,15 @@ import {
 } from "@/lib/scholarship/api";
 import { useRouter } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
+import { useScholarshipPreview } from "@/hooks/useScholarshipPreview";
+import ScholarshipPreviewCard from "@/routes/_sponsor/create/-components/preview/ScholarshipPreviewCard";
+import ScholarshipFullPreviewModal from "@/routes/_sponsor/create/-components/preview/ScholarshipFullPreviewDrawer";
 
 export const Route = createFileRoute("/_sponsor/scholarship/$id/edit/")({
 	component: EditScholarshipPage,
 });
 
 function EditScholarshipPage() {
-
 	const params = Route.useParams();
 	const router = useRouter();
 	const queryClient = useQueryClient();
@@ -98,23 +106,61 @@ function EditScholarshipPage() {
 	const [loading, setLoading] = useState(false);
 	const [saving, setSaving] = useState(false);
 	const [showFormFieldsDialog, setShowFormFieldsDialog] = useState(false);
-	const [draftFormFields, setDraftFormFields] = useState<CreateFormFieldRequest[]>([]);
+	const [draftFormFields, setDraftFormFields] = useState<
+		CreateFormFieldRequest[]
+	>([]);
 	const [showCloseConfirmation, setShowCloseConfirmation] = useState(false);
 	const [showSaveConfirmation, setShowSaveConfirmation] = useState(false);
 	const [showEndConfirmation, setShowEndConfirmation] = useState(false);
 	const [ending, setEnding] = useState(false);
 	const [pendingFormData, setPendingFormData] = useState<any>(null);
 	const [amountType, setAmountType] = useState<AmountType>(() => {
-		if (scholarship.totalAmountMin != null || scholarship.totalAmountMax != null) return 'range';
-		if (scholarship.totalAmount != null) return 'fixed';
-		return 'varies';
+		if (
+			scholarship.totalAmountMin != null ||
+			scholarship.totalAmountMax != null
+		)
+			return "range";
+		if (scholarship.totalAmount != null) return "fixed";
+		return "varies";
 	});
-	const [unlimitedSlots, setUnlimitedSlots] = useState(scholarship.totalSlots == null);
+	const [unlimitedSlots, setUnlimitedSlots] = useState(
+		scholarship.totalSlots == null,
+	);
+	const [showPreview, setShowPreview] = useState(false);
+	const [showFullPreview, setShowFullPreview] = useState(false);
 
 	const criterias = form.watch("criterias") || [];
 	const requiredDocuments = form.watch("requirements") || [];
 	const formFields = form.watch("formFields") || [];
 	const status = form.watch("status");
+	const name = form.watch("name");
+	const description = form.watch("description");
+	const totalAmount = form.watch("totalAmount");
+	const totalAmountMin = form.watch("totalAmountMin");
+	const totalAmountMax = form.watch("totalAmountMax");
+	const totalSlots = form.watch("totalSlots");
+	const applicationDeadline = form.watch("applicationDeadline");
+	const scholarshipType = form.watch("scholarshipType");
+	const imageUrl = form.watch("imageUrl");
+	const cardColor = form.watch("cardColor");
+
+	const { previewScholarship } = useScholarshipPreview({
+		scholarshipType,
+		name,
+		description,
+		imageUrl: imageUrl || "/scholarship-banner-placeholder.png",
+		totalAmount,
+		totalAmountMin,
+		totalAmountMax,
+		totalSlots,
+		applicationDeadline,
+		criterias,
+		requirements: requiredDocuments,
+		formFields,
+		sponsorId: scholarship.sponsor.id,
+		status,
+		cardColor: cardColor ?? "#3A52A6",
+	} as unknown as ScholarshipFormData);
 
 	const hydrateForm = useCallback(
 		(scholarship: Scholarship) => {
@@ -162,11 +208,24 @@ function EditScholarshipPage() {
 	};
 
 	const removeDocument = (index: number) => {
+		const removedDoc = requiredDocuments[index];
 		form.setValue(
 			"requirements",
 			requiredDocuments?.filter((_, i) => i !== index),
 			{ shouldValidate: true },
 		);
+		// Remove the auto-generated file-upload field tied to this document.
+		if (removedDoc) {
+			const currentFields = form.getValues("formFields") || [];
+			form.setValue(
+				"formFields",
+				currentFields.filter(
+					(f) =>
+						!(f.label === removedDoc && f.fieldType === FormFieldType.File),
+				),
+				{ shouldValidate: true },
+			);
+		}
 	};
 
 	const addCriterionDirect = (value: string) => {
@@ -184,6 +243,26 @@ function EditScholarshipPage() {
 			form.setValue("requirements", [...(requiredDocuments || []), trimmed], {
 				shouldValidate: true,
 			});
+			// Auto-generate a required file-upload field for the new document.
+			const currentFields = form.getValues("formFields") || [];
+			const alreadyExists = currentFields.some(
+				(f) => f.label === trimmed && f.fieldType === FormFieldType.File,
+			);
+			if (!alreadyExists) {
+				form.setValue(
+					"formFields",
+					[
+						...currentFields,
+						{
+							label: trimmed,
+							fieldType: FormFieldType.File,
+							isRequired: true,
+							options: [],
+						},
+					],
+					{ shouldValidate: true },
+				);
+			}
 		}
 	};
 
@@ -200,7 +279,9 @@ function EditScholarshipPage() {
 	};
 
 	const handleSaveFormFields = () => {
-		form.setValue("formFields", draftFormFields as any, { shouldValidate: true });
+		form.setValue("formFields", draftFormFields as any, {
+			shouldValidate: true,
+		});
 		setShowFormFieldsDialog(false);
 		setEditingFieldIndex(null);
 	};
@@ -250,7 +331,9 @@ function EditScholarshipPage() {
 	const endMutation = useMutation({
 		mutationFn: () => endScholarship(params.id),
 		onSuccess: async (res) => {
-			await queryClient.invalidateQueries({ queryKey: ["scholarship", params.id] });
+			await queryClient.invalidateQueries({
+				queryKey: ["scholarship", params.id],
+			});
 			await queryClient.invalidateQueries({ queryKey: ["scholarships"] });
 			toast.success("Scholarship ended", res.message, 1250);
 			setEnding(false);
@@ -305,192 +388,267 @@ function EditScholarshipPage() {
 	}
 
 	return (
-		<div className="max-w-2xl mx-auto">
+		<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
 			<SEO title="Edit Scholarship" noindex={true} />
-			{/* Go Back Button */}
-			<button
-				type="button"
-				onClick={() => router.history.back()}
-				className="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-primary mb-4 cursor-pointer transition-colors"
-			>
-				<ArrowLeft size={16} />
-				Back to My Scholarships
-			</button>
 
-			<div className="space-y-4 lg:col-span-8">
-				{/* Card Color */}
-				<div className="bg-[#F8F9FC] rounded-xl p-3 shadow-sm">
-					<Controller
-						control={form.control as any}
-						name="cardColor"
-						render={({ field }) => (
-							<CardColorPicker
-								value={field.value ?? "#3A52A6"}
-								onChange={field.onChange}
-								disabled={saving}
-							/>
-						)}
-					/>
-				</div>
-
-				{/* Close Button */}
-				{status === "active" && (
-					<button
-						type="button"
-						disabled={saving || ending}
-						onClick={() => setShowCloseConfirmation(true)}
-						className="w-full px-4 py-3 bg-white border border-[#EF4444] text-[#EF4444] text-sm rounded-lg hover:bg-red-50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-					>
-						Close Scholarship
-					</button>
-				)}
-				{status === "closed" && (
-					<div className="w-full px-4 py-3 bg-[#FEF2F2] border border-[#FCA5A5] text-[#991B1B] text-sm rounded-lg">
-						This scholarship is closed
-					</div>
-				)}
-
-				{/* End Scholarship Button */}
-				{status !== ScholarshipStatus.Archived ? (
-					<button
-						type="button"
-						disabled={saving || ending}
-						onClick={() => setShowEndConfirmation(true)}
-						className="w-full px-4 py-3 bg-[#7F1D1D] text-white text-sm rounded-lg hover:bg-[#6B1A1A] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-					>
-						End Scholarship
-					</button>
-				) : (
-					<div className="w-full px-4 py-3 bg-[#F3F4F6] border border-[#D1D5DB] text-[#6B7280] text-sm rounded-lg">
-						This scholarship has ended
-					</div>
-				)}
-
-				{/* Image, Title, Description Section */}
-				<div className="bg-[#F8F9FC] rounded-xl p-3 shadow-sm">
-					<ImageTitleDescriptionSection
-						imagePreview={imagePreview}
-						handleImageUpload={handleImageUpload}
-						removeImage={() => {
-							setImagePreview(null);
-							form.setValue("imageUrl", "", { shouldValidate: true });
-						}}
-						control={form.control as any}
-						errors={form.formState.errors as any}
-						disabled={saving}
-					/>
-				</div>
-
-				{/* Amount and Slots/Deadline Section */}
-				<div className="bg-[#F8F9FC] rounded-xl p-3 shadow-sm space-y-4">
-					<AmountField
-						amountType={amountType}
-						onAmountTypeChange={(type) => {
-							setAmountType(type);
-							form.setValue("totalAmount", undefined);
-							form.setValue("totalAmountMin", undefined);
-							form.setValue("totalAmountMax", undefined);
-							form.clearErrors(["totalAmount", "totalAmountMin", "totalAmountMax"] as any);
-						}}
-						control={form.control as any}
-						errors={form.formState.errors as any}
-						setValue={form.setValue as any}
-						clearErrors={(fields) => form.clearErrors(fields as any)}
-						disabled={saving}
-					/>
-
-					<SlotsDeadlineFields
-						showSlots={true}
-						onShowSlots={() => {}}
-						onHideSlots={() => {}}
-						unlimitedSlots={unlimitedSlots}
-						onUnlimitedSlotsChange={(unlimited) => {
-							setUnlimitedSlots(unlimited);
-							if (unlimited) {
-								form.setValue("totalSlots", undefined);
-								form.clearErrors("totalSlots");
-							}
-						}}
-						control={form.control as any}
-						errors={form.formState.errors as any}
-						setValue={form.setValue as any}
-						clearErrors={(field) => form.clearErrors([field] as any)}
-						disabled={saving}
-					/>
-				</div>
-
-				{/* Eligibility Criteria */}
-				<TagsListField
-					label="Eligibility Criteria"
-					presets={PRESET_CRITERIA}
-					selectedItems={criterias || []}
-					onSelect={addCriterionDirect}
-					onRemove={removeCriterion}
-					disabled={saving}
-					error={form.formState.errors.criterias?.message}
-					placeholder="Select eligibility criteria"
-				/>
-
-				{/* Required Documents */}
-				<TagsListField
-					label="Required Documents"
-					presets={PRESET_DOCUMENTS}
-					selectedItems={requiredDocuments || []}
-					onSelect={addDocumentDirect}
-					onRemove={removeDocument}
-					disabled={saving}
-					error={form.formState.errors.requirements?.message}
-					placeholder="Select required documents"
-				/>
-
-				{/* Application Form */}
-				<div>
-					<div className="mb-3">
-						<label className="block text-sm text-[#4A5568] mb-1 ml-0.5">
-							Application Form <span className="text-[#EF4444]">*</span>
-						</label>
-						<p className="text-xs text-[#6B7280] ml-0.5">
-							Maintain the form fields applicants complete when applying.
-						</p>
-					</div>
-
-					<button
-						type="button"
-						disabled={saving}
-						onClick={openFormFieldsDialog}
-						className={`w-full flex cursor-pointer items-center justify-center gap-2 px-4 py-3.5 border-2 border-dashed ${
-							form.formState.errors.formFields
-								? "border-[#EF4444]"
-								: "border-[#3A52A6]"
-						} bg-[#E0ECFF] text-secondary text-sm rounded-lg hover:bg-[#D0DCFF] transition-colors`}
-					>
-						<Edit2 size={20} />
-						{formFields.length === 0 ? "Add Form Field" : "Edit Form Fields"}
-					</button>
-					{form.formState.errors.formFields && (
-						<p className="text-xs text-[#EF4444] mt-1">
-							{form.formState.errors.formFields.message}
-						</p>
-					)}
-				</div>
-
-				{/* Save Button */}
+			<div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+				{/* Go Back Button */}
 				<button
-					onClick={form.handleSubmit(onSubmit)}
-					className={`w-full py-3 bg-[#EFA508] text-tertiary cursor-pointer rounded-lg hover:bg-[#D89407] transition-colors ${
-						saving && "opacity-60 cursor-not-allowed"
-					}`}
-					disabled={saving}
+					type="button"
+					onClick={() => router.history.back()}
+					className="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-primary cursor-pointer transition-colors w-fit"
 				>
-					{saving ? (
-						<span className="flex items-center justify-center">
-							<Loader2 className="w-4 h-4 animate-spin" />
-						</span>
-					) : (
-						<span>Save</span>
-					)}
+					<ArrowLeft size={16} />
+					Back to My Scholarships
 				</button>
+
+				<div className="flex items-center gap-2">
+					<input
+						type="checkbox"
+						id="preview-toggle"
+						checked={showPreview}
+						onChange={(e) => setShowPreview(e.target.checked)}
+						className="w-4 h-4 rounded border-[#D1D5DB] cursor-pointer"
+					/>
+					<label
+						htmlFor="preview-toggle"
+						className="text-sm text-[#4A5568] cursor-pointer whitespace-nowrap"
+					>
+						Show Live Preview
+					</label>
+				</div>
 			</div>
+
+			<div
+				className={`grid grid-cols-1 gap-6 ${showPreview ? "lg:grid-cols-15" : ""}`}
+			>
+				<div
+					className={`space-y-4 ${showPreview ? "lg:col-span-8" : "w-full lg:max-w-2xl lg:mx-auto"}`}
+				>
+					{/* Card Color */}
+					<div className="bg-[#F8F9FC] rounded-xl p-3 shadow-sm">
+						<Controller
+							control={form.control as any}
+							name="cardColor"
+							render={({ field }) => (
+								<CardColorPicker
+									value={field.value ?? "#3A52A6"}
+									onChange={field.onChange}
+									disabled={saving}
+								/>
+							)}
+						/>
+					</div>
+
+					{/* Close Button */}
+					{status === "active" && (
+						<button
+							type="button"
+							disabled={saving || ending}
+							onClick={() => setShowCloseConfirmation(true)}
+							className="w-full px-4 py-3 bg-white border border-[#EF4444] text-[#EF4444] text-sm rounded-lg hover:bg-red-50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+						>
+							Close Scholarship
+						</button>
+					)}
+					{status === "closed" && (
+						<div className="w-full px-4 py-3 bg-[#FEF2F2] border border-[#FCA5A5] text-[#991B1B] text-sm rounded-lg">
+							This scholarship is closed
+						</div>
+					)}
+
+					{/* End Scholarship Button */}
+					{status !== ScholarshipStatus.Archived ? (
+						<button
+							type="button"
+							disabled={saving || ending}
+							onClick={() => setShowEndConfirmation(true)}
+							className="w-full px-4 py-3 bg-[#7F1D1D] text-white text-sm rounded-lg hover:bg-[#6B1A1A] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+						>
+							End Scholarship
+						</button>
+					) : (
+						<div className="w-full px-4 py-3 bg-[#F3F4F6] border border-[#D1D5DB] text-[#6B7280] text-sm rounded-lg">
+							This scholarship has ended
+						</div>
+					)}
+
+					{/* Image, Title, Description Section */}
+					<div className="bg-[#F8F9FC] rounded-xl p-3 shadow-sm">
+						<ImageTitleDescriptionSection
+							imagePreview={imagePreview}
+							handleImageUpload={handleImageUpload}
+							removeImage={() => {
+								setImagePreview(null);
+								form.setValue("imageUrl", "", { shouldValidate: true });
+							}}
+							control={form.control as any}
+							errors={form.formState.errors as any}
+							disabled={saving}
+						/>
+					</div>
+
+					{/* Amount and Slots/Deadline Section */}
+					<div className="bg-[#F8F9FC] rounded-xl p-3 shadow-sm space-y-4">
+						<AmountField
+							amountType={amountType}
+							onAmountTypeChange={(type) => {
+								setAmountType(type);
+								form.setValue("totalAmount", undefined);
+								form.setValue("totalAmountMin", undefined);
+								form.setValue("totalAmountMax", undefined);
+								form.clearErrors([
+									"totalAmount",
+									"totalAmountMin",
+									"totalAmountMax",
+								] as any);
+							}}
+							control={form.control as any}
+							errors={form.formState.errors as any}
+							setValue={form.setValue as any}
+							clearErrors={(fields) => form.clearErrors(fields as any)}
+							disabled={saving}
+						/>
+
+						<SlotsDeadlineFields
+							showSlots={true}
+							onShowSlots={() => {}}
+							onHideSlots={() => {}}
+							unlimitedSlots={unlimitedSlots}
+							onUnlimitedSlotsChange={(unlimited) => {
+								setUnlimitedSlots(unlimited);
+								if (unlimited) {
+									form.setValue("totalSlots", undefined);
+									form.clearErrors("totalSlots");
+								}
+							}}
+							control={form.control as any}
+							errors={form.formState.errors as any}
+							setValue={form.setValue as any}
+							clearErrors={(field) => form.clearErrors([field] as any)}
+							disabled={saving}
+						/>
+					</div>
+
+					{/* Eligibility Criteria */}
+					<TagsListField
+						label="Eligibility Criteria"
+						presets={PRESET_CRITERIA}
+						selectedItems={criterias || []}
+						onSelect={addCriterionDirect}
+						onRemove={removeCriterion}
+						disabled={saving}
+						error={form.formState.errors.criterias?.message}
+						placeholder="Select eligibility criteria"
+					/>
+
+					{/* Required Documents */}
+					<TagsListField
+						label="Required Documents"
+						presets={PRESET_DOCUMENTS}
+						selectedItems={requiredDocuments || []}
+						onSelect={addDocumentDirect}
+						onRemove={removeDocument}
+						disabled={saving}
+						error={form.formState.errors.requirements?.message}
+						placeholder="Select required documents"
+					/>
+
+					{/* Application Form */}
+					<div>
+						<div className="mb-3">
+							<label className="block text-sm text-[#4A5568] mb-1 ml-0.5">
+								Application Form <span className="text-[#EF4444]">*</span>
+							</label>
+							<p className="text-xs text-[#6B7280] ml-0.5">
+								Maintain the form fields applicants complete when applying.
+							</p>
+						</div>
+
+						<button
+							type="button"
+							disabled={saving}
+							onClick={openFormFieldsDialog}
+							className={`w-full flex cursor-pointer items-center justify-center gap-2 px-4 py-3.5 border-2 border-dashed ${
+								form.formState.errors.formFields
+									? "border-[#EF4444]"
+									: "border-[#3A52A6]"
+							} bg-[#E0ECFF] text-secondary text-sm rounded-lg hover:bg-[#D0DCFF] transition-colors`}
+						>
+							<Edit2 size={20} />
+							{formFields.length === 0
+								? "Add Form Field"
+								: `Edit Form Fields (${formFields.length})`}
+						</button>
+						{form.formState.errors.formFields && (
+							<p className="text-xs text-[#EF4444] mt-1">
+								{form.formState.errors.formFields.message}
+							</p>
+						)}
+					</div>
+
+					{/* Save Button */}
+					<button
+						onClick={form.handleSubmit(onSubmit)}
+						className={`w-full py-3 bg-[#EFA508] text-tertiary cursor-pointer rounded-lg hover:bg-[#D89407] transition-colors ${
+							saving && "opacity-60 cursor-not-allowed"
+						}`}
+						disabled={saving}
+					>
+						{saving ? (
+							<span className="flex items-center justify-center">
+								<Loader2 className="w-4 h-4 animate-spin" />
+							</span>
+						) : (
+							<span>Save</span>
+						)}
+					</button>
+				</div>
+
+				{showPreview && (
+					<>
+						{/* Mobile and tablet preview - shown at bottom */}
+						<div className="col-span-1 lg:hidden">
+							<div className="flex items-center justify-start gap-3 mb-3">
+								<h2 className="text-sm text-primary">Live Preview</h2>
+								<p className="text-xs text-[#6B7280]">
+									This is how students see your scholarship.
+								</p>
+							</div>
+							<ScholarshipPreviewCard
+								scholarship={previewScholarship}
+								amountType={amountType}
+								unlimitedSlots={unlimitedSlots}
+								onClick={() => setShowFullPreview(true)}
+							/>
+						</div>
+
+						{/* Desktop preview - shown on the right side */}
+						<div className="hidden lg:block lg:col-span-7 lg:sticky lg:top-6 h-fit">
+							<div className="flex items-center justify-start gap-3 mb-3">
+								<h2 className="text-sm text-primary">Live Preview</h2>
+								<p className="text-xs text-[#6B7280]">
+									This is how students see your scholarship.
+								</p>
+							</div>
+							<ScholarshipPreviewCard
+								scholarship={previewScholarship}
+								amountType={amountType}
+								unlimitedSlots={unlimitedSlots}
+								onClick={() => setShowFullPreview(true)}
+							/>
+						</div>
+					</>
+				)}
+			</div>
+
+			{showFullPreview && (
+				<ScholarshipFullPreviewModal
+					scholarship={previewScholarship}
+					onClose={() => setShowFullPreview(false)}
+					isPreview={true}
+				/>
+			)}
 
 			<FormFieldsDialog
 				open={showFormFieldsDialog}
@@ -528,7 +686,10 @@ function EditScholarshipPage() {
 			/>
 
 			{/* Save Confirmation Dialog */}
-			<Dialog open={showSaveConfirmation} onOpenChange={setShowSaveConfirmation}>
+			<Dialog
+				open={showSaveConfirmation}
+				onOpenChange={setShowSaveConfirmation}
+			>
 				<DialogContent>
 					<DialogHeader>
 						<DialogTitle className="font-normal">Save Changes</DialogTitle>
@@ -563,7 +724,10 @@ function EditScholarshipPage() {
 					<DialogHeader>
 						<DialogTitle className="font-normal">End Scholarship</DialogTitle>
 						<DialogDescription>
-							This will permanently end the {scholarship.name} scholarship and notify all applicants. Selected applicants will receive a congratulatory message; others will receive a closing notice. This action cannot be undone.
+							This will permanently end the {scholarship.name} scholarship and
+							notify all applicants. Selected applicants will receive a
+							congratulatory message; others will receive a closing notice. This
+							action cannot be undone.
 						</DialogDescription>
 					</DialogHeader>
 					<DialogFooter>
@@ -588,12 +752,16 @@ function EditScholarshipPage() {
 			</Dialog>
 
 			{/* Close Confirmation Dialog */}
-			<Dialog open={showCloseConfirmation} onOpenChange={setShowCloseConfirmation}>
+			<Dialog
+				open={showCloseConfirmation}
+				onOpenChange={setShowCloseConfirmation}
+			>
 				<DialogContent>
 					<DialogHeader>
 						<DialogTitle>Close Scholarship</DialogTitle>
 						<DialogDescription>
-							Are you sure you want to close this scholarship immediately? Once closed, students will no longer be able to apply.
+							Are you sure you want to close this scholarship immediately? Once
+							closed, students will no longer be able to apply.
 						</DialogDescription>
 					</DialogHeader>
 					<DialogFooter>
