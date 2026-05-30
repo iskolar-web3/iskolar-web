@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, createElement } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import {
 	AlertCircle,
@@ -29,8 +29,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
 	Dialog,
 	DialogContent,
-	DialogHeader,
+	DialogDescription,
 	DialogFooter,
+	DialogHeader,
+	DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "@/lib/toast";
 import { SEO } from "@/components/SEO";
@@ -39,9 +41,11 @@ import { logger } from "@/lib/logger";
 import { formatDateTime } from "@/utils/formatting.utils";
 import {
 	ScholarshipApplicationStatus,
+	ScholarshipStatus,
 	type Applicant,
 } from "@/lib/scholarship/model";
 import {
+	endScholarship,
 	getApplicantsQuery,
 	getScholarshipByIdQuery,
 	updateApplication,
@@ -77,6 +81,7 @@ export const Route = createFileRoute("/_sponsor/scholarship/$id/applicants")({
 function ApplicantsListPage() {
 
 	const params = Route.useParams();
+	const router = useRouter();
 	const queryClient = useQueryClient();
 
 	const applicantsQuery = useQuery(getApplicantsQuery(params.id));
@@ -138,6 +143,32 @@ function ApplicantsListPage() {
 		return map;
 	}, [disbursementsQuery.data]);
 
+
+	// End scholarship state
+	const [showEndConfirmation, setShowEndConfirmation] = useState(false);
+	const [ending, setEnding] = useState(false);
+
+	const endMutation = useMutation({
+		mutationFn: () => endScholarship(params.id),
+		onSuccess: async (res) => {
+			await queryClient.invalidateQueries({ queryKey: ["scholarships", params.id] });
+			await queryClient.invalidateQueries({ queryKey: ["scholarships"] });
+			await queryClient.invalidateQueries({ queryKey: ["scholarships", "applicants", params.id] });
+			toast.success("Scholarship ended", res.message, 1250);
+			setEnding(false);
+			setShowEndConfirmation(false);
+			setTimeout(() => router.history.back(), 1500);
+		},
+		onError: (err: Error) => {
+			toast.error("Error", err.message);
+			setEnding(false);
+		},
+	});
+
+	const handleEndScholarship = () => {
+		setEnding(true);
+		endMutation.mutate();
+	};
 
 	// Confirmation modal state
 	const [confirmationModal, setConfirmationModal] = useState(false);
@@ -421,14 +452,30 @@ function ApplicantsListPage() {
 				<div className="max-w-3xl mx-auto">
 					{/* Scholarship Info Header */}
 					<div className="bg-card rounded-lg shadow-sm p-4 md:p-5 mb-3">
-						<div className="flex-1">
-							<h1 className="text-2xl text-primary mb-1">
-								{scholarship?.name}
-							</h1>
-							<p className="text-[11px] md:text-xs text-[#6B7280]">
-								{applicants.length}{" "}
-								{applicants.length === 1 ? "Applicant" : "Applicants"}
-							</p>
+						<div className="flex items-start justify-between gap-4">
+							<div className="flex-1">
+								<h1 className="text-2xl text-primary mb-1">
+									{scholarship?.name}
+								</h1>
+								<p className="text-[11px] md:text-xs text-[#6B7280]">
+									{applicants.length}{" "}
+									{applicants.length === 1 ? "Applicant" : "Applicants"}
+								</p>
+							</div>
+							{scholarship?.status.code !== ScholarshipStatus.Archived ? (
+								<button
+									type="button"
+									disabled={ending}
+									onClick={() => setShowEndConfirmation(true)}
+									className="shrink-0 px-3 py-1.5 bg-[#7F1D1D] text-white text-xs rounded-lg hover:bg-[#6B1A1A] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+								>
+									End Scholarship
+								</button>
+							) : (
+								<span className="shrink-0 px-3 py-1.5 bg-[#F3F4F6] border border-[#D1D5DB] text-[#6B7280] text-xs rounded-lg">
+									Ended
+								</span>
+							)}
 						</div>
 					</div>
 
@@ -1388,6 +1435,36 @@ function ApplicantsListPage() {
 					</div>
 				</div>
 			)}
+
+			{/* End Scholarship Confirmation Dialog */}
+			<Dialog open={showEndConfirmation} onOpenChange={setShowEndConfirmation}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle className="font-normal">End Scholarship</DialogTitle>
+						<DialogDescription>
+							This will permanently end the {scholarship?.name} scholarship and notify all applicants. Selected applicants will receive a congratulatory message; others will receive a closing notice. This action cannot be undone.
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter>
+						<button
+							type="button"
+							disabled={ending}
+							onClick={() => setShowEndConfirmation(false)}
+							className="px-4 py-2 rounded-md border border-[#C4CBD5] text-primary text-sm hover:bg-[#F3F4F6] transition-colors disabled:opacity-60"
+						>
+							Cancel
+						</button>
+						<button
+							type="button"
+							disabled={ending}
+							onClick={handleEndScholarship}
+							className="px-4 py-2 rounded-md bg-[#7F1D1D] text-white text-sm hover:bg-[#6B1A1A] transition-colors disabled:opacity-60"
+						>
+							{ending ? "Ending..." : "End Scholarship"}
+						</button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 
 			<DisbursementDialog
 				open={!!activeScholar}

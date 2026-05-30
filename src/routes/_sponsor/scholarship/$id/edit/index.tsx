@@ -255,9 +255,7 @@ function EditScholarshipPage() {
 			toast.success("Scholarship ended", res.message, 1250);
 			setEnding(false);
 			setShowEndConfirmation(false);
-			setTimeout(() => {
-				router.history.back();
-			}, 1500);
+			setTimeout(() => router.history.back(), 1500);
 		},
 		onError: (err: Error) => {
 			toast.error("Error", err.message);
@@ -352,7 +350,7 @@ function EditScholarshipPage() {
 					</div>
 				)}
 
-				{/* End Scholarship Button — shown for any non-archived status */}
+				{/* End Scholarship Button */}
 				{status !== ScholarshipStatus.Archived ? (
 					<button
 						type="button"
