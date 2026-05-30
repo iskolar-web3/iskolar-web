@@ -419,7 +419,7 @@ function CreateScholarship() {
 									className="w-full flex cursor-pointer items-center justify-center gap-2 px-4 py-3.5 border-2 border-dashed border-[#3A52A6] bg-[#E0ECFF] text-secondary text-sm rounded-lg hover:bg-[#D0DCFF] transition-colors"
 								>
 									<Plus size={20} />
-									{customFormFields.length === 0 ? "Add Form Field" : "Edit Form Field"}
+									{customFormFields.length === 0 ? "Add Form Field" : `Edit Form Field (${customFormFields.length})`}
 								</button>
 							</div>
 
