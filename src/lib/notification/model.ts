@@ -3,6 +3,8 @@ import { enumDetailSchema } from "../api";
 
 export enum NotificationType {
 	ScholarshipCreated = "scholarship:created",
+	ScholarshipEndedSelected = "scholarship:ended:selected",
+	ScholarshipEndedNotSelected = "scholarship:ended:not_selected",
 }
 
 export const notificationSchema = z.object({

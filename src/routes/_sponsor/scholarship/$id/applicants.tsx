@@ -276,6 +276,8 @@ function ApplicantsListPage() {
 		switch (status) {
 			case ScholarshipApplicationStatus.Approved:
 				return "#31D0AA";
+			case ScholarshipApplicationStatus.Granted:
+				return "#C7D2FE";
 			case ScholarshipApplicationStatus.Denied:
 				return "#EF4444";
 			case ScholarshipApplicationStatus.Shortlisted:
@@ -291,6 +293,8 @@ function ApplicantsListPage() {
 		switch (status) {
 			case ScholarshipApplicationStatus.Approved:
 				return CheckCircle2;
+			case ScholarshipApplicationStatus.Granted:
+				return GraduationCap;
 			case ScholarshipApplicationStatus.Denied:
 				return XCircle;
 			case ScholarshipApplicationStatus.Shortlisted:

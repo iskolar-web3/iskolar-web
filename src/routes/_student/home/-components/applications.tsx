@@ -7,7 +7,7 @@ import {
 	Clock,
 	CheckCircle,
 	XCircle,
-	Award,
+	GraduationCap,
 	FileText,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -195,7 +195,7 @@ export function HomeApplications(props: Props): JSX.Element {
 																shortlisted: FileText,
 																approved: CheckCircle,
 																denied: XCircle,
-																granted: Award,
+																granted: GraduationCap,
 															};
 															const Icon = statusIcons[item.application.status.code];
 															return Icon ? <Icon size={20} /> : null;

@@ -246,6 +246,30 @@ export async function deleteScholarship(id: string): Promise<ApiResponse> {
 	return result;
 }
 
+export async function endScholarship(id: string): Promise<ApiResponse> {
+	const token = getCookie(ACCESS_TOKEN_KEY);
+	if (!token) {
+		throw new Error("Access token not found.");
+	}
+
+	const url = new URL(`${BACKEND_URL}/scholarships/${id}/end`);
+
+	const response = await fetch(url.toString(), {
+		method: "PATCH",
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+		credentials: "include",
+	});
+	const result: ApiResponse = await safeResponseJson(response);
+
+	if (!response.ok) {
+		throw new Error(result.message);
+	}
+
+	return result;
+}
+
 export async function getMyApplicationStatus(
 	scholarshipId: string,
 ): Promise<ApplicationStatus | null> {
