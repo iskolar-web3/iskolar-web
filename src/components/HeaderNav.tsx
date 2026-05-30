@@ -11,6 +11,7 @@ import {
 	X,
 	GraduationCap,
 	HandCoins,
+	BookOpen,
 } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
@@ -22,18 +23,15 @@ import { DisbursementStatus } from "@/lib/disbursement/model";
 import {
 	Popover,
 	PopoverContent,
-	PopoverHeader,
-	PopoverTitle,
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Notification } from "@/lib/notification/model";
 import {
 	formatTimeAgo,
-	getNotificationMessage,
-	getNotificationMetadata,
+	getNotificationTitle,
+	getNotificationSubtitle,
 } from "@/lib/notification/helper";
-import { Button } from "./ui/button";
 
 /**
  * User role type for navigation context
@@ -358,33 +356,45 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 									) : null}
 								</button>
 							</PopoverTrigger>
-							<PopoverContent align="end" className="h-[85vh] p-0 overflow-clip border-0">
-								<PopoverHeader className="p-3 bg-secondary">
-									<PopoverTitle className="text-xl text-secondary-foreground">Notifications</PopoverTitle>
-								</PopoverHeader>
+							<PopoverContent align="end" className="w-80 p-0 overflow-clip shadow-lg border border-border">
+								<div className="px-4 py-3 border-b border-border">
+									<h2 className="text-sm text-primary">Notifications</h2>
+									{notifications.length > 0 && (
+										<p className="text-xs text-muted-foreground mt-0.5">{notifications.length} unread</p>
+									)}
+								</div>
 
-								<ScrollArea className="h-full space-y-2 ">
-									{notifications.map((notif) => {
-										const metadata = getNotificationMetadata(notif);
-										const message = getNotificationMessage(notif);
-										return (
-											<Button
-												variant="ghost"
-												className="border-y border-muted flex-1 flex flex-col items-start gap-0 w-full py-2 px-3 h-auto space-y-2 whitespace-normal text-start rounded-none"
-											>
-												<div>
-													<h1>{message}</h1>
-													<p className="text-muted-foreground">
-														{metadata?.name}
-													</p>
+								<ScrollArea className="max-h-[420px]">
+									{notifications.length === 0 ? (
+										<div className="flex flex-col items-center justify-center py-12 px-4 gap-2 text-muted-foreground">
+											<Bell className="w-7 h-7 opacity-25" />
+											<p className="text-sm">No notifications yet</p>
+										</div>
+									) : (
+										notifications.map((notif) => {
+											const title = getNotificationTitle(notif);
+											const subtitle = getNotificationSubtitle(notif);
+											return (
+												<div
+													key={notif.notificationId}
+													className="flex items-start gap-3 px-4 py-3 border-b border-border last:border-0 hover:bg-accent/50 transition-colors"
+												>
+													<div className="shrink-0 mt-0.5 w-8 h-8 rounded-full flex items-center justify-center bg-primary/8">
+														<BookOpen className="w-4 h-4 text-primary" />
+													</div>
+													<div className="flex-1 min-w-0">
+														<p className="text-sm font-medium text-primary leading-snug">{title}</p>
+														{subtitle && (
+															<p className="text-xs text-muted-foreground mt-0.5 leading-snug">{subtitle}</p>
+														)}
+													</div>
+													<span className="shrink-0 text-[10px] text-muted-foreground mt-0.5 whitespace-nowrap">
+														{formatTimeAgo(notif.createdAt)}
+													</span>
 												</div>
-
-												<p className="text-secondary text-xs">
-													{formatTimeAgo(metadata?.createdAt)}
-												</p>
-											</Button>
-										);
-									})}
+											);
+										})
+									)}
 								</ScrollArea>
 							</PopoverContent>
 						</Popover>

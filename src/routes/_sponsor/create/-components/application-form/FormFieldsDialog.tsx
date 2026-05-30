@@ -71,7 +71,7 @@ export default function FormFieldsDialog({
 	return (
 		<>
 			<Dialog open={open} onOpenChange={(o) => !o && handleClose()}>
-				<DialogContent className="sm:max-w-2xl">
+				<DialogContent className="sm:max-w-2xl flex flex-col max-h-[85vh]">
 					<DialogHeader>
 						<div className="flex items-center gap-2">
 							<DialogTitle className="font-normal">Application Form</DialogTitle>
@@ -100,13 +100,15 @@ export default function FormFieldsDialog({
 						</DialogDescription>
 					</DialogHeader>
 
-					<div className="space-y-3">
-						<CustomFormFieldsList
-							fields={draftFormFields}
-							onEdit={openCustomFormModal}
-							onRemove={removeCustomFormField}
-							disabled={loading}
-						/>
+					<div className="flex flex-col flex-1 overflow-hidden gap-3 min-h-0">
+						<div className="overflow-y-auto flex-1 min-h-0">
+							<CustomFormFieldsList
+								fields={draftFormFields}
+								onEdit={openCustomFormModal}
+								onRemove={removeCustomFormField}
+								disabled={loading}
+							/>
+						</div>
 
 						<button
 							type="button"

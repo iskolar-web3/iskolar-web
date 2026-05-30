@@ -2,7 +2,7 @@ import { Calendar, Users, Coins, UserIcon, LockKeyhole } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { formatCurrency, formatDate } from '@/utils/formatting.utils';
-import { ScholarshipType, type Scholarship } from '@/lib/scholarship/model';
+import { ScholarshipStatus, ScholarshipType, type Scholarship } from '@/lib/scholarship/model';
 import { getSponsorName } from '@/lib/sponsor/api';
 import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
@@ -33,7 +33,8 @@ export default function ScholarshipCard({ scholarship, index, onClick, isVerifie
   const isRange = scholarship.totalAmountMin != null || scholarship.totalAmountMax != null;
   const isFixed = !isRange && scholarship.totalAmount != null;
   const isVaries = !isRange && !isFixed;
-  const applyDisabled = !isVerified;
+  const isClosed = scholarship.status.code === ScholarshipStatus.Closed;
+  const applyDisabled = !isVerified || isClosed;
   const cardColor = scholarship.cardColor ?? "#3A52A6";
   const isLight = isLightColor(cardColor);
   const headerTextColor = isLight ? "#111827" : undefined;
@@ -209,7 +210,7 @@ export default function ScholarshipCard({ scholarship, index, onClick, isVerifie
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 + 0.25 }}
           >
-            <span title={applyDisabled ? "Verify your identity to apply" : undefined}>
+            <span title={isClosed ? "This scholarship is no longer accepting applications" : !isVerified ? "Verify your identity to apply" : undefined}>
               <Button
                 size="default"
                 onClick={handleApplyClick}

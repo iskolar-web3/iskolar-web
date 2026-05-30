@@ -9,9 +9,6 @@ import {
 	Loader2,
 } from "lucide-react";
 import { DisbursementStatus } from "@/lib/disbursement/model";
-import { uploadFile } from "@/lib/api";
-import { getCookie } from "@/lib/cookie";
-import { ACCESS_TOKEN_KEY } from "@/lib/user/auth";
 import { handleFileSelection, validateFile } from "@/utils/fileHandling.utils";
 
 export function formatPeso(amount: number): string {
@@ -230,18 +227,18 @@ export function InfoBanner({
 
 type ProofUploadFieldProps = {
 	value: string | null;
-	onChange: (url: string | null) => void;
+	onFileChange: (file: File | null) => void;
 	disabled?: boolean;
 };
 
 export function ProofUploadField({
 	value,
-	onChange,
+	onFileChange,
 	disabled,
 }: ProofUploadFieldProps) {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [preview, setPreview] = useState<string | null>(null);
-	const [uploading, setUploading] = useState(false);
+	const [processing, setProcessing] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
 	async function handleSelect(e: React.ChangeEvent<HTMLInputElement>) {
@@ -258,13 +255,7 @@ export function ProofUploadField({
 			return;
 		}
 
-		const token = getCookie(ACCESS_TOKEN_KEY);
-		if (!token) {
-			setError("Access token not found.");
-			return;
-		}
-
-		setUploading(true);
+		setProcessing(true);
 		try {
 			const processed = await handleFileSelection(file, { compress: true });
 			if (processed.error) {
@@ -273,22 +264,11 @@ export function ProofUploadField({
 			}
 
 			setPreview(processed.preview);
-
-			const uploadRes = await uploadFile(
-				processed.file,
-				token,
-				"disbursement-files",
-			);
-			if (!uploadRes.data?.url) {
-				setError(uploadRes.message || "Failed to upload proof.");
-				return;
-			}
-
-			onChange(uploadRes.data.url);
+			onFileChange(processed.file);
 		} catch (err) {
-			setError(err instanceof Error ? err.message : "Failed to upload proof.");
+			setError(err instanceof Error ? err.message : "Failed to process file.");
 		} finally {
-			setUploading(false);
+			setProcessing(false);
 		}
 	}
 
@@ -310,7 +290,7 @@ export function ProofUploadField({
 						</span>
 						<button
 							type="button"
-							disabled={disabled || uploading}
+							disabled={disabled || processing}
 							onClick={() => inputRef.current?.click()}
 							className="cursor-pointer text-xs text-primary hover:underline disabled:opacity-60"
 						>
@@ -321,17 +301,17 @@ export function ProofUploadField({
 			) : (
 				<button
 					type="button"
-					disabled={disabled || uploading}
+					disabled={disabled || processing}
 					onClick={() => inputRef.current?.click()}
 					className="flex w-full cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-[#C7D5F5] bg-[#F8FAFF] px-4 py-6 text-center transition-colors hover:border-primary disabled:cursor-not-allowed disabled:opacity-60"
 				>
-					{uploading ? (
+					{processing ? (
 						<Loader2 className="h-5 w-5 animate-spin text-primary" />
 					) : (
 						<FileUp className="h-5 w-5 text-[#9CA3AF]" />
 					)}
 					<span className="text-sm text-primary">
-						{uploading ? "Uploading..." : "Upload proof image"}
+						{processing ? "Processing..." : "Upload proof image"}
 					</span>
 					<span className="text-[11px] text-[#9CA3AF]">
 						PNG, JPG or PDF · up to 10MB
@@ -344,7 +324,7 @@ export function ProofUploadField({
 				accept="image/png,image/jpeg,image/jpg,application/pdf"
 				className="hidden"
 				onChange={handleSelect}
-				disabled={disabled || uploading}
+				disabled={disabled || processing}
 			/>
 			{error && <p className="text-xs text-red-600">{error}</p>}
 		</div>

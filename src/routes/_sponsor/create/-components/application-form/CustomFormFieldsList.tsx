@@ -24,6 +24,9 @@ export default function CustomFormFieldsList({
 					key={index}
 					className="flex items-center gap-3 p-3 bg-white border border-[#E0ECFF] rounded-lg"
 				>
+					<span className="text-xs text-[#6B7280] w-5 text-center shrink-0">
+						{index + 1}
+					</span>
 					<div className="w-9 h-9 bg-[#E0ECFF] rounded-lg flex items-center justify-center">
 						{renderFieldTypeIcon(field.fieldType)}
 					</div>

@@ -16,6 +16,7 @@ import {
 	Dialog,
 	DialogContent,
 	DialogHeader,
+	DialogTitle,
 	DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -58,6 +59,7 @@ export default function ScholarshipDetailsModal({
 }: ScholarshipDetailsModalProps) {
 	const [isExiting, setIsExiting] = useState(false);
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
+	const [showQuestionnairesDialog, setShowQuestionnairesDialog] = useState(false);
 	const [showTitleModal, setShowTitleModal] = useState(false);
 	const [titleInput, setTitleInput] = useState("");
 	const [loading, setLoading] = useState(false);
@@ -131,6 +133,7 @@ export default function ScholarshipDetailsModal({
 	};
 
 	return (
+		<>
 		<AnimatePresence>
 			<div className="fixed inset-0 z-50 flex items-center justify-end p-2">
 				{/* Backdrop */}
@@ -323,47 +326,19 @@ export default function ScholarshipDetailsModal({
 								</div>
 							)}
 
-						{/* Custom Form Fields */}
+						{/* Questionnaires */}
 						{scholarship.formFields.length > 0 && (
 							<div className="mb-6">
-								<h3 className="text-sm text-primary mb-3">
-									Application Form Fields
-								</h3>
-								<div className="space-y-2.5">
-									{scholarship.formFields.map((field: any, i: number) => {
-										const fieldTypeCode = (field.fieldType?.code ?? field.type) as FormFieldType;
-										const fieldType = Object.values(FormFieldType).includes(fieldTypeCode) ? fieldTypeCode : FormFieldType.ShortAnswer;
-										const hasOptions = fieldType === FormFieldType.Dropdown || fieldType === FormFieldType.Checkbox || fieldType === FormFieldType.MultipleChoice;
-										return (
-										<div
-											key={i}
-											className="flex items-start gap-3 p-3 bg-[#F9FAFB] border border-[#E0ECFF] rounded-lg"
-										>
-											<div className="w-9 h-9 bg-[#E0ECFF] rounded-lg flex items-center justify-center shrink-0">
-												{renderFieldTypeIcon(fieldType)}
-											</div>
-											<div className="flex-1 min-w-0">
-												<div className="flex items-center gap-2 mb-1">
-													<span className="text-[13px] text-primary font-medium">
-														{field.label}
-													</span>
-													{(field.isRequired ?? field.required) && (
-														<span className="px-1.5 py-0.5 bg-[#FEE2E2] text-[#DC2626] text-[9px] rounded">
-															Required
-														</span>
-													)}
-												</div>
-												<p className="text-[11px] text-[#6B7280]">
-													{getFieldTypeLabel(fieldType)}
-													{hasOptions &&
-														field.options &&
-														field.options.length > 0 &&
-														` • ${field.options.length} option${field.options.length !== 1 ? "s" : ""}`}
-												</p>
-											</div>
-										</div>
-									);})}
-								</div>
+								<button
+									type="button"
+									onClick={() => setShowQuestionnairesDialog(true)}
+									className="w-full flex cursor-pointer items-center justify-between px-4 py-3 border border-[#E0ECFF] bg-[#F9FAFB] rounded-lg hover:bg-[#E0ECFF] transition-colors text-sm text-primary"
+								>
+									<span>Questionnaires</span>
+									<span className="text-xs text-[#6B7280]">
+										{scholarship.formFields.length} item{scholarship.formFields.length !== 1 ? "s" : ""}
+									</span>
+								</button>
 							</div>
 						)}
 
@@ -511,5 +486,57 @@ export default function ScholarshipDetailsModal({
 				</Dialog>
 			</div>
 		</AnimatePresence>
+
+		{/* Questionnaires Dialog */}
+
+		<Dialog open={showQuestionnairesDialog} onOpenChange={setShowQuestionnairesDialog}>
+			<DialogContent className="sm:max-w-lg max-h-[80vh] flex flex-col">
+				<DialogHeader>
+					<DialogTitle className="font-normal">
+						Questionnaires ({scholarship.formFields.length})
+					</DialogTitle>
+				</DialogHeader>
+				<div className="overflow-y-auto flex-1 space-y-2.5 pr-1">
+					{scholarship.formFields.map((field: any, i: number) => {
+						const fieldTypeCode = (field.fieldType?.code ?? field.type) as FormFieldType;
+						const fieldType = Object.values(FormFieldType).includes(fieldTypeCode) ? fieldTypeCode : FormFieldType.ShortAnswer;
+						const hasOptions = fieldType === FormFieldType.Dropdown || fieldType === FormFieldType.Checkbox || fieldType === FormFieldType.MultipleChoice;
+						return (
+							<div
+								key={i}
+								className="flex items-start gap-3 p-3 bg-[#F9FAFB] border border-[#E0ECFF] rounded-lg"
+							>
+								<span className="text-xs text-[#6B7280] w-5 text-center shrink-0 mt-2.5">
+									{i + 1}
+								</span>
+								<div className="w-9 h-9 bg-[#E0ECFF] rounded-lg flex items-center justify-center shrink-0">
+									{renderFieldTypeIcon(fieldType)}
+								</div>
+								<div className="flex-1 min-w-0">
+									<div className="flex items-center gap-2 mb-1">
+										<span className="text-[13px] text-primary font-medium">
+											{field.label}
+										</span>
+										{(field.isRequired ?? field.required) && (
+											<span className="px-1.5 py-0.5 bg-[#FEE2E2] text-[#DC2626] text-[9px] rounded">
+												Required
+											</span>
+										)}
+									</div>
+									<p className="text-[11px] text-[#6B7280]">
+										{getFieldTypeLabel(fieldType)}
+										{hasOptions &&
+											field.options &&
+											field.options.length > 0 &&
+											` • ${field.options.length} option${field.options.length !== 1 ? "s" : ""}`}
+									</p>
+								</div>
+							</div>
+						);
+					})}
+				</div>
+			</DialogContent>
+		</Dialog>
+		</>
 	);
 }

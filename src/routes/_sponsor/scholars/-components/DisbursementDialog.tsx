@@ -15,7 +15,10 @@ import {
 	getSponsorDisbursementsQuery,
 	markDisbursementSent,
 } from "@/lib/disbursement/api";
-import { type Disbursement, DisbursementStatus } from "@/lib/disbursement/model";
+import {
+	type Disbursement,
+	DisbursementStatus,
+} from "@/lib/disbursement/model";
 import {
 	DisbursementSteps,
 	InfoBanner,
@@ -26,6 +29,9 @@ import {
 	formatPeso,
 } from "@/components/disbursement/DisbursementShared";
 import { toast } from "@/lib/toast";
+import { uploadFile } from "@/lib/api";
+import { getCookie } from "@/lib/cookie";
+import { ACCESS_TOKEN_KEY } from "@/lib/user/auth";
 
 export type ScholarInfo = {
 	applicationId: string;
@@ -64,7 +70,8 @@ export function DisbursementDialog({
 	const [createdId, setCreatedId] = useState<string | null>(null);
 	const [amount, setAmount] = useState("");
 	const [sponsorNote, setSponsorNote] = useState("");
-	const [proofUrl, setProofUrl] = useState<string | null>(null);
+	const [proofFile, setProofFile] = useState<File | null>(null);
+	const [uploading, setUploading] = useState(false);
 	const [sendNote, setSendNote] = useState("");
 	const [formError, setFormError] = useState<string | null>(null);
 
@@ -118,7 +125,8 @@ export function DisbursementDialog({
 		setCreatedId(null);
 		setAmount("");
 		setSponsorNote("");
-		setProofUrl(null);
+		setProofFile(null);
+		setUploading(false);
 		setSendNote("");
 		setFormError(null);
 		createMutation.reset();
@@ -151,21 +159,43 @@ export function DisbursementDialog({
 		});
 	}
 
-	function handleSend() {
+	async function handleSend() {
 		setFormError(null);
-		if (!activeId) {
-			return;
-		}
-		if (!proofUrl) {
+		if (!activeId) return;
+		if (!proofFile) {
 			setFormError("Upload a proof image before marking as sent.");
 			return;
 		}
 
-		sendMutation.mutate({
-			id: activeId,
-			proofUrl,
-			note: sendNote.trim() || undefined,
-		});
+		const token = getCookie(ACCESS_TOKEN_KEY);
+		if (!token) {
+			setFormError("Session expired. Please refresh.");
+			return;
+		}
+
+		setUploading(true);
+		try {
+			const uploadRes = await uploadFile(
+				proofFile,
+				token,
+				"disbursement-files",
+			);
+			if (!uploadRes.data?.url) {
+				setFormError(uploadRes.message || "Failed to upload proof.");
+				return;
+			}
+			sendMutation.mutate({
+				id: activeId,
+				proofUrl: uploadRes.data.url,
+				note: sendNote.trim() || undefined,
+			});
+		} catch (err) {
+			setFormError(
+				err instanceof Error ? err.message : "Failed to upload proof.",
+			);
+		} finally {
+			setUploading(false);
+		}
 	}
 
 	return (
@@ -176,14 +206,12 @@ export function DisbursementDialog({
 						<DialogTitle className="font-normal">
 							{scholar?.scholarshipName ?? ""}
 						</DialogTitle>
-						<DialogDescription>
-							{scholar?.studentName ?? ""}
-						</DialogDescription>
+						<DialogDescription>{scholar?.studentName ?? ""}</DialogDescription>
 					</DialogHeader>
-	
+
 					<div className="space-y-5 p-5">
 						<DisbursementSteps current={disbursement?.status ?? null} />
-	
+
 						{!disbursement ? (
 							<div className="space-y-4">
 								{paymentQuery.isLoading ? (
@@ -202,12 +230,9 @@ export function DisbursementDialog({
 										can't be disbursed.
 									</InfoBanner>
 								)}
-	
+
 								<div className="space-y-1.5">
-									<label
-										htmlFor={amountId}
-										className="text-sm text-primary"
-									>
+									<label htmlFor={amountId} className="text-sm text-primary">
 										Amount
 									</label>
 									<div className="relative">
@@ -226,12 +251,9 @@ export function DisbursementDialog({
 										/>
 									</div>
 								</div>
-	
+
 								<div className="space-y-1.5">
-									<label
-										htmlFor={noteId}
-										className="text-sm text-primary"
-									>
+									<label htmlFor={noteId} className="text-sm text-primary">
 										Reference note{" "}
 										<span className="font-normal text-[#9CA3AF]">
 											(optional)
@@ -246,7 +268,7 @@ export function DisbursementDialog({
 										className="w-full rounded-md border border-[#D3DCF6] px-3 py-2 text-sm text-primary focus:outline-none focus:ring-2 focus:ring-[#3A52A6]"
 									/>
 								</div>
-	
+
 								{(formError || createMutation.isError) && (
 									<p className="text-sm text-red-600">
 										{formError ||
@@ -255,14 +277,16 @@ export function DisbursementDialog({
 												: "Failed to create disbursement.")}
 									</p>
 								)}
-	
+
 								<Button
 									type="button"
 									className="w-full cursor-pointer"
 									disabled={!paymentQuery.data || createMutation.isPending}
 									onClick={handleCreate}
 								>
-									{createMutation.isPending ? "Creating..." : "Create Disbursement"}
+									{createMutation.isPending
+										? "Creating..."
+										: "Create Disbursement"}
 								</Button>
 							</div>
 						) : (
@@ -273,7 +297,7 @@ export function DisbursementDialog({
 									accountName={disbursement.paymentMethod.accountName}
 									accountNumber={disbursement.paymentMethod.accountNumber}
 								/>
-	
+
 								{disbursement.status === DisbursementStatus.Initiated && (
 									<div className="space-y-3">
 										<div>
@@ -285,7 +309,10 @@ export function DisbursementDialog({
 												a screenshot as proof.
 											</p>
 										</div>
-										<ProofUploadField value={proofUrl} onChange={setProofUrl} />
+										<ProofUploadField
+											value={null}
+											onFileChange={setProofFile}
+										/>
 										<textarea
 											value={sendNote}
 											onChange={(e) => setSendNote(e.target.value)}
@@ -304,18 +331,25 @@ export function DisbursementDialog({
 										<Button
 											type="button"
 											className="w-full cursor-pointer"
-											disabled={!proofUrl || sendMutation.isPending}
+											disabled={
+												!proofFile || uploading || sendMutation.isPending
+											}
 											onClick={handleSend}
 										>
-											{sendMutation.isPending ? "Saving..." : "Mark as Sent"}
+											{uploading
+												? "Uploading..."
+												: sendMutation.isPending
+													? "Saving..."
+													: "Mark as Sent"}
 										</Button>
 									</div>
 								)}
-	
+
 								{disbursement.status === DisbursementStatus.Sent && (
 									<div className="space-y-3">
 										<InfoBanner variant="waiting">
-											Waiting for the student to confirm they received the funds.
+											Waiting for the student to confirm they received the
+											funds.
 										</InfoBanner>
 										<ProofImageLink
 											label="Your proof of transfer"
@@ -323,7 +357,7 @@ export function DisbursementDialog({
 										/>
 									</div>
 								)}
-	
+
 								{disbursement.status === DisbursementStatus.Received && (
 									<div className="space-y-3">
 										<InfoBanner variant="success">
@@ -348,8 +382,8 @@ export function DisbursementDialog({
 							</div>
 						)}
 					</div>
-			</DialogContent>
-		</Dialog>
+				</DialogContent>
+			</Dialog>
 		</>
 	);
 }

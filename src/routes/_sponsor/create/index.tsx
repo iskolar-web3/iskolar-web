@@ -8,6 +8,7 @@ import { SEO } from "@/components/SEO";
 import { toast } from "@/lib/toast";
 import {
 	DEFAULT_APPLICATION_QUESTION,
+	generateDocumentFileFields,
 	useScholarshipForm,
 } from "@/hooks/useScholarshipForm";
 import { useScholarshipPreview } from "@/hooks/useScholarshipPreview";
@@ -156,6 +157,10 @@ function CreateScholarship() {
 
 	useEffect(() => {
 		if (!selectedTemplate) return;
+		const mergedFormFields = generateDocumentFileFields(
+			selectedTemplate.requirements as string[],
+			selectedTemplate.formFields as CreateFormFieldRequest[],
+		);
 		form.reset({
 			scholarshipType: selectedTemplate.scholarshipType,
 			name: selectedTemplate.suggestedTitle,
@@ -167,14 +172,14 @@ function CreateScholarship() {
 			applicationDeadline: undefined,
 			criterias: selectedTemplate.criterias,
 			requirements: selectedTemplate.requirements,
-			formFields: selectedTemplate.formFields,
+			formFields: mergedFormFields,
 			imageUrl: undefined,
 			sponsorId: auth.profile.id,
 			status: ScholarshipStatus.Active,
 		})
 		setUnlimitedSlots(false);
 		setAmountType(selectedTemplate.amountType);
-		setDraftFormFields(selectedTemplate.formFields);
+		setDraftFormFields(mergedFormFields);
 	}, [auth.profile.id, form, selectedTemplate]);
 
 	const openFormFieldsDialog = () => {
@@ -414,7 +419,7 @@ function CreateScholarship() {
 									className="w-full flex cursor-pointer items-center justify-center gap-2 px-4 py-3.5 border-2 border-dashed border-[#3A52A6] bg-[#E0ECFF] text-secondary text-sm rounded-lg hover:bg-[#D0DCFF] transition-colors"
 								>
 									<Plus size={20} />
-									{customFormFields.length === 0 ? "Add Form Field" : "Edit Form Field"}
+									{customFormFields.length === 0 ? "Add Form Field" : `Edit Form Field (${customFormFields.length})`}
 								</button>
 							</div>
 

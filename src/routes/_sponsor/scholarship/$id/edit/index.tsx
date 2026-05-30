@@ -34,6 +34,7 @@ import {
 } from "@/lib/scholarship/model";
 import { useMutation, useSuspenseQuery, useQueryClient } from "@tanstack/react-query";
 import {
+	endScholarship,
 	getScholarshipByIdQuery,
 	updateScholarship,
 } from "@/lib/scholarship/api";
@@ -100,6 +101,8 @@ function EditScholarshipPage() {
 	const [draftFormFields, setDraftFormFields] = useState<CreateFormFieldRequest[]>([]);
 	const [showCloseConfirmation, setShowCloseConfirmation] = useState(false);
 	const [showSaveConfirmation, setShowSaveConfirmation] = useState(false);
+	const [showEndConfirmation, setShowEndConfirmation] = useState(false);
+	const [ending, setEnding] = useState(false);
 	const [pendingFormData, setPendingFormData] = useState<any>(null);
 	const [amountType, setAmountType] = useState<AmountType>(() => {
 		if (scholarship.totalAmountMin != null || scholarship.totalAmountMax != null) return 'range';
@@ -244,6 +247,27 @@ function EditScholarshipPage() {
 		},
 	});
 
+	const endMutation = useMutation({
+		mutationFn: () => endScholarship(params.id),
+		onSuccess: async (res) => {
+			await queryClient.invalidateQueries({ queryKey: ["scholarship", params.id] });
+			await queryClient.invalidateQueries({ queryKey: ["scholarships"] });
+			toast.success("Scholarship ended", res.message, 1250);
+			setEnding(false);
+			setShowEndConfirmation(false);
+			setTimeout(() => router.history.back(), 1500);
+		},
+		onError: (err: Error) => {
+			toast.error("Error", err.message);
+			setEnding(false);
+		},
+	});
+
+	const handleEndScholarship = () => {
+		setEnding(true);
+		endMutation.mutate();
+	};
+
 	const onSubmit = (data: any) => {
 		// Clean up amount fields based on amountType
 		const amountPayload: any = {};
@@ -313,7 +337,7 @@ function EditScholarshipPage() {
 				{status === "active" && (
 					<button
 						type="button"
-						disabled={saving}
+						disabled={saving || ending}
 						onClick={() => setShowCloseConfirmation(true)}
 						className="w-full px-4 py-3 bg-white border border-[#EF4444] text-[#EF4444] text-sm rounded-lg hover:bg-red-50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
 					>
@@ -323,6 +347,22 @@ function EditScholarshipPage() {
 				{status === "closed" && (
 					<div className="w-full px-4 py-3 bg-[#FEF2F2] border border-[#FCA5A5] text-[#991B1B] text-sm rounded-lg">
 						This scholarship is closed
+					</div>
+				)}
+
+				{/* End Scholarship Button */}
+				{status !== ScholarshipStatus.Archived ? (
+					<button
+						type="button"
+						disabled={saving || ending}
+						onClick={() => setShowEndConfirmation(true)}
+						className="w-full px-4 py-3 bg-[#7F1D1D] text-white text-sm rounded-lg hover:bg-[#6B1A1A] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+					>
+						End Scholarship
+					</button>
+				) : (
+					<div className="w-full px-4 py-3 bg-[#F3F4F6] border border-[#D1D5DB] text-[#6B7280] text-sm rounded-lg">
+						This scholarship has ended
 					</div>
 				)}
 
@@ -512,6 +552,36 @@ function EditScholarshipPage() {
 							className="cursor-pointer px-4 py-2 rounded-md bg-[#EFA508] text-tertiary text-sm hover:bg-[#D89407] transition-colors disabled:opacity-60"
 						>
 							{saving ? "Saving..." : "Save Changes"}
+						</button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+
+			{/* End Confirmation Dialog */}
+			<Dialog open={showEndConfirmation} onOpenChange={setShowEndConfirmation}>
+				<DialogContent>
+					<DialogHeader>
+						<DialogTitle className="font-normal">End Scholarship</DialogTitle>
+						<DialogDescription>
+							This will permanently end the {scholarship.name} scholarship and notify all applicants. Selected applicants will receive a congratulatory message; others will receive a closing notice. This action cannot be undone.
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter>
+						<button
+							type="button"
+							disabled={ending}
+							onClick={() => setShowEndConfirmation(false)}
+							className="px-4 py-2 rounded-md border border-[#C4CBD5] text-primary text-sm hover:bg-[#F3F4F6] transition-colors disabled:opacity-60"
+						>
+							Cancel
+						</button>
+						<button
+							type="button"
+							disabled={ending}
+							onClick={handleEndScholarship}
+							className="px-4 py-2 rounded-md bg-[#7F1D1D] text-white text-sm hover:bg-[#6B1A1A] transition-colors disabled:opacity-60"
+						>
+							{ending ? "Ending..." : "End Scholarship"}
 						</button>
 					</DialogFooter>
 				</DialogContent>

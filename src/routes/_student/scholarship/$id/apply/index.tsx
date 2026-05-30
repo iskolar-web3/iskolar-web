@@ -320,6 +320,7 @@ function ApplyScholarshipPage() {
 		return (
 			<div key={field.id} className="space-y-2">
 				<label className="block text-xs md:text-sm text-primary">
+					<span className="text-[#6B7280] mr-1">{index + 1}.</span>
 					{field.label}
 					{field.isRequired && <span className="text-[#EF4444] ml-1">*</span>}
 				</label>

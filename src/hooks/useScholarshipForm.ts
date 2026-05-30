@@ -15,6 +15,27 @@ import { normalizeText } from "@/utils/normalize.utils";
 
 const DRAFT_STORAGE_KEY_PREFIX = "scholarship-create-draft:";
 
+export function generateDocumentFileFields(
+	requirements: string[],
+	existingFormFields: CreateFormFieldRequest[],
+): CreateFormFieldRequest[] {
+	const added: CreateFormFieldRequest[] = [];
+	for (const doc of requirements) {
+		const alreadyExists = existingFormFields.some(
+			(f) => f.label === doc && f.fieldType === FormFieldType.File,
+		);
+		if (!alreadyExists) {
+			added.push({
+				label: doc,
+				fieldType: FormFieldType.File,
+				isRequired: true,
+				options: [],
+			});
+		}
+	}
+	return [...existingFormFields, ...added];
+}
+
 export const DEFAULT_APPLICATION_QUESTION: CreateFormFieldRequest = {
 	label: "Why are you applying for this scholarship?",
 	fieldType: FormFieldType.Paragraph,
@@ -206,6 +227,25 @@ export function useScholarshipForm(sponsorId: string) {
 				form.setValue("requirements", [...requirements, normalized], {
 					shouldValidate: true,
 				});
+				const currentFields = form.getValues("formFields") || [];
+				const alreadyExists = currentFields.some(
+					(f) => f.label === normalized && f.fieldType === FormFieldType.File,
+				);
+				if (!alreadyExists) {
+					form.setValue(
+						"formFields",
+						[
+							...currentFields,
+							{
+								label: normalized,
+								fieldType: FormFieldType.File,
+								isRequired: true,
+								options: [],
+							},
+						],
+						{ shouldValidate: true },
+					);
+				}
 			}
 		},
 		[requirements, form],
@@ -213,10 +253,21 @@ export function useScholarshipForm(sponsorId: string) {
 
 	const removeDocument = useCallback(
 		(index: number) => {
+			const removedDoc = requirements[index];
 			form.setValue(
 				"requirements",
 				requirements.filter((_, i) => i !== index),
 			);
+			if (removedDoc) {
+				const currentFields = form.getValues("formFields") || [];
+				form.setValue(
+					"formFields",
+					currentFields.filter(
+						(f) => !(f.label === removedDoc && f.fieldType === FormFieldType.File),
+					),
+					{ shouldValidate: true },
+				);
+			}
 		},
 		[requirements, form],
 	);
