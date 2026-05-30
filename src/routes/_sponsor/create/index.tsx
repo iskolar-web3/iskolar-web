@@ -8,6 +8,7 @@ import { SEO } from "@/components/SEO";
 import { toast } from "@/lib/toast";
 import {
 	DEFAULT_APPLICATION_QUESTION,
+	generateDocumentFileFields,
 	useScholarshipForm,
 } from "@/hooks/useScholarshipForm";
 import { useScholarshipPreview } from "@/hooks/useScholarshipPreview";
@@ -156,6 +157,10 @@ function CreateScholarship() {
 
 	useEffect(() => {
 		if (!selectedTemplate) return;
+		const mergedFormFields = generateDocumentFileFields(
+			selectedTemplate.requirements as string[],
+			selectedTemplate.formFields as CreateFormFieldRequest[],
+		);
 		form.reset({
 			scholarshipType: selectedTemplate.scholarshipType,
 			name: selectedTemplate.suggestedTitle,
@@ -167,14 +172,14 @@ function CreateScholarship() {
 			applicationDeadline: undefined,
 			criterias: selectedTemplate.criterias,
 			requirements: selectedTemplate.requirements,
-			formFields: selectedTemplate.formFields,
+			formFields: mergedFormFields,
 			imageUrl: undefined,
 			sponsorId: auth.profile.id,
 			status: ScholarshipStatus.Active,
 		})
 		setUnlimitedSlots(false);
 		setAmountType(selectedTemplate.amountType);
-		setDraftFormFields(selectedTemplate.formFields);
+		setDraftFormFields(mergedFormFields);
 	}, [auth.profile.id, form, selectedTemplate]);
 
 	const openFormFieldsDialog = () => {
