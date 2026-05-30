@@ -36,7 +36,8 @@ export default function ScholarshipCard({ scholarship, index, onClick, isVerifie
   const isFixed = !isRange && scholarship.totalAmount != null;
   const isVaries = !isRange && !isFixed;
   const isClosed = scholarship.status.code === ScholarshipStatus.Closed;
-  const applyDisabled = !isVerified || isClosed || alreadyApplied;
+  const isEnded = scholarship.status.code === ScholarshipStatus.Archived;
+  const applyDisabled = !isVerified || isClosed || isEnded || alreadyApplied;
   const cardColor = scholarship.cardColor ?? "#3A52A6";
   const isLight = isLightColor(cardColor);
   const headerTextColor = isLight ? "#111827" : undefined;
@@ -91,7 +92,15 @@ export default function ScholarshipCard({ scholarship, index, onClick, isVerifie
               {alreadyApplied ? (
                 <div className="flex items-center gap-1 shrink-0 bg-white/20 rounded px-2 py-0.5 text-[11px] whitespace-nowrap">
                   <CheckCircle size={11} />
-                  <span>Already Applied</span>
+                  <span>Applied</span>
+                </div>
+              ) : isEnded ? (
+                <div className="flex items-center gap-1 shrink-0 bg-white/20 rounded px-2 py-0.5 text-[11px] whitespace-nowrap">
+                  <span>Ended</span>
+                </div>
+              ) : isClosed ? (
+                <div className="flex items-center gap-1 shrink-0 bg-white/20 rounded px-2 py-0.5 text-[11px] whitespace-nowrap">
+                  <span>Closed</span>
                 </div>
               ) : scholarship.applicationCount > 0 && (
                 <div className="flex items-center gap-1 shrink-0 bg-white/20 rounded px-2 py-0.5 text-[11px] whitespace-nowrap">
@@ -217,7 +226,7 @@ export default function ScholarshipCard({ scholarship, index, onClick, isVerifie
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 + 0.25 }}
           >
-            <span title={alreadyApplied ? "You have already applied to this scholarship" : isClosed ? "This scholarship is no longer accepting applications" : !isVerified ? "Verify your identity to apply" : undefined}>
+            <span title={alreadyApplied ? "You have already applied to this scholarship" : isEnded ? "This scholarship has ended" : isClosed ? "This scholarship is no longer accepting applications" : !isVerified ? "Verify your identity to apply" : undefined}>
               <Button
                 size="default"
                 onClick={handleApplyClick}
@@ -231,9 +240,7 @@ export default function ScholarshipCard({ scholarship, index, onClick, isVerifie
                   filter: applyHovered && !applyDisabled ? "brightness(0.88)" : "none",
                 }}
               >
-                {alreadyApplied ? (
-                  <><CheckCircle className="w-3 h-3" /> Already Applied</>
-                ) : applyDisabled ? (
+                {applyDisabled ? (
                   <><LockKeyhole className="w-3 h-3" /> Apply Now</>
                 ) : (
                   "Apply Now"

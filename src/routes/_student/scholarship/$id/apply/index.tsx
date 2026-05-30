@@ -34,6 +34,7 @@ import { handleError } from "@/lib/errorHandler";
 import { logger } from "@/lib/logger";
 import {
 	FormFieldType,
+	ScholarshipStatus,
 	type CreateApplicationRequest,
 	type FormField,
 } from "@/lib/scholarship/model";
@@ -696,6 +697,29 @@ function ApplyScholarshipPage() {
 					<p className="text-sm text-[#6B7280] mb-6">
 						You have already submitted an application for{" "}
 						<span className="text-primary">{scholarship?.name}</span>.
+					</p>
+					<button
+						onClick={() => navigate({ to: "/discover" })}
+						className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#3A52A6] text-white rounded-lg text-sm hover:bg-[#2F4189] transition-colors"
+					>
+						<ArrowLeft size={16} />
+						Back to Discover
+					</button>
+				</div>
+			</div>
+		);
+	}
+
+	if (scholarship?.status.code === ScholarshipStatus.Archived) {
+		return (
+			<div className="min-h-screen bg-[#F8F9FC] flex items-center justify-center p-4">
+				<SEO title="Scholarship Ended" noindex={true} />
+				<div className="bg-white rounded-lg p-8 shadow-sm border border-[#E0ECFF] max-w-md w-full text-center">
+					<AlertCircle className="w-16 h-16 text-orange-400 mx-auto mb-4" />
+					<h1 className="text-xl text-primary mb-2">Scholarship Ended</h1>
+					<p className="text-sm text-[#6B7280] mb-6">
+						<span className="text-primary">{scholarship?.name}</span> has ended
+						and is no longer accepting applications.
 					</p>
 					<button
 						onClick={() => navigate({ to: "/discover" })}

@@ -30,6 +30,8 @@ export default function ScholarshipDetailsModal({ scholarship, onClose, isVerifi
     return scholarship.status.code === ScholarshipStatus.Closed;
   }, [scholarship?.status]);
 
+  const isEnded = scholarship.status.code === ScholarshipStatus.Archived;
+
   /**
    * Handles modal close with exit animation
    */
@@ -89,15 +91,19 @@ export default function ScholarshipDetailsModal({ scholarship, onClose, isVerifi
               <div className="flex items-center gap-2 mb-4">
                 <div
                   className={`w-2 h-2 rounded-full ${
-                    scholarship.status.code === ScholarshipStatus.Closed ? 'bg-[#EF4444]' : 'bg-[#31D0AA]'
+                    scholarship.status.code === ScholarshipStatus.Closed ? 'bg-[#EF4444]'
+                    : isEnded ? 'bg-orange-500'
+                    : 'bg-[#31D0AA]'
                   }`}
                 />
                 <span
                   className={`text-sm font-medium capitalize ${
-                    scholarship.status.code === ScholarshipStatus.Closed ? 'text-[#EF4444]' : 'text-[#31D0AA]'
+                    scholarship.status.code === ScholarshipStatus.Closed ? 'text-[#EF4444]'
+                    : isEnded ? 'text-orange-500'
+                    : 'text-[#31D0AA]'
                   }`}
                 >
-                  {scholarship.status.name}
+                  {isEnded ? 'Ended' : scholarship.status.name}
                 </span>
               </div>
             )}
@@ -214,6 +220,13 @@ export default function ScholarshipDetailsModal({ scholarship, onClose, isVerifi
                 <CheckCircle size={16} className="text-green-600 shrink-0" />
                 <p className="text-[11px] md:text-xs text-green-700 leading-relaxed flex-1">
                   You have already submitted an application for this scholarship.
+                </p>
+              </div>
+            ) : isEnded ? (
+              <div className="flex items-center gap-2.5 bg-orange-50 border border-orange-200 rounded-md p-3 mt-1.5 mb-2">
+                <LockKeyhole size={16} className="text-orange-500 shrink-0" />
+                <p className="text-[11px] md:text-xs text-orange-600 leading-relaxed flex-1">
+                  This scholarship has ended and is no longer accepting applications.
                 </p>
               </div>
             ) : isClosed() ? (
