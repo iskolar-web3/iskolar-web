@@ -1,6 +1,10 @@
 import type { ScholarshipCreatedEvent } from "../scholarship/model";
 import { NotificationType, type Notification } from "./model";
 
+type ApplicationStatusChangedEvent = {
+	scholarshipName: string;
+};
+
 export function getNotificationMetadata(notif: Notification) {
 	switch (notif.notificationType.code) {
 		case NotificationType.ScholarshipCreated:
@@ -30,6 +34,16 @@ export function getNotificationTitle(notif: Notification): string {
 	switch (notif.notificationType.code) {
 		case NotificationType.ScholarshipCreated:
 			return "New scholarship available";
+		case NotificationType.ScholarshipEndedSelected:
+			return "You were selected!";
+		case NotificationType.ScholarshipEndedNotSelected:
+			return "Scholarship has ended";
+		case NotificationType.ApplicationShortlisted:
+			return "Application shortlisted";
+		case NotificationType.ApplicationApproved:
+			return "Application approved";
+		case NotificationType.ApplicationGranted:
+			return "Scholarship granted";
 		default:
 			return "Notification";
 	}
@@ -41,6 +55,14 @@ export function getNotificationSubtitle(notif: Notification): string {
 			const meta = notif.metadata as ScholarshipCreatedEvent | null;
 			return meta?.name ?? "";
 		}
+		case NotificationType.ScholarshipEndedSelected:
+		case NotificationType.ScholarshipEndedNotSelected:
+		case NotificationType.ApplicationShortlisted:
+		case NotificationType.ApplicationApproved:
+		case NotificationType.ApplicationGranted: {
+			const meta = notif.metadata as ApplicationStatusChangedEvent | null;
+			return meta?.scholarshipName ?? "";
+		}
 		default:
 			return "";
 	}
@@ -50,6 +72,16 @@ export function getNotificationMessage(notif: Notification): string {
 	switch (notif.notificationType.code) {
 		case NotificationType.ScholarshipCreated:
 			return "New scholarship available";
+		case NotificationType.ScholarshipEndedSelected:
+			return "You were selected!";
+		case NotificationType.ScholarshipEndedNotSelected:
+			return "Scholarship has ended";
+		case NotificationType.ApplicationShortlisted:
+			return "Your application has been shortlisted";
+		case NotificationType.ApplicationApproved:
+			return "Your application has been approved";
+		case NotificationType.ApplicationGranted:
+			return "Scholarship funds have been granted";
 		default:
 			return "";
 	}

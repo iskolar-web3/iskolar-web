@@ -14,7 +14,7 @@ import {
 	BookOpen,
 } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import ProfileDropdown from "./profile/ProfileDropdown";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/auth";
@@ -32,6 +32,10 @@ import {
 	getNotificationTitle,
 	getNotificationSubtitle,
 } from "@/lib/notification/helper";
+import {
+	getMyNotificationsQuery,
+	markMyNotificationsAsReadMutation,
+} from "@/lib/notification/api";
 
 /**
  * User role type for navigation context
@@ -204,6 +208,24 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 		return false;
 	};
 
+	const [isNotifOpen, setIsNotifOpen] = useState(false);
+	const queryClient = useQueryClient();
+	const markAsRead = useMutation({
+		...markMyNotificationsAsReadMutation(),
+		onSuccess: () => {
+			queryClient.invalidateQueries(getMyNotificationsQuery());
+		},
+	});
+
+	const handleNotifOpenChange = (open: boolean) => {
+		setIsNotifOpen(open);
+		if (open && notifications.some((n) => !n.isRead)) {
+			markAsRead.mutate();
+		}
+	};
+
+	const unreadCount = notifications.filter((n) => !n.isRead).length;
+
 	const auth = useAuth();
 
 	const studentDisbursementsQuery = useQuery(
@@ -339,7 +361,7 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 
 					{/* Notifications and Profile */}
 					<div className="flex items-center gap-1 md:gap-2 shrink-0">
-						<Popover>
+						<Popover open={isNotifOpen} onOpenChange={handleNotifOpenChange}>
 							<PopoverTrigger asChild>
 								{/* Notification Bell */}
 								<button
@@ -349,9 +371,9 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 								>
 									<Bell className="w-4 md:w-5 h-4 md:h-5" />
 
-									{notifications.length > 0 ? (
+									{unreadCount > 0 ? (
 										<span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] text-white">
-											{notifications.length}
+											{unreadCount}
 										</span>
 									) : null}
 								</button>
@@ -359,8 +381,8 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 							<PopoverContent align="end" className="w-80 p-0 overflow-clip shadow-lg border border-border">
 								<div className="px-4 py-3 border-b border-border">
 									<h2 className="text-sm text-primary">Notifications</h2>
-									{notifications.length > 0 && (
-										<p className="text-xs text-muted-foreground mt-0.5">{notifications.length} unread</p>
+									{unreadCount > 0 && (
+										<p className="text-xs text-muted-foreground mt-0.5">{unreadCount} unread</p>
 									)}
 								</div>
 
@@ -377,7 +399,7 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 											return (
 												<div
 													key={notif.notificationId}
-													className="flex items-start gap-3 px-4 py-3 border-b border-border last:border-0 hover:bg-accent/50 transition-colors"
+													className={`flex items-start gap-3 px-4 py-3 border-b border-border last:border-0 hover:bg-accent/50 transition-colors ${!notif.isRead ? "bg-primary/4" : ""}`}
 												>
 													<div className="shrink-0 mt-0.5 w-8 h-8 rounded-full flex items-center justify-center bg-primary/8">
 														<BookOpen className="w-4 h-4 text-primary" />
@@ -388,9 +410,14 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 															<p className="text-xs text-muted-foreground mt-0.5 leading-snug">{subtitle}</p>
 														)}
 													</div>
-													<span className="shrink-0 text-[10px] text-muted-foreground mt-0.5 whitespace-nowrap">
-														{formatTimeAgo(notif.createdAt)}
-													</span>
+													<div className="flex flex-col items-end gap-1 shrink-0">
+														<span className="text-[10px] text-muted-foreground whitespace-nowrap">
+															{formatTimeAgo(notif.createdAt)}
+														</span>
+														{!notif.isRead && (
+															<span className="w-2 h-2 rounded-full bg-primary" />
+														)}
+													</div>
 												</div>
 											);
 										})

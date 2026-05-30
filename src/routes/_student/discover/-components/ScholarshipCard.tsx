@@ -1,4 +1,4 @@
-import { Calendar, Users, Coins, UserIcon, LockKeyhole } from 'lucide-react';
+import { Calendar, Users, Coins, UserIcon, LockKeyhole, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { formatCurrency, formatDate } from '@/utils/formatting.utils';
@@ -18,6 +18,8 @@ export interface ScholarshipCardProps {
   index: number;
   /** Whether the student has a verified identity */
   isVerified?: boolean;
+  /** Whether the student has already applied to this scholarship */
+  alreadyApplied?: boolean;
   /** Optional callback when card is clicked */
   onClick?: () => void;
 }
@@ -28,13 +30,14 @@ export interface ScholarshipCardProps {
  * @param props - Component props
  * @returns Animated scholarship card component
  */
-export default function ScholarshipCard({ scholarship, index, onClick, isVerified = true }: ScholarshipCardProps) {
+export default function ScholarshipCard({ scholarship, index, onClick, isVerified = true, alreadyApplied = false }: ScholarshipCardProps) {
   const navigate = useNavigate();
   const isRange = scholarship.totalAmountMin != null || scholarship.totalAmountMax != null;
   const isFixed = !isRange && scholarship.totalAmount != null;
   const isVaries = !isRange && !isFixed;
   const isClosed = scholarship.status.code === ScholarshipStatus.Closed;
-  const applyDisabled = !isVerified || isClosed;
+  const isEnded = scholarship.status.code === ScholarshipStatus.Archived;
+  const applyDisabled = !isVerified || isClosed || isEnded || alreadyApplied;
   const cardColor = scholarship.cardColor ?? "#3A52A6";
   const isLight = isLightColor(cardColor);
   const headerTextColor = isLight ? "#111827" : undefined;
@@ -86,7 +89,20 @@ export default function ScholarshipCard({ scholarship, index, onClick, isVerifie
           <div className="flex-1 text-tertiary px-4 py-2" style={{ color: headerTextColor }}>
             <div className="flex items-start justify-between gap-2 mb-1">
               <h3 className="text-xl line-clamp-1">{scholarship.name}</h3>
-              {scholarship.applicationCount > 0 && (
+              {alreadyApplied ? (
+                <div className="flex items-center gap-1 shrink-0 bg-white/20 rounded px-2 py-0.5 text-[11px] whitespace-nowrap">
+                  <CheckCircle size={11} />
+                  <span>Applied</span>
+                </div>
+              ) : isEnded ? (
+                <div className="flex items-center gap-1 shrink-0 bg-white/20 rounded px-2 py-0.5 text-[11px] whitespace-nowrap">
+                  <span>Ended</span>
+                </div>
+              ) : isClosed ? (
+                <div className="flex items-center gap-1 shrink-0 bg-white/20 rounded px-2 py-0.5 text-[11px] whitespace-nowrap">
+                  <span>Closed</span>
+                </div>
+              ) : scholarship.applicationCount > 0 && (
                 <div className="flex items-center gap-1 shrink-0 bg-white/20 rounded px-2 py-0.5 text-[11px] whitespace-nowrap">
                   <Users size={11} />
                   <span>{scholarship.applicationCount} {scholarship.applicationCount === 1 ? "applicant" : "applicants"}</span>
@@ -210,7 +226,7 @@ export default function ScholarshipCard({ scholarship, index, onClick, isVerifie
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 + 0.25 }}
           >
-            <span title={isClosed ? "This scholarship is no longer accepting applications" : !isVerified ? "Verify your identity to apply" : undefined}>
+            <span title={alreadyApplied ? "You have already applied to this scholarship" : isEnded ? "This scholarship has ended" : isClosed ? "This scholarship is no longer accepting applications" : !isVerified ? "Verify your identity to apply" : undefined}>
               <Button
                 size="default"
                 onClick={handleApplyClick}
