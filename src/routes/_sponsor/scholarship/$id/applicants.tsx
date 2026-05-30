@@ -467,12 +467,12 @@ function ApplicantsListPage() {
 									type="button"
 									disabled={ending}
 									onClick={() => setShowEndConfirmation(true)}
-									className="shrink-0 px-3 py-1.5 bg-[#7F1D1D] text-white text-xs rounded-lg hover:bg-[#6B1A1A] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+									className="shrink-0 px-3 py-1.5 bg-destructive text-tertiary text-xs rounded-lg hover:bg-destructive/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
 								>
 									End Scholarship
 								</button>
 							) : (
-								<span className="shrink-0 px-3 py-1.5 bg-[#F3F4F6] border border-[#D1D5DB] text-[#6B7280] text-xs rounded-lg">
+								<span className="shrink-0 px-3 py-1.5 bg-muted border border-border text-muted-foreground text-xs rounded-lg">
 									Ended
 								</span>
 							)}
@@ -486,8 +486,8 @@ function ApplicantsListPage() {
 							onClick={toggleBulkMode}
 							className={`px-4 py-2 rounded-md border cursor-pointer text-[11px] md:text-xs transition-colors ${
 								bulkMode
-									? "bg-[#3A52A6] text-tertiary border-[#3A52A6]"
-									: "bg-white text-secondary border-[#3A52A6]"
+									? "bg-secondary text-tertiary border-secondary"
+									: "bg-card text-primary border-border"
 							}`}
 						>
 							{bulkMode ? "Cancel" : "Bulk Select"}
@@ -497,13 +497,13 @@ function ApplicantsListPage() {
 							<>
 								<button
 									onClick={selectAll}
-									className="px-4 py-2 bg-card cursor-pointer border border-[#E5E7EB] rounded-md text-[11px] md:text-xs text-[#6B7280] hover:bg-[#F9FAFB] transition-colors"
+									className="px-4 py-2 bg-card cursor-pointer border border-border rounded-md text-[11px] md:text-xs text-muted-foreground hover:bg-muted transition-colors"
 								>
 									Select All
 								</button>
 								<button
 									onClick={deselectAll}
-									className="px-4 py-2 bg-card cursor-pointer border border-[#E5E7EB] rounded-md text-xs text-[#6B7280] hover:bg-[#F9FAFB] transition-colors"
+									className="px-4 py-2 bg-card cursor-pointer border border-border rounded-md text-xs text-muted-foreground hover:bg-muted transition-colors"
 								>
 									Deselect
 								</button>
@@ -522,8 +522,8 @@ function ApplicantsListPage() {
 								}
 								className={`flex items-center cursor-pointer gap-1.5 px-4 py-2 rounded-md border transition-colors text-[11px] md:text-xs ${
 									filterStatus === ScholarshipApplicationStatus.Approved
-										? "bg-[#31D0AA] text-white border-[#31D0AA]"
-										: "bg-white text-[#31D0AA] border-[#31D0AA]"
+										? "bg-success text-tertiary border-success"
+										: "bg-card text-primary border-border"
 								}`}
 							>
 								<GraduationCap className="w-3.5 h-3.5" />
@@ -532,7 +532,7 @@ function ApplicantsListPage() {
 									className={`px-1 rounded-full text-[9px] md:text-[10px] ${
 										filterStatus === ScholarshipApplicationStatus.Approved
 											? "bg-white/30 text-white"
-											: "bg-[#31D0AA] text-white"
+											: "bg-primary text-tertiary"
 									}`}
 								>
 									{statusCounts.approved}
@@ -555,17 +555,17 @@ function ApplicantsListPage() {
 						<div className="relative ml-auto">
 							<button
 								onClick={() => setShowDropdown(!showDropdown)}
-								className="flex items-center gap-2 px-4 py-2 bg-card border border-[#E5E7EB] rounded-md hover:border-[#3A52A6] transition-colors"
+								className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-md hover:border-secondary transition-colors"
 							>
 								<span className="text-[11px] md:text-xs text-primary capitalize">
 									{filterStatus}
 								</span>
-								<span className="px-1  bg-[#3A52A6] text-tertiary text-[9px] md:text-[10px] rounded-full">
+								<span className="px-1  bg-primary text-tertiary text-[9px] md:text-[10px] rounded-full">
 									{/* @ts-expect-error just leave it like this for now */}
 									{statusCounts[filterStatus]}
 								</span>
 								<ChevronDown
-									className={`w-4 h-4 text-[#6B7280] transition-transform ${showDropdown ? "rotate-180" : ""}`}
+									className={`w-4 h-4 text-muted-foreground transition-transform ${showDropdown ? "rotate-180" : ""}`}
 								/>
 							</button>
 
@@ -664,7 +664,7 @@ function ApplicantsListPage() {
 									) && (
 									<button
 										onClick={() => handleBulkAction("denied")}
-										className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-[#EF4444] text-tertiary rounded-md hover:bg-[#DC2626] transition-colors text-xs"
+										className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-destructive text-tertiary rounded-md hover:bg-destructive/90 transition-colors text-xs"
 									>
 										<XCircle className="w-4 h-4" />
 										Deny
@@ -695,7 +695,7 @@ function ApplicantsListPage() {
 									) && (
 									<button
 										onClick={() => handleBulkAction("approved")}
-										className="flex cursor-pointer items-center gap-2 px-4 py-2 bg-[#31D0AA] text-tertiary rounded-md hover:bg-[#10B981] transition-colors text-xs"
+										className="flex cursor-pointer items-center gap-2 px-4 py-2 bg-success text-tertiary rounded-md hover:bg-success/90 transition-colors text-xs"
 									>
 										<CheckCircle2 className="w-4 h-4" />
 										Approve
