@@ -16,7 +16,7 @@ import { SponsorType } from "@/lib/sponsor/model";
 import { useQuery } from "@tanstack/react-query";
 import type { Student } from "@/lib/student/model";
 import { useAuth } from "@/auth";
-import { getMyScholarshipsQuery } from "@/lib/scholarship/api";
+import { getMyApplicationsQuery, getMyScholarshipsQuery } from "@/lib/scholarship/api";
 import { useVerificationStatus } from "@/hooks/useVerificationStatus";
 import { VerificationStatus } from "@/lib/verification/model";
 
@@ -42,11 +42,15 @@ function DiscoverScholarship() {
 	const isVerified = !verificationEnabled || verificationQuery.isLoading || verificationQuery.data?.status === VerificationStatus.Verified;
 
 	const scholarshipsQuery = useQuery(
-		getMyScholarshipsQuery(auth.sessionToken, {
-			notAppliedBy: auth.profile.id,
-		}),
+		getMyScholarshipsQuery(auth.sessionToken),
 	);
 	const scholarships = scholarshipsQuery.data || [];
+
+	const applicationsQuery = useQuery(getMyApplicationsQuery({}));
+	const appliedScholarshipIds = useMemo(
+		() => new Set((applicationsQuery.data || []).map((a) => a.scholarship.id)),
+		[applicationsQuery.data],
+	);
 
 	useEffect(() => {
 		if (scholarshipsQuery.isError) {
@@ -393,6 +397,7 @@ function DiscoverScholarship() {
 									scholarship={scholarship}
 									index={index}
 									isVerified={isVerified}
+									alreadyApplied={appliedScholarshipIds.has(scholarship.id)}
 									onClick={() => setSelectedScholarship(scholarship)}
 								/>
 							))
@@ -406,6 +411,7 @@ function DiscoverScholarship() {
 				<ScholarshipDetailsModal
 					scholarship={selectedScholarship}
 					isVerified={isVerified}
+					alreadyApplied={appliedScholarshipIds.has(selectedScholarship.id)}
 					onClose={() => setSelectedScholarship(null)}
 				/>
 			)}

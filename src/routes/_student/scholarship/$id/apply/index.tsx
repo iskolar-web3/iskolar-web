@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -11,6 +11,7 @@ import {
 	CalendarDays,
 	UserIcon,
 	ArrowLeft,
+	CheckCircle,
 } from "lucide-react";
 import { Calendar as CalendarPicker } from "@/components/ui/calendar";
 import {
@@ -54,11 +55,9 @@ import type { Student } from "@/lib/student/model";
 
 export const Route = createFileRoute("/_student/scholarship/$id/apply/")({
 	component: ApplyScholarshipPage,
-	beforeLoad: async ({ params }) => {
+	loader: async ({ params }) => {
 		const applicationStatus = await getMyApplicationStatus(params.id);
-		if (applicationStatus !== null) {
-			throw redirect({ to: "/home" });
-		}
+		return { applicationStatus };
 	},
 });
 
@@ -69,7 +68,9 @@ function ApplyScholarshipPage() {
 	const [customFiles, setCustomFiles] = useState<Record<string, File[]>>({});
 
 	const auth = useAuth<Student>();
+	const navigate = useNavigate();
 	const params = Route.useParams();
+	const { applicationStatus } = Route.useLoaderData();
 	const scholarshipQuery = useSuspenseQuery(getScholarshipByIdQuery(params.id));
 	const scholarship = scholarshipQuery.data;
 
@@ -244,7 +245,6 @@ function ApplyScholarshipPage() {
 		setShowConfirmation(true);
 	}
 
-	const navigate = useNavigate();
 	const queryClient = useQueryClient();
 
 	const mutation = useMutation({
@@ -686,6 +686,29 @@ function ApplyScholarshipPage() {
 	//   );
 	// }
 	//
+	if (applicationStatus !== null) {
+		return (
+			<div className="min-h-screen bg-[#F8F9FC] flex items-center justify-center p-4">
+				<SEO title="Already Applied" noindex={true} />
+				<div className="bg-white rounded-lg p-8 shadow-sm border border-[#E0ECFF] max-w-md w-full text-center">
+					<CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+					<h1 className="text-xl text-primary mb-2">Already Applied</h1>
+					<p className="text-sm text-[#6B7280] mb-6">
+						You have already submitted an application for{" "}
+						<span className="text-primary">{scholarship?.name}</span>.
+					</p>
+					<button
+						onClick={() => navigate({ to: "/discover" })}
+						className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#3A52A6] text-white rounded-lg text-sm hover:bg-[#2F4189] transition-colors"
+					>
+						<ArrowLeft size={16} />
+						Back to Discover
+					</button>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div className="min-h-screen bg-[#F8F9FC]">
 			<SEO title="Apply" noindex={true} />

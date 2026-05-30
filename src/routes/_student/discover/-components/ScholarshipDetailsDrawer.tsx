@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from "@tanstack/react-router";
-import { Calendar, Users, Coins, ChevronsRight, LockKeyhole, UserIcon } from 'lucide-react';
+import { Calendar, Users, Coins, ChevronsRight, LockKeyhole, UserIcon, CheckCircle } from 'lucide-react';
 import { formatCurrency, formatDate } from '@/utils/formatting.utils';
 import { ScholarshipStatus, ScholarshipType, type Scholarship } from '@/lib/scholarship/model';
 import { getSponsorName } from '@/lib/sponsor/api';
@@ -14,7 +14,7 @@ import { getSponsorName } from '@/lib/sponsor/api';
  * @param props.onClose - Callback function to close the modal
  * @returns Animated side panel modal with scholarship details and apply button
  */
-export default function ScholarshipDetailsModal({ scholarship, onClose, isVerified = true }: { scholarship: Scholarship; onClose: () => void; isVerified?: boolean }) {
+export default function ScholarshipDetailsModal({ scholarship, onClose, isVerified = true, alreadyApplied = false }: { scholarship: Scholarship; onClose: () => void; isVerified?: boolean; alreadyApplied?: boolean }) {
   const navigate = useNavigate();
 
   const [isExiting, setIsExiting] = useState(false);
@@ -209,7 +209,14 @@ export default function ScholarshipDetailsModal({ scholarship, onClose, isVerifi
             </div>
 
             {/* Apply Button */}
-            {isClosed() ? (
+            {alreadyApplied ? (
+              <div className="flex items-center gap-2.5 bg-green-50 border border-green-200 rounded-md p-3 mt-1.5 mb-2">
+                <CheckCircle size={16} className="text-green-600 shrink-0" />
+                <p className="text-[11px] md:text-xs text-green-700 leading-relaxed flex-1">
+                  You have already submitted an application for this scholarship.
+                </p>
+              </div>
+            ) : isClosed() ? (
               <div className="flex items-center gap-2.5 bg-[#FEE2E2] border border-[#FECACA] rounded-md p-3 mt-1.5 mb-2">
                 <LockKeyhole size={16} className="text-[#DC2626] shrink-0" />
                 <p className="text-[11px] md:text-xs text-[#DC2626] leading-relaxed flex-1">
