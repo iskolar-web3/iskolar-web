@@ -16,6 +16,7 @@ import { type ApiResponse, BACKEND_URL } from "@/lib/api";
 import { getCookie } from "@/lib/cookie";
 import {
 	type CreateFormFieldRequest,
+	FormFieldType,
 	type Scholarship,
 	type ScholarshipFormData,
 	ScholarshipStatus,
@@ -68,9 +69,14 @@ function CreateScholarship() {
 	const auth = useAuth<AnySponsor>();
 	const queryClient = useQueryClient();
 
-	const verificationEnabled = import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true";
-	const isIndividualSponsor = auth.profile?.sponsorType?.code === SponsorType.Individual;
-	const verificationQuery = useVerificationStatus("sponsors", verificationEnabled && isIndividualSponsor);
+	const verificationEnabled =
+		import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true";
+	const isIndividualSponsor =
+		auth.profile?.sponsorType?.code === SponsorType.Individual;
+	const verificationQuery = useVerificationStatus(
+		"sponsors",
+		verificationEnabled && isIndividualSponsor,
+	);
 	const isVerified =
 		!verificationEnabled ||
 		!isIndividualSponsor ||
@@ -98,16 +104,22 @@ function CreateScholarship() {
 
 	const [showFormFieldsDialog, setShowFormFieldsDialog] = useState(false);
 	const [showCustomFieldModal, setShowCustomFieldModal] = useState(false);
-	const [editingFieldIndex, setEditingFieldIndex] = useState<number | null>(null);
-	const [draftFormFields, setDraftFormFields] = useState<CreateFormFieldRequest[]>([]);
+	const [editingFieldIndex, setEditingFieldIndex] = useState<number | null>(
+		null,
+	);
+	const [draftFormFields, setDraftFormFields] = useState<
+		CreateFormFieldRequest[]
+	>([]);
 	const [showFullPreview, setShowFullPreview] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [amountType, setAmountType] = useState<AmountType>("varies");
 	const [unlimitedSlots, setUnlimitedSlots] = useState(true);
 	const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-	const [pendingFormData, setPendingFormData] = useState<ScholarshipFormData | null>(null);
+	const [pendingFormData, setPendingFormData] =
+		useState<ScholarshipFormData | null>(null);
 	const [step, setStep] = useState<"template" | "form">("template");
-	const [selectedTemplate, setSelectedTemplate] = useState<ScholarshipTemplate | null>(null);
+	const [selectedTemplate, setSelectedTemplate] =
+		useState<ScholarshipTemplate | null>(null);
 	const [formResetKey, setFormResetKey] = useState(0);
 	const [showPreview, setShowPreview] = useState(false);
 
@@ -143,7 +155,11 @@ function CreateScholarship() {
 		cardColor: cardColor ?? "#3A52A6",
 	});
 
-	const resetCreateFormState = ({ step: nextStep = "form" }: { step?: "template" | "form" } = {}) => {
+	const resetCreateFormState = ({
+		step: nextStep = "form",
+	}: {
+		step?: "template" | "form";
+	} = {}) => {
 		resetForm();
 		setFormResetKey((prev) => prev + 1);
 		setAmountType("varies");
@@ -153,7 +169,7 @@ function CreateScholarship() {
 		setSelectedTemplate(null);
 		setShowConfirmationModal(false);
 		setStep(nextStep);
-	}
+	};
 
 	useEffect(() => {
 		if (!selectedTemplate) return;
@@ -176,7 +192,7 @@ function CreateScholarship() {
 			imageUrl: undefined,
 			sponsorId: auth.profile.id,
 			status: ScholarshipStatus.Active,
-		})
+		});
 		setUnlimitedSlots(false);
 		setAmountType(selectedTemplate.amountType);
 		setDraftFormFields(mergedFormFields);
@@ -185,13 +201,33 @@ function CreateScholarship() {
 	const openFormFieldsDialog = () => {
 		setDraftFormFields(customFormFields);
 		setShowFormFieldsDialog(true);
-	}
+	};
 
 	const handleSaveFormFields = () => {
+		// Baseline: the file fields that existed when the dialog was opened.
+		const previousFileLabels = new Set(
+			customFormFields
+				.filter((f) => f.fieldType === FormFieldType.File)
+				.map((f) => f.label),
+		);
 		setValue("formFields", draftFormFields, { shouldValidate: true });
+		// Keep "Required Documents" in sync: drop a document only if its backing
+		// file field existed before this edit and was removed/renamed in the
+		// dialog. Documents that never had a file field are left untouched.
+		const newFileLabels = new Set(
+			draftFormFields
+				.filter((f) => f.fieldType === FormFieldType.File)
+				.map((f) => f.label),
+		);
+		const syncedRequirements = requiredDocuments.filter(
+			(doc) => !(previousFileLabels.has(doc) && !newFileLabels.has(doc)),
+		);
+		if (syncedRequirements.length !== requiredDocuments.length) {
+			setValue("requirements", syncedRequirements, { shouldValidate: true });
+		}
 		setShowFormFieldsDialog(false);
 		setEditingFieldIndex(null);
-	}
+	};
 
 	const mutation = useMutation({
 		mutationFn: createScholarship,
@@ -212,25 +248,33 @@ function CreateScholarship() {
 	const onSubmit = async (data: ScholarshipFormData) => {
 		if (amountType === "fixed" && !data.totalAmount) {
 			form.setError("totalAmount", { message: "Please enter a valid amount" });
-			return
+			return;
 		}
 		if (amountType === "range") {
 			if (!data.totalAmountMin) {
-				form.setError("totalAmountMin", { message: "Please enter a minimum amount" });
-				return
+				form.setError("totalAmountMin", {
+					message: "Please enter a minimum amount",
+				});
+				return;
 			}
 			if (!data.totalAmountMax) {
-				form.setError("totalAmountMax", { message: "Please enter a maximum amount" });
-				return
+				form.setError("totalAmountMax", {
+					message: "Please enter a maximum amount",
+				});
+				return;
 			}
 			if (data.totalAmountMin >= data.totalAmountMax) {
-				form.setError("totalAmountMax", { message: "Max must be greater than min" });
-				return
+				form.setError("totalAmountMax", {
+					message: "Max must be greater than min",
+				});
+				return;
 			}
 		}
 		if (!unlimitedSlots && !data.totalSlots) {
-			form.setError("totalSlots", { message: "Please enter the number of slots" });
-			return
+			form.setError("totalSlots", {
+				message: "Please enter the number of slots",
+			});
+			return;
 		}
 
 		const amountPayload: Partial<ScholarshipFormData> =
@@ -238,7 +282,11 @@ function CreateScholarship() {
 				? { totalAmountMin: undefined, totalAmountMax: undefined }
 				: amountType === "range"
 					? { totalAmount: undefined }
-					: { totalAmount: undefined, totalAmountMin: undefined, totalAmountMax: undefined };
+					: {
+							totalAmount: undefined,
+							totalAmountMin: undefined,
+							totalAmountMax: undefined,
+						};
 
 		const slotsPayload = unlimitedSlots ? { totalSlots: undefined } : {};
 		const imageUrlValue = data.imageUrl || DEFAULT_SCHOLARSHIP_IMAGE;
@@ -256,7 +304,7 @@ function CreateScholarship() {
 			formFields: formFieldsPayload,
 		} as ScholarshipFormData);
 		setShowConfirmationModal(true);
-	}
+	};
 
 	const handleConfirmSubmit = () => {
 		if (!pendingFormData) return;
@@ -265,21 +313,23 @@ function CreateScholarship() {
 			mutation.mutate(pendingFormData);
 			setShowConfirmationModal(false);
 		} catch (err) {
-			toast.error("Error", err instanceof Error ? err.message : "Something went wrong");
+			toast.error(
+				"Error",
+				err instanceof Error ? err.message : "Something went wrong",
+			);
 			setLoading(false);
 		}
-	}
+	};
 
 	return (
 		<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
 			<SEO title="Create Scholarship" noindex={true} />
 
-
 			{step === "template" ? (
 				<TemplateSelectionStep
 					onSelectTemplate={(template: ScholarshipTemplate) => {
 						setSelectedTemplate(template);
-						setStep("form")
+						setStep("form");
 					}}
 					onStartFromScratch={() => resetCreateFormState()}
 				/>
@@ -303,7 +353,10 @@ function CreateScholarship() {
 								onChange={(e) => setShowPreview(e.target.checked)}
 								className="w-4 h-4 rounded border-[#D1D5DB] cursor-pointer"
 							/>
-							<label htmlFor="preview-toggle" className="text-sm text-[#4A5568] cursor-pointer whitespace-nowrap">
+							<label
+								htmlFor="preview-toggle"
+								className="text-sm text-[#4A5568] cursor-pointer whitespace-nowrap"
+							>
 								Show Live Preview
 							</label>
 						</div>
@@ -318,9 +371,13 @@ function CreateScholarship() {
 						</div>
 					)}
 
-					<div className={`grid grid-cols-1 gap-6 ${showPreview ? "lg:grid-cols-15" : ""}`}>
+					<div
+						className={`grid grid-cols-1 gap-6 ${showPreview ? "lg:grid-cols-15" : ""}`}
+					>
 						{/* Scholarship Details */}
-						<div className={`space-y-4 ${showPreview ? "lg:col-span-8" : "w-full lg:max-w-2xl lg:mx-auto"}`}>
+						<div
+							className={`space-y-4 ${showPreview ? "lg:col-span-8" : "w-full lg:max-w-2xl lg:mx-auto"}`}
+						>
 							<div className="bg-[#F8F9FC] rounded-xl p-4 sm:p-6 shadow-sm space-y-4">
 								<Controller
 									control={control}
@@ -337,7 +394,9 @@ function CreateScholarship() {
 								<ScholarshipTypeSelect
 									value={scholarshipType}
 									onValueChange={(v) =>
-										setValue("scholarshipType", v as ScholarshipType, { shouldValidate: true })
+										setValue("scholarshipType", v as ScholarshipType, {
+											shouldValidate: true,
+										})
 									}
 									disabled={loading}
 									error={errors.scholarshipType?.message}
@@ -409,7 +468,9 @@ function CreateScholarship() {
 										Application Form
 									</label>
 									<p className="text-xs text-[#6B7280] ml-0.5">
-										Optional. Add questionnaires to collect information from applicants. If left blank, applicants will be asked why they're applying.
+										Optional. Add questionnaires to collect information from
+										applicants. If left blank, applicants will be asked why
+										they're applying.
 									</p>
 								</div>
 								<button
@@ -419,7 +480,9 @@ function CreateScholarship() {
 									className="w-full flex cursor-pointer items-center justify-center gap-2 px-4 py-3.5 border-2 border-dashed border-[#3A52A6] bg-[#E0ECFF] text-secondary text-sm rounded-lg hover:bg-[#D0DCFF] transition-colors"
 								>
 									<Plus size={20} />
-									{customFormFields.length === 0 ? "Add Form Field" : `Edit Form Field (${customFormFields.length})`}
+									{customFormFields.length === 0
+										? "Add Form Field"
+										: `Edit Form Field (${customFormFields.length})`}
 								</button>
 							</div>
 
@@ -432,10 +495,14 @@ function CreateScholarship() {
 									(validationErrors) => {
 										const firstMessage = Object.values(validationErrors)
 											.map((e) => e?.message)
-											.find((m): m is string => typeof m === "string" && m.length > 0);
+											.find(
+												(m): m is string =>
+													typeof m === "string" && m.length > 0,
+											);
 										toast.error(
 											"Please complete the required fields",
-											firstMessage ?? "Some fields need attention before you can publish.",
+											firstMessage ??
+												"Some fields need attention before you can publish.",
 										);
 									},
 								)}
@@ -535,5 +602,5 @@ function CreateScholarship() {
 				loading={loading}
 			/>
 		</div>
-	)
+	);
 }

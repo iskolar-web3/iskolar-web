@@ -3,13 +3,14 @@ import { useEffect, type JSX } from "react";
 import HeaderNav from "@/components/HeaderNav";
 import { UserRole } from "@/lib/user/model";
 import { BACKEND_URL, getDefaultPathOfRole } from "@/lib/api";
-import { BetaNoticeModal } from "@/components/student/BetaNotice";
 import { PaymentMethodBanner } from "@/components/student/PaymentMethodBanner";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { getMyNotificationsQuery } from "@/lib/notification/api";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { NotificationType } from "@/lib/notification/model";
 import type { ScholarshipCreatedEvent } from "@/lib/scholarship/model";
+import { getCookie } from "@/lib/cookie";
+import { ACCESS_TOKEN_KEY } from "@/lib/user/auth";
 
 export const Route = createFileRoute("/_student")({
 	component: StudentLayout,
@@ -37,9 +38,14 @@ function StudentLayout(): JSX.Element {
 	const queryClient = useQueryClient();
 
 	useEffect(() => {
-		const es = new EventSource(`${BACKEND_URL}/sse/scholarships`, {
-			withCredentials: true,
-		});
+		const token = getCookie(ACCESS_TOKEN_KEY);
+		if (!token) {
+			return;
+		}
+
+		const url = new URL(`${BACKEND_URL}/sse/scholarships`);
+		url.searchParams.append("token", token);
+		const es = new EventSource(url.toString());
 
 		es.addEventListener(NotificationType.ScholarshipCreated, (e) => {
 			const data = JSON.parse(e.data) as ScholarshipCreatedEvent;
@@ -57,7 +63,6 @@ function StudentLayout(): JSX.Element {
 				<PaymentMethodBanner />
 				<Outlet />
 			</div>
-			<BetaNoticeModal />
 			<FeedbackWidget />
 		</div>
 	);
