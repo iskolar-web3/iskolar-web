@@ -9,7 +9,6 @@ import { getMyNotificationsQuery } from "@/lib/notification/api";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { NotificationType } from "@/lib/notification/model";
 import type { ScholarshipCreatedEvent } from "@/lib/scholarship/model";
-import { useAuth } from "@/auth";
 import { getCookie } from "@/lib/cookie";
 import { ACCESS_TOKEN_KEY } from "@/lib/user/auth";
 
