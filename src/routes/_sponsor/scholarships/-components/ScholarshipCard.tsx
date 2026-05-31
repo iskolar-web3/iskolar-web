@@ -192,7 +192,7 @@ export default function ScholarshipCard({
 								animate={{ opacity: 1, scale: 1, y: 0 }}
 								exit={{ opacity: 0, scale: 0.95, y: -4 }}
 								transition={{ duration: 0.1 }}
-								className="absolute right-0 mt-1 bg-white rounded-lg shadow-xl border border-border py-1 min-w-40 z-30"
+								className="absolute right-0 mt-1 bg-white rounded-lg shadow-xl border border-border py-1 min-w-28 z-30"
 								onClick={(e) => e.stopPropagation()}
 							>
 								<button
