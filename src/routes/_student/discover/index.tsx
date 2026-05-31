@@ -18,6 +18,7 @@ import type { Student } from "@/lib/student/model";
 import { useAuth } from "@/auth";
 import { getMyApplicationsQuery, getMyScholarshipsQuery } from "@/lib/scholarship/api";
 import { useVerificationStatus } from "@/hooks/useVerificationStatus";
+import { useAnimateOnce } from "@/hooks/useAnimateOnce";
 import { VerificationStatus } from "@/lib/verification/model";
 
 export const Route = createFileRoute("/_student/discover/")({
@@ -34,6 +35,11 @@ function DiscoverScholarship() {
 	const [selectedScholarship, setSelectedScholarship] =
 		useState<Scholarship | null>(null);
 	const [showFiltersModal, setShowFiltersModal] = useState(false);
+
+	// Entrance animations should only play once per session, not on every
+	// navigation back to the discover page.
+	const mobileFiltersAnim = useAnimateOnce("discover:mobile-filters");
+	const filtersAnim = useAnimateOnce("discover:filters");
 
 
 	const auth = useAuth<Student>();
@@ -101,9 +107,10 @@ function DiscoverScholarship() {
 			<SEO title="Discover Scholarships" noindex={true} />
 			{/* Mobile/Tablet Layout */}
 			<motion.div
-				initial={{ opacity: 0, y: -20 }}
+				initial={mobileFiltersAnim.shouldAnimate ? { opacity: 0, y: -20 } : false}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.4 }}
+				onAnimationComplete={mobileFiltersAnim.markAnimated}
 				className="lg:hidden bg-card rounded-md mb-4 p-2 shadow-sm"
 			>
 				<button
@@ -261,9 +268,10 @@ function DiscoverScholarship() {
 			<div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
 				{/* Filters Sidebar */}
 				<motion.div
-					initial={{ opacity: 0, x: -20 }}
+					initial={filtersAnim.shouldAnimate ? { opacity: 0, x: -20 } : false}
 					animate={{ opacity: 1, x: 0 }}
 					transition={{ duration: 0.5 }}
+					onAnimationComplete={filtersAnim.markAnimated}
 					className="hidden lg:block lg:col-span-1"
 				>
 					<div className="bg-card rounded-lg p-6 border border-border sticky top-4 shadow-sm">
