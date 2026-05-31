@@ -1,4 +1,3 @@
-import { useState, useMemo, useEffect } from "react";
 import {
 	useMutation,
 	useQueryClient,
@@ -9,42 +8,48 @@ import {
 	useNavigate,
 	useSearch,
 } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-	Filter,
-	X,
-	GraduationCap,
-	Plus,
 	AlertCircle,
+	Filter,
+	GraduationCap,
 	Loader2,
+	Lock,
 	LockKeyhole,
+	Plus,
+	Power,
+	X,
 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "@/auth";
+import ScholarshipCardSkeleton from "@/components/ScholarshipCardSkeleton";
+import { SEO } from "@/components/SEO";
 import {
 	Dialog,
 	DialogContent,
-	DialogHeader,
 	DialogFooter,
+	DialogHeader,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { motion, AnimatePresence } from "framer-motion";
-import FilterSelect from "./-components/Filters";
-import ScholarshipCard from "./-components/ScholarshipCard";
-import ScholarshipCardSkeleton from "@/components/ScholarshipCardSkeleton";
-import ScholarshipDetailsModal from "./-components/ScholarshipDetailsDrawer";
-import { SEO } from "@/components/SEO";
-import { toast } from "@/lib/toast";
+import { useAnimateOnce } from "@/hooks/useAnimateOnce";
+import { useVerificationStatus } from "@/hooks/useVerificationStatus";
 import {
 	deleteScholarship,
+	endScholarship,
 	getMyScholarshipsQuery,
+	updateScholarship,
 } from "@/lib/scholarship/api";
-import { useAuth } from "@/auth";
-import { SponsorType, type AnySponsor } from "@/lib/sponsor/model";
-import { useVerificationStatus } from "@/hooks/useVerificationStatus";
-import { useAnimateOnce } from "@/hooks/useAnimateOnce";
-import { VerificationStatus } from "@/lib/verification/model";
 import {
 	getScholarshipQueryParamSchema,
 	type Scholarship,
+	ScholarshipStatus,
 } from "@/lib/scholarship/model";
+import { type AnySponsor, SponsorType } from "@/lib/sponsor/model";
+import { toast } from "@/lib/toast";
+import { VerificationStatus } from "@/lib/verification/model";
+import FilterSelect from "./-components/Filters";
+import ScholarshipCard from "./-components/ScholarshipCard";
+import ScholarshipDetailsModal from "./-components/ScholarshipDetailsDrawer";
 
 export const Route = createFileRoute("/_sponsor/scholarships/")({
 	component: Scholarships,
@@ -52,7 +57,6 @@ export const Route = createFileRoute("/_sponsor/scholarships/")({
 });
 
 function Scholarships() {
-
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
 
@@ -73,19 +77,32 @@ function Scholarships() {
 	const [selectedScholarship, setSelectedScholarship] =
 		useState<Scholarship | null>(null);
 	const [showFiltersModal, setShowFiltersModal] = useState(false);
-	const [scholarshipToDelete, setScholarshipToDelete] = useState<Scholarship | null>(null);
+	const [scholarshipToDelete, setScholarshipToDelete] =
+		useState<Scholarship | null>(null);
 	const [showDeleteModal, setShowDeleteModal] = useState(false);
 	const [showTitleModal, setShowTitleModal] = useState(false);
 	const [titleInput, setTitleInput] = useState("");
 	const [loading, setLoading] = useState(false);
+	const [scholarshipToClose, setScholarshipToClose] =
+		useState<Scholarship | null>(null);
+	const [showCloseModal, setShowCloseModal] = useState(false);
+	const [scholarshipToEnd, setScholarshipToEnd] = useState<Scholarship | null>(
+		null,
+	);
+	const [showEndModal, setShowEndModal] = useState(false);
 
 	const search = useSearch({ from: "/_sponsor/scholarships/" });
 
 	const auth = useAuth<AnySponsor>();
 
-	const verificationEnabled = import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true";
-	const isIndividualSponsor = auth.profile?.sponsorType?.code === SponsorType.Individual;
-	const verificationQuery = useVerificationStatus("sponsors", verificationEnabled && isIndividualSponsor);
+	const verificationEnabled =
+		import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true";
+	const isIndividualSponsor =
+		auth.profile?.sponsorType?.code === SponsorType.Individual;
+	const verificationQuery = useVerificationStatus(
+		"sponsors",
+		verificationEnabled && isIndividualSponsor,
+	);
 	const isVerified =
 		!verificationEnabled ||
 		!isIndividualSponsor ||
@@ -98,7 +115,6 @@ function Scholarships() {
 			sponsorId: auth.profile?.id ?? "",
 		}),
 	);
-
 
 	const handleViewApplicants = (scholarship: Scholarship) => {
 		navigate({
@@ -156,6 +172,52 @@ function Scholarships() {
 		},
 	});
 
+	const handleCloseClick = (scholarship: Scholarship) => {
+		setScholarshipToClose(scholarship);
+		setShowCloseModal(true);
+	};
+
+	const closeMutation = useMutation({
+		mutationFn: (scholarship: Scholarship) =>
+			updateScholarship({
+				id: scholarship.id,
+				status: ScholarshipStatus.Closed,
+			}),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["scholarships"] });
+			toast.success("Success", "Scholarship closed successfully", 2000);
+		},
+		onError: (err) => {
+			toast.error("Error", err.message);
+			console.error(err);
+		},
+		onSettled: () => {
+			setShowCloseModal(false);
+			setScholarshipToClose(null);
+		},
+	});
+
+	const handleEndClick = (scholarship: Scholarship) => {
+		setScholarshipToEnd(scholarship);
+		setShowEndModal(true);
+	};
+
+	const endMutation = useMutation({
+		mutationFn: (scholarship: Scholarship) => endScholarship(scholarship.id),
+		onSuccess: (res) => {
+			queryClient.invalidateQueries({ queryKey: ["scholarships"] });
+			toast.success("Scholarship ended", res.message, 2000);
+		},
+		onError: (err) => {
+			toast.error("Error", err.message);
+			console.error(err);
+		},
+		onSettled: () => {
+			setShowEndModal(false);
+			setScholarshipToEnd(null);
+		},
+	});
+
 	useEffect(() => {
 		if (scholarships.isError) {
 			toast.error("Error", scholarships.error.message, 2500);
@@ -186,14 +248,13 @@ function Scholarships() {
 				(!amountRange.max || amountPerScholar <= Number(amountRange.max));
 
 			const matchesSlots =
-				(!slotRange.min || (scholarship.totalSlots ?? 0) >= Number(slotRange.min)) &&
-				(!slotRange.max || (scholarship.totalSlots ?? 0) <= Number(slotRange.max));
+				(!slotRange.min ||
+					(scholarship.totalSlots ?? 0) >= Number(slotRange.min)) &&
+				(!slotRange.max ||
+					(scholarship.totalSlots ?? 0) <= Number(slotRange.max));
 
 			return (
-				matchesType &&
-				matchesApplications &&
-				matchesAmount &&
-				matchesSlots
+				matchesType && matchesApplications && matchesAmount && matchesSlots
 			);
 		});
 	}, [
@@ -224,7 +285,10 @@ function Scholarships() {
 				<motion.div
 					initial={headerAnim.shouldAnimate ? { opacity: 0, y: -20 } : false}
 					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.4, delay: headerAnim.shouldAnimate ? 0.1 : 0 }}
+					transition={{
+						duration: 0.4,
+						delay: headerAnim.shouldAnimate ? 0.1 : 0,
+					}}
 					className="bg-white rounded-md p-2 shadow-sm"
 				>
 					<button
@@ -584,13 +648,23 @@ function Scholarships() {
 									<p className="max-w-xl text-sm md:text-base text-[#9CA3AF] mt-2 mb-4 md:mb-6">
 										Create scholarship programs to help students succeed.
 									</p>
-									<span title={!isVerified ? "Verify your identity to create a scholarship" : undefined}>
+									<span
+										title={
+											!isVerified
+												? "Verify your identity to create a scholarship"
+												: undefined
+										}
+									>
 										<button
 											onClick={() => navigate({ to: "/create" })}
 											disabled={!isVerified}
 											className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#9CA3AF] text-tertiary text-sm md:text-base rounded-md hover:bg-muted-foreground hover:text-tertiary transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
 										>
-											{!isVerified ? <LockKeyhole size={18} /> : <Plus size={18} />}
+											{!isVerified ? (
+												<LockKeyhole size={18} />
+											) : (
+												<Plus size={18} />
+											)}
 											Create Scholarship
 										</button>
 									</span>
@@ -601,10 +675,12 @@ function Scholarships() {
 										key={scholarship.id}
 										scholarship={scholarship}
 										index={index}
-										onClick={() => setSelectedScholarship(scholarship)}
+										onViewDetails={() => setSelectedScholarship(scholarship)}
+										onViewApplicants={handleViewApplicants}
 										onEdit={handleEdit}
 										onDelete={handleDeleteClick}
-										onViewApplicants={handleViewApplicants}
+										onClose={handleCloseClick}
+										onEnd={handleEndClick}
 									/>
 								))
 							)}
@@ -637,8 +713,10 @@ function Scholarships() {
 							<h3 className="text-lg text-primary mb-2">Delete Scholarship</h3>
 							<p className="text-sm text-[#6B7280] mb-6">
 								Are you sure you want to delete{" "}
-								<span className="text-primary font-medium">"{scholarshipToDelete?.name}"</span>?
-								This action cannot be undone.
+								<span className="text-primary font-medium">
+									"{scholarshipToDelete?.name}"
+								</span>
+								? This action cannot be undone.
 							</p>
 						</div>
 					</DialogHeader>
@@ -660,7 +738,15 @@ function Scholarships() {
 			</Dialog>
 
 			{/* Title Confirmation Modal */}
-			<Dialog open={showTitleModal} onOpenChange={(open) => { if (!open) { setShowTitleModal(false); setTitleInput(""); } }}>
+			<Dialog
+				open={showTitleModal}
+				onOpenChange={(open) => {
+					if (!open) {
+						setShowTitleModal(false);
+						setTitleInput("");
+					}
+				}}
+			>
 				<DialogContent
 					className="bg-tertiary border-0 py-4 px-6 w-[400px]"
 					showCloseButton={true}
@@ -678,7 +764,11 @@ function Scholarships() {
 								onClick={() => {
 									if (scholarshipToDelete?.name) {
 										navigator.clipboard.writeText(scholarshipToDelete.name);
-										toast.success("Copied", "Scholarship name copied to clipboard", 1500);
+										toast.success(
+											"Copied",
+											"Scholarship name copied to clipboard",
+											1500,
+										);
 									}
 								}}
 								className="text-xs font-medium text-primary mb-4 bg-[#F9FAFB] border border-border rounded px-3 py-2 select-none cursor-pointer hover:bg-[#F0F4FF] transition-colors"
@@ -696,7 +786,10 @@ function Scholarships() {
 					</DialogHeader>
 					<DialogFooter className="flex gap-3 mt-4">
 						<button
-							onClick={() => { setShowTitleModal(false); setTitleInput(""); }}
+							onClick={() => {
+								setShowTitleModal(false);
+								setTitleInput("");
+							}}
 							disabled={loading}
 							className="flex-1 px-4 py-2 cursor-pointer text-sm bg-tertiary border border-[#D1D5DB] text-[#374151] rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
 						>
@@ -711,6 +804,98 @@ function Scholarships() {
 								<Loader2 className="w-4 h-4 animate-spin" />
 							) : (
 								"Delete"
+							)}
+						</button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+
+			{/* Close Confirmation Modal */}
+			<Dialog open={showCloseModal} onOpenChange={setShowCloseModal}>
+				<DialogContent
+					className="bg-tertiary border-0 py-4 px-6 w-[400px]"
+					showCloseButton={true}
+				>
+					<DialogHeader>
+						<div className="text-center">
+							<div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-1 text-[#F59E0B]">
+								<Lock size={34} />
+							</div>
+							<h3 className="text-lg text-primary mb-2">Close Scholarship</h3>
+							<p className="text-sm text-[#6B7280] mb-6">
+								Are you sure you want to close{" "}
+								<span className="text-primary font-medium">
+									"{scholarshipToClose?.name}"
+								</span>
+								? It will stop accepting new applications.
+							</p>
+						</div>
+					</DialogHeader>
+					<DialogFooter className="flex gap-3">
+						<button
+							onClick={() => setShowCloseModal(false)}
+							disabled={closeMutation.isPending}
+							className="flex-1 px-4 py-2 cursor-pointer text-sm bg-tertiary border border-[#D1D5DB] text-[#374151] rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
+						>
+							Cancel
+						</button>
+						<button
+							onClick={() =>
+								scholarshipToClose && closeMutation.mutate(scholarshipToClose)
+							}
+							disabled={closeMutation.isPending}
+							className="flex-1 px-4 py-2 cursor-pointer text-sm text-tertiary bg-[#F59E0B] rounded-md transition-colors flex items-center justify-center gap-2 hover:bg-[#D97706] disabled:opacity-50 disabled:cursor-not-allowed"
+						>
+							{closeMutation.isPending ? (
+								<Loader2 className="w-4 h-4 animate-spin" />
+							) : (
+								"Close"
+							)}
+						</button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+
+			{/* End Scholarship Confirmation Modal */}
+			<Dialog open={showEndModal} onOpenChange={setShowEndModal}>
+				<DialogContent
+					className="bg-tertiary border-0 py-4 px-6 w-[400px]"
+					showCloseButton={true}
+				>
+					<DialogHeader>
+						<div className="text-center">
+							<div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full mb-1 text-[#EF4444]">
+								<Power size={34} />
+							</div>
+							<h3 className="text-lg text-primary mb-2">End Scholarship</h3>
+							<p className="text-sm text-[#6B7280] mb-6">
+								Are you sure you want to end{" "}
+								<span className="text-primary font-medium">
+									"{scholarshipToEnd?.name}"
+								</span>
+								? This concludes the program and cannot be undone.
+							</p>
+						</div>
+					</DialogHeader>
+					<DialogFooter className="flex gap-3">
+						<button
+							onClick={() => setShowEndModal(false)}
+							disabled={endMutation.isPending}
+							className="flex-1 px-4 py-2 cursor-pointer text-sm bg-tertiary border border-[#D1D5DB] text-[#374151] rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50"
+						>
+							Cancel
+						</button>
+						<button
+							onClick={() =>
+								scholarshipToEnd && endMutation.mutate(scholarshipToEnd)
+							}
+							disabled={endMutation.isPending}
+							className="flex-1 px-4 py-2 cursor-pointer text-sm text-tertiary bg-[#EF4444] rounded-md transition-colors flex items-center justify-center gap-2 hover:bg-[#DC2626] disabled:opacity-50 disabled:cursor-not-allowed"
+						>
+							{endMutation.isPending ? (
+								<Loader2 className="w-4 h-4 animate-spin" />
+							) : (
+								"End Scholarship"
 							)}
 						</button>
 					</DialogFooter>
