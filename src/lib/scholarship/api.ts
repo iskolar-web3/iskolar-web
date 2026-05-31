@@ -112,6 +112,10 @@ export async function updateScholarship(
 	});
 	const result: ApiResponse<Scholarship> = await safeResponseJson(response);
 
+	if (!response.ok) {
+		throw new Error(result.message || "Failed to update scholarship.");
+	}
+
 	scholarshipSchema(anySponsorSchema).parse(result.data);
 
 	return result;
