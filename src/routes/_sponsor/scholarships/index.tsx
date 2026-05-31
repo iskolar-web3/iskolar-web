@@ -39,6 +39,7 @@ import {
 import { useAuth } from "@/auth";
 import { SponsorType, type AnySponsor } from "@/lib/sponsor/model";
 import { useVerificationStatus } from "@/hooks/useVerificationStatus";
+import { useAnimateOnce } from "@/hooks/useAnimateOnce";
 import { VerificationStatus } from "@/lib/verification/model";
 import {
 	getScholarshipQueryParamSchema,
@@ -54,6 +55,12 @@ function Scholarships() {
 
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
+
+	// Page-entrance animations should only play once per session, not on every
+	// navigation back to this page.
+	const headerAnim = useAnimateOnce("sponsor-scholarships:header");
+	const filtersAnim = useAnimateOnce("sponsor-scholarships:filters");
+	const sectionAnim = useAnimateOnce("sponsor-scholarships:section");
 
 	const [sortBy, setSortBy] = useState("Newest");
 	const [scholarshipType, setScholarshipType] = useState("All");
@@ -203,9 +210,10 @@ function Scholarships() {
 			{/* Mobile/Tablet Layout */}
 			<div className="lg:hidden space-y-2">
 				<motion.div
-					initial={{ opacity: 0, y: -20 }}
+					initial={headerAnim.shouldAnimate ? { opacity: 0, y: -20 } : false}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.4 }}
+					onAnimationComplete={headerAnim.markAnimated}
 					className="bg-card rounded-md text-center p-2 border border-[#D3DCF6] shadow-sm"
 				>
 					<p className="text-base text-primary tracking-wide">
@@ -214,9 +222,9 @@ function Scholarships() {
 				</motion.div>
 
 				<motion.div
-					initial={{ opacity: 0, y: -20 }}
+					initial={headerAnim.shouldAnimate ? { opacity: 0, y: -20 } : false}
 					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.4, delay: 0.1 }}
+					transition={{ duration: 0.4, delay: headerAnim.shouldAnimate ? 0.1 : 0 }}
 					className="bg-white rounded-md p-2 shadow-sm"
 				>
 					<button
@@ -398,9 +406,10 @@ function Scholarships() {
 			<div className="space-y-4 mt-4 lg:mt-0">
 				<div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-4">
 					<motion.aside
-						initial={{ opacity: 0, x: -20 }}
+						initial={filtersAnim.shouldAnimate ? { opacity: 0, x: -20 } : false}
 						animate={{ opacity: 1, x: 0 }}
 						transition={{ duration: 0.4 }}
+						onAnimationComplete={filtersAnim.markAnimated}
 						className="hidden lg:block"
 					>
 						<div className="h-fit sticky top-4">
@@ -552,9 +561,10 @@ function Scholarships() {
 					</motion.aside>
 
 					<motion.section
-						initial={{ opacity: 0, y: 20 }}
+						initial={sectionAnim.shouldAnimate ? { opacity: 0, y: 20 } : false}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.4 }}
+						onAnimationComplete={sectionAnim.markAnimated}
 						className="space-y-5"
 					>
 						<div className="grid grid-cols-1 xl:grid-cols-2 gap-2.5">

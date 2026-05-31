@@ -7,6 +7,7 @@ import { getSponsorName } from '@/lib/sponsor/api';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { isLightColor } from '@/routes/_sponsor/create/-components/fields/CardColorPicker';
+import { useAnimateOnce } from '@/hooks/useAnimateOnce';
 
 /**
  * Props for the ScholarshipCard component (sponsor view)
@@ -55,6 +56,7 @@ export default function ScholarshipCard({
   const [cardHovered, setCardHovered] = useState(false);
   const [viewApplicantsHovered, setViewApplicantsHovered] = useState(false);
   const [editHovered, setEditHovered] = useState(false);
+  const { shouldAnimate, markAnimated } = useAnimateOnce(`scholarship:${scholarship.id}`);
 
   /**
    * Handles right-click context menu
@@ -124,17 +126,14 @@ export default function ScholarshipCard({
   return (
     <motion.div
       ref={cardRef}
-      initial={{ opacity: 0, y: 20 }}
+      initial={shouldAnimate ? { opacity: 0, y: 20 } : false}
       animate={{ opacity: 1, y: 0 }}
       transition={{
         duration: 0.4,
-        delay: index * 0.05,
+        delay: shouldAnimate ? index * 0.05 : 0,
         ease: [0.25, 0.1, 0.25, 1]
       }}
-      whileHover={{
-        scale: 0.99,
-        transition: { duration: 0.2 }
-      }}
+      onAnimationComplete={markAnimated}
       onClick={onClick}
       onContextMenu={handleContextMenu}
       onMouseEnter={() => setCardHovered(true)}
@@ -209,7 +208,7 @@ export default function ScholarshipCard({
               {scholarship.scholarshipType.code === ScholarshipType.Combined ? (
                 <>
                   <motion.span
-                    initial={{ scale: 0 }}
+                    initial={shouldAnimate ? { scale: 0 } : false}
                     animate={{ scale: 1 }}
                     transition={{ delay: index * 0.05 + 0.1 }}
                     className="px-2 py-0.5 bg-white/90 text-secondary text-[10px] md:text-[11px] rounded"
@@ -217,7 +216,7 @@ export default function ScholarshipCard({
                     Merit-Based
                   </motion.span>
                   <motion.span
-                    initial={{ scale: 0 }}
+                    initial={shouldAnimate ? { scale: 0 } : false}
                     animate={{ scale: 1 }}
                     transition={{ delay: index * 0.05 + 0.15 }}
                     className="px-2 py-0.5 bg-white/90 text-secondary text-[10px] md:text-[11px] rounded"
@@ -227,7 +226,7 @@ export default function ScholarshipCard({
                 </>
               ) : (
                 <motion.span
-                  initial={{ scale: 0 }}
+                  initial={shouldAnimate ? { scale: 0 } : false}
                   animate={{ scale: 1 }}
                   transition={{ delay: index * 0.05 + 0.1 }}
                   className="px-2 py-0.5 bg-white/90 text-secondary text-[10px] md:text-[11px] rounded"
@@ -307,7 +306,7 @@ export default function ScholarshipCard({
         {/* Action Buttons */}
         <div className="grid grid-cols-3 gap-2 pt-3">
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={shouldAnimate ? { opacity: 0, y: 10 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 + 0.2 }}
           >
@@ -329,7 +328,7 @@ export default function ScholarshipCard({
             </Button>
           </motion.div>
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={shouldAnimate ? { opacity: 0, y: 10 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 + 0.25 }}
           >
@@ -351,7 +350,7 @@ export default function ScholarshipCard({
             </Button>
           </motion.div>
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={shouldAnimate ? { opacity: 0, y: 10 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 + 0.3 }}
           >

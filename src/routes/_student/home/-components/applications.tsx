@@ -25,6 +25,7 @@ import { getSponsorName } from "@/lib/sponsor/api";
 import { isLightColor } from "@/routes/_sponsor/create/-components/fields/CardColorPicker";
 import { format } from "date-fns";
 import SubmittedFormsModal from "@/components/student/home/SubmittedFormsModal";
+import { hasAnimatedOnce, markAnimatedOnce } from "@/hooks/useAnimateOnce";
 
 type Props = {
 	applications: Application[];
@@ -41,6 +42,8 @@ export function HomeApplications(props: Props): JSX.Element {
 					const cardColor = item.scholarship.cardColor ?? "#3A52A6";
 					const isLight = isLightColor(cardColor);
 					const headerTextColor = isLight ? "#111827" : "#F9FAFB";
+						const animateKey = `application:${item.application.id}`;
+						const shouldAnimate = !hasAnimatedOnce(animateKey);
 					return (
 					<div key={item.application.id} className="flex gap-4 md:gap-6">
 						{/* Desktop: Date/Time */}
@@ -101,13 +104,10 @@ export function HomeApplications(props: Props): JSX.Element {
 								className="w-full text-left cursor-pointer"
 							>
 								<motion.div
-									initial={{ opacity: 0, y: 18 }}
+									initial={shouldAnimate ? { opacity: 0, y: 18 } : false}
 									animate={{ opacity: 1, y: 0 }}
-									transition={{ duration: 0.3, delay: index * 0.05 }}
-									whileHover={{
-										scale: 0.99,
-										transition: { duration: 0.2 },
-									}}
+									transition={{ duration: 0.3, delay: shouldAnimate ? index * 0.05 : 0 }}
+									onAnimationComplete={() => markAnimatedOnce(animateKey)}
 									className="overflow-hidden rounded-lg bg-white hover:border-[#3A52A6] shadow-sm border border-[#E0ECFF] hover:shadow-md transition-colors"
 								>
 									{/* Header */}
