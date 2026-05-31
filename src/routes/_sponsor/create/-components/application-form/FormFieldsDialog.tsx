@@ -74,7 +74,9 @@ export default function FormFieldsDialog({
 				<DialogContent className="sm:max-w-2xl flex flex-col max-h-[85vh]">
 					<DialogHeader>
 						<div className="flex items-center gap-2">
-							<DialogTitle className="font-normal">Application Form</DialogTitle>
+							<DialogTitle className="font-normal">
+								Application Form
+							</DialogTitle>
 							<TooltipProvider delayDuration={100}>
 								<Tooltip>
 									<TooltipTrigger asChild>
@@ -87,9 +89,9 @@ export default function FormFieldsDialog({
 										side="right"
 										className="max-w-59 text-xs bg-[#3A52A6] text-white [--tooltip-arrow-color:#3A52A6]"
 									>
-										Name, gender, email, date of birth, contact number, education
-										level, and school name are already in the student profile -
-										no need to include them here.
+										Name, gender, email, date of birth, contact number,
+										education level, and school name are already in the student
+										profile - no need to include them here.
 									</TooltipContent>
 								</Tooltip>
 							</TooltipProvider>

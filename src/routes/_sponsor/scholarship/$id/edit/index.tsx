@@ -279,9 +279,31 @@ function EditScholarshipPage() {
 	};
 
 	const handleSaveFormFields = () => {
+		// Baseline: the file fields that existed when the dialog was opened.
+		const previousFileLabels = new Set(
+			(form.getValues("formFields") || [])
+				.filter((f) => f.fieldType === FormFieldType.File)
+				.map((f) => f.label),
+		);
 		form.setValue("formFields", draftFormFields as any, {
 			shouldValidate: true,
 		});
+		// Keep "Required Documents" in sync: drop a document only if its backing
+		// file field existed before this edit and was removed/renamed in the
+		// dialog. Documents that never had a file field are left untouched.
+		const newFileLabels = new Set(
+			draftFormFields
+				.filter((f) => f.fieldType === FormFieldType.File)
+				.map((f) => f.label),
+		);
+		const syncedRequirements = requiredDocuments.filter(
+			(doc) => !(previousFileLabels.has(doc) && !newFileLabels.has(doc)),
+		);
+		if (syncedRequirements.length !== requiredDocuments.length) {
+			form.setValue("requirements", syncedRequirements, {
+				shouldValidate: true,
+			});
+		}
 		setShowFormFieldsDialog(false);
 		setEditingFieldIndex(null);
 	};

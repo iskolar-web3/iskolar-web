@@ -1,6 +1,9 @@
 import { Edit2, Trash2 } from "lucide-react";
 import type { CreateFormFieldRequest } from "@/lib/scholarship/model";
-import { getFieldTypeLabel, renderFieldTypeIcon } from "@/utils/formField.utils";
+import {
+	getFieldTypeLabel,
+	renderFieldTypeIcon,
+} from "@/utils/formField.utils";
 
 interface CustomFormFieldsListProps {
 	fields: CreateFormFieldRequest[];
