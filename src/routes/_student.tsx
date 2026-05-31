@@ -9,6 +9,7 @@ import { getMyNotificationsQuery } from "@/lib/notification/api";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { NotificationType } from "@/lib/notification/model";
 import type { ScholarshipCreatedEvent } from "@/lib/scholarship/model";
+import { useAuth } from "@/auth";
 
 export const Route = createFileRoute("/_student")({
 	component: StudentLayout,
@@ -34,11 +35,12 @@ export const Route = createFileRoute("/_student")({
 function StudentLayout(): JSX.Element {
 	const notifications = useQuery(getMyNotificationsQuery());
 	const queryClient = useQueryClient();
+	const auth = useAuth();
 
 	useEffect(() => {
-		const es = new EventSource(`${BACKEND_URL}/sse/scholarships`, {
-			withCredentials: true,
-		});
+		const url = new URL(`${BACKEND_URL}/sse/scholarships`);
+		url.searchParams.append("token", auth.sessionToken);
+		const es = new EventSource(url.toString());
 
 		es.addEventListener(NotificationType.ScholarshipCreated, (e) => {
 			const data = JSON.parse(e.data) as ScholarshipCreatedEvent;
