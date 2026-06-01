@@ -2,19 +2,29 @@ import { MotionContainer, MotionItem } from "@/components/landing/MotionContaine
 import { motion } from "framer-motion"
 import { GraduationCapBg, GraduationCap3D } from "@/components/landing/graphics/GraduationCap"
 
+// Flatten a logo to a silhouette, then tint it to the theme blue (#3a52a6).
+// Best for line/text logos with transparent interiors.
+const BLUE_TINT =
+  "brightness(0) saturate(100%) invert(27%) sepia(46%) saturate(1066%) hue-rotate(196deg) brightness(91%) contrast(88%)"
+
+// Grayscale duotone mapped onto blue. Keeps internal detail, so filled
+// artwork (AWS badge, Tech Kubo illustration) stays legible instead of
+// collapsing into a solid blob.
+const BLUE_DUOTONE = "grayscale(1) sepia(1) hue-rotate(190deg) saturate(2.2) brightness(0.95)"
+
 const partners = [
-  { src: "/partnerships/byc-ventures.png", alt: "BYC Ventures", size: "h-9 sm:h-10" },
-  { src: "/partnerships/tutorials-dojo.png", alt: "Tutorials Dojo", size: "h-11 sm:h-12" },
-  { src: "/partnerships/cryptita-plays.png", alt: "Cryptita Plays", size: "h-12 sm:h-14" },
-  { src: "/partnerships/aws-learning-club-heron.png", alt: "AWS Learning Club - Heron", size: "h-12 sm:h-14" },
-  { src: "/partnerships/tech-kubo.png", alt: "Tech Kubo", size: "h-13 sm:h-15" },
+  { src: "/partnerships/byc-ventures.png", alt: "BYC Ventures", size: "h-11 sm:h-12", filter: BLUE_TINT },
+  { src: "/partnerships/tutorials-dojo.png", alt: "Tutorials Dojo", size: "h-11 sm:h-12", filter: BLUE_TINT },
+  { src: "/partnerships/cryptita-plays.png", alt: "Cryptita Plays", size: "h-18 sm:h-22", filter: BLUE_TINT },
+  { src: "/partnerships/aws-learning-club-heron.png", alt: "AWS Learning Club - Heron", size: "h-17 sm:h-21", filter: BLUE_DUOTONE },
+  { src: "/partnerships/tech-kubo.png", alt: "Tech Kubo", size: "h-20 sm:h-24", filter: BLUE_DUOTONE },
 ]
 
 export function Hero() {
   return (
     <section
       id="home"
-      className="relative min-h-dvh px-6 flex items-center justify-center shrink-0 pt-24 pb-16 overflow-hidden support-[min-height:100dvh]:min-h-[100dvh]"
+      className="relative min-h-dvh px-6 flex items-center justify-center shrink-0 pt-24 pb-24 overflow-hidden support-[min-height:100dvh]:min-h-[100dvh]"
     >
       <div className="absolute inset-0 z-26 overflow-hidden pointer-events-none">
         {/* Graduation cap shape with animated gradient */}
@@ -63,8 +73,7 @@ export function Hero() {
 
         <MotionItem>
           <p className="text-lg sm:text-xl text-secondary/80 max-w-2xl mx-auto mt-10 text-pretty leading-relaxed">
-            A centralized platform connecting students with scholarship providers, making
-            education accessible and transparent.
+            Connecting students and scholarship providers, making scholarships accessible, efficient, and transparent.
           </p>
         </MotionItem>
 
@@ -75,8 +84,8 @@ export function Hero() {
             visible: { opacity: 1, y: 0, transition: { delay: 0.5, duration: 0.6 } },
           }}
         >
-          <div className="mt-14 sm:mt-16">
-            <div className="flex items-center justify-center gap-4 mb-8">
+          <div className="mt-10 sm:mt-12">
+            <div className="flex items-center justify-center gap-4 mb-6">
               <div className="h-px w-10 bg-secondary/20" />
               <span className="text-xs uppercase tracking-[0.2em] text-secondary/50">
                 Trusted by
@@ -91,6 +100,7 @@ export function Hero() {
                   src={partner.src}
                   alt={partner.alt}
                   className={`${partner.size} w-auto object-contain`}
+                  style={{ filter: partner.filter }}
                 />
               ))}
             </div>

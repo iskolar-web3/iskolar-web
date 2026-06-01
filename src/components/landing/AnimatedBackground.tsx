@@ -24,13 +24,13 @@ const iconTypes: IconType[] = [
   "globe", "calculator", "ruler", "scroll", "palette"
 ]
 
+// Brand-only palette: theme blue (#3a52a6) and its lighter tints, plus a sky
+// accent. Keeps the floating motif strictly on the blue + white identity.
 const colors = [
-  '#60a5fa', // Soft Blue
-  '#2dd4bf', // Teal
-  '#818cf8', // Indigo
-  '#a78bfa', // Violet
-  '#34d399', // Emerald
-  '#f472b6', // Pink
+  '#3a52a6', // Theme blue (--secondary)
+  '#5b73c4', // Blue 400
+  '#8ea3e0', // Blue 300
+  '#60a5fa', // Sky
 ]
 
 function GraduationCap({ className }: { className?: string }) {
@@ -183,6 +183,30 @@ export default function AnimatedBackground() {
 
   return (
     <>
+      {/* Ambient mesh: soft blue glows over the white base for depth, plus a
+          faint grid that echoes the HowItWorks section. Sits behind content. */}
+      <div
+        className="fixed inset-0 -z-10 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(60vw 50vh at 18% 0%, rgba(58,82,166,0.12), transparent 60%)," +
+            "radial-gradient(55vw 45vh at 100% 20%, rgba(96,165,250,0.10), transparent 55%)," +
+            "radial-gradient(70vw 55vh at 50% 108%, rgba(58,82,166,0.08), transparent 60%)",
+        }}
+      />
+      <div
+        className="fixed inset-0 -z-10 pointer-events-none"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(58,82,166,0.04) 1px, transparent 1px)," +
+            "linear-gradient(90deg, rgba(58,82,166,0.04) 1px, transparent 1px)",
+          backgroundSize: "64px 64px",
+          maskImage:
+            "radial-gradient(ellipse 100% 80% at 50% 40%, black, transparent 80%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 100% 80% at 50% 40%, black, transparent 80%)",
+        }}
+      />
       <style>{`
         @keyframes float-complex {
           0% {
