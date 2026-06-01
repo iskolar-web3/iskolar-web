@@ -9,14 +9,9 @@ import { LocalTimeClock } from "@/components/landing/LocalTimeClock";
 import { Suspense, lazy, useEffect } from "react";
 
 // Lazy load below-the-fold sections
-const Problem = lazy(() =>
-	import("@/components/landing/sections/Problems").then((m) => ({
-		default: m.Problem,
-	})),
-);
-const Solution = lazy(() =>
-	import("@/components/landing/sections/Solution").then((m) => ({
-		default: m.Solution,
+const HowItWorks = lazy(() =>
+	import("@/components/landing/sections/HowItWorks").then((m) => ({
+		default: m.HowItWorks,
 	})),
 );
 const TargetUsers = lazy(() =>
@@ -24,9 +19,9 @@ const TargetUsers = lazy(() =>
 		default: m.TargetUsers,
 	})),
 );
-const Features = lazy(() =>
-	import("@/components/landing/sections/Feature").then((m) => ({
-		default: m.Features,
+const Testimonials = lazy(() =>
+	import("@/components/landing/sections/Testimonials").then((m) => ({
+		default: m.Testimonials,
 	})),
 );
 const Roadmap = lazy(() =>
@@ -74,10 +69,9 @@ function App() {
 			<AnimatedBackground />
 			<Hero />
 			<Suspense fallback={<div className="min-h-[50vh]" />}>
-				<Problem />
-				<Solution />
+				<HowItWorks />
 				<TargetUsers />
-				<Features />
+				<Testimonials />
 				<Roadmap />
 				<FAQ />
 				<Footer />

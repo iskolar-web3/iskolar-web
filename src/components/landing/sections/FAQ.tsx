@@ -90,7 +90,7 @@ function AccordionItem({ question, answer, isOpen, onToggle }: AccordionItemProp
 }
 
 const GMAIL_COMPOSE_URL = "https://mail.google.com/mail/u/0/#all?compose=new"
-const CONTACT_EMAIL = "scholarpass23@gmail.com"
+const CONTACT_EMAIL = "hello@iskolar.io"
 
 export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)

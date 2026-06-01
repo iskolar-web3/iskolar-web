@@ -129,7 +129,7 @@ export function TargetUsers() {
                 )}
 
                 {/* Animated underline accent */}
-                <div className="absolute inset-x-6 bottom-0 h-px bg-linear-to-r from-transparent via-blue-500/60 to-transparent scale-x-0 origin-center group-hover:scale-x-100 transition-transform duration-500" />
+                <div className="absolute inset-x-6 bottom-0 h-px bg-linear-to-r from-transparent via-secondary/60 to-transparent scale-x-0 origin-center group-hover:scale-x-100 transition-transform duration-500" />
               </div>
             </MotionItem>
           ))}

@@ -3,7 +3,7 @@ import { Facebook, Linkedin, Mail } from "lucide-react"
 
 const quickLinks = [
   { name: "Home", href: "/#home" },
-  { name: "Features", href: "/#features" },
+  { name: "How it works", href: "/#how-it-works" },
   { name: "Roadmap", href: "/#roadmap" },
   { name: "FAQs", href: "/#faqs" },
   { name: "Company Overview", href: "/about/#company-overview" },
@@ -39,7 +39,7 @@ const socialLinks = [
 ]
 
 const GMAIL_COMPOSE_URL = "https://mail.google.com/mail/u/0/#all?compose=new"
-const CONTACT_EMAIL = "scholarpass23@gmail.com"
+const CONTACT_EMAIL = "hello@iskolar.io"
 
 export function Footer() {
   const [emailCopied, setEmailCopied] = useState(false)

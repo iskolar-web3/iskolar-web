@@ -38,16 +38,16 @@ const milestones = [
 
 export function Roadmap() {
   return (
-    <section id="roadmap" className="py-20 lg:py-32 px-5">
+    <section id="roadmap" className="py-16 lg:py-24 px-5">
       <MotionContainer className="max-w-5xl mx-auto relative z-26">
         {/* Section Header */}
-        <MotionItem className="text-center mb-16">
+        <MotionItem className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-2">
             <div className="w-2 h-2 bg-secondary rounded-full animate-pulse" />
             <span className="text-sm text-secondary uppercase tracking-wider">Roadmap</span>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl text-secondary mt-4 mb-6 text-balance">
-            Our Journey to <span className="text-[#6073F2]">2026</span>
+            Our Journey to <span className="text-secondary/55">2026</span>
           </h2>
           <p className="text-lg text-secondary/80 max-w-2xl mx-auto text-pretty">
             We're building iSkolar step by step, ensuring quality and impact at every milestone.
@@ -57,10 +57,10 @@ export function Roadmap() {
         {/* Timeline */}
         <div className="relative">
           {/* Vertical Line */}
-          <div className="absolute left-4 lg:left-1/2 top-0 bottom-0 w-0.5 bg-linear-to-b from-secondary/50 via-secondary to-[#6073F2]/10  lg:-translate-x-1/2" />
+          <div className="absolute left-4 lg:left-1/2 top-0 bottom-0 w-0.5 bg-linear-to-b from-secondary/50 via-secondary to-secondary/10  lg:-translate-x-1/2" />
 
           {/* Milestone Items */}
-          <div className="space-y-12 lg:space-y-16">
+          <div className="space-y-8 lg:space-y-10">
             {milestones.map((milestone, index) => (
               <MotionItem
                 key={milestone.quarter}

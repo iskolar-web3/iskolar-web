@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 const homeLinks = [
 	{ name: "Overview", href: "#home" },
-	{ name: "Features", href: "#features" },
+	{ name: "How it works", href: "#how-it-works" },
 	{ name: "Roadmap", href: "#roadmap" },
 	{ name: "FAQs", href: "#faqs" },
 	{
@@ -26,7 +26,7 @@ const aboutLinks = [
 		href: "/",
 		dropdown: [
 			{ name: "Overview", href: "/#home" },
-			{ name: "Features", href: "/#features" },
+			{ name: "How it works", href: "/#how-it-works" },
 			{ name: "Roadmap", href: "/#roadmap" },
 			{ name: "FAQs", href: "/#faqs" },
 		],

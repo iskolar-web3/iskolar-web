@@ -244,7 +244,7 @@ function PrivacyPolicyPage(): JSX.Element {
 										your privacy rights, please contact our Data Protection Officer at:
 									</p>
 									<p className="text-xs sm:text-[11px] xl:text-sm font-medium">
-										scholarpass23@gmail.com
+										hello@iskolar.io
 									</p>
 								</section>
 							</div>
