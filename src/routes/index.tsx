@@ -82,7 +82,7 @@ function App() {
 		url: "https://iskolar.io",
 		logo: "https://iskolar.io/logo.jpg",
 		description:
-			"Find and apply for scholarships online. iSkolar helps students discover opportunities, submit applications, and track their progress, while enabling scholarship providers to create, manage, and award scholarship programs.",
+			"iSkolar is a scholarship platform connecting students with scholarship providers, making scholarships more accessible and transparent.",
 		sameAs: [
 			"https://www.facebook.com/profile.php?id=61575967087555",
 			"https://www.linkedin.com/company/107364901",
