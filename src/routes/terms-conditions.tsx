@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import type { JSX } from "react";
 import { SEO } from "@/components/SEO";
+import { JsonLd } from "@/components/JsonLd";
 import { UserRole } from "@/lib/user/model";
 
 export const Route = createFileRoute("/terms-conditions")({
@@ -31,6 +32,19 @@ function TermsConditionsPage(): JSX.Element {
 	return (
 		<>
 			<SEO title="Terms and Conditions" canonicalPath="/terms-conditions" />
+			<JsonLd
+				data={{
+					"@context": "https://schema.org",
+					"@type": "WebPage",
+					name: "Terms and Conditions",
+					url: "https://iskolar.io/terms-conditions",
+					isPartOf: {
+						"@type": "WebSite",
+						name: "iSkolar",
+						url: "https://iskolar.io",
+					},
+				}}
+			/>
 
 			<div
 				className="min-h-screen flex items-center justify-center px-6 py-12"
@@ -67,8 +81,9 @@ function TermsConditionsPage(): JSX.Element {
 								</h1>
 								<p className="text-[11px] sm:text-xs xl:text-sm text-[#8C8C8C]">
 									Acceptance of Terms. By downloading, installing, or using the
-									iSkolar mobile application, you agree to be bound by these Terms and
-									Conditions. If you do not agree, please do not use the app.
+									iSkolar mobile application, you agree to be bound by these
+									Terms and Conditions. If you do not agree, please do not use
+									the app.
 								</p>
 							</div>
 
@@ -79,18 +94,19 @@ function TermsConditionsPage(): JSX.Element {
 									</h2>
 									<ul className="list-disc pl-5 text-xs sm:text-[11px] xl:text-sm space-y-1">
 										<li>
-											Registration. You must provide accurate, current, and complete
-											information during registration (Email, Name, Organization
-											details).
+											Registration. You must provide accurate, current, and
+											complete information during registration (Email, Name,
+											Organization details).
 										</li>
 										<li>
-											Security. You are responsible for maintaining the confidentiality
-											of your login credentials. You agree not to share your password or
-											OTP with others.
+											Security. You are responsible for maintaining the
+											confidentiality of your login credentials. You agree not
+											to share your password or OTP with others.
 										</li>
 										<li>
-											Eligibility. You must be a bona fide student or a legitimate
-											representative of a scholarship-providing organization.
+											Eligibility. You must be a bona fide student or a
+											legitimate representative of a scholarship-providing
+											organization.
 										</li>
 									</ul>
 								</section>
@@ -103,16 +119,18 @@ function TermsConditionsPage(): JSX.Element {
 									</h2>
 									<ul className="list-disc pl-5 text-xs sm:text-[11px] xl:text-sm space-y-1">
 										<li>
-											Students: You agree to submit authentic documents (grades, IDs,
-											etc.). You may only submit one application per scholarship.
-											Falsification of documents may result in a permanent ban.
+											Students: You agree to submit authentic documents (grades,
+											IDs, etc.). You may only submit one application per
+											scholarship. Falsification of documents may result in a
+											permanent ban.
 										</li>
 										<li>
-											Sponsors: You agree to post only legitimate scholarship programs.
-											You must not use applicant data for any purpose other than
-											evaluating scholarship eligibility. You are responsible for
-											fulfilling the financial obligations of the scholarships you post.
-											iSkolar is not the funding provider.
+											Sponsors: You agree to post only legitimate scholarship
+											programs. You must not use applicant data for any purpose
+											other than evaluating scholarship eligibility. You are
+											responsible for fulfilling the financial obligations of
+											the scholarships you post. iSkolar is not the funding
+											provider.
 										</li>
 									</ul>
 								</section>
@@ -127,13 +145,17 @@ function TermsConditionsPage(): JSX.Element {
 										You agree not to:
 									</p>
 									<ul className="list-disc pl-5 text-xs sm:text-[11px] xl:text-sm space-y-1">
-										<li>Post false, misleading, or fraudulent scholarship listings.</li>
 										<li>
-											Upload content that is offensive, illegal, or violates the rights
-											of others.
+											Post false, misleading, or fraudulent scholarship
+											listings.
 										</li>
 										<li>
-											Attempt to hack, reverse engineer, or disrupt the iSkolar system.
+											Upload content that is offensive, illegal, or violates the
+											rights of others.
+										</li>
+										<li>
+											Attempt to hack, reverse engineer, or disrupt the iSkolar
+											system.
 										</li>
 									</ul>
 								</section>
@@ -145,12 +167,13 @@ function TermsConditionsPage(): JSX.Element {
 										4. Platform Role and Disclaimers
 									</h2>
 									<p className="text-xs sm:text-[11px] xl:text-sm">
-										We provide the platform to connect Students and Sponsors. We are
-										not a scholarship provider (unless explicitly stated) and we do not
-										guarantee that a student will receive a scholarship. iSkolar is not
-										liable for any Sponsor failing to disburse funds to a selected
-										scholar. While we allow Admins to flag and remove suspicious posts,
-										we do not guarantee the accuracy of every listing.
+										We provide the platform to connect Students and Sponsors. We
+										are not a scholarship provider (unless explicitly stated)
+										and we do not guarantee that a student will receive a
+										scholarship. iSkolar is not liable for any Sponsor failing
+										to disburse funds to a selected scholar. While we allow
+										Admins to flag and remove suspicious posts, we do not
+										guarantee the accuracy of every listing.
 									</p>
 								</section>
 
@@ -161,10 +184,11 @@ function TermsConditionsPage(): JSX.Element {
 										5. Account Termination
 									</h2>
 									<p className="text-xs sm:text-[11px] xl:text-sm">
-										Admin Rights. iSkolar Administrators reserve the right to suspend,
-										deactivate, or delete your account if you violate these Terms,
-										particularly regarding fraudulent posts or fake applications.
-										Deactivated accounts are restricted from logging in.
+										Admin Rights. iSkolar Administrators reserve the right to
+										suspend, deactivate, or delete your account if you violate
+										these Terms, particularly regarding fraudulent posts or fake
+										applications. Deactivated accounts are restricted from
+										logging in.
 									</p>
 								</section>
 
@@ -175,11 +199,11 @@ function TermsConditionsPage(): JSX.Element {
 										6. Intellectual Property
 									</h2>
 									<p className="text-xs sm:text-[11px] xl:text-sm">
-										The design, source code, and "iSkolar" branding are the property of
-										the University of Makati / Project Team (Group 5). You retain
-										ownership of the documents and images you upload, but you grant
-										iSkolar a license to display and process them for the purpose of
-										the app's services.
+										The design, source code, and "iSkolar" branding are the
+										property of the University of Makati / Project Team (Group
+										5). You retain ownership of the documents and images you
+										upload, but you grant iSkolar a license to display and
+										process them for the purpose of the app's services.
 									</p>
 								</section>
 
@@ -190,10 +214,11 @@ function TermsConditionsPage(): JSX.Element {
 										7. Limitation of Liability
 									</h2>
 									<p className="text-xs sm:text-[11px] xl:text-sm">
-										To the fullest extent permitted by law, iSkolar and its developers
-										shall not be liable for any indirect, incidental, or consequential
-										damages arising from your use of the app, including but not limited
-										to loss of data or loss of scholarship opportunities.
+										To the fullest extent permitted by law, iSkolar and its
+										developers shall not be liable for any indirect, incidental,
+										or consequential damages arising from your use of the app,
+										including but not limited to loss of data or loss of
+										scholarship opportunities.
 									</p>
 								</section>
 
@@ -205,8 +230,8 @@ function TermsConditionsPage(): JSX.Element {
 									</h2>
 									<p className="text-xs sm:text-[11px] xl:text-sm">
 										These Terms are governed by the laws of the Republic of the
-										Philippines. Any disputes shall be resolved in the courts of Makati
-										City.
+										Philippines. Any disputes shall be resolved in the courts of
+										Makati City.
 									</p>
 								</section>
 
@@ -217,9 +242,9 @@ function TermsConditionsPage(): JSX.Element {
 										9. Changes to Terms
 									</h2>
 									<p className="text-xs sm:text-[11px] xl:text-sm">
-										We reserve the right to modify these Terms at any time. Continued
-										use of the app after changes constitutes acceptance of the new
-										Terms.
+										We reserve the right to modify these Terms at any time.
+										Continued use of the app after changes constitutes
+										acceptance of the new Terms.
 									</p>
 								</section>
 
@@ -230,8 +255,9 @@ function TermsConditionsPage(): JSX.Element {
 										10. Contact Us
 									</h2>
 									<p className="text-xs sm:text-[11px] xl:text-sm">
-										If you have questions about this Privacy Policy or wish to exercise
-										your privacy rights, please contact our Data Protection Officer at:
+										If you have questions about this Privacy Policy or wish to
+										exercise your privacy rights, please contact our Data
+										Protection Officer at:
 									</p>
 									<p className="text-xs sm:text-[11px] xl:text-sm font-medium">
 										scholarpass23@gmail.com

@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SEO } from "@/components/SEO";
+import { JsonLd } from "@/components/JsonLd";
 import { useSmoothScroll } from "@/hooks/useSmoothScroll";
 import Navbar from "@/components/landing/Navbar";
 import AnimatedBackground from "@/components/landing/AnimatedBackground";
@@ -67,9 +68,25 @@ function App() {
 		tryScroll();
 	}, []);
 
+	const organizationSchema = {
+		"@context": "https://schema.org",
+		"@type": "Organization",
+		name: "iSkolar",
+		url: "https://iskolar.io",
+		logo: "https://iskolar.io/logo.jpg",
+		description:
+			"Find and apply for scholarships online. iSkolar helps students discover opportunities, submit applications, and track their progress, while enabling scholarship providers to create, manage, and award scholarship programs.",
+		sameAs: [
+			"https://www.facebook.com/profile.php?id=61575967087555",
+			"https://www.linkedin.com/company/107364901",
+			"https://discord.gg/Jw8xDA8Hnx",
+		],
+	};
+
 	return (
 		<main className="relative min-h-screen bg-background">
 			<SEO canonicalPath="/" />
+			<JsonLd data={organizationSchema} />
 			<Navbar />
 			<AnimatedBackground />
 			<Hero />
