@@ -68,6 +68,13 @@ function App() {
 		tryScroll();
 	}, []);
 
+	const websiteSchema = {
+		"@context": "https://schema.org",
+		"@type": "WebSite",
+		name: "iSkolar",
+		url: "https://iskolar.io",
+	};
+
 	const organizationSchema = {
 		"@context": "https://schema.org",
 		"@type": "Organization",
@@ -86,6 +93,7 @@ function App() {
 	return (
 		<main className="relative min-h-screen bg-background">
 			<SEO canonicalPath="/" />
+			<JsonLd data={websiteSchema} />
 			<JsonLd data={organizationSchema} />
 			<Navbar />
 			<AnimatedBackground />
