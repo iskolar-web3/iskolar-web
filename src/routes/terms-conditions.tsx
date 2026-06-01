@@ -30,7 +30,7 @@ export const Route = createFileRoute("/terms-conditions")({
 function TermsConditionsPage(): JSX.Element {
 	return (
 		<>
-			<SEO title="Terms and Conditions" noindex={true} />
+			<SEO title="Terms and Conditions" canonicalPath="/terms-conditions" />
 
 			<div
 				className="min-h-screen flex items-center justify-center px-6 py-12"
