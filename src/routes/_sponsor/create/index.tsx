@@ -71,17 +71,30 @@ function CreateScholarship() {
 
 	const verificationEnabled =
 		import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true";
-	const isIndividualSponsor =
-		auth.profile?.sponsorType?.code === SponsorType.Individual;
+	const sponsorTypeCode = auth.profile?.sponsorType?.code;
+	const isIndividualSponsor = sponsorTypeCode === SponsorType.Individual;
+	// Organization and government-agency sponsors are hard-blocked from creating
+	// scholarships until they complete KYC. There is no KYC submission flow for
+	// them yet, so they stay blocked while identity verification is enabled.
+	const isOrgOrGovSponsor =
+		sponsorTypeCode === SponsorType.Organization ||
+		sponsorTypeCode === SponsorType.Government;
+	const orgGovBlocked = verificationEnabled && isOrgOrGovSponsor;
+
 	const verificationQuery = useVerificationStatus(
 		"sponsors",
 		verificationEnabled && isIndividualSponsor,
 	);
+	// Individual sponsors keep the existing Didit verification gate.
 	const isVerified =
 		!verificationEnabled ||
 		!isIndividualSponsor ||
 		verificationQuery.isLoading ||
 		verificationQuery.data?.status === VerificationStatus.Verified;
+
+	// Students and individual sponsors can create freely (individuals once
+	// verified); org/gov sponsors are blocked pending KYC.
+	const canCreate = isVerified && !orgGovBlocked;
 	const {
 		form,
 		imagePreview,
@@ -362,13 +375,24 @@ function CreateScholarship() {
 						</div>
 					</div>
 
-					{!isVerified && (
+					{orgGovBlocked ? (
 						<div className="flex items-center gap-2.5 bg-amber-50 border border-amber-200 rounded-md p-3 mb-4">
 							<LockKeyhole size={16} className="text-amber-600 shrink-0" />
 							<p className="text-xs text-amber-700 leading-relaxed flex-1">
-								Verify your identity on your profile to create a scholarship.
+								Your organization must complete KYC verification before creating
+								a scholarship. This is coming soon, please contact the iSkolar
+								team for assistance.
 							</p>
 						</div>
+					) : (
+						!isVerified && (
+							<div className="flex items-center gap-2.5 bg-amber-50 border border-amber-200 rounded-md p-3 mb-4">
+								<LockKeyhole size={16} className="text-amber-600 shrink-0" />
+								<p className="text-xs text-amber-700 leading-relaxed flex-1">
+									Verify your identity on your profile to create a scholarship.
+								</p>
+							</div>
+						)
 					)}
 
 					<div
@@ -507,9 +531,9 @@ function CreateScholarship() {
 									},
 								)}
 								className={`w-full mt-4 py-3 font-medium bg-[#EFA508] text-tertiary cursor-pointer rounded-lg hover:bg-[#D89407] transition-colors ${
-									(loading || !isVerified) && "opacity-60 cursor-not-allowed"
+									(loading || !canCreate) && "opacity-60 cursor-not-allowed"
 								}`}
-								disabled={loading || !isVerified}
+								disabled={loading || !canCreate}
 							>
 								{loading ? (
 									<span className="flex items-center justify-center">
