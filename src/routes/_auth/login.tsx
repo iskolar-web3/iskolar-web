@@ -147,7 +147,7 @@ function LoginPage(): JSX.Element {
 
   return (
     <>
-      <SEO title="Log In" noindex={true} />
+      <SEO title="Log In" canonicalPath="/login" />
       {showPreloader && (
         <Preloader
           onComplete={handlePreloaderComplete}

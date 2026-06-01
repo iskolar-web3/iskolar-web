@@ -104,7 +104,7 @@ function RegisterPage(): JSX.Element {
 
 	return (
 		<>
-			<SEO title="Sign Up" noindex={true} />
+			<SEO title="Sign Up" canonicalPath="/register" />
 			<FeedbackWidget />
 
 			<motion.div
