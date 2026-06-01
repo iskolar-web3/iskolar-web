@@ -30,7 +30,7 @@ export const Route = createFileRoute("/privacy-policy")({
 function PrivacyPolicyPage(): JSX.Element {
 	return (
 		<>
-			<SEO title="Privacy Policy" noindex={true} />
+			<SEO title="Privacy Policy" canonicalPath="/privacy-policy" />
 
 			<div
 				className="min-h-screen flex items-center justify-center px-6 py-12"
