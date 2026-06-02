@@ -12,6 +12,9 @@ import {
 	GraduationCap,
 	HandCoins,
 	BookOpen,
+	Star,
+	BadgeCheck,
+	Trophy,
 } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -36,6 +39,26 @@ import {
 	getMyNotificationsQuery,
 	markMyNotificationsAsReadMutation,
 } from "@/lib/notification/api";
+import { NotificationType } from "@/lib/notification/model";
+
+function getNotificationIcon(notif: Notification) {
+	switch (notif.notificationType.code) {
+		case NotificationType.ScholarshipCreated:
+			return <BookOpen className="w-5 h-5 text-foreground" />;
+		case NotificationType.ApplicationShortlisted:
+			return <Star className="w-5 h-5 text-foreground" />;
+		case NotificationType.ApplicationApproved:
+			return <BadgeCheck className="w-5 h-5 text-foreground" />;
+		case NotificationType.ApplicationGranted:
+			return <HandCoins className="w-5 h-5 text-foreground" />;
+		case NotificationType.ScholarshipEndedSelected:
+			return <Trophy className="w-5 h-5 text-foreground" />;
+		case NotificationType.ScholarshipEndedNotSelected:
+			return <BookOpen className="w-5 h-5 text-foreground" />;
+		default:
+			return <Bell className="w-5 h-5 text-foreground" />;
+	}
+}
 
 /**
  * User role type for navigation context
@@ -401,8 +424,8 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 													key={notif.notificationId}
 													className={`flex items-start gap-3 px-4 py-3 border-b border-border last:border-0 hover:bg-accent/50 transition-colors ${!notif.isRead ? "bg-primary/4" : ""}`}
 												>
-													<div className="shrink-0 mt-0.5 w-8 h-8 rounded-full flex items-center justify-center bg-primary/8">
-														<BookOpen className="w-4 h-4 text-primary" />
+													<div className="shrink-0 mt-0.5">
+														{getNotificationIcon(notif)}
 													</div>
 													<div className="flex-1 min-w-0">
 														<p className="text-sm font-medium text-primary leading-snug">{title}</p>

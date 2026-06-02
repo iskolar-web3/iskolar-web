@@ -402,7 +402,7 @@ function CreateScholarship() {
 						<div
 							className={`space-y-4 ${showPreview ? "lg:col-span-8" : "w-full lg:max-w-2xl lg:mx-auto"}`}
 						>
-							<div className="bg-[#F8F9FC] rounded-xl p-4 sm:p-6 shadow-sm space-y-4">
+							<div className="bg-[#F8F9FC] rounded-xl p-3 shadow-sm">
 								<Controller
 									control={control}
 									name="cardColor"
@@ -414,7 +414,9 @@ function CreateScholarship() {
 										/>
 									)}
 								/>
+							</div>
 
+							<div className="bg-[#F8F9FC] rounded-xl p-4 sm:p-6 shadow-sm space-y-4">
 								<ScholarshipTypeSelect
 									value={scholarshipType}
 									onValueChange={(v) =>
