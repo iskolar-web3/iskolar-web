@@ -24,10 +24,11 @@ export async function getDashboardMetrics(
 
 export async function getSignupTimeline(
 	token: string,
-	days = 30,
+	startDate: string,
+	endDate: string,
 ): Promise<ApiResponse<SignupTimelineEntry[]>> {
 	const response = await fetch(
-		`${BACKEND_URL}/admin/dashboard/signups?days=${days}`,
+		`${BACKEND_URL}/admin/dashboard/signups?startDate=${startDate}&endDate=${endDate}`,
 		{
 			method: "GET",
 			headers: { Authorization: `Bearer ${token}` },
