@@ -4,5 +4,5 @@ export const SEO_DEFAULTS = {
 	defaultTitle: "iSkolar",
 	defaultDescription:
 		"iSkolar is a scholarship platform connecting students with scholarship providers, making scholarships more accessible and transparent.",
-	defaultImage: "/logo.jpg",
+	defaultImage: "/preview.jpg",
 } as const;
