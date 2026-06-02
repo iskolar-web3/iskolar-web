@@ -15,32 +15,12 @@ import {
 import { getMyStudentProfile } from "./lib/student/api";
 import { getMySponsorProfile } from "./lib/sponsor/api";
 
-const AUTH_CACHE_KEY = "auth_cache";
+const LEGACY_AUTH_CACHE_KEYS = ["auth_cache"];
 
-type AuthCache = {
-	user: User;
-	profile: unknown;
-};
-
-function loadAuthCache(): AuthCache | null {
-	try {
-		const raw = localStorage.getItem(AUTH_CACHE_KEY);
-		return raw ? (JSON.parse(raw) as AuthCache) : null;
-	} catch {
-		return null;
+function purgeAuthCache() {
+	for (const key of LEGACY_AUTH_CACHE_KEYS) {
+		localStorage.removeItem(key);
 	}
-}
-
-function saveAuthCache(user: User, profile: unknown) {
-	try {
-		localStorage.setItem(AUTH_CACHE_KEY, JSON.stringify({ user, profile }));
-	} catch {
-		// ignore storage errors
-	}
-}
-
-function clearAuthCache() {
-	localStorage.removeItem(AUTH_CACHE_KEY);
 }
 
 export type AuthContextValue<T = any> = {
@@ -62,18 +42,16 @@ type AuthProviderProps = {
 };
 
 export function AuthProvider(props: AuthProviderProps): JSX.Element {
-	const cachedAuth = loadAuthCache();
-	const [user, setUser] = useState<User | null>(cachedAuth?.user ?? null);
+	const [user, setUser] = useState<User | null>(null);
 	const [sessionToken, setSessionToken] = useState<string>("");
-	const [profile, setProfile] = useState<any | null>(cachedAuth?.profile ?? null);
-	const [isLoading, setIsLoading] = useState(!cachedAuth);
+	const [profile, setProfile] = useState<any | null>(null);
+	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<Error | null>(null);
 
 	async function getSession(): Promise<AuthSession | null> {
 		try {
 			const oldToken = getCookie(ACCESS_TOKEN_KEY);
 			if (!oldToken) {
-				clearAuthCache();
 				setUser(null);
 				setProfile(null);
 				return null;
@@ -84,7 +62,6 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 				session = await validateSession(oldToken);
 			} catch {
 				deleteCookie(ACCESS_TOKEN_KEY);
-				clearAuthCache();
 				setUser(null);
 				setProfile(null);
 				return null;
@@ -92,7 +69,6 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 
 			if (!session.data) {
 				deleteCookie(ACCESS_TOKEN_KEY);
-				clearAuthCache();
 				setUser(null);
 				setProfile(null);
 				setError(new Error(session.message));
@@ -127,7 +103,6 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 					setProfile(null);
 			}
 
-			saveAuthCache(session.data.user, resolvedProfile);
 			return session.data;
 		} finally {
 			setIsLoading(false);
@@ -140,10 +115,10 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 		setSessionToken("");
 		setError(null);
 		deleteCookie(ACCESS_TOKEN_KEY);
-		clearAuthCache();
 	}
 
 	useEffect(() => {
+		purgeAuthCache();
 		getSession();
 	}, []);
 
