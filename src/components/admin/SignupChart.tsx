@@ -8,13 +8,51 @@ import {
 	ResponsiveContainer,
 } from "recharts";
 import type { SignupTimelineEntry } from "@/lib/admin/model";
+import type { TimeRange } from "@/lib/admin/queries";
 import { format } from "date-fns";
 
 interface SignupChartProps {
 	data: SignupTimelineEntry[];
+	timeRange: TimeRange;
+	onTimeRangeChange: (range: TimeRange) => void;
 }
 
-export default function SignupChart({ data }: SignupChartProps) {
+const RANGE_OPTIONS: { value: TimeRange; label: string }[] = [
+	{ value: "7d", label: "7 days" },
+	{ value: "30d", label: "30 days" },
+	{ value: "q1", label: "Q1" },
+	{ value: "q2", label: "Q2" },
+	{ value: "q3", label: "Q3" },
+	{ value: "q4", label: "Q4" },
+	{ value: "1y", label: "1 year" },
+];
+
+function getRangeTitle(range: TimeRange): string {
+	const year = new Date().getFullYear();
+	switch (range) {
+		case "7d": return "Signups in the last 7 days";
+		case "30d": return "Signups in the last 30 days";
+		case "q1": return `Signups in Q1 ${year}`;
+		case "q2": return `Signups in Q2 ${year}`;
+		case "q3": return `Signups in Q3 ${year}`;
+		case "q4": return `Signups in Q4 ${year}`;
+		case "1y": return "Signups in the last year";
+	}
+}
+
+function getXAxisInterval(range: TimeRange): number {
+	switch (range) {
+		case "7d": return 0;
+		case "30d": return 4;
+		case "q1":
+		case "q2":
+		case "q3":
+		case "q4": return 13;
+		case "1y": return 29;
+	}
+}
+
+export default function SignupChart({ data, timeRange, onTimeRangeChange }: SignupChartProps) {
 	const formatted = data.map((entry) => ({
 		...entry,
 		label: format(new Date(entry.date), "MMM d"),
@@ -36,32 +74,43 @@ export default function SignupChart({ data }: SignupChartProps) {
 						Growth pulse
 					</p>
 					<h3 className="mt-2 text-lg text-primary">
-						Signups in the last 30 days
+						{getRangeTitle(timeRange)}
 					</h3>
 					<p className="mt-1 text-sm text-[#6B7280]">
 						A rolling view of how quickly new users are discovering iSkolar.
 					</p>
 				</div>
-				<div className="flex gap-3">
-					<div className="rounded-2xl border border-[#E0ECFF] bg-[#F8FBFF] px-4 py-3">
-						<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
-							Total
+				<select
+					value={timeRange}
+					onChange={(e) => onTimeRangeChange(e.target.value as TimeRange)}
+					className="self-start rounded-xl border border-[#E0ECFF] bg-[#F8FBFF] px-3 py-1.5 text-xs font-medium text-[#6B7280] outline-none focus:border-primary/40 focus:text-primary lg:self-auto"
+				>
+					{RANGE_OPTIONS.map((opt) => (
+						<option key={opt.value} value={opt.value}>
+							{opt.label}
+						</option>
+					))}
+				</select>
+			</div>
+			<div className="relative mb-6 flex gap-3">
+				<div className="rounded-2xl border border-[#E0ECFF] bg-[#F8FBFF] px-4 py-3">
+					<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
+						Total
+					</p>
+					<p className="mt-1 text-xl text-primary">{total}</p>
+				</div>
+				<div className="rounded-2xl border border-[#E0ECFF] bg-[#F8FBFF] px-4 py-3">
+					<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
+						Peak day
+					</p>
+					<p className="mt-1 text-xl text-primary">
+						{peak ? peak.count : 0}
+					</p>
+					{peak ? (
+						<p className="text-xs text-[#8A94A8]">
+							{format(new Date(peak.date), "MMM d")}
 						</p>
-						<p className="mt-1 text-xl text-primary">{total}</p>
-					</div>
-					<div className="rounded-2xl border border-[#E0ECFF] bg-[#F8FBFF] px-4 py-3">
-						<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
-							Peak day
-						</p>
-						<p className="mt-1 text-xl text-primary">
-							{peak ? peak.count : 0}
-						</p>
-						{peak ? (
-							<p className="text-xs text-[#8A94A8]">
-								{format(new Date(peak.date), "MMM d")}
-							</p>
-						) : null}
-					</div>
+					) : null}
 				</div>
 			</div>
 			{data.length === 0 ? (
@@ -84,6 +133,7 @@ export default function SignupChart({ data }: SignupChartProps) {
 							tick={{ fontSize: 12, fill: "#9CA3AF" }}
 							axisLine={false}
 							tickLine={false}
+							interval={getXAxisInterval(timeRange)}
 						/>
 						<YAxis
 							allowDecimals={false}
