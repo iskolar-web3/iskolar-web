@@ -5,8 +5,6 @@ import type { RankingCriteria, RankingResult } from "@/lib/ranking/model";
 import { RankingMode } from "@/lib/ranking/model";
 import { DecisionTreeRanker } from "@/services/ranking/DecisionTreeRanker";
 import { AIRanker } from "@/services/ranking/AIRanker";
-import { useAuth } from "@/auth";
-
 interface RankingControlPanelProps {
 	scholarship: Scholarship;
 	applicants: Applicant[];
@@ -25,7 +23,6 @@ export function RankingControlPanel({
 	onShowSuccess,
 	onShowError,
 }: RankingControlPanelProps) {
-	const { sessionToken } = useAuth();
 	const [selectedMode, setSelectedMode] = useState<RankingMode>(
 		RankingMode.DecisionTree,
 	);
@@ -126,8 +123,6 @@ export function RankingControlPanel({
 						throw new Error("Gemini API key not configured");
 					}
 					
-					console.log('Session token available:', !!sessionToken);
-					
 					// Determine how many to analyze with AI
 					const topNToAnalyze = isPremiumUnlocked ? applicants.length : Math.min(aiTopN, applicants.length);
 					console.log('AI Top N:', topNToAnalyze, 'Premium:', isPremiumUnlocked);
@@ -151,7 +146,6 @@ export function RankingControlPanel({
 							topCandidates.map(r => r.applicant),
 							criterias,
 							scholarship.description || undefined,
-							sessionToken,
 						);
 						
 						console.log('AI ranking completed successfully');
