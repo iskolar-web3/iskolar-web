@@ -155,7 +155,7 @@ function ScholarsPage() {
 	const [activeScholar, setActiveScholar] = useState<ScholarInfo | null>(null);
 
 	const scholarshipsQuery = useQuery(
-		getMyScholarshipsQuery(auth.sessionToken, {
+		getMyScholarshipsQuery({
 			sponsorId: auth.profile?.id ?? "",
 		}),
 	);

@@ -1,6 +1,4 @@
 import { type ApiResponse, BACKEND_URL, safeResponseJson } from "../api";
-import { getCookie } from "../cookie";
-import { ACCESS_TOKEN_KEY } from "../user/auth";
 import {
 	type AnySponsor,
 	anySponsorSchema,
@@ -19,14 +17,13 @@ import {
 export async function createIndividualSponsor(
 	value: CreateIndividualSponsorRequest,
 ): Promise<IndividualSponsor> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
 	const response = await fetch(`${BACKEND_URL}/sponsors/individuals`, {
 		method: "POST",
 		body: JSON.stringify(value),
 		headers: {
 			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
 		},
+		credentials: "include",
 	});
 	const result: ApiResponse<IndividualSponsor> =
 		await safeResponseJson(response);
@@ -39,14 +36,13 @@ export async function createIndividualSponsor(
 export async function createOrganizationSponsor(
 	value: CreateOrganizationSponsorRequest,
 ): Promise<OrganizationSponsor> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
 	const response = await fetch(`${BACKEND_URL}/sponsors/organizations`, {
 		method: "POST",
 		body: JSON.stringify(value),
 		headers: {
 			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
 		},
+		credentials: "include",
 	});
 	const result: ApiResponse<OrganizationSponsor> =
 		await safeResponseJson(response);
@@ -59,14 +55,13 @@ export async function createOrganizationSponsor(
 export async function createGovernmentSponsor(
 	value: CreateGovernmentSponsorRequest,
 ): Promise<GovernmentSponsor> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
 	const response = await fetch(`${BACKEND_URL}/sponsors/governments`, {
 		method: "POST",
 		body: JSON.stringify(value),
 		headers: {
 			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
 		},
+		credentials: "include",
 	});
 	const result: ApiResponse<GovernmentSponsor> =
 		await safeResponseJson(response);
@@ -76,12 +71,9 @@ export async function createGovernmentSponsor(
 	return result.data;
 }
 
-export async function getMySponsorProfile(
-	token: string,
-): Promise<AnySponsor | null> {
+export async function getMySponsorProfile(): Promise<AnySponsor | null> {
 	const response = await fetch(`${BACKEND_URL}/sponsors/me`, {
 		method: "GET",
-		headers: { Authorization: `Bearer ${token}` },
 		credentials: "include",
 	});
 	if (!response.ok) {
@@ -112,7 +104,6 @@ export function getSponsorName(sponsor: AnySponsor): string {
 export async function updateIndividualSponsor(
 	value: UpdateIndividualSponsorRequest,
 ): Promise<ApiResponse<IndividualSponsor>> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
 	const response = await fetch(
 		`${BACKEND_URL}/sponsors/individuals/${value.id}`,
 		{
@@ -120,8 +111,8 @@ export async function updateIndividualSponsor(
 			body: JSON.stringify(value),
 			headers: {
 				"Content-Type": "application/json",
-				Authorization: `Bearer ${token}`,
 			},
+			credentials: "include",
 		},
 	);
 	const result: ApiResponse<IndividualSponsor> =
@@ -136,7 +127,6 @@ export async function updateIndividualSponsor(
 export async function updateOrganizationSponsor(
 	value: UpdateOrganizationSponsorRequest,
 ): Promise<ApiResponse<OrganizationSponsor>> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
 	const response = await fetch(
 		`${BACKEND_URL}/sponsors/organizations/${value.id}`,
 		{
@@ -144,8 +134,8 @@ export async function updateOrganizationSponsor(
 			body: JSON.stringify(value),
 			headers: {
 				"Content-Type": "application/json",
-				Authorization: `Bearer ${token}`,
 			},
+			credentials: "include",
 		},
 	);
 	const result: ApiResponse<OrganizationSponsor> =
@@ -160,7 +150,6 @@ export async function updateOrganizationSponsor(
 export async function updateGovernmentSponsor(
 	value: UpdateGovernmentSponsorRequest,
 ): Promise<ApiResponse<GovernmentSponsor>> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
 	const response = await fetch(
 		`${BACKEND_URL}/sponsors/governments/${value.id}`,
 		{
@@ -168,8 +157,8 @@ export async function updateGovernmentSponsor(
 			body: JSON.stringify(value),
 			headers: {
 				"Content-Type": "application/json",
-				Authorization: `Bearer ${token}`,
 			},
+			credentials: "include",
 		},
 	);
 	const result: ApiResponse<GovernmentSponsor> =

@@ -110,7 +110,7 @@ function Scholarships() {
 		verificationQuery.data?.status === VerificationStatus.Verified;
 
 	const scholarships = useSuspenseQuery(
-		getMyScholarshipsQuery(auth.sessionToken, {
+		getMyScholarshipsQuery({
 			...search,
 			sponsorId: auth.profile?.id ?? "",
 		}),
