@@ -2,8 +2,6 @@ import { useRef } from "react";
 import { useAuth } from "@/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Edit, User } from "lucide-react";
-import { getCookie } from "@/lib/cookie";
-import { ACCESS_TOKEN_KEY } from "@/lib/user/auth";
 import { uploadFile } from "@/lib/api";
 import type { Student, UpdateStudentRequest } from "@/lib/student/model";
 
@@ -23,12 +21,7 @@ export default function ProfileAvatar(props: ProfileAvatarProps) {
 			return;
 		}
 
-		const token = getCookie(ACCESS_TOKEN_KEY);
-		if (!token) {
-			return;
-		}
-
-		const uploadRes = await uploadFile(file, token, "profile-images");
+		const uploadRes = await uploadFile(file, "profile-images");
 		await props.onSubmit({
 			id: auth.profile.id,
 			userId: auth.user?.id,

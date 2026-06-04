@@ -285,7 +285,6 @@ function ApplyScholarshipPage() {
 							const file = files[0];
 							const uploadRes = await uploadFile(
 								file,
-								auth.sessionToken,
 								"application-files",
 							)
 

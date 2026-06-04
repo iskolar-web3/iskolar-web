@@ -14,8 +14,6 @@ import {
 } from "@/lib/scholarship/model";
 import { SponsorType } from "@/lib/sponsor/model";
 import { useQuery } from "@tanstack/react-query";
-import type { Student } from "@/lib/student/model";
-import { useAuth } from "@/auth";
 import { getMyApplicationsQuery, getMyScholarshipsQuery } from "@/lib/scholarship/api";
 import { useVerificationStatus } from "@/hooks/useVerificationStatus";
 import { useAnimateOnce } from "@/hooks/useAnimateOnce";
@@ -42,13 +40,12 @@ function DiscoverScholarship() {
 	const filtersAnim = useAnimateOnce("discover:filters");
 
 
-	const auth = useAuth<Student>();
 	const verificationEnabled = import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true";
 	const verificationQuery = useVerificationStatus("students", verificationEnabled);
 	const isVerified = !verificationEnabled || verificationQuery.isLoading || verificationQuery.data?.status === VerificationStatus.Verified;
 
 	const scholarshipsQuery = useQuery(
-		getMyScholarshipsQuery(auth.sessionToken),
+		getMyScholarshipsQuery(),
 	);
 	const scholarships = scholarshipsQuery.data || [];
 
