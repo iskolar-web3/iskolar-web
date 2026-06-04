@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useRef } from "react";
-import { useAuth } from "@/auth";
 import { adminUsersQueryOptions, adminDashboardQueryOptions } from "@/lib/admin/queries";
 import UserTable from "@/components/admin/UserTable";
 import { LocalTimeClock } from "@/components/landing/LocalTimeClock";
@@ -13,9 +12,6 @@ export const Route = createFileRoute("/_admin/users-management")({
 });
 
 function AdminUsers() {
-	const auth = useAuth();
-	const token = auth.sessionToken;
-
 	const [search, setSearch] = useState("");
 	const [debouncedSearch, setDebouncedSearch] = useState("");
 	const [role, setRole] = useState<UserListQuery["role"]>(undefined);
@@ -32,8 +28,8 @@ function AdminUsers() {
 		sortOrder,
 	};
 
-	const { data, isLoading } = useQuery(adminUsersQueryOptions(token, params));
-	const { data: metrics } = useQuery(adminDashboardQueryOptions(token));
+	const { data, isLoading } = useQuery(adminUsersQueryOptions(params));
+	const { data: metrics } = useQuery(adminDashboardQueryOptions());
 
 	const searchTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
 	const handleSearchChange = (value: string) => {
