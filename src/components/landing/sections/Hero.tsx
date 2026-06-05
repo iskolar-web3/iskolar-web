@@ -14,7 +14,9 @@ const BLUE_DUOTONE = "grayscale(1) sepia(1) hue-rotate(190deg) saturate(2.2) bri
 
 const partners = [
   { src: "/partnerships/byc-ventures.png", alt: "BYC Ventures", size: "h-11 sm:h-12", filter: BLUE_TINT },
+  { src: "/partnerships/qbo-innovation.png", alt: "QBO Innovation", size: "h-13 sm:h-15", filter: BLUE_DUOTONE },
   { src: "/partnerships/tutorials-dojo.png", alt: "Tutorials Dojo", size: "h-11 sm:h-12", filter: BLUE_TINT },
+  { src: "/partnerships/university-of-makati.png", alt: "University of Makati", size: "h-14 sm:h-16", filter: BLUE_DUOTONE },
   { src: "/partnerships/cryptita-plays.png", alt: "Cryptita Plays", size: "h-18 sm:h-22", filter: BLUE_TINT },
   { src: "/partnerships/aws-learning-club-heron.png", alt: "AWS Learning Club - Heron", size: "h-17 sm:h-21", filter: BLUE_DUOTONE },
   { src: "/partnerships/tech-kubo.png", alt: "Tech Kubo", size: "h-20 sm:h-24", filter: BLUE_DUOTONE },

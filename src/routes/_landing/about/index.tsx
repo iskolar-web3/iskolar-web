@@ -14,11 +14,6 @@ const MissionVisionSection = lazy(
 	() => import("@/components/landing/about/MissionVision"),
 );
 const TeamSection = lazy(() => import("@/components/landing/about/Team"));
-const Partnerships = lazy(() =>
-	import("@/components/landing/about/Partnerships").then((m) => ({
-		default: m.Partnerships,
-	})),
-);
 const Footer = lazy(() =>
 	import("@/components/landing/sections/Footer").then((m) => ({
 		default: m.Footer,
@@ -64,7 +59,6 @@ function About() {
 					<CompanyOverviewSection />
 					<MissionVisionSection />
 					<TeamSection />
-					<Partnerships />
 					<Footer />
 				</Suspense>
 			</div>
