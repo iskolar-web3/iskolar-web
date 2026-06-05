@@ -30,8 +30,6 @@ import {
 } from "@/components/disbursement/DisbursementShared";
 import { toast } from "@/lib/toast";
 import { uploadFile } from "@/lib/api";
-import { getCookie } from "@/lib/cookie";
-import { ACCESS_TOKEN_KEY } from "@/lib/user/auth";
 
 export type ScholarInfo = {
 	applicationId: string;
@@ -167,17 +165,10 @@ export function DisbursementDialog({
 			return;
 		}
 
-		const token = getCookie(ACCESS_TOKEN_KEY);
-		if (!token) {
-			setFormError("Session expired. Please refresh.");
-			return;
-		}
-
 		setUploading(true);
 		try {
 			const uploadRes = await uploadFile(
 				proofFile,
-				token,
 				"disbursement-files",
 			);
 			if (!uploadRes.data?.url) {

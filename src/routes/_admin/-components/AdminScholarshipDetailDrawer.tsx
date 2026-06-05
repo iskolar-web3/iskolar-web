@@ -145,13 +145,11 @@ function ExpandableList<T>({
 interface Props {
 	scholarship: Scholarship;
 	onClose: () => void;
-	token: string;
 }
 
 export default function AdminScholarshipDetailModal({
 	scholarship,
 	onClose,
-	token,
 }: Props) {
 	const [isExiting, setIsExiting] = useState(false);
 	const [formFieldsOpen, setFormFieldsOpen] = useState(false);
@@ -164,7 +162,7 @@ export default function AdminScholarshipDetailModal({
 		data: applicants,
 		isLoading: applicantsLoading,
 		isError: applicantsError,
-	} = useQuery(adminScholarshipApplicantsQueryOptions(token, scholarship.id));
+	} = useQuery(adminScholarshipApplicantsQueryOptions(scholarship.id));
 
 	const deleteMutation = useMutation({
 		mutationFn: () => deleteScholarship(scholarship.id),

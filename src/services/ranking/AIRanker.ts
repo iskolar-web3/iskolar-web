@@ -18,14 +18,12 @@ export class AIRanker {
 		applicants: Applicant[],
 		criterias: RankingCriteria[],
 		scholarshipDescription?: string,
-		token?: string,
 	): Promise<RankingResult> {
 		return this.rankTopCandidates(
 			scholarshipId,
 			applicants,
 			criterias,
 			scholarshipDescription,
-			token,
 		);
 	}
 
@@ -34,18 +32,11 @@ export class AIRanker {
 		applicants: Applicant[],
 		criterias: RankingCriteria[],
 		scholarshipDescription?: string,
-		token?: string,
 	): Promise<RankingResult> {
 		// Call backend API for AI ranking with on-demand OCR
 		const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-		
-		if (!token) {
-			console.error('No authentication token provided for AI ranking');
-			return this.fallbackRanking(scholarshipId, applicants, criterias);
-		}
-		
+
 		console.log('Starting AI ranking with backend:', BACKEND_URL);
-		console.log('Token available:', !!token);
 		console.log('Number of applicants:', applicants.length);
 		
 		try {
@@ -53,7 +44,6 @@ export class AIRanker {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${token}`
 				},
 				credentials: 'include',
 				body: JSON.stringify({

@@ -9,8 +9,6 @@ import { getMyNotificationsQuery } from "@/lib/notification/api";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { NotificationType } from "@/lib/notification/model";
 import type { ScholarshipCreatedEvent } from "@/lib/scholarship/model";
-import { getCookie } from "@/lib/cookie";
-import { ACCESS_TOKEN_KEY } from "@/lib/user/auth";
 
 export const Route = createFileRoute("/_student")({
 	component: StudentLayout,
@@ -38,14 +36,8 @@ function StudentLayout(): JSX.Element {
 	const queryClient = useQueryClient();
 
 	useEffect(() => {
-		const token = getCookie(ACCESS_TOKEN_KEY);
-		if (!token) {
-			return;
-		}
-
 		const url = new URL(`${BACKEND_URL}/sse/scholarships`);
-		url.searchParams.append("token", token);
-		const es = new EventSource(url.toString());
+		const es = new EventSource(url.toString(), { withCredentials: true });
 
 		es.addEventListener(NotificationType.ScholarshipCreated, (e) => {
 			const data = JSON.parse(e.data) as ScholarshipCreatedEvent;
