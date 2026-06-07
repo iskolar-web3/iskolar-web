@@ -48,7 +48,7 @@ const doodles = [
 	{ icon: BookOpen, className: "bottom-[10%] left-[8%] w-11 h-11 rotate-6" },
 ];
 
-export function InTheNews() {
+export function Spotlight() {
 	const reduce = useReducedMotion();
 	const lift = reduce ? {} : cardHoverLift;
 
@@ -80,7 +80,7 @@ export function InTheNews() {
 							style={{ animation: "soft-pulse 3s ease-in-out infinite" }}
 						/>
 						<span className="text-xs uppercase tracking-[0.2em] text-secondary/55">
-							In the news
+							Spotlight
 						</span>
 					</div>
 					<h2 className="text-3xl sm:text-4xl lg:text-5xl text-secondary text-balance">

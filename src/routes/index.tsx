@@ -29,9 +29,9 @@ const Roadmap = lazy(() =>
 		default: m.Roadmap,
 	})),
 );
-const InTheNews = lazy(() =>
-	import("@/components/landing/sections/InTheNews").then((m) => ({
-		default: m.InTheNews,
+const Spotlight = lazy(() =>
+	import("@/components/landing/sections/Spotlight").then((m) => ({
+		default: m.Spotlight,
 	})),
 );
 const Ecosystem = lazy(() =>
@@ -87,7 +87,7 @@ function App() {
 				<Roadmap />
 				<Ecosystem />
 				<Testimonials />
-				<InTheNews />
+				<Spotlight />
 				<CTA />
 				<FAQ />
 				<Footer />

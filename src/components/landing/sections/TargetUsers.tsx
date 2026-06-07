@@ -125,7 +125,7 @@ export function TargetUsers() {
                     {user.subTypes.map((subType) => (
                       <span
                         key={subType.label}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-secondary/15 bg-secondary/[0.06] px-3 py-1 text-[12px] tracking-tight text-secondary/85 transition-colors duration-300 hover:bg-secondary/[0.12]"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-secondary/15 bg-secondary/6 px-3 py-1 text-[12px] tracking-tight text-secondary/85 transition-colors duration-300 hover:bg-secondary/12"
                       >
                         <subType.icon className="size-3.5 text-secondary/70" />
                         {subType.label}
@@ -135,7 +135,7 @@ export function TargetUsers() {
                 )}
 
                 {/* Highlighter draw-in accent (left to right on hover) */}
-                <span className="pointer-events-none absolute inset-x-8 bottom-0 h-[2px] origin-left scale-x-0 rounded-full bg-secondary/45 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100" />
+                <span className="pointer-events-none absolute inset-x-8 bottom-0 h-0.5 origin-left scale-x-0 rounded-full bg-secondary/45 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100" />
               </motion.div>
             </MotionItem>
           ))}

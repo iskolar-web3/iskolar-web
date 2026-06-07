@@ -13,7 +13,7 @@ export function CTA() {
       >
         {/* Faint ruled-paper texture on the blue card for the academic feel */}
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.06] [background-image:repeating-linear-gradient(to_bottom,transparent_0,transparent_31px,white_31px,white_32px)]"
+          className="pointer-events-none absolute inset-0 opacity-[0.06] bg-[repeating-linear-gradient(to_bottom,transparent_0,transparent_31px,white_31px,white_32px)]"
           aria-hidden
         />
         <div className="relative z-10">
@@ -27,7 +27,7 @@ export function CTA() {
           <h2 className="text-3xl sm:text-4xl lg:text-5xl text-tertiary leading-tight text-balance">
             Ready to start your scholarship journey?
           </h2>
-          <p className="text-tertiary/80 text-lg mt-5 mb-9 max-w-2xl mx-auto text-pretty">
+          <p className="text-tertiary/80 text-lg mt-5 mb-9 max-w-3xl mx-auto text-pretty">
             Join students, sponsors, and schools preparing for the future of scholarship management.
           </p>
           <motion.a
