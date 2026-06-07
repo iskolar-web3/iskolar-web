@@ -5,7 +5,7 @@ export default function MissionVisionSection() {
   return (
     <section id="mission-vision" className="py-36 text-secondary w-full overflow-hidden">
       <MotionContainer>
-        <div className="px-4 sm:px-12 lg:px-26 max-w-7xl mx-auto relative z-26">
+        <div className="px-4 sm:px-12 lg:px-26 relative z-26">
           <h2 className="text-4xl md:text-5xl mb-12 text-center text-secondary">
             Mission & Vision
           </h2>

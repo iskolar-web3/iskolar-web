@@ -15,7 +15,7 @@ const MissionVisionSection = lazy(
 	() => import("@/components/landing/about/MissionVision"),
 );
 const TeamSection = lazy(() => import("@/components/landing/about/Team"));
-const Partnerships = lazy(() =>
+const PartnershipsSection = lazy(() =>
 	import("@/components/landing/about/Partnerships").then((m) => ({
 		default: m.Partnerships,
 	})),
@@ -79,8 +79,8 @@ function About() {
 				<Suspense fallback={<div className="min-h-[50vh]" />}>
 					<CompanyOverviewSection />
 					<MissionVisionSection />
+					<PartnershipsSection />
 					<TeamSection />
-					<Partnerships />
 					<Footer />
 				</Suspense>
 			</div>

@@ -1,25 +1,31 @@
 import { queryOptions } from "@tanstack/react-query";
-import { BACKEND_URL, safeResponseJson, type ApiResponse } from "../api";
+import { type ApiResponse, BACKEND_URL, safeResponseJson } from "../api";
+import { getCookie } from "../cookie";
 import { anySponsorSchema } from "../sponsor/model";
+import { ACCESS_TOKEN_KEY } from "../user/auth";
 import {
-	applicantSchema,
-	applicationSchema,
-	applicationStatusSchema,
-	scholarshipSchema,
 	type Applicant,
 	type Application,
 	type ApplicationStatus,
+	applicantSchema,
+	applicationSchema,
+	applicationStatusSchema,
 	type CreateApplicationRequest,
 	type EditScholarshipFormData,
 	type GetApplicationsQueryParam,
 	type GetScholarshipQueryParam,
 	type Scholarship,
 	type SelectScholarRequest,
+	scholarshipSchema,
 } from "./model";
 
 async function getMyScholarships(
 	params?: GetScholarshipQueryParam,
 ): Promise<Scholarship[]> {
+	const resolvedToken = token || getCookie(ACCESS_TOKEN_KEY);
+	if (!resolvedToken) {
+		return [];
+	}
 	const url = new URL(`${BACKEND_URL}/scholarships`);
 	if (params?.status) {
 		url.searchParams.append("status", params.status);
@@ -40,10 +46,12 @@ async function getMyScholarships(
 	});
 	const result: ApiResponse<Scholarship[]> = await safeResponseJson(response);
 
-	return scholarshipSchema(anySponsorSchema)
+	const parsed = scholarshipSchema(anySponsorSchema)
 		.array()
 		.default([])
 		.parse(result.data);
+
+	return parsed;
 }
 
 export const getMyScholarshipsQuery = (

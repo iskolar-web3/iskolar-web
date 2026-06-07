@@ -1,7 +1,7 @@
 import { useState } from "react"
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion"
 import { MotionContainer, MotionItem } from "@/components/landing/MotionContainer"
 import { ChevronDown } from "lucide-react"
-import { CTA } from "./CTA"
 
 const faqs = [
   {
@@ -22,7 +22,7 @@ const faqs = [
   {
     question: "How do I apply for a scholarship?",
     answer:
-      "Simply browse available scholarships, review the criteria and requirements, and tap “Apply Now.” You’ll fill out the application form and upload any required documents directly in the app.",
+      "Simply browse available scholarships, review the criteria and requirements, and tap \"Apply Now.\" You'll fill out the application form and upload any required documents directly in the app.",
   },
   {
     question: "How are users and scholarships verified?",
@@ -54,43 +54,53 @@ interface AccordionItemProps {
 }
 
 function AccordionItem({ question, answer, isOpen, onToggle }: AccordionItemProps) {
+  const reduce = useReducedMotion()
   return (
     <MotionItem
-      className="bg-card rounded-md border border-border px-6 overflow-hidden"
+      className="bg-card rounded-md border border-border px-6 overflow-hidden transition-colors hover:border-secondary/30"
       variants={{
         hidden: { opacity: 0, y: 20 },
-        visible: { 
-            opacity: 1, 
+        visible: {
+            opacity: 1,
             y: 0,
             transition: { duration: 0.5 }
         }
       }}
     >
       <button
+        type="button"
         onClick={onToggle}
+        aria-expanded={isOpen}
         className="w-full text-left text-lg text-secondary py-5 flex items-center justify-between gap-4"
       >
         <span>{question}</span>
-        <ChevronDown 
-          className={`w-5 h-5 shrink-0 transition-transform duration-300 ${
+        <ChevronDown
+          className={`w-5 h-5 shrink-0 text-secondary/70 transition-transform duration-300 ${
             isOpen ? 'rotate-180' : ''
           }`}
         />
       </button>
-      <div
-        className={`transition-all duration-300 ease-in-out ${
-          isOpen ? 'max-h-96 pb-5' : 'max-h-0'
-        }`}
-        style={{ overflow: 'hidden' }}
-      >
-        <p className="text-secondary/80 leading-relaxed">{answer}</p>
-      </div>
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            key="content"
+            initial={reduce ? false : { height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
+            transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden"
+          >
+            <hr className="ruled-line mb-4" />
+            <p className="text-secondary/80 leading-relaxed pb-5">{answer}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </MotionItem>
   )
 }
 
 const GMAIL_COMPOSE_URL = "https://mail.google.com/mail/u/0/#all?compose=new"
-const CONTACT_EMAIL = "scholarpass23@gmail.com"
+const CONTACT_EMAIL = "hello@iskolar.io"
 
 export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
@@ -111,17 +121,26 @@ export function FAQ() {
   }
 
   return (
-    <section id="faqs" className="py-20 lg:py-32">
-      <MotionContainer className="max-w-3xl mx-auto relative z-26">
+    <section id="faqs" className="py-20 lg:py-28">
+      <MotionContainer className="max-w-3xl mx-auto relative z-30">
         {/* Section Header */}
-        <MotionItem className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl text-secondary mt-4 text-balance">
-            FAQ
+        <MotionItem className="flex flex-col items-center text-center mb-12">
+          <div className="inline-flex items-center gap-2 mb-4">
+            <div
+              className="w-1.5 h-1.5 bg-secondary rounded-full"
+              style={{ animation: "soft-pulse 3s ease-in-out infinite" }}
+            />
+            <span className="text-xs uppercase tracking-[0.2em] text-secondary/55">
+              Questions
+            </span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl text-secondary leading-tight text-balance">
+            Frequently asked questions
           </h2>
         </MotionItem>
 
         {/* FAQ Accordion */}
-        <MotionContainer 
+        <MotionContainer
             className="space-y-4 px-6"
             staggerDelay={0.1}
         >
@@ -136,21 +155,18 @@ export function FAQ() {
           ))}
         </MotionContainer>
 
-        {/* CTA */}
-        <MotionItem className="mt-26 text-center relative z-26">
+        {/* Contact prompt */}
+        <MotionItem className="mt-16 text-center relative z-30">
           <p className="text-secondary/80 mb-4">Still have questions?</p>
           <a
             href={GMAIL_COMPOSE_URL}
             onClick={handleEmailClick}
-            className="inline-flex items-center text-secondary hover:underline mb-16"
+            className="inline-flex items-center text-secondary hover:underline mb-0"
           >
             {emailCopied ? "Email copied!" : `Contact us at ${CONTACT_EMAIL}`}
           </a>
         </MotionItem>
       </MotionContainer>
-
-      {/* CTA */}
-      <CTA/>
     </section>
   )
 }
