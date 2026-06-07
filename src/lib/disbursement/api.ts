@@ -1,11 +1,9 @@
 import { queryOptions } from "@tanstack/react-query";
 import { type ApiResponse, BACKEND_URL, safeResponseJson } from "../api";
-import { getCookie } from "../cookie";
 import {
 	type PaymentMethodDetail,
 	paymentMethodSchema,
 } from "../student/model";
-import { ACCESS_TOKEN_KEY } from "../user/auth";
 import {
 	type CreateDisbursementRequest,
 	type Disbursement,

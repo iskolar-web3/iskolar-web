@@ -22,7 +22,7 @@ import {
 async function getMyScholarships(
 	params?: GetScholarshipQueryParam,
 ): Promise<Scholarship[]> {
-	const resolvedToken = token || getCookie(ACCESS_TOKEN_KEY);
+	const resolvedToken = getCookie(ACCESS_TOKEN_KEY);
 	if (!resolvedToken) {
 		return [];
 	}
