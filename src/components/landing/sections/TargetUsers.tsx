@@ -59,7 +59,7 @@ export function TargetUsers() {
       id="about"
       className="py-20 lg:py-32 px-6 md:px-16 relative overflow-hidden"
     >
-      <MotionContainer className="relative z-10 max-w-6xl mx-auto">
+      <MotionContainer className="relative z-30 max-w-6xl mx-auto">
         {/* Section Header */}
         <MotionItem className="flex flex-col items-center text-center mb-16 lg:mb-20">
           <div className="inline-flex items-center gap-2 mb-5">

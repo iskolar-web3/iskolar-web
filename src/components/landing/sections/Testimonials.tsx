@@ -177,17 +177,8 @@ export function Testimonials() {
 
               <p className="text-[15px] text-secondary leading-relaxed grow">{item.quote}</p>
 
-              <div className="flex items-center gap-3.5 border-t border-secondary/10 mt-6 pt-5">
-                <span
-                  aria-hidden="true"
-                  className="grid place-items-center shrink-0 size-11 rounded-full bg-secondary text-tertiary text-sm font-bold tracking-wide ring-2 ring-secondary/15"
-                >
-                  {item.initials}
-                </span>
-                <div className="min-w-0">
-                  <p className="text-secondary font-bold leading-tight truncate">{item.name}</p>
-                  <p className="text-sm text-secondary/55 mt-0.5 truncate">{item.role}</p>
-                </div>
+              <div className="border-t border-secondary/10 mt-6 pt-5">
+                <p className="text-secondary leading-tight truncate">{item.name}</p>
               </div>
             </MotionItem>
           ))}

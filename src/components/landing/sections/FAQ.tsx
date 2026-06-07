@@ -122,7 +122,7 @@ export function FAQ() {
 
   return (
     <section id="faqs" className="py-20 lg:py-32">
-      <MotionContainer className="max-w-3xl mx-auto relative z-10">
+      <MotionContainer className="max-w-3xl mx-auto relative z-30">
         {/* Section Header */}
         <MotionItem className="flex flex-col items-center text-center mb-12">
           <div className="inline-flex items-center gap-2 mb-4">
@@ -156,7 +156,7 @@ export function FAQ() {
         </MotionContainer>
 
         {/* Contact prompt */}
-        <MotionItem className="mt-16 text-center relative z-10">
+        <MotionItem className="mt-16 text-center relative z-30">
           <p className="text-secondary/80 mb-4">Still have questions?</p>
           <a
             href={GMAIL_COMPOSE_URL}

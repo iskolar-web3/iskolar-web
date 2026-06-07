@@ -9,7 +9,7 @@ export function CTA() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ type: "spring", stiffness: 100, damping: 16 }}
-        className="relative mx-auto max-w-4xl overflow-hidden rounded-3xl bg-secondary px-6 py-16 sm:px-12 lg:py-20 text-center"
+        className="relative z-30 mx-auto max-w-4xl overflow-hidden rounded-3xl bg-secondary px-6 py-16 sm:px-12 lg:py-20 text-center"
       >
         {/* Faint ruled-paper texture on the blue card for the academic feel */}
         <div

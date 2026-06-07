@@ -54,7 +54,7 @@ export function Roadmap() {
 
   return (
     <section id="roadmap" className="py-16 lg:py-24 px-5">
-      <MotionContainer className="max-w-5xl mx-auto relative z-10">
+      <MotionContainer className="max-w-5xl mx-auto relative z-30">
         {/* Section Header */}
         <MotionItem className="flex flex-col items-center text-center mb-14">
           <div className="inline-flex items-center gap-2 mb-4">
@@ -127,19 +127,6 @@ export function Roadmap() {
                         <span className="inline-flex items-center rounded-full bg-secondary/10 px-3 py-1 text-xs uppercase tracking-[0.12em] text-secondary">
                           {milestone.quarter}
                         </span>
-                        {milestone.status === "upcoming" ? (
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-2.5 py-1 text-[11px] uppercase tracking-wide text-tertiary">
-                            <span
-                              className="w-1.5 h-1.5 rounded-full bg-tertiary"
-                              style={{ animation: "soft-pulse 2s ease-in-out infinite" }}
-                            />
-                            Upcoming
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center rounded-full border border-secondary/25 px-2.5 py-1 text-[11px] uppercase tracking-wide text-secondary/55">
-                            Planned
-                          </span>
-                        )}
                       </div>
                       <h3 className="text-lg md:text-xl text-secondary mb-2">{milestone.title}</h3>
                       <p className="text-sm text-secondary/80 leading-relaxed">{milestone.description}</p>
