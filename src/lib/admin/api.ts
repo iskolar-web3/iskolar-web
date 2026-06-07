@@ -11,45 +11,37 @@ import type {
 	UserListQuery,
 } from "./model";
 
-export async function getDashboardMetrics(
-	token: string,
-): Promise<ApiResponse<DashboardMetrics>> {
+export async function getDashboardMetrics(): Promise<ApiResponse<DashboardMetrics>> {
 	const response = await fetch(`${BACKEND_URL}/admin/dashboard`, {
 		method: "GET",
-		headers: { Authorization: `Bearer ${token}` },
 		credentials: "include",
 	});
 	return safeResponseJson(response);
 }
 
 export async function getSignupTimeline(
-	token: string,
-	days = 30,
+	startDate: string,
+	endDate: string,
 ): Promise<ApiResponse<SignupTimelineEntry[]>> {
 	const response = await fetch(
-		`${BACKEND_URL}/admin/dashboard/signups?days=${days}`,
+		`${BACKEND_URL}/admin/dashboard/signups?startDate=${startDate}&endDate=${endDate}`,
 		{
 			method: "GET",
-			headers: { Authorization: `Bearer ${token}` },
 			credentials: "include",
 		},
 	);
 	return safeResponseJson(response);
 }
 
-export async function getStudentDistribution(
-	token: string,
-): Promise<ApiResponse<StudentDistribution>> {
+export async function getStudentDistribution(): Promise<ApiResponse<StudentDistribution>> {
 	const response = await fetch(`${BACKEND_URL}/admin/dashboard/students`, {
 		method: "GET",
-		headers: { Authorization: `Bearer ${token}` },
 		credentials: "include",
 	});
 	return safeResponseJson(response);
 }
 
 export async function getAdminScholarships(
-	token: string,
 	params?: { search?: string },
 ): Promise<Scholarship[]> {
 	const url = new URL(`${BACKEND_URL}/admin/scholarships`);
@@ -57,7 +49,6 @@ export async function getAdminScholarships(
 
 	const response = await fetch(url.toString(), {
 		method: "GET",
-		headers: { Authorization: `Bearer ${token}` },
 		credentials: "include",
 	});
 	const result: ApiResponse<Scholarship[]> = await safeResponseJson(response);
@@ -65,14 +56,12 @@ export async function getAdminScholarships(
 }
 
 export async function getAdminScholarshipApplicants(
-	token: string,
 	scholarshipId: string,
 ): Promise<Applicant[]> {
 	const response = await fetch(
 		`${BACKEND_URL}/scholarships/${scholarshipId}/applications`,
 		{
 			method: "GET",
-			headers: { Authorization: `Bearer ${token}` },
 			credentials: "include",
 		},
 	);
@@ -81,7 +70,6 @@ export async function getAdminScholarshipApplicants(
 }
 
 export async function getUsers(
-	token: string,
 	params: UserListQuery,
 ): Promise<ApiResponse<PaginatedResponse<UserListItem>>> {
 	const searchParams = new URLSearchParams();
@@ -97,7 +85,6 @@ export async function getUsers(
 		`${BACKEND_URL}/admin/users?${searchParams.toString()}`,
 		{
 			method: "GET",
-			headers: { Authorization: `Bearer ${token}` },
 			credentials: "include",
 		},
 	);

@@ -2,8 +2,6 @@
 User-agent: *
 Allow: /
 Allow: /about
-Disallow: /login
-Disallow: /register
 Disallow: /welcome
 Disallow: /role-selection
 Disallow: /profile-setup

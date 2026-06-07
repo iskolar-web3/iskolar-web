@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SEO } from "@/components/SEO";
+import { JsonLd } from "@/components/JsonLd";
 import { useSmoothScroll } from "@/hooks/useSmoothScroll";
 import Navbar from "@/components/landing/Navbar";
 import AnimatedBackground from "@/components/landing/AnimatedBackground";
@@ -75,9 +76,33 @@ function App() {
 		tryScroll();
 	}, []);
 
+	const websiteSchema = {
+		"@context": "https://schema.org",
+		"@type": "WebSite",
+		name: "iSkolar",
+		url: "https://iskolar.io",
+	};
+
+	const organizationSchema = {
+		"@context": "https://schema.org",
+		"@type": "Organization",
+		name: "iSkolar",
+		url: "https://iskolar.io",
+		logo: "https://iskolar.io/logo.jpg",
+		description:
+			"iSkolar is a scholarship platform connecting students with scholarship providers, making scholarships more accessible and transparent.",
+		sameAs: [
+			"https://www.facebook.com/profile.php?id=61575967087555",
+			"https://www.linkedin.com/company/107364901",
+			"https://discord.gg/Jw8xDA8Hnx",
+		],
+	};
+
 	return (
 		<main className="relative min-h-screen bg-background">
 			<SEO canonicalPath="/" />
+			<JsonLd data={websiteSchema} />
+			<JsonLd data={organizationSchema} />
 			<Navbar />
 			<AnimatedBackground />
 			<Hero />

@@ -15,7 +15,6 @@ export const CARD_COLORS = [
 	{ value: "#0F766E", label: "Teal" },
 	{ value: "#475569", label: "Slate" },
 	{ value: "#1C1917", label: "Charcoal" },
-	{ value: "#FFFFFF", label: "White" },
 ];
 
 export function isLightColor(hex: string): boolean {

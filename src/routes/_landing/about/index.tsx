@@ -5,6 +5,7 @@ import { LocalTimeClock } from "@/components/landing/LocalTimeClock";
 import Navbar from "@/components/landing/Navbar";
 import { ScrollToTop } from "@/components/landing/ScrollToTop";
 import { SEO } from "@/components/SEO";
+import { JsonLd } from "@/components/JsonLd";
 import { useSmoothScroll } from "@/hooks/useSmoothScroll";
 
 const CompanyOverviewSection = lazy(
@@ -45,7 +46,7 @@ function About() {
 				setTimeout(tryScroll, 50);
 			}
 		};
-		
+
 		tryScroll();
 	}, []);
 
@@ -55,6 +56,21 @@ function About() {
 				title="About Us"
 				description="Learn about iSkolar's mission, vision, and the team building the future of scholarship management."
 				canonicalPath="/about"
+			/>
+			<JsonLd
+				data={{
+					"@context": "https://schema.org",
+					"@type": "AboutPage",
+					name: "About iSkolar",
+					url: "https://iskolar.io/about",
+					description:
+						"Learn about iSkolar's mission, vision, and the team building the future of scholarship management.",
+					isPartOf: {
+						"@type": "WebSite",
+						name: "iSkolar",
+						url: "https://iskolar.io",
+					},
+				}}
 			/>
 			<Navbar />
 			<AnimatedBackground />

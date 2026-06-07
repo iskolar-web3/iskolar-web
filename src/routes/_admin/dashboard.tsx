@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/auth";
+import { useState } from "react";
 import {
 	adminDashboardQueryOptions,
 	adminSignupTimelineQueryOptions,
 	adminStudentDistributionQueryOptions,
+	type TimeRange,
 } from "@/lib/admin/queries";
 import MetricCard from "@/components/admin/MetricCard";
 import SignupChart from "@/components/admin/SignupChart";
@@ -24,17 +25,16 @@ export const Route = createFileRoute("/_admin/dashboard")({
 });
 
 function AdminDashboard() {
-	const auth = useAuth();
-	const token = auth.sessionToken;
+	const [timeRange, setTimeRange] = useState<TimeRange>("30d");
 
 	const { data: metrics, isLoading: metricsLoading } = useQuery(
-		adminDashboardQueryOptions(token),
+		adminDashboardQueryOptions(),
 	);
 	const { data: timeline, isLoading: timelineLoading } = useQuery(
-		adminSignupTimelineQueryOptions(token),
+		adminSignupTimelineQueryOptions(timeRange),
 	);
 	const { data: studentDistribution, isLoading: studentDistributionLoading } =
-		useQuery(adminStudentDistributionQueryOptions(token));
+		useQuery(adminStudentDistributionQueryOptions());
 
 	const spotlightMetrics = metrics
 		? [
@@ -160,7 +160,7 @@ function AdminDashboard() {
 			{timelineLoading ? (
 				<div className="h-80 animate-pulse rounded-4xl border border-[#E0ECFF] bg-white" />
 			) : timeline ? (
-				<SignupChart data={timeline} />
+				<SignupChart data={timeline} timeRange={timeRange} onTimeRangeChange={setTimeRange} />
 			) : null}
 
 			{/* Student school & education level distribution */}

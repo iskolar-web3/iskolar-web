@@ -2,7 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { uploadFile } from "@/lib/api";
-import { getCookie } from "@/lib/cookie";
 import {
 	type CreateFormFieldRequest,
 	createScholarshipRequestSchema,
@@ -10,7 +9,6 @@ import {
 	type ScholarshipFormData,
 	ScholarshipStatus,
 } from "@/lib/scholarship/model";
-import { ACCESS_TOKEN_KEY } from "@/lib/user/auth";
 import { normalizeText } from "@/utils/normalize.utils";
 
 const DRAFT_STORAGE_KEY_PREFIX = "scholarship-create-draft:";
@@ -160,16 +158,13 @@ export function useScholarshipForm(sponsorId: string) {
 			};
 			reader.readAsDataURL(file);
 
-			const token = getCookie(ACCESS_TOKEN_KEY);
-			if (token) {
-				const uploadRes = await uploadFile(file, token, "scholarship-images");
-				console.log("Scholarship image upload:", uploadRes);
+			const uploadRes = await uploadFile(file, "scholarship-images");
+			console.log("Scholarship image upload:", uploadRes);
 
-				form.setValue("imageUrl", uploadRes.data.url, {
-					shouldValidate: true,
-				});
-				console.log("Set scholarship imageUrl value");
-			}
+			form.setValue("imageUrl", uploadRes.data.url, {
+				shouldValidate: true,
+			});
+			console.log("Set scholarship imageUrl value");
 		}
 	};
 

@@ -12,9 +12,7 @@ import { z } from "zod";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 import { BACKEND_URL, type ApiResponse } from "@/lib/api";
 import { useMutation } from "@tanstack/react-query";
-import { setCookie } from "@/lib/cookie";
 import { UserRole, type AuthSession } from "@/lib/user/model";
-import { ACCESS_TOKEN_KEY } from "@/lib/user/auth";
 import { useAuth } from "@/auth";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 
@@ -42,6 +40,7 @@ async function login(value: LoginFormData): Promise<AuthSession> {
 		method: "POST",
 		body: JSON.stringify(value),
 		headers: { "Content-Type": "application/json" },
+		credentials: "include",
 	});
 	const result: ApiResponse<AuthSession> = await response.json();
 	if (!response.ok) {
@@ -78,7 +77,6 @@ function LoginPage(): JSX.Element {
         }
 
         toast.success(`Success`, 'Login successful', 1250);
-        setCookie(ACCESS_TOKEN_KEY, res.token);
 
         // Validate the user session, account, and profile
         await auth.getSession()
@@ -147,7 +145,7 @@ function LoginPage(): JSX.Element {
 
   return (
     <>
-      <SEO title="Log In" noindex={true} />
+      <SEO title="Log In" canonicalPath="/login" />
       {showPreloader && (
         <Preloader
           onComplete={handlePreloaderComplete}

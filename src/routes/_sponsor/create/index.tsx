@@ -13,7 +13,6 @@ import {
 } from "@/hooks/useScholarshipForm";
 import { useScholarshipPreview } from "@/hooks/useScholarshipPreview";
 import { type ApiResponse, BACKEND_URL } from "@/lib/api";
-import { getCookie } from "@/lib/cookie";
 import {
 	type CreateFormFieldRequest,
 	FormFieldType,
@@ -27,7 +26,6 @@ import type { ScholarshipTemplate } from "@/lib/scholarship/templates";
 import { SponsorType, type AnySponsor } from "@/lib/sponsor/model";
 import { useVerificationStatus } from "@/hooks/useVerificationStatus";
 import { VerificationStatus } from "@/lib/verification/model";
-import { ACCESS_TOKEN_KEY } from "@/lib/user/auth";
 import type { AmountType } from "./-model";
 import ConfirmationDialog from "./-components/ConfirmationDialog";
 import TemplateSelectionStep from "./-components/TemplateSelectionStep";
@@ -49,14 +47,13 @@ export const Route = createFileRoute("/_sponsor/create/")({
 async function createScholarship(
 	value: ScholarshipFormData,
 ): Promise<ApiResponse<Scholarship>> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
 	const response = await fetch(`${BACKEND_URL}/scholarships`, {
 		method: "POST",
 		body: JSON.stringify(value),
 		headers: {
 			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
 		},
+		credentials: "include",
 	});
 	const result: ApiResponse<Scholarship> = await response.json();
 	if (!response.ok) throw new Error(result.message);
@@ -71,17 +68,30 @@ function CreateScholarship() {
 
 	const verificationEnabled =
 		import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true";
-	const isIndividualSponsor =
-		auth.profile?.sponsorType?.code === SponsorType.Individual;
+	const sponsorTypeCode = auth.profile?.sponsorType?.code;
+	const isIndividualSponsor = sponsorTypeCode === SponsorType.Individual;
+	// Organization and government-agency sponsors are hard-blocked from creating
+	// scholarships until they complete KYC. There is no KYC submission flow for
+	// them yet, so they stay blocked while identity verification is enabled.
+	const isOrgOrGovSponsor =
+		sponsorTypeCode === SponsorType.Organization ||
+		sponsorTypeCode === SponsorType.Government;
+	const orgGovBlocked = verificationEnabled && isOrgOrGovSponsor;
+
 	const verificationQuery = useVerificationStatus(
 		"sponsors",
 		verificationEnabled && isIndividualSponsor,
 	);
+	// Individual sponsors keep the existing Didit verification gate.
 	const isVerified =
 		!verificationEnabled ||
 		!isIndividualSponsor ||
 		verificationQuery.isLoading ||
 		verificationQuery.data?.status === VerificationStatus.Verified;
+
+	// Students and individual sponsors can create freely (individuals once
+	// verified); org/gov sponsors are blocked pending KYC.
+	const canCreate = isVerified && !orgGovBlocked;
 	const {
 		form,
 		imagePreview,
@@ -362,13 +372,24 @@ function CreateScholarship() {
 						</div>
 					</div>
 
-					{!isVerified && (
+					{orgGovBlocked ? (
 						<div className="flex items-center gap-2.5 bg-amber-50 border border-amber-200 rounded-md p-3 mb-4">
 							<LockKeyhole size={16} className="text-amber-600 shrink-0" />
 							<p className="text-xs text-amber-700 leading-relaxed flex-1">
-								Verify your identity on your profile to create a scholarship.
+								Your organization must complete KYC verification before creating
+								a scholarship. This is coming soon, please contact the iSkolar
+								team for assistance.
 							</p>
 						</div>
+					) : (
+						!isVerified && (
+							<div className="flex items-center gap-2.5 bg-amber-50 border border-amber-200 rounded-md p-3 mb-4">
+								<LockKeyhole size={16} className="text-amber-600 shrink-0" />
+								<p className="text-xs text-amber-700 leading-relaxed flex-1">
+									Verify your identity on your profile to create a scholarship.
+								</p>
+							</div>
+						)
 					)}
 
 					<div
@@ -378,7 +399,7 @@ function CreateScholarship() {
 						<div
 							className={`space-y-4 ${showPreview ? "lg:col-span-8" : "w-full lg:max-w-2xl lg:mx-auto"}`}
 						>
-							<div className="bg-[#F8F9FC] rounded-xl p-4 sm:p-6 shadow-sm space-y-4">
+							<div className="bg-[#F8F9FC] rounded-xl p-3 shadow-sm">
 								<Controller
 									control={control}
 									name="cardColor"
@@ -390,7 +411,9 @@ function CreateScholarship() {
 										/>
 									)}
 								/>
+							</div>
 
+							<div className="bg-[#F8F9FC] rounded-xl p-4 sm:p-6 shadow-sm space-y-4">
 								<ScholarshipTypeSelect
 									value={scholarshipType}
 									onValueChange={(v) =>
@@ -507,9 +530,9 @@ function CreateScholarship() {
 									},
 								)}
 								className={`w-full mt-4 py-3 font-medium bg-[#EFA508] text-tertiary cursor-pointer rounded-lg hover:bg-[#D89407] transition-colors ${
-									(loading || !isVerified) && "opacity-60 cursor-not-allowed"
+									(loading || !canCreate) && "opacity-60 cursor-not-allowed"
 								}`}
-								disabled={loading || !isVerified}
+								disabled={loading || !canCreate}
 							>
 								{loading ? (
 									<span className="flex items-center justify-center">

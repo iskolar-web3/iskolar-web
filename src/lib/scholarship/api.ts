@@ -20,7 +20,6 @@ import {
 } from "./model";
 
 async function getMyScholarships(
-	token: string,
 	params?: GetScholarshipQueryParam,
 ): Promise<Scholarship[]> {
 	const resolvedToken = token || getCookie(ACCESS_TOKEN_KEY);
@@ -43,7 +42,6 @@ async function getMyScholarships(
 
 	const response = await fetch(url.toString(), {
 		method: "GET",
-		headers: { Authorization: `Bearer ${resolvedToken}` },
 		credentials: "include",
 	});
 	const result: ApiResponse<Scholarship[]> = await safeResponseJson(response);
@@ -57,30 +55,22 @@ async function getMyScholarships(
 }
 
 export const getMyScholarshipsQuery = (
-	token: string,
 	params?: GetScholarshipQueryParam,
 ) =>
 	queryOptions({
 		queryKey: [
 			"scholarships",
-			token || getCookie(ACCESS_TOKEN_KEY) || null,
 			params,
 		],
-		queryFn: () => getMyScholarships(token, params),
+		queryFn: () => getMyScholarships(params),
 		refetchOnMount: true,
 	});
 
 async function getScholarshipById(id: string): Promise<Scholarship> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
-	if (!token) {
-		throw new Error("Access token not found.");
-	}
-
 	const url = new URL(`${BACKEND_URL}/scholarships/${id}`);
 
 	const response = await fetch(url.toString(), {
 		method: "GET",
-		headers: { Authorization: `Bearer ${token}` },
 		credentials: "include",
 	});
 	const result: ApiResponse<Scholarship> = await safeResponseJson(response);
@@ -99,18 +89,12 @@ export const getScholarshipByIdQuery = (id: string) =>
 export async function updateScholarship(
 	data: EditScholarshipFormData,
 ): Promise<ApiResponse<Scholarship>> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
-	if (!token) {
-		throw new Error("Access token not found.");
-	}
-
 	const url = new URL(`${BACKEND_URL}/scholarships/${data.id}`);
 	const response = await fetch(url.toString(), {
 		method: "PATCH",
 		body: JSON.stringify(data),
 		headers: {
 			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
 		},
 		credentials: "include",
 	});
@@ -126,15 +110,10 @@ export async function updateScholarship(
 }
 
 async function getApplicants(id: string): Promise<Applicant[]> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
-	if (!token) {
-		throw new Error("Access token not found.");
-	}
 	const url = new URL(`${BACKEND_URL}/scholarships/${id}/applications`);
 
 	const response = await fetch(url.toString(), {
 		method: "GET",
-		headers: { Authorization: `Bearer ${token}` },
 		credentials: "include",
 	});
 	const result: ApiResponse<Applicant[]> = await safeResponseJson(response);
@@ -151,10 +130,6 @@ export const getApplicantsQuery = (id: string) =>
 async function getMyApplications(
 	param: GetApplicationsQueryParam,
 ): Promise<Application[]> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
-	if (!token) {
-		throw new Error("Access token not found.");
-	}
 	const url = new URL(`${BACKEND_URL}/students/me/applications`);
 	if (param.status) {
 		url.searchParams.append("status", param.status);
@@ -162,7 +137,6 @@ async function getMyApplications(
 
 	const response = await fetch(url.toString(), {
 		method: "GET",
-		headers: { Authorization: `Bearer ${token}` },
 		credentials: "include",
 	});
 	const result: ApiResponse<Application[]> = await safeResponseJson(response);
@@ -179,10 +153,6 @@ export const getMyApplicationsQuery = (param: GetApplicationsQueryParam) =>
 export async function createApplication(
 	data: CreateApplicationRequest,
 ): Promise<ApiResponse> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
-	if (!token) {
-		throw new Error("Access token not found.");
-	}
 	const url = new URL(
 		`${BACKEND_URL}/scholarships/${data.scholarshipId}/applications`,
 	);
@@ -192,7 +162,6 @@ export async function createApplication(
 		body: JSON.stringify(data),
 		headers: {
 			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
 		},
 		credentials: "include",
 	});
@@ -204,10 +173,6 @@ export async function createApplication(
 export async function updateApplication(
 	data: SelectScholarRequest,
 ): Promise<ApiResponse> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
-	if (!token) {
-		throw new Error("Access token not found.");
-	}
 	const url = new URL(
 		`${BACKEND_URL}/scholarships/${data.scholarshipId}/applications`,
 	);
@@ -217,7 +182,6 @@ export async function updateApplication(
 		body: JSON.stringify(data),
 		headers: {
 			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
 		},
 		credentials: "include",
 	});
@@ -231,18 +195,10 @@ export async function updateApplication(
 }
 
 export async function deleteScholarship(id: string): Promise<ApiResponse> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
-	if (!token) {
-		throw new Error("Access token not found.");
-	}
-
 	const url = new URL(`${BACKEND_URL}/scholarships/${id}`);
 
 	const response = await fetch(url.toString(), {
 		method: "DELETE",
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
 		credentials: "include",
 	});
 	const result: ApiResponse = await safeResponseJson(response);
@@ -255,18 +211,10 @@ export async function deleteScholarship(id: string): Promise<ApiResponse> {
 }
 
 export async function endScholarship(id: string): Promise<ApiResponse> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
-	if (!token) {
-		throw new Error("Access token not found.");
-	}
-
 	const url = new URL(`${BACKEND_URL}/scholarships/${id}/end`);
 
 	const response = await fetch(url.toString(), {
 		method: "PATCH",
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
 		credentials: "include",
 	});
 	const result: ApiResponse = await safeResponseJson(response);
@@ -281,17 +229,12 @@ export async function endScholarship(id: string): Promise<ApiResponse> {
 export async function getMyApplicationStatus(
 	scholarshipId: string,
 ): Promise<ApplicationStatus | null> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
-	if (!token) {
-		throw new Error("Access token not found.");
-	}
 	const url = new URL(
 		`${BACKEND_URL}/students/me/scholarships/${scholarshipId}`,
 	);
 
 	const response = await fetch(url.toString(), {
 		method: "GET",
-		headers: { Authorization: `Bearer ${token}` },
 		credentials: "include",
 	});
 	const result: ApiResponse<ApplicationStatus> =

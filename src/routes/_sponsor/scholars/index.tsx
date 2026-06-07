@@ -7,6 +7,7 @@ import { SEO } from "@/components/SEO";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/auth";
+import { useAnimateOnce } from "@/hooks/useAnimateOnce";
 import { getMyScholarshipsQuery, getApplicantsQuery } from "@/lib/scholarship/api";
 import { ScholarshipApplicationStatus, type Applicant } from "@/lib/scholarship/model";
 import type { AnySponsor } from "@/lib/sponsor/model";
@@ -36,12 +37,12 @@ function formatDate(date: Date): string {
 	});
 }
 
-function ScholarCardSkeleton({ index }: { index: number }) {
+function ScholarCardSkeleton({ index, shouldAnimate }: { index: number; shouldAnimate: boolean }) {
 	return (
 		<motion.div
-			initial={{ opacity: 0, y: 10 }}
+			initial={shouldAnimate ? { opacity: 0, y: 10 } : false}
 			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.3, delay: index * 0.05 }}
+			transition={{ duration: 0.3, delay: shouldAnimate ? index * 0.05 : 0 }}
 			className="bg-card border border-[#D3DCF6] rounded-md p-4 shadow-sm"
 		>
 			<div className="flex items-start gap-3">
@@ -65,20 +66,22 @@ function ScholarCard({
 	index,
 	disbursement,
 	onDisburse,
+	shouldAnimate,
 }: {
 	scholar: Scholar;
 	index: number;
 	disbursement?: Disbursement;
 	onDisburse: (scholar: Scholar) => void;
+	shouldAnimate: boolean;
 }) {
 	const { student } = scholar;
 	const initials = `${student.firstName[0]}${student.lastName[0]}`.toUpperCase();
 
 	return (
 		<motion.div
-			initial={{ opacity: 0, y: 10 }}
+			initial={shouldAnimate ? { opacity: 0, y: 10 } : false}
 			animate={{ opacity: 1, y: 0 }}
-			transition={{ duration: 0.3, delay: index * 0.04 }}
+			transition={{ duration: 0.3, delay: shouldAnimate ? index * 0.04 : 0 }}
 			className="bg-card border border-[#D3DCF6] rounded-md p-4 shadow-sm"
 		>
 			<div className="flex items-start gap-3">
@@ -143,12 +146,16 @@ function ScholarCard({
 
 function ScholarsPage() {
 	const auth = useAuth<AnySponsor>();
+	const headerAnim = useAnimateOnce("scholars:header");
+	const filtersAnim = useAnimateOnce("scholars:filters");
+	const sectionAnim = useAnimateOnce("scholars:section");
+
 	const [search, setSearch] = useState("");
 	const [filterScholarshipId, setFilterScholarshipId] = useState("all");
 	const [activeScholar, setActiveScholar] = useState<ScholarInfo | null>(null);
 
 	const scholarshipsQuery = useQuery(
-		getMyScholarshipsQuery(auth.sessionToken, {
+		getMyScholarshipsQuery({
 			sponsorId: auth.profile?.id ?? "",
 		}),
 	);
@@ -216,9 +223,10 @@ function ScholarsPage() {
 			<div className="space-y-4">
 				{/* Header */}
 				<motion.div
-					initial={{ opacity: 0, y: -20 }}
+					initial={headerAnim.shouldAnimate ? { opacity: 0, y: -20 } : false}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.4 }}
+					onAnimationComplete={headerAnim.markAnimated}
 					className="bg-card rounded-md text-center p-3 border border-[#D3DCF6] shadow-sm"
 				>
 					<p className="text-xl text-primary tracking-wide">My Scholars</p>
@@ -232,9 +240,10 @@ function ScholarsPage() {
 
 				{/* Filters */}
 				<motion.div
-					initial={{ opacity: 0, y: -10 }}
+					initial={filtersAnim.shouldAnimate ? { opacity: 0, y: -10 } : false}
 					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.4, delay: 0.1 }}
+					transition={{ duration: 0.4, delay: filtersAnim.shouldAnimate ? 0.1 : 0 }}
+					onAnimationComplete={filtersAnim.markAnimated}
 					className="flex flex-col sm:flex-row gap-2"
 				>
 					<div className="relative flex-1">
@@ -265,10 +274,16 @@ function ScholarsPage() {
 				</motion.div>
 
 				{/* Scholars grid */}
+				<motion.div
+					initial={sectionAnim.shouldAnimate ? { opacity: 0, y: 20 } : false}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.4 }}
+					onAnimationComplete={sectionAnim.markAnimated}
+				>
 				<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
 					{isLoading ? (
 						Array.from({ length: 6 }).map((_, i) => (
-							<ScholarCardSkeleton key={`skel-${i}`} index={i} />
+							<ScholarCardSkeleton key={`skel-${i}`} index={i} shouldAnimate={sectionAnim.shouldAnimate} />
 						))
 					) : scholars.length === 0 ? (
 						<div className="col-span-full flex flex-col items-center justify-center pt-24 pb-16">
@@ -287,6 +302,7 @@ function ScholarsPage() {
 								scholar={scholar}
 								index={index}
 								disbursement={disbursementsByApplication.get(scholar.id)}
+								shouldAnimate={sectionAnim.shouldAnimate}
 								onDisburse={(s) =>
 									setActiveScholar({
 										applicationId: s.id,
@@ -299,6 +315,7 @@ function ScholarsPage() {
 						))
 					)}
 				</div>
+				</motion.div>
 			</div>
 
 			<DisbursementDialog

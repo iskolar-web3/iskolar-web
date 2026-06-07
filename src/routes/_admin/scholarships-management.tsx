@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useRef } from "react";
-import { useAuth } from "@/auth";
 import { adminScholarshipsQueryOptions } from "@/lib/admin/queries";
 import { LocalTimeClock } from "@/components/landing/LocalTimeClock";
 import { Search, GraduationCap, BookOpen, CheckCircle2, ChevronRight } from "lucide-react";
@@ -44,16 +43,13 @@ function formatAmount(s: Scholarship) {
 }
 
 function AdminScholarships() {
-	const auth = useAuth();
-	const token = auth.sessionToken;
-
 	const [search, setSearch] = useState("");
 	const [debouncedSearch, setDebouncedSearch] = useState("");
 	const [statusFilter, setStatusFilter] = useState("all");
 	const [selectedScholarship, setSelectedScholarship] = useState<Scholarship | null>(null);
 
 	const { data, isLoading } = useQuery(
-		adminScholarshipsQueryOptions(token, {
+		adminScholarshipsQueryOptions({
 			search: debouncedSearch || undefined,
 		}),
 	);
@@ -296,7 +292,6 @@ function AdminScholarships() {
 			{selectedScholarship && (
 				<AdminScholarshipDetailDrawer
 					scholarship={selectedScholarship}
-					token={token}
 					onClose={() => setSelectedScholarship(null)}
 				/>
 			)}
