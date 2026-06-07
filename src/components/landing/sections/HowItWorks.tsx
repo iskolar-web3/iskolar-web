@@ -119,9 +119,9 @@ export function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="relative py-16 lg:py-28 px-6 md:px-12 overflow-hidden"
+      className="relative py-16 lg:py-28 px-4 sm:px-12 lg:px-26 overflow-hidden"
     >
-      <div className="mx-auto max-w-7xl relative z-30">
+      <div className="relative z-30">
         {/* Section Header */}
         <MotionContainer className="text-center mb-16 lg:mb-24" viewportMargin="-50px">
           <MotionItem>

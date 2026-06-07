@@ -121,8 +121,8 @@ export function FAQ() {
   }
 
   return (
-    <section id="faqs" className="py-20 lg:py-32">
-      <MotionContainer className="max-w-3xl mx-auto relative z-30">
+    <section id="faqs" className="py-20 lg:py-32 px-4 sm:px-12 lg:px-26">
+      <MotionContainer className="relative z-30">
         {/* Section Header */}
         <MotionItem className="flex flex-col items-center text-center mb-12">
           <div className="inline-flex items-center gap-2 mb-4">
@@ -141,7 +141,7 @@ export function FAQ() {
 
         {/* FAQ Accordion */}
         <MotionContainer 
-            className="space-y-4 px-6"
+            className="space-y-4"
             staggerDelay={0.1}
         >
           {faqs.map((faq, index) => (

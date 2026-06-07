@@ -16,7 +16,7 @@ export function Partnerships() {
 			id="partnerships"
 			className="py-36 text-secondary w-full overflow-hidden"
 		>
-			<MotionContainer className="relative z-26 mx-auto max-w-6xl px-6 md:px-12">
+			<MotionContainer className="relative z-26 px-4 sm:px-12 lg:px-26">
 				<MotionItem className="text-center mb-16 lg:mb-20">
 					<h2 className="text-4xl md:text-5xl text-secondary text-balance">
 						iSkolar Partner Ecosystem
@@ -33,7 +33,7 @@ export function Partnerships() {
 							<div className="grid grid-cols-1 items-start gap-8 py-12 lg:grid-cols-12 lg:gap-10 lg:py-16">
 								{/* Name + category */}
 								<div className="lg:col-span-3">
-									<h3 className="text-lg sm:text-xl font-semibold uppercase tracking-wide text-secondary">
+									<h3 className="text-lg sm:text-xl uppercase tracking-wide text-secondary">
 										{partner.name}
 									</h3>
 									<p className="mt-1 text-sm italic text-secondary/55">

@@ -39,7 +39,7 @@ export function Hero() {
     <section
       ref={sectionRef}
       id="home"
-      className="relative min-h-dvh px-6 flex items-center justify-center shrink-0 pt-24 pb-24 overflow-hidden support-[min-height:100dvh]:min-h-[100dvh]"
+      className="relative min-h-dvh px-4 sm:px-12 lg:px-26 flex items-center justify-center shrink-0 pt-24 pb-24 overflow-hidden support-[min-height:100dvh]:min-h-[100dvh]"
     >
       <div className="absolute inset-0 z-26 overflow-hidden pointer-events-none">
         {/* Graduation cap shape with animated gradient */}

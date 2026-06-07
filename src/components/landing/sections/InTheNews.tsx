@@ -69,7 +69,7 @@ export function InTheNews() {
 			</div>
 
 			<MotionContainer
-				className="relative z-30 mx-auto max-w-6xl px-6 md:px-12"
+				className="relative z-30 px-4 sm:px-12 lg:px-26"
 				viewportMargin="-50px"
 			>
 				{/* Header */}
@@ -92,7 +92,7 @@ export function InTheNews() {
 				</MotionItem>
 
 				{/* Coverage cards */}
-				<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
+				<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 					{coverage.map((item) => (
 						<MotionItem
 							key={item.href}

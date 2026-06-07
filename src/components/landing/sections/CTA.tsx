@@ -3,13 +3,13 @@ import { motion, useReducedMotion } from "framer-motion"
 export function CTA() {
   const reduce = useReducedMotion()
   return (
-    <section id="get-started" className="px-4 pb-20 lg:pb-28">
+    <section id="get-started" className="pb-20 lg:pb-28">
       <motion.div
         initial={reduce ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-100px" }}
         transition={{ type: "spring", stiffness: 100, damping: 16 }}
-        className="relative z-30 mx-auto max-w-4xl overflow-hidden rounded-3xl bg-secondary px-6 py-16 sm:px-12 lg:py-20 text-center"
+        className="relative z-30 overflow-hidden bg-secondary px-4 py-16 sm:px-12 lg:px-26 lg:py-20 text-center"
       >
         {/* Faint ruled-paper texture on the blue card for the academic feel */}
         <div

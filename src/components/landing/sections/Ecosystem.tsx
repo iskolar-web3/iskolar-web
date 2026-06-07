@@ -8,9 +8,12 @@ import { partnerGroups } from "@/components/landing/partners";
 
 export function Ecosystem() {
 	return (
-		<section id="ecosystem" className="relative overflow-hidden py-20 lg:py-28">
+		<section
+			id="ecosystem"
+			className="relative overflow-hidden py-20 lg:py-28 px-4 sm:px-12 lg:px-26"
+		>
 			<MotionContainer
-				className="relative z-30 mx-auto max-w-7xl"
+				className="relative z-30"
 				viewportMargin="-50px"
 			>
 				{/* Header */}

@@ -45,7 +45,7 @@ export function Footer() {
       <div className="h-px w-full bg-secondary/15" />
 
       {/* Main Footer */}
-      <div className="pt-30 pb-16 px-6 md:px-26">
+      <div className="pt-30 pb-16 px-4 sm:px-12 lg:px-26">
         <div className="relative z-26">
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             {/* Brand */}
