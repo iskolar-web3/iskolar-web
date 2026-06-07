@@ -44,7 +44,7 @@ export const partners: Partner[] = [
 		description:
 			"QBO Innovation Hub is the Philippines' first public private startup platform, giving iSkolar mentorship, investor access, and a national network of founders building for impact.",
 		href: "https://www.qboinnovation.com/",
-		linkLabel: "qbo.com.ph",
+		linkLabel: "qboinnovation.com",
 		filter: BLUE_DUOTONE,
 	},
 	{
