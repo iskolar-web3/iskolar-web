@@ -29,6 +29,11 @@ const Roadmap = lazy(() =>
 		default: m.Roadmap,
 	})),
 );
+const InTheNews = lazy(() =>
+	import("@/components/landing/sections/InTheNews").then((m) => ({
+		default: m.InTheNews,
+	})),
+);
 const CTA = lazy(() =>
 	import("@/components/landing/sections/CTA").then((m) => ({ default: m.CTA })),
 );
@@ -76,6 +81,7 @@ function App() {
 				<TargetUsers />
 				<Roadmap />
 				<Testimonials />
+				<InTheNews />
 				<CTA />
 				<FAQ />
 				<Footer />
