@@ -106,7 +106,7 @@ export function InTheNews() {
 								className="ruled-paper group relative flex h-full flex-col overflow-hidden rounded-2xl bg-card border border-secondary/15 shadow-[0_18px_45px_-30px_rgba(58,82,166,0.55)] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-secondary/40"
 							>
 								{/* Featured image */}
-								<div className="relative aspect-[1200/630] overflow-hidden bg-secondary/5">
+								<div className="relative aspect-1200/630 overflow-hidden bg-secondary/5">
 									<img
 										src={item.image}
 										alt={`${item.source} coverage of iSkolar`}

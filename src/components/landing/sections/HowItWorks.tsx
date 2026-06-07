@@ -196,7 +196,7 @@ export function HowItWorks() {
               {/* Soft glow for depth */}
               <div
                 aria-hidden
-                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-secondary/[0.06] blur-3xl"
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-secondary/6 blur-3xl"
               />
 
               {/* Orbital rings */}

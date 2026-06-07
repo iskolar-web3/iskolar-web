@@ -81,7 +81,7 @@ export function Roadmap() {
           />
           <motion.div
             style={{ scaleY: reduce ? 1 : lineScale }}
-            className="absolute left-4 lg:left-1/2 top-0 bottom-0 w-0.5 origin-top bg-gradient-to-b from-secondary via-secondary to-secondary/30 lg:-translate-x-1/2"
+            className="absolute left-4 lg:left-1/2 top-0 bottom-0 w-0.5 origin-top bg-linear-to-b from-secondary via-secondary to-secondary/30 lg:-translate-x-1/2"
             aria-hidden
           />
 

@@ -154,7 +154,7 @@ export default function Navbar() {
 													handleNavClick(e, link.href);
 												}
 											}}
-											className={`relative flex items-center gap-1 text-md text-secondary transition-colors hover:text-secondary/80 after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:rounded-full after:bg-secondary/40 after:transition-transform after:duration-300 hover:after:scale-x-100 motion-reduce:after:transition-none ${activeDropdown === link.name ? "text-secondary/80 after:scale-x-100" : ""}`}
+											className={`relative flex items-center gap-1 text-md text-secondary transition-colors hover:text-secondary/80 after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:rounded-full after:bg-secondary/40 after:transition-transform after:duration-300 hover:after:scale-x-100 motion-reduce:after:transition-none ${activeDropdown === link.name ? "text-secondary/80 after:scale-x-100" : ""}`}
 										>
 											{link.name}
 											{link.dropdown && (
@@ -169,7 +169,7 @@ export default function Navbar() {
 										<a
 											href={link.href}
 											onClick={(e) => handleNavClick(e, link.href)}
-											className="relative flex items-center gap-1 text-md text-secondary transition-colors hover:text-secondary/80 after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:rounded-full after:bg-secondary/40 after:transition-transform after:duration-300 hover:after:scale-x-100 motion-reduce:after:transition-none"
+											className="relative flex items-center gap-1 text-md text-secondary transition-colors hover:text-secondary/80 after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:rounded-full after:bg-secondary/40 after:transition-transform after:duration-300 hover:after:scale-x-100 motion-reduce:after:transition-none"
 										>
 											{link.name}
 										</a>
