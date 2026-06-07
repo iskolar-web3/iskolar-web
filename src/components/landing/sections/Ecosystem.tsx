@@ -34,7 +34,7 @@ export function Ecosystem() {
 						Building with partners, reaching students through communities.
 					</p>
 					{/* Know more */}
-					<MotionItem className="flex justify-end">
+					<MotionItem className="mt-6 flex justify-center lg:mt-8 lg:justify-end">
 						<Link
 							to="/about"
 							hash="partnerships"
