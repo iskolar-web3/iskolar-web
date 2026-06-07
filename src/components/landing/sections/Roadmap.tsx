@@ -70,7 +70,7 @@ export function Roadmap() {
             Our journey to 2026
           </h2>
           <p className="text-lg text-secondary/80 max-w-2xl mx-auto text-pretty mt-6">
-            We are building iSkolar step by step, ensuring quality and impact at every milestone.
+            Building iSkolar step by step, with quality and impact at every stage.
           </p>
         </MotionItem>
 

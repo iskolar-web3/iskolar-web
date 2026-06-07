@@ -14,6 +14,11 @@ const MissionVisionSection = lazy(
 	() => import("@/components/landing/about/MissionVision"),
 );
 const TeamSection = lazy(() => import("@/components/landing/about/Team"));
+const PartnershipsSection = lazy(() =>
+	import("@/components/landing/about/Partnerships").then((m) => ({
+		default: m.Partnerships,
+	})),
+);
 const Footer = lazy(() =>
 	import("@/components/landing/sections/Footer").then((m) => ({
 		default: m.Footer,
@@ -58,6 +63,7 @@ function About() {
 				<Suspense fallback={<div className="min-h-[50vh]" />}>
 					<CompanyOverviewSection />
 					<MissionVisionSection />
+					<PartnershipsSection />
 					<TeamSection />
 					<Footer />
 				</Suspense>

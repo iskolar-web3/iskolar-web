@@ -34,6 +34,11 @@ const InTheNews = lazy(() =>
 		default: m.InTheNews,
 	})),
 );
+const Ecosystem = lazy(() =>
+	import("@/components/landing/sections/Ecosystem").then((m) => ({
+		default: m.Ecosystem,
+	})),
+);
 const CTA = lazy(() =>
 	import("@/components/landing/sections/CTA").then((m) => ({ default: m.CTA })),
 );
@@ -80,6 +85,7 @@ function App() {
 				<HowItWorks />
 				<TargetUsers />
 				<Roadmap />
+				<Ecosystem />
 				<Testimonials />
 				<InTheNews />
 				<CTA />

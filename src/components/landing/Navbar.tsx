@@ -4,16 +4,24 @@ import { ChevronDown, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const homeLinks = [
-	{ name: "Overview", href: "#home" },
-	{ name: "How it works", href: "#how-it-works" },
-	{ name: "Roadmap", href: "#roadmap" },
-	{ name: "FAQs", href: "#faqs" },
+	{
+		name: "Home",
+		href: "/",
+		dropdown: [
+			{ name: "Home", href: "#home" },
+			{ name: "How it works", href: "#how-it-works" },
+			{ name: "Roadmap", href: "#roadmap" },
+			{ name: "Ecosystem", href: "#ecosystem" },
+			{ name: "FAQs", href: "#faqs" },
+		],
+	},
 	{
 		name: "About",
 		href: "/about",
 		dropdown: [
 			{ name: "Company Overview", href: "/about#company-overview" },
 			{ name: "Mission & Vision", href: "/about#mission-vision" },
+			{ name: "Partnerships", href: "/about#partnerships" },
 			{ name: "Our Team", href: "/about#team" },
 		],
 	},
@@ -24,15 +32,23 @@ const aboutLinks = [
 		name: "Home",
 		href: "/",
 		dropdown: [
-			{ name: "Overview", href: "/#home" },
+			{ name: "Home", href: "/#home" },
 			{ name: "How it works", href: "/#how-it-works" },
 			{ name: "Roadmap", href: "/#roadmap" },
+			{ name: "Ecosystem", href: "/#ecosystem" },
 			{ name: "FAQs", href: "/#faqs" },
 		],
 	},
-	{ name: "Company Overview", href: "/about#company-overview" },
-	{ name: "Mission & Vision", href: "/about#mission-vision" },
-	{ name: "Our Team", href: "/about#team" },
+	{
+		name: "About",
+		href: "/about",
+		dropdown: [
+			{ name: "Company Overview", href: "#company-overview" },
+			{ name: "Mission & Vision", href: "#mission-vision" },
+			{ name: "Partnerships", href: "#partnerships" },
+			{ name: "Our Team", href: "#team" },
+		],
+	},
 ];
 
 export default function Navbar() {
