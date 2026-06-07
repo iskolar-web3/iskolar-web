@@ -5,21 +5,28 @@ import {
 	ChevronLeft,
 	ChevronRight,
 	Compass,
+	ExternalLink,
 	GraduationCap,
 	Linkedin,
+	Loader2,
 	Palette,
 	PenTool,
 	Quote,
 	Sparkles,
 } from "lucide-react";
 import type { KeyboardEvent } from "react";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
 	cardHoverLift,
 	MotionContainer,
 	MotionItem,
 } from "@/components/landing/MotionContainer";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogTitle,
+} from "@/components/ui/dialog";
 
 type Testimonial = {
 	quote: string;
@@ -105,6 +112,16 @@ const testimonials: Testimonial[] = [
 	},
 ];
 
+// The public post link for a testimonial. Falls back to deriving it from the
+// embed URL so cards without an explicit postUrl still have a working link
+// when the iframe preview is blocked (ad blockers, Brave Shields, etc.).
+function postLinkFor(item: Testimonial): string | undefined {
+	if (item.postUrl) return item.postUrl;
+	if (item.embedUrl)
+		return item.embedUrl.replace("/embed/feed/update/", "/feed/update/");
+	return undefined;
+}
+
 // Faint scattered education doodles in the background.
 const doodles = [
 	{ icon: GraduationCap, className: "top-[6%] left-[3%] w-10 h-10 -rotate-12" },
@@ -122,6 +139,26 @@ export function Testimonials() {
 	const lift = reduce ? {} : cardHoverLift;
 	const scrollerRef = useRef<HTMLDivElement>(null);
 	const [active, setActive] = useState<Testimonial | null>(null);
+	// The embed iframe is frequently blocked by ad blockers / Brave Shields.
+	// Track its load so we can fall back to a plain link instead of a blank modal.
+	const [embedStatus, setEmbedStatus] = useState<
+		"loading" | "loaded" | "failed"
+	>("loading");
+
+	const openPost = (item: Testimonial) => {
+		setEmbedStatus("loading");
+		setActive(item);
+	};
+
+	// If the iframe has not loaded within a few seconds it was almost certainly
+	// blocked, so surface the fallback rather than leaving an empty dialog.
+	useEffect(() => {
+		if (!active) return;
+		const timer = setTimeout(() => {
+			setEmbedStatus((status) => (status === "loaded" ? status : "failed"));
+		}, 5000);
+		return () => clearTimeout(timer);
+	}, [active]);
 
 	const scrollByCards = (dir: number) => {
 		scrollerRef.current?.scrollBy({ left: dir * 360, behavior: "smooth" });
@@ -201,7 +238,7 @@ export function Testimonials() {
 							<MotionItem
 								key={item.name}
 								{...lift}
-								onClick={hasPost ? () => setActive(item) : undefined}
+								onClick={hasPost ? () => openPost(item) : undefined}
 								role={hasPost ? "button" : undefined}
 								tabIndex={hasPost ? 0 : undefined}
 								onKeyDown={
@@ -209,7 +246,7 @@ export function Testimonials() {
 										? (e: KeyboardEvent) => {
 												if (e.key === "Enter" || e.key === " ") {
 													e.preventDefault();
-													setActive(item);
+													openPost(item);
 												}
 											}
 										: undefined
@@ -262,16 +299,86 @@ export function Testimonials() {
 					<DialogTitle className="sr-only">
 						{active ? `${active.name} on LinkedIn` : "LinkedIn post"}
 					</DialogTitle>
-					{active?.embedUrl && (
-						<iframe
-							key={active.embedUrl}
-							title={`${active.name} on LinkedIn`}
-							src={active.embedUrl}
-							className="h-[70vh] max-h-[946px] w-full border-0"
-							loading="lazy"
-							allowFullScreen
-						/>
-					)}
+					<DialogDescription className="sr-only">
+						{active
+							? `Scholar story from ${active.name}, ${active.role}.`
+							: "LinkedIn post preview."}
+					</DialogDescription>
+
+					{active &&
+						(embedStatus === "failed" ? (
+							// The preview was blocked. Show the quote plus a working link so
+							// the reader still reaches the post on LinkedIn.
+							<div className="flex flex-col items-center gap-5 px-8 py-12 text-center">
+								<div className="grid size-14 place-items-center rounded-full bg-secondary/10 text-secondary">
+									<Linkedin className="h-6 w-6" strokeWidth={1.75} />
+								</div>
+								<p className="text-[15px] leading-relaxed text-secondary">
+									"{active.quote}"
+								</p>
+								<div>
+									<p className="text-secondary">{active.name}</p>
+									<p className="text-sm text-secondary/60">{active.role}</p>
+								</div>
+								<p className="text-sm text-secondary/55">
+									It looks like an ad blocker may be stopping this preview from
+									loading. Try turning it off for this site, or just read the
+									full post on LinkedIn.
+								</p>
+								{postLinkFor(active) && (
+									<a
+										href={postLinkFor(active)}
+										target="_blank"
+										rel="noreferrer"
+										className="inline-flex items-center gap-2 rounded-full bg-secondary px-5 py-2.5 text-sm text-tertiary transition-colors hover:bg-secondary/90"
+									>
+										View post on LinkedIn
+										<ExternalLink className="h-4 w-4" strokeWidth={1.75} />
+									</a>
+								)}
+							</div>
+						) : (
+							<div className="relative">
+								{embedStatus === "loading" && (
+									<div className="absolute inset-0 z-10 grid place-items-center bg-card text-secondary/60">
+										<Loader2 className="h-6 w-6 animate-spin" strokeWidth={1.75} />
+									</div>
+								)}
+								<iframe
+									key={active.embedUrl}
+									title={`${active.name} on LinkedIn`}
+									src={active.embedUrl}
+									className="h-[70vh] max-h-[946px] w-full border-0"
+									allowFullScreen
+									onLoad={(e) => {
+										// A real LinkedIn frame is cross-origin, so its document is
+										// unreadable. If we *can* read it, the request was blocked
+										// (ad blocker / Brave Shields) and we landed on about:blank.
+										try {
+											setEmbedStatus(
+												e.currentTarget.contentDocument == null
+													? "loaded"
+													: "failed",
+											);
+										} catch {
+											setEmbedStatus("loaded");
+										}
+									}}
+									onError={() => setEmbedStatus("failed")}
+								/>
+								{postLinkFor(active) && (
+									<a
+										href={postLinkFor(active)}
+										target="_blank"
+										rel="noreferrer"
+										className="flex items-center justify-center gap-2 border-t border-secondary/10 bg-card py-3 text-sm text-secondary/70 transition-colors hover:text-secondary"
+									>
+										View post on LinkedIn
+										<ExternalLink className="h-3.5 w-3.5" strokeWidth={1.75} />
+									</a>
+								)}
+							</div>
+						))}
 				</DialogContent>
 			</Dialog>
 		</section>
