@@ -73,6 +73,7 @@ export function Ecosystem() {
 												src={partner.logo}
 												alt={partner.name}
 												loading="lazy"
+												style={{ filter: partner.filter }}
 												className={
 													group.category === "Community Partner"
 														? "max-h-20 max-w-52 object-contain"

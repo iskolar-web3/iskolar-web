@@ -28,7 +28,7 @@ export default function TeamSection() {
   return (
     <section id="team" className="py-36 pb-24 text-secondary w-full overflow-hidden">
       <MotionContainer>
-        <div className="px-4 sm:px-12 lg:px-26 max-w-8xl mx-auto relative z-26">
+        <div className="px-4 sm:px-12 lg:px-26 relative z-26">
           <h2 className="text-4xl md:text-5xl mb-4 text-center text-secondary">
             Meet Our Team
           </h2>

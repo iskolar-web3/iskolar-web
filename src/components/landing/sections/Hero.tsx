@@ -2,16 +2,7 @@ import { MotionContainer, MotionItem } from "@/components/landing/MotionContaine
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion"
 import { useRef } from "react"
 import { GraduationCapBg, GraduationCap3D } from "@/components/landing/graphics/GraduationCap"
-
-// Flatten a logo to a silhouette, then tint it to the theme blue (#3a52a6).
-// Best for line/text logos with transparent interiors.
-const BLUE_TINT =
-  "brightness(0) saturate(100%) invert(27%) sepia(46%) saturate(1066%) hue-rotate(196deg) brightness(91%) contrast(88%)"
-
-// Grayscale duotone mapped onto blue. Keeps internal detail, so filled
-// artwork (AWS badge, Tech Kubo illustration) stays legible instead of
-// collapsing into a solid blob.
-const BLUE_DUOTONE = "grayscale(1) sepia(1) hue-rotate(190deg) saturate(2.2) brightness(0.95)"
+import { BLUE_DUOTONE, BLUE_TINT } from "@/components/landing/partners"
 
 const partners = [
   { src: "/partnerships/byc-ventures.png", alt: "BYC Ventures", size: "h-11 sm:h-12", filter: BLUE_TINT },

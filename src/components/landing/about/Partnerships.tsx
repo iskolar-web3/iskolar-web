@@ -51,7 +51,12 @@ export function Partnerships() {
 											src={partner.logo}
 											alt={partner.name}
 											loading="lazy"
-											className="max-h-24 max-w-[220px] object-contain"
+											style={{ filter: partner.filter }}
+											className={`object-contain ${
+												partner.category === "Community Partner"
+													? "max-h-32 max-w-[280px]"
+													: "max-h-24 max-w-[220px]"
+											}`}
 										/>
 									</div>
 								</MotionItem>

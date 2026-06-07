@@ -119,7 +119,7 @@ export function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="relative py-16 lg:py-28 px-4 sm:px-12 lg:px-26 overflow-hidden"
+      className="relative py-16 lg:py-28 px-4 sm:px-12 overflow-hidden"
     >
       <div className="relative z-30">
         {/* Section Header */}

@@ -3,7 +3,6 @@ import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion
 import {
   MotionContainer,
   MotionItem,
-  cardHoverLift,
 } from "@/components/landing/MotionContainer"
 import { Rocket, Sparkles, Building, Globe } from "lucide-react"
 
@@ -45,7 +44,6 @@ const milestones = [
 export function Roadmap() {
   const timelineRef = useRef<HTMLDivElement>(null)
   const reduce = useReducedMotion()
-  const lift = reduce ? {} : cardHoverLift
   const { scrollYProgress } = useScroll({
     target: timelineRef,
     offset: ["start 80%", "end 60%"],
@@ -119,10 +117,7 @@ export function Roadmap() {
 
                   {/* Content Card */}
                   <div className={`lg:w-[calc(50%-2rem)] ${index % 2 === 0 ? "lg:text-right lg:pr-8" : "lg:pl-8"}`}>
-                    <motion.div
-                      {...lift}
-                      className="relative overflow-hidden rounded-2xl border border-secondary/15 bg-card p-6 shadow-sm will-change-transform"
-                    >
+                    <div className="relative border-y border-secondary/15 py-6">
                       <div className={`flex flex-wrap items-center gap-2.5 mb-3 ${index % 2 === 0 ? "lg:justify-end" : ""}`}>
                         <span className="inline-flex items-center rounded-full bg-secondary/10 px-3 py-1 text-xs uppercase tracking-[0.12em] text-secondary">
                           {milestone.quarter}
@@ -130,7 +125,7 @@ export function Roadmap() {
                       </div>
                       <h3 className="text-lg md:text-xl text-secondary mb-2">{milestone.title}</h3>
                       <p className="text-sm text-secondary/80 leading-relaxed">{milestone.description}</p>
-                    </motion.div>
+                    </div>
                   </div>
 
                   {/* Spacer for alternating layout */}

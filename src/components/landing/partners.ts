@@ -2,6 +2,15 @@
 // Partnerships section, so the two stay in sync. Logos live in
 // /public/partnerships/.
 
+// Blue color treatments matched to the Hero trust strip, so partner logos
+// read in the same brand blue everywhere they appear.
+// BLUE_TINT flattens line/text logos to a solid blue silhouette.
+export const BLUE_TINT =
+	"brightness(0) saturate(100%) invert(27%) sepia(46%) saturate(1066%) hue-rotate(196deg) brightness(91%) contrast(88%)";
+// BLUE_DUOTONE keeps internal detail for filled artwork while mapping it to blue.
+export const BLUE_DUOTONE =
+	"grayscale(1) sepia(1) hue-rotate(190deg) saturate(2.2) brightness(0.95)";
+
 export type PartnerCategory =
 	| "Strategic Incubation Partner"
 	| "Community Partner";
@@ -13,6 +22,8 @@ export type Partner = {
 	description: string;
 	href: string;
 	linkLabel: string;
+	// CSS filter that tints the logo to brand blue (BLUE_TINT or BLUE_DUOTONE).
+	filter: string;
 };
 
 export const partners: Partner[] = [
@@ -24,6 +35,7 @@ export const partners: Partner[] = [
 			"BYC Ventures is a venture studio working with iSkolar to design and scale verifiable credential infrastructure, turning student records into portable, tamper proof proof of achievement.",
 		href: "https://byc.ventures",
 		linkLabel: "byc.ventures",
+		filter: BLUE_TINT,
 	},
 	{
 		name: "QBO Innovation Hub",
@@ -33,6 +45,7 @@ export const partners: Partner[] = [
 			"QBO Innovation Hub is the Philippines' first public private startup platform, giving iSkolar mentorship, investor access, and a national network of founders building for impact.",
 		href: "https://www.qboinnovation.com/",
 		linkLabel: "qbo.com.ph",
+		filter: BLUE_DUOTONE,
 	},
 	{
 		name: "Tutorials Dojo",
@@ -42,6 +55,7 @@ export const partners: Partner[] = [
 			"Tutorials Dojo lends iSkolar its experience building learning products at scale, guiding how students discover scholarships and prepare for the opportunities that fit them.",
 		href: "https://tutorialsdojo.com",
 		linkLabel: "tutorialsdojo.com",
+		filter: BLUE_TINT,
 	},
 	{
 		name: "Cryptita Plays",
@@ -51,6 +65,7 @@ export const partners: Partner[] = [
 			"Cryptita Plays runs an engaged Web3 and gaming community that helps iSkolar introduce transparent, blockchain backed scholarships to a wider student audience.",
 		href: "https://cryptitaplays.org",
 		linkLabel: "cryptitaplays.org",
+		filter: BLUE_TINT,
 	},
 	{
 		name: "Tech Kubo",
@@ -60,6 +75,7 @@ export const partners: Partner[] = [
 			"Tech Kubo brings together a grassroots community of student developers and builders, helping iSkolar reach the learners shaping the next wave of Filipino tech.",
 		href: "https://techkubo.com/",
 		linkLabel: "techkubo.com",
+		filter: BLUE_DUOTONE,
 	},
 	{
 		name: "AWS Learning Club Heron",
@@ -69,6 +85,7 @@ export const partners: Partner[] = [
 			"The AWS Learning Club Heron is a student cloud community that connects iSkolar with learners pursuing cloud skills and certifications across partner campuses.",
 		href: "https://www.facebook.com/awslearningclubheron",
 		linkLabel: "awslearningclub.org",
+		filter: BLUE_DUOTONE,
 	},
 ];
 
