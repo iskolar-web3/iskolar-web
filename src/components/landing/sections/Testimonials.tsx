@@ -144,7 +144,7 @@ export function Testimonials() {
 			</div>
 
 			<MotionContainer
-				className="relative z-30 mx-auto max-w-6xl px-4 sm:px-12 lg:px-26"
+				className="relative z-30 mx-auto max-w-7xl px-4 sm:px-12 lg:px-26"
 				viewportMargin="-50px"
 			>
 				{/* Header */}
@@ -168,7 +168,7 @@ export function Testimonials() {
 			</MotionContainer>
 
 			{/* Horizontal scroll carousel */}
-			<div className="relative z-30 mx-auto max-w-6xl">
+			<div className="relative z-30 mx-auto max-w-7xl">
 				{/* Edge fades to hint there is more to scroll */}
 				<div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-8 sm:w-16 bg-linear-to-r from-background to-transparent" />
 				<div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-8 sm:w-16 bg-linear-to-l from-background to-transparent" />
