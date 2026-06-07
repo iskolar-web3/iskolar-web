@@ -1,30 +1,45 @@
 import { queryOptions } from "@tanstack/react-query";
-import { BACKEND_URL, safeResponseJson, type ApiResponse } from "../api";
-import { anySponsorSchema } from "../sponsor/model";
+import { type ApiResponse, BACKEND_URL, safeResponseJson } from "../api";
+import { getCookie } from "../cookie";
+// MOCK DATA START — remove this import when removing landing-page mock data
 import {
-	applicantSchema,
-	applicationSchema,
-	applicationStatusSchema,
-	scholarshipSchema,
+	getMockApplicants,
+	getMockApplications,
+	getMockScholarshipById,
+	MOCK_DATA_ENABLED,
+	mockScholarships,
+} from "../mockData";
+import { anySponsorSchema } from "../sponsor/model";
+import { ACCESS_TOKEN_KEY } from "../user/auth";
+import {
 	type Applicant,
 	type Application,
 	type ApplicationStatus,
+	applicantSchema,
+	applicationSchema,
+	applicationStatusSchema,
 	type CreateApplicationRequest,
 	type EditScholarshipFormData,
 	type GetApplicationsQueryParam,
 	type GetScholarshipQueryParam,
 	type Scholarship,
 	type SelectScholarRequest,
+	scholarshipSchema,
 } from "./model";
-import { getCookie } from "../cookie";
-import { ACCESS_TOKEN_KEY } from "../user/auth";
+
+// MOCK DATA END
 
 async function getMyScholarships(
 	token: string,
 	params?: GetScholarshipQueryParam,
 ): Promise<Scholarship[]> {
 	const resolvedToken = token || getCookie(ACCESS_TOKEN_KEY);
-	if (!resolvedToken) return [];
+	if (!resolvedToken) {
+		// MOCK DATA START
+		if (MOCK_DATA_ENABLED) return [...mockScholarships];
+		// MOCK DATA END
+		return [];
+	}
 	const url = new URL(`${BACKEND_URL}/scholarships`);
 	if (params?.status) {
 		url.searchParams.append("status", params.status);
@@ -46,10 +61,16 @@ async function getMyScholarships(
 	});
 	const result: ApiResponse<Scholarship[]> = await safeResponseJson(response);
 
-	return scholarshipSchema(anySponsorSchema)
+	const parsed = scholarshipSchema(anySponsorSchema)
 		.array()
 		.default([])
 		.parse(result.data);
+
+	// MOCK DATA START
+	if (MOCK_DATA_ENABLED) return [...mockScholarships, ...parsed];
+	// MOCK DATA END
+
+	return parsed;
 }
 
 export const getMyScholarshipsQuery = (
@@ -67,6 +88,12 @@ export const getMyScholarshipsQuery = (
 	});
 
 async function getScholarshipById(id: string): Promise<Scholarship> {
+	// MOCK DATA START
+	if (MOCK_DATA_ENABLED) {
+		const mock = getMockScholarshipById(id);
+		if (mock) return mock;
+	}
+	// MOCK DATA END
 	const token = getCookie(ACCESS_TOKEN_KEY);
 	if (!token) {
 		throw new Error("Access token not found.");
@@ -122,6 +149,12 @@ export async function updateScholarship(
 }
 
 async function getApplicants(id: string): Promise<Applicant[]> {
+	// MOCK DATA START
+	if (MOCK_DATA_ENABLED) {
+		const mock = getMockApplicants(id);
+		if (mock.length) return mock;
+	}
+	// MOCK DATA END
 	const token = getCookie(ACCESS_TOKEN_KEY);
 	if (!token) {
 		throw new Error("Access token not found.");
@@ -147,6 +180,12 @@ export const getApplicantsQuery = (id: string) =>
 async function getMyApplications(
 	param: GetApplicationsQueryParam,
 ): Promise<Application[]> {
+	// MOCK DATA START
+	if (MOCK_DATA_ENABLED) {
+		const mock = getMockApplications(param.status ?? "");
+		if (mock.length) return mock;
+	}
+	// MOCK DATA END
 	const token = getCookie(ACCESS_TOKEN_KEY);
 	if (!token) {
 		throw new Error("Access token not found.");

@@ -33,7 +33,7 @@ export function ScrollToTop() {
 			type="button"
 			onClick={scrollToTop}
 			aria-label="Scroll to top"
-			className="fixed cursor-pointer bottom-11 md:bottom-5 right-6 md:right-5 z-50 transition-all duration-300"
+			className="fixed cursor-pointer bottom-11 md:bottom-5 right-6 md:right-5 z-50 transition-all duration-300 hover:-translate-y-0.5 motion-reduce:transform-none motion-reduce:transition-none"
 			style={{
 				opacity: visible ? 1 : 0,
 				pointerEvents: visible ? "auto" : "none",
@@ -42,7 +42,7 @@ export function ScrollToTop() {
 		>
 			<div className="relative flex items-center justify-center w-14 h-14">
 				{/* Background circle */}
-				<div className="absolute inset-0 rounded-full bg-white shadow-lg" />
+				<div className="absolute inset-0 rounded-full bg-card shadow-lg shadow-secondary/15 ring-1 ring-secondary/10" />
 
 				{/* SVG progress ring */}
 				<svg
@@ -55,7 +55,7 @@ export function ScrollToTop() {
 						cy="28"
 						r={RADIUS}
 						fill="none"
-						stroke="#e4e4e7"
+						stroke="rgba(58,82,166,0.14)"
 						strokeWidth="3"
 					/>
 					{/* Progress */}
@@ -64,17 +64,17 @@ export function ScrollToTop() {
 						cy="28"
 						r={RADIUS}
 						fill="none"
-						stroke="#1e3a8a"
+						stroke="var(--secondary)"
 						strokeWidth="3"
 						strokeLinecap="round"
 						strokeDasharray={CIRCUMFERENCE}
 						strokeDashoffset={strokeDashoffset}
-						style={{ transition: "stroke-dashoffset 0.1s linear" }}
+						className="transition-[stroke-dashoffset] duration-100 ease-linear motion-reduce:transition-none"
 					/>
 				</svg>
 
 				{/* Arrow icon */}
-				<ArrowUp className="relative z-10 w-5 h-5 text-[#1e3a8a]" />
+				<ArrowUp className="relative z-10 w-5 h-5 text-secondary" />
 			</div>
 		</button>
 	);

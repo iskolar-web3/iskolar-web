@@ -1,4 +1,9 @@
-import { motion, type HTMLMotionProps, type Variants } from "framer-motion"
+import {
+  motion,
+  useReducedMotion,
+  type HTMLMotionProps,
+  type Variants,
+} from "framer-motion"
 import type { ReactNode } from "react"
 
 interface MotionContainerProps extends HTMLMotionProps<"div"> {
@@ -34,6 +39,36 @@ const defaultItemVariants: Variants = {
   },
 }
 
+// Shared academic motion vocabulary so every section draws/lifts identically.
+// A rule or underline that paints in from the left as it enters the viewport.
+export const drawLineVariants: Variants = {
+  hidden: { scaleX: 0 },
+  visible: {
+    scaleX: 1,
+    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
+  },
+}
+
+// Vertical counterpart for connectors that grow top to bottom.
+export const drawLineVariantsY: Variants = {
+  hidden: { scaleY: 0 },
+  visible: {
+    scaleY: 1,
+    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
+  },
+}
+
+// The single hover-lift spec for every card on a white surface.
+export const cardHoverLift = {
+  whileHover: {
+    y: -6,
+    scale: 1.015,
+    boxShadow: "0 18px 40px -16px rgba(58, 82, 166, 0.28)",
+    transition: { type: "spring", stiffness: 260, damping: 22 },
+  },
+  whileTap: { y: -2, scale: 1.0 },
+} as const
+
 export function MotionContainer({
   children,
   staggerDelay = 0.1,
@@ -43,9 +78,10 @@ export function MotionContainer({
   variants = defaultContainerVariants,
   ...props
 }: MotionContainerProps) {
+  const reduce = useReducedMotion()
   return (
     <motion.div
-      initial="hidden"
+      initial={reduce ? "visible" : "hidden"}
       whileInView="visible"
       viewport={{ once: true, margin: viewportMargin }}
       custom={{ staggerDelay, delayChildren }}
@@ -69,8 +105,14 @@ export function MotionItem({
   variants = defaultItemVariants,
   ...props
 }: MotionItemProps) {
+  const reduce = useReducedMotion()
   return (
-    <motion.div variants={variants} className={className} {...props}>
+    <motion.div
+      variants={variants}
+      initial={reduce ? "visible" : undefined}
+      className={className}
+      {...props}
+    >
       {children}
     </motion.div>
   )

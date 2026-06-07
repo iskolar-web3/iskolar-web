@@ -1,4 +1,9 @@
-import { MotionContainer, MotionItem } from "@/components/landing/MotionContainer"
+import { motion, useReducedMotion } from "framer-motion"
+import {
+  MotionContainer,
+  MotionItem,
+  cardHoverLift,
+} from "@/components/landing/MotionContainer"
 import {
   GraduationCap,
   Building2,
@@ -14,9 +19,8 @@ const userTypes = [
     icon: GraduationCap,
     title: "Students",
     subtitle: "Aspiring Scholars",
-    color: "bg-secondary",
     description:
-      "Discover scholarships, apply with ease, and track your applications in real-time.",
+      "Discover scholarships, apply with ease, and track your applications in real time.",
     subTypes: [
       { icon: BookOpen, label: "Pre-College" },    
       { icon: UserRound, label: "Undergraduates" }, 
@@ -26,7 +30,6 @@ const userTypes = [
     icon: Building2,
     title: "Sponsors",
     subtitle: "Scholarship Providers",
-    color: "bg-secondary",
     description: "Create scholarships, evaluate applicants, and track disbursements transparently.",
     subTypes: [
       { icon: Heart, label: "Individuals" },
@@ -38,7 +41,6 @@ const userTypes = [
     icon: School,
     title: "Schools",
     subtitle: "Educational Institutions",
-    color: "bg-secondary",
     description:
       "Monitor scholarships, ensure compliance, and support transparency.",
     subTypes: [
@@ -49,27 +51,30 @@ const userTypes = [
 ]
 
 export function TargetUsers() {
+  const reduce = useReducedMotion()
+  const lift = reduce ? {} : cardHoverLift
+
   return (
     <section
       id="about"
       className="py-20 lg:py-32 px-6 md:px-16 relative overflow-hidden"
     >
-      {/* Decorative Background */}
-      <div className="pointer-events-none absolute inset-0" />
-
-      <MotionContainer className="relative z-26 max-w-6xl mx-auto">
+      <MotionContainer className="relative z-10 max-w-6xl mx-auto">
         {/* Section Header */}
-        <MotionItem className="text-center mb-22">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5">
-            <div className="w-1.5 h-1.5 bg-secondary rounded-full animate-pulse" />
-            <span className="text-sm text-secondary uppercase tracking-wider">
+        <MotionItem className="flex flex-col items-center text-center mb-16 lg:mb-20">
+          <div className="inline-flex items-center gap-2 mb-5">
+            <div
+              className="w-1.5 h-1.5 bg-secondary rounded-full"
+              style={{ animation: "soft-pulse 3s ease-in-out infinite" }}
+            />
+            <span className="text-xs uppercase tracking-[0.2em] text-secondary/55">
               Who it's for
             </span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-[2.75rem] leading-tight text-secondary mt-5 mb-3 text-balance">
+          <h2 className="text-3xl sm:text-4xl lg:text-[2.75rem] leading-tight text-secondary text-balance">
             Built for the scholarship ecosystem
           </h2>
-          <p className="text-sm sm:text-base text-secondary/70 max-w-xl mx-auto text-pretty">
+          <p className="mt-5 text-sm sm:text-base text-secondary/70 max-w-xl mx-auto text-pretty">
             Three perspectives, one streamlined experience.
           </p>
         </MotionItem>
@@ -79,7 +84,7 @@ export function TargetUsers() {
           {userTypes.map((user, index) => (
             <MotionItem
               key={user.title}
-              className="group relative h-full px-8"
+              className="group relative h-full"
               variants={{
                 hidden: { opacity: 0, y: 30 },
                 visible: {
@@ -89,48 +94,49 @@ export function TargetUsers() {
                 },
               }}
             >
-              <div className="relative h-full flex flex-col rounded-3xl bg-background overflow-hidden">
+              <motion.div
+                {...lift}
+                className="ruled-paper relative h-full flex flex-col rounded-3xl border border-border bg-card px-8 pt-8 pb-7 overflow-hidden will-change-transform"
+              >
                 {/* Icon */}
-                <div className="relative flex justify-center pt-8 pb-5">
-                  <div className="text-secondary">
-                    <user.icon className="w-21 h-21" />
-                  </div>
+                <div className="relative flex justify-center pb-5">
+                  <user.icon className="size-16 text-secondary" strokeWidth={1.5} />
                 </div>
 
                 {/* Title and Subtitle */}
-                <div className="relative text-center pb-6">
-                  <h3 className="text-2xl sm:text-[2rem] text-secondary">
+                <div className="relative text-center pb-5">
+                  <h3 className="text-2xl sm:text-[1.75rem] text-secondary leading-snug">
                     {user.title}
                   </h3>
-                  <p className="text-[13px] uppercase tracking-[0.15em] text-secondary/60 mt-1">
+                  <p className="mt-1.5 text-[12px] uppercase tracking-[0.18em] text-secondary/55">
                     {user.subtitle}
                   </p>
                 </div>
 
                 {/* Description */}
-                <div className="relative pb-4 grow">
-                  <p className="md:text-base text-secondary/80 leading-relaxed">
+                <div className="relative grow pb-5">
+                  <p className="text-sm md:text-base text-secondary/80 leading-relaxed">
                     {user.description}
                   </p>
                 </div>
 
                 {user.subTypes && (
-                  <div className="relative pt-2 pb-5 flex flex-wrap gap-2">
+                  <div className="relative flex flex-wrap gap-2 pt-1">
                     {user.subTypes.map((subType) => (
-                      <div
+                      <span
                         key={subType.label}
-                        className="flex items-center gap-1 text-secondary/80 text-[13px] tracking-tight"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-secondary/15 bg-secondary/[0.06] px-3 py-1 text-[12px] tracking-tight text-secondary/85 transition-colors duration-300 hover:bg-secondary/[0.12]"
                       >
-                        <subType.icon className="w-4 h-4 text-secondary/75" />
-                        <span>{subType.label}</span>
-                      </div>
+                        <subType.icon className="size-3.5 text-secondary/70" />
+                        {subType.label}
+                      </span>
                     ))}
                   </div>
                 )}
 
-                {/* Animated underline accent */}
-                <div className="absolute inset-x-6 bottom-0 h-px bg-linear-to-r from-transparent via-secondary/60 to-transparent scale-x-0 origin-center group-hover:scale-x-100 transition-transform duration-500" />
-              </div>
+                {/* Highlighter draw-in accent (left to right on hover) */}
+                <span className="pointer-events-none absolute inset-x-8 bottom-0 h-[2px] origin-left scale-x-0 rounded-full bg-secondary/45 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-x-100" />
+              </motion.div>
             </MotionItem>
           ))}
         </div>

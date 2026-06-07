@@ -13,7 +13,6 @@ const quickLinks = [
 ]
 
 const legalLinks = [
-  { name: "", href: "/" },
   { name: "Privacy Policy", href: "/privacy-policy" },
   { name: "Terms & Conditions", href: "/terms-conditions" },
 ]
@@ -56,8 +55,8 @@ export function Footer() {
 
   return (
     <footer className="bg-background text-tertiary">
-      {/* Horizontal line at top */}
-      <div className="border-t border-secondary/20"></div>
+      {/* Ruled hairline at top */}
+      <div className="h-px w-full bg-secondary/15" />
 
       {/* Main Footer */}
       <div className="pt-30 pb-16 px-6 md:px-26">
@@ -75,6 +74,7 @@ export function Footer() {
                   />
                 </div>
               </a>
+              <span className="eyebrow mb-3">For students</span>
               <p className="text-secondary/80 text-sm leading-relaxed mb-6">
                 Empowering students with accessible, transparent, and efficient scholarship opportunities.
               </p>
@@ -97,11 +97,11 @@ export function Footer() {
 
             {/* Quick Links */}
             <div>
-              <h4 className="text-lg mb-4 text-secondary">Quick Links</h4>
+              <h4 className="text-secondary text-base tracking-wide mb-4">Quick Links</h4>
               <ul className="space-y-3">
                 {quickLinks.map((link) => (
                   <li key={link.name}>
-                    <a href={link.href} className="text-secondary/80 hover:text-secondary transition-colors text-sm">
+                    <a href={link.href} className="text-secondary/80 hover:text-secondary text-sm inline-block transition-all duration-200 hover:translate-x-0.5 motion-reduce:transition-none motion-reduce:hover:translate-x-0">
                       {link.name}
                     </a>
                   </li>
@@ -111,11 +111,11 @@ export function Footer() {
 
             {/* Legal */}
             <div>
-              <h4 className="text-secondary text-lg mb-4">Legal</h4>
+              <h4 className="text-secondary text-base tracking-wide mb-4">Legal</h4>
               <ul className="space-y-3">
                 {legalLinks.map((link) => (
                   <li key={link.name}>
-                    <a href={link.href} className="text-secondary/80 hover:text-secondary transition-colors text-sm">
+                    <a href={link.href} className="text-secondary/80 hover:text-secondary text-sm inline-block transition-all duration-200 hover:translate-x-0.5 motion-reduce:transition-none motion-reduce:hover:translate-x-0">
                       {link.name}
                     </a>
                   </li>
@@ -125,7 +125,7 @@ export function Footer() {
 
             {/* Contact */}
             <div>
-              <h4 className="text-secondary text-lg mb-4">Contact Us</h4>
+              <h4 className="text-secondary text-base tracking-wide mb-4">Contact Us</h4>
               <a
                 href={GMAIL_COMPOSE_URL}
                 onClick={handleEmailClick}

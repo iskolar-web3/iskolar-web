@@ -1,5 +1,6 @@
 import { MotionContainer, MotionItem } from "@/components/landing/MotionContainer"
-import { motion } from "framer-motion"
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion"
+import { useRef } from "react"
 import { GraduationCapBg, GraduationCap3D } from "@/components/landing/graphics/GraduationCap"
 
 // Flatten a logo to a silhouette, then tint it to the theme blue (#3a52a6).
@@ -16,46 +17,64 @@ const partners = [
   { src: "/partnerships/byc-ventures.png", alt: "BYC Ventures", size: "h-11 sm:h-12", filter: BLUE_TINT },
   { src: "/partnerships/qbo-innovation.png", alt: "QBO Innovation", size: "h-13 sm:h-15", filter: BLUE_DUOTONE },
   { src: "/partnerships/tutorials-dojo.png", alt: "Tutorials Dojo", size: "h-11 sm:h-12", filter: BLUE_TINT },
-  { src: "/partnerships/university-of-makati.png", alt: "University of Makati", size: "h-14 sm:h-16", filter: BLUE_DUOTONE },
   { src: "/partnerships/cryptita-plays.png", alt: "Cryptita Plays", size: "h-18 sm:h-22", filter: BLUE_TINT },
   { src: "/partnerships/aws-learning-club-heron.png", alt: "AWS Learning Club - Heron", size: "h-17 sm:h-21", filter: BLUE_DUOTONE },
   { src: "/partnerships/tech-kubo.png", alt: "Tech Kubo", size: "h-20 sm:h-24", filter: BLUE_DUOTONE },
 ]
 
 export function Hero() {
+  const sectionRef = useRef<HTMLElement>(null)
+  const reduce = useReducedMotion()
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  })
+  // Background graphics drift up slightly slower than the foreground for depth.
+  const capYRaw = useTransform(scrollYProgress, [0, 1], [0, -40])
+  const bgCapYRaw = useTransform(scrollYProgress, [0, 1], [0, -20])
+  const capY = reduce ? 0 : capYRaw
+  const bgCapY = reduce ? 0 : bgCapYRaw
+
   return (
     <section
+      ref={sectionRef}
       id="home"
       className="relative min-h-dvh px-6 flex items-center justify-center shrink-0 pt-24 pb-24 overflow-hidden support-[min-height:100dvh]:min-h-[100dvh]"
     >
       <div className="absolute inset-0 z-26 overflow-hidden pointer-events-none">
         {/* Graduation cap shape with animated gradient */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
+          style={{ y: bgCapY }}
+          initial={reduce ? { opacity: 0.2, scale: 1 } : { opacity: 0, scale: 0.8 }}
           animate={{ opacity: 0.2, scale: 1 }}
           transition={{ duration: 1.5, ease: "easeOut" }}
           className="absolute top-[8%] right-[2%] w-[80vw] max-w-[400px] aspect-4/3 md:w-[500px] md:h-[380px] lg:w-[550px] lg:h-[425px] opacity-20"
         >
-          <GraduationCapBg />
+          <GraduationCapBg reduced={!!reduce} />
         </motion.div>
 
         {/* 3D Graduation Cap */}
         <motion.div
-          initial={{ opacity: 0, y: 50, rotate: -5 }}
+          initial={reduce ? { opacity: 0.1, y: 0, rotate: -5 } : { opacity: 0, y: 50, rotate: -5 }}
           animate={{ opacity: 0.1, y: 0, rotate: -5 }}
           transition={{ duration: 2, ease: "easeOut" }}
           className="absolute -bottom-[5%] md:-bottom-[20%] -left-[3%] w-[90vw] max-w-[500px] aspect-square md:w-[600px] md:h-[600px] lg:w-[700px] lg:h-[700px] opacity-100"
         >
-          {/* Floating CSS Animation Container */}
-          <div
-            className="w-full h-full"
-            style={{
-              animation: 'float-soothing 8s ease-in-out infinite',
-              transformOrigin: 'center center'
-            }}
-          >
-            <GraduationCap3D />
-          </div>
+          {/* Scroll parallax layer, kept separate from the entrance y and the float */}
+          <motion.div style={{ y: capY }} className="w-full h-full">
+            {/* Floating CSS Animation Container */}
+            <div
+              className="w-full h-full"
+              style={{
+                animation: reduce
+                  ? "none"
+                  : "float-soothing 8s ease-in-out infinite",
+                transformOrigin: "center center",
+              }}
+            >
+              <GraduationCap3D reduced={!!reduce} />
+            </div>
+          </motion.div>
         </motion.div>
       </div>
 
@@ -95,17 +114,48 @@ export function Hero() {
               <div className="h-px w-10 bg-secondary/20" />
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-x-9 gap-y-6">
+            <motion.div
+              className="flex flex-wrap items-center justify-center gap-x-9 gap-y-6"
+              initial={reduce ? "visible" : "hidden"}
+              whileInView="visible"
+              viewport={{ once: true, margin: "-80px" }}
+              variants={{
+                visible: {
+                  transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+                },
+              }}
+            >
               {partners.map((partner) => (
-                <img
+                <motion.img
                   key={partner.src}
                   src={partner.src}
                   alt={partner.alt}
-                  className={`${partner.size} w-auto object-contain`}
+                  className={`${partner.size} w-auto object-contain will-change-transform`}
                   style={{ filter: partner.filter }}
+                  variants={{
+                    hidden: { opacity: 0, y: 12 },
+                    visible: {
+                      opacity: 1,
+                      y: 0,
+                      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+                    },
+                  }}
+                  whileHover={
+                    reduce
+                      ? undefined
+                      : {
+                          y: -3,
+                          scale: 1.04,
+                          transition: {
+                            type: "spring",
+                            stiffness: 260,
+                            damping: 22,
+                          },
+                        }
+                  }
                 />
               ))}
-            </div>
+            </motion.div>
           </div>
         </MotionItem>
       </MotionContainer>

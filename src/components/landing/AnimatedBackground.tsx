@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { useReducedMotion } from "framer-motion"
 
 type IconType = 
   | "graduationCap" | "book" | "certificate" | "pencil" 
@@ -163,23 +164,29 @@ function IconRenderer({ type, className }: { type: IconType; className?: string 
 
 export default function AnimatedBackground() {
   const [icons, setIcons] = useState<FloatingIcon[]>([])
+  const reduce = useReducedMotion()
 
   useEffect(() => {
+    // Skip the floating motif entirely for reduced-motion users.
+    if (reduce) {
+      setIcons([])
+      return
+    }
     // Increased count for better coverage
     const generatedIcons: FloatingIcon[] = Array.from({ length: 25 }, (_, i) => ({
       id: i,
-      size: Math.random() * 40 + 20, 
+      size: Math.random() * 40 + 20,
       x: Math.random() * 100,
       y: Math.random() * 100,
       delay: Math.random() * 20,
-      duration: Math.random() * 20 + 20, 
-      opacity: Math.random() * 0.15 + 0.05, 
+      duration: Math.random() * 20 + 20,
+      opacity: Math.random() * 0.15 + 0.05,
       type: iconTypes[Math.floor(Math.random() * iconTypes.length)],
       rotation: Math.random() * 360, // Full rotation start
       color: colors[Math.floor(Math.random() * colors.length)],
     }))
     setIcons(generatedIcons)
-  }, [])
+  }, [reduce])
 
   return (
     <>

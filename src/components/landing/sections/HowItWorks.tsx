@@ -1,139 +1,268 @@
-import { MotionContainer, MotionItem } from "@/components/landing/MotionContainer"
+import { motion, useReducedMotion } from "framer-motion"
 import {
+  Activity,
   Building2,
   ClipboardCheck,
   Compass,
-  FileCheck,
   GraduationCap,
   HandCoins,
+  type LucideIcon,
   SquarePen,
   Wallet,
 } from "lucide-react"
+import { MotionContainer, MotionItem } from "@/components/landing/MotionContainer"
 
-const tracks = [
+type Feature = {
+  icon: LucideIcon
+  title: string
+  description: string
+  position: "left" | "right"
+}
+
+// Left = the student journey, right = the sponsor journey (same content as the
+// previous How it works section, laid out around the central hub).
+const features: Feature[] = [
   {
-    audience: "For students",
-    icon: GraduationCap,
-    steps: [
-      {
-        icon: Compass,
-        title: "Discover",
-        description: "Browse every opportunity in one place and filter down to the scholarships that fit you.",
-      },
-      {
-        icon: FileCheck,
-        title: "Apply",
-        description: "Submit applications and documents digitally. No printing, no queues, no forms lost in transit.",
-      },
-      {
-        icon: Wallet,
-        title: "Receive",
-        description: "Follow your status in real time and receive funds transparently, all the way to disbursement.",
-      },
-    ],
+    icon: Compass,
+    title: "Discover & Apply",
+    description: "Browse scholarships, then apply and submit documents digitally. No printing, no queues.",
+    position: "left",
   },
   {
-    audience: "For sponsors",
-    icon: Building2,
-    steps: [
-      {
-        icon: SquarePen,
-        title: "Create",
-        description: "Set up scholarships with eligibility rules that match exactly what you are looking for.",
-      },
-      {
-        icon: ClipboardCheck,
-        title: "Review",
-        description: "Evaluate and shortlist applicants fairly, with everything you need in one workspace.",
-      },
-      {
-        icon: HandCoins,
-        title: "Disburse",
-        description: "Release funds transparently and follow every payout through to completion.",
-      },
-    ],
+    icon: Activity,
+    title: "Track",
+    description: "Follow every application in real time and always know exactly where you stand.",
+    position: "left",
+  },
+  {
+    icon: Wallet,
+    title: "Receive",
+    description: "Receive your funds transparently once you are selected, all the way to disbursement.",
+    position: "left",
+  },
+  {
+    icon: SquarePen,
+    title: "Create",
+    description: "Set up scholarships with eligibility rules that match exactly what you are looking for.",
+    position: "right",
+  },
+  {
+    icon: ClipboardCheck,
+    title: "Review",
+    description: "Evaluate and shortlist applicants fairly, with everything you need in one workspace.",
+    position: "right",
+  },
+  {
+    icon: HandCoins,
+    title: "Disburse",
+    description: "Release funds transparently and follow every payout through to completion.",
+    position: "right",
   },
 ]
 
+const students = features.filter((f) => f.position === "left")
+const sponsors = features.filter((f) => f.position === "right")
+
+// Concentric orbital rings, faint to slightly stronger toward the center.
+// Brand blue (#3a52a6) at low opacity, applied inline so Tailwind does not
+// need to see runtime-built opacity classes.
+const rings = [
+  { size: 1025, color: "rgba(58,82,166,0.12)", delay: 0.32 },
+  { size: 855, color: "rgba(58,82,166,0.18)", delay: 0.24 },
+  { size: 690, color: "rgba(58,82,166,0.21)", delay: 0.16 },
+  { size: 520, color: "rgba(58,82,166,0.24)", delay: 0.08 },
+  { size: 350, color: "rgba(58,82,166,0.28)", delay: 0 },
+]
+
+function PersonaLabel({
+  icon: Icon,
+  label,
+}: {
+  icon: LucideIcon
+  label: string
+}) {
+  return (
+    <span className="inline-flex items-center gap-2 rounded-full border border-secondary/20 bg-card px-4 py-1.5 text-xs uppercase tracking-[0.18em] text-secondary shadow-sm">
+      <Icon className="w-4 h-4" strokeWidth={1.75} />
+      {label}
+    </span>
+  )
+}
+
+function FeatureCard({ feature, side }: { feature: Feature; side: "left" | "right" }) {
+  const Icon = feature.icon
+  const isLeft = side === "left"
+  return (
+    <MotionItem
+      className={`group relative flex items-start gap-4 min-h-[150px] bg-card border border-secondary/20 px-8 py-6 transition-all duration-300 hover:shadow-sm ${
+        isLeft
+          ? "rounded-tr-full rounded-bl-full hover:-translate-x-1"
+          : "flex-row-reverse rounded-tl-full rounded-br-full hover:translate-x-1"
+      } motion-reduce:transition-none motion-reduce:hover:translate-x-0`}
+    >
+      <Icon
+        className="shrink-0 w-8 h-8 text-secondary/70 transition-colors duration-300 group-hover:text-secondary"
+        strokeWidth={1.5}
+      />
+      <div className={`flex-1 ${isLeft ? "" : "text-right"}`}>
+        <h3 className="text-[19px] text-secondary mb-1">{feature.title}</h3>
+        <p className="text-sm text-secondary/80 leading-relaxed">{feature.description}</p>
+      </div>
+    </MotionItem>
+  )
+}
+
 export function HowItWorks() {
+  const reduce = useReducedMotion()
+  const popIn = reduce ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 }
+
   return (
     <section
       id="how-it-works"
-      className="relative overflow-hidden bg-secondary py-20 lg:py-28 px-6 md:px-16"
+      className="relative py-16 lg:py-28 px-6 md:px-12 overflow-hidden"
     >
-      {/* Faint grid texture */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(240,247,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(240,247,255,0.04)_1px,transparent_1px)] bg-size-[64px_64px]" />
-
-      <MotionContainer className="relative z-26 max-w-5xl mx-auto" viewportMargin="-50px">
-        {/* Header */}
-        <MotionItem className="text-center mb-16 lg:mb-20">
-          <div className="inline-flex items-center gap-2 mb-3">
-            <div className="w-1.5 h-1.5 bg-tertiary rounded-full animate-pulse" />
-            <span className="text-sm text-tertiary/80 uppercase tracking-wider">How it works</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl text-tertiary mt-2 mb-5 text-balance">
-            From scattered listings to scholarships that reach you
-          </h2>
-          <p className="text-base sm:text-lg text-tertiary/75 max-w-2xl mx-auto text-pretty leading-relaxed">
-            One clear path for students and sponsors, from discovery to disbursement.
-          </p>
-        </MotionItem>
-
-        {/* Persona tracks */}
-        <div className="space-y-16 lg:space-y-20">
-          {tracks.map((track) => (
-            <div key={track.audience}>
-              {/* Track label */}
-              <MotionItem className="flex items-center gap-3 mb-10">
-                <track.icon className="w-6 h-6 text-tertiary" strokeWidth={1.75} />
-                <h3 className="text-lg sm:text-xl text-tertiary tracking-tight">{track.audience}</h3>
-                <div className="h-px flex-1 bg-tertiary/15" />
-              </MotionItem>
-
-              {/* Steps */}
-              <div className="relative grid gap-10 md:grid-cols-3 md:gap-6">
-                {/* Connecting line on desktop */}
-                <div className="hidden md:block absolute top-5 left-[16%] right-[16%] h-px bg-tertiary/20" />
-
-                {track.steps.map((step, index) => (
-                  <MotionItem
-                    key={step.title}
-                    className="relative flex flex-col items-center text-center"
-                    variants={{
-                      hidden: { opacity: 0, y: 30 },
-                      visible: {
-                        opacity: 1,
-                        y: 0,
-                        transition: { delay: index * 0.12, duration: 0.5 },
-                      },
-                    }}
-                  >
-                    <div className="relative z-10 flex items-center justify-center bg-secondary px-4">
-                      <step.icon className="w-10 h-10 text-tertiary" strokeWidth={1.5} />
-                      <span className="absolute -top-2 -right-1 text-xs font-semibold text-tertiary/50">
-                        0{index + 1}
-                      </span>
-                    </div>
-                    <h4 className="text-lg lg:text-xl text-tertiary mt-5 mb-2">{step.title}</h4>
-                    <p className="text-sm lg:text-base text-tertiary/75 leading-relaxed max-w-xs">
-                      {step.description}
-                    </p>
-                  </MotionItem>
-                ))}
-              </div>
+      <div className="mx-auto max-w-7xl relative z-30">
+        {/* Section Header */}
+        <MotionContainer className="text-center mb-16 lg:mb-24" viewportMargin="-50px">
+          <MotionItem>
+            <div className="inline-flex items-center gap-2 mb-3">
+              <div
+                className="w-1.5 h-1.5 bg-secondary rounded-full"
+                style={{ animation: "soft-pulse 3s ease-in-out infinite" }}
+              />
+              <span className="text-sm text-secondary/80 uppercase tracking-wider">
+                How it works
+              </span>
             </div>
+          </MotionItem>
+          <MotionItem>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl text-secondary leading-[1.15] tracking-tight mt-2 mb-5 text-balance">
+              From scattered listings to scholarships that reach you
+            </h2>
+          </MotionItem>
+          <MotionItem>
+            <p className="text-base sm:text-lg text-secondary/75 max-w-2xl mx-auto text-pretty leading-relaxed">
+              One clear path for students and sponsors, from discovery to disbursement.
+            </p>
+          </MotionItem>
+        </MotionContainer>
+
+        {/* Mobile: grouped, numbered-free stacks */}
+        <div className="lg:hidden space-y-12">
+          {[
+            { label: "For students", icon: GraduationCap, items: students },
+            { label: "For sponsors", icon: Building2, items: sponsors },
+          ].map((persona) => (
+            <MotionContainer key={persona.label} className="space-y-5" staggerDelay={0.12}>
+              <MotionItem>
+                <PersonaLabel icon={persona.icon} label={persona.label} />
+              </MotionItem>
+              {persona.items.map((feature) => {
+                const Icon = feature.icon
+                const isLeft = feature.position === "left"
+                return (
+                  <MotionItem
+                    key={feature.title}
+                    className={`group relative flex items-start gap-4 bg-card border border-secondary/20 p-6 transition-all duration-300 hover:shadow-sm ${
+                      isLeft
+                        ? "rounded-tr-3xl rounded-bl-3xl"
+                        : "flex-row-reverse rounded-tl-3xl rounded-br-3xl"
+                    }`}
+                  >
+                    <Icon
+                      className="shrink-0 w-8 h-8 text-secondary/70 transition-colors duration-300 group-hover:text-secondary"
+                      strokeWidth={1.5}
+                    />
+                    <div className={`flex-1 ${isLeft ? "" : "text-right"}`}>
+                      <h3 className="text-lg text-secondary mb-1">{feature.title}</h3>
+                      <p className="text-sm text-secondary/80 leading-relaxed">
+                        {feature.description}
+                      </p>
+                    </div>
+                  </MotionItem>
+                )
+              })}
+            </MotionContainer>
           ))}
         </div>
 
-        {/* Closing line */}
-        <MotionItem className="text-center mt-16 lg:mt-20">
-          <div className="inline-flex items-center gap-3 text-tertiary/65 text-base">
-            <div className="h-px w-12 bg-tertiary/20" />
-            <span>Scholarships that find you, so you don&apos;t have to.</span>
-            <div className="h-px w-12 bg-tertiary/20" />
+        {/* Desktop: orbital layout */}
+        <div className="hidden lg:block relative">
+          <div className="relative mx-auto max-w-6xl">
+            {/* Central hub */}
+            <motion.div
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+              style={{ zIndex: 10 }}
+              initial={reduce ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            >
+              {/* Soft glow for depth */}
+              <div
+                aria-hidden
+                className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-secondary/[0.06] blur-3xl"
+              />
+
+              {/* Orbital rings */}
+              {rings.map((ring) => (
+                <motion.div
+                  key={ring.size}
+                  aria-hidden
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border"
+                  style={{ width: ring.size, height: ring.size, borderColor: ring.color }}
+                  initial={popIn}
+                  whileInView={{ scale: 1, opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 1.0, delay: ring.delay, ease: [0.34, 1.56, 0.64, 1] }}
+                />
+              ))}
+
+              {/* Center logo */}
+              <motion.div
+                className="relative w-50 h-50 rounded-full border-2 border-secondary/30 bg-card shadow-2xl flex items-center justify-center overflow-hidden"
+                initial={popIn}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
+              >
+                <img src="/logo.png" alt="iSkolar" className="w-40 h-40 object-contain" />
+              </motion.div>
+            </motion.div>
+
+            {/* Feature cards */}
+            <MotionContainer
+              className="relative z-20"
+              style={{ minHeight: "925px" }}
+              staggerDelay={0.12}
+            >
+              {/* Left = students */}
+              <div className="absolute left-[25px] top-1/2 -translate-y-1/2 w-[360px]">
+                <MotionItem className="mb-6">
+                  <PersonaLabel icon={GraduationCap} label="For students" />
+                </MotionItem>
+                <div className="space-y-6">
+                  {students.map((feature) => (
+                    <FeatureCard key={feature.title} feature={feature} side="left" />
+                  ))}
+                </div>
+              </div>
+
+              {/* Right = sponsors */}
+              <div className="absolute right-[25px] top-1/2 -translate-y-1/2 w-[360px]">
+                <MotionItem className="mb-6 flex justify-end">
+                  <PersonaLabel icon={Building2} label="For sponsors" />
+                </MotionItem>
+                <div className="space-y-6">
+                  {sponsors.map((feature) => (
+                    <FeatureCard key={feature.title} feature={feature} side="right" />
+                  ))}
+                </div>
+              </div>
+            </MotionContainer>
           </div>
-        </MotionItem>
-      </MotionContainer>
+        </div>
+      </div>
     </section>
   )
 }

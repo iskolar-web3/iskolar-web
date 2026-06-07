@@ -29,6 +29,9 @@ const Roadmap = lazy(() =>
 		default: m.Roadmap,
 	})),
 );
+const CTA = lazy(() =>
+	import("@/components/landing/sections/CTA").then((m) => ({ default: m.CTA })),
+);
 const FAQ = lazy(() =>
 	import("@/components/landing/sections/FAQ").then((m) => ({ default: m.FAQ })),
 );
@@ -71,8 +74,9 @@ function App() {
 			<Suspense fallback={<div className="min-h-[50vh]" />}>
 				<HowItWorks />
 				<TargetUsers />
-				<Testimonials />
 				<Roadmap />
+				<Testimonials />
+				<CTA />
 				<FAQ />
 				<Footer />
 			</Suspense>
