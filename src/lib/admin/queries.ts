@@ -42,34 +42,34 @@ export function getDateRange(range: TimeRange): { startDate: string; endDate: st
 	}
 }
 
-export function adminDashboardQueryOptions(token: string) {
+export function adminDashboardQueryOptions() {
 	return queryOptions({
 		queryKey: ["admin", "dashboard"],
 		queryFn: async () => {
-			const res = await getDashboardMetrics(token);
+			const res = await getDashboardMetrics();
 			return res.data;
 		},
 		staleTime: 60 * 1000,
 	});
 }
 
-export function adminSignupTimelineQueryOptions(token: string, range: TimeRange = "30d") {
+export function adminSignupTimelineQueryOptions(range: TimeRange = "30d") {
 	const { startDate, endDate } = getDateRange(range);
 	return queryOptions({
 		queryKey: ["admin", "signups", range],
 		queryFn: async () => {
-			const res = await getSignupTimeline(token, startDate, endDate);
+			const res = await getSignupTimeline(startDate, endDate);
 			return res.data;
 		},
 		staleTime: 60 * 1000,
 	});
 }
 
-export function adminStudentDistributionQueryOptions(token: string) {
+export function adminStudentDistributionQueryOptions() {
 	return queryOptions({
 		queryKey: ["admin", "students", "distribution"],
 		queryFn: async () => {
-			const res = await getStudentDistribution(token);
+			const res = await getStudentDistribution();
 			return res.data;
 		},
 		staleTime: 60 * 1000,
@@ -77,13 +77,12 @@ export function adminStudentDistributionQueryOptions(token: string) {
 }
 
 export function adminUsersQueryOptions(
-	token: string,
 	params: UserListQuery,
 ) {
 	return queryOptions({
 		queryKey: ["admin", "users", params],
 		queryFn: async () => {
-			const res = await getUsers(token, params);
+			const res = await getUsers(params);
 			return res.data;
 		},
 		staleTime: 60 * 1000,
@@ -91,23 +90,21 @@ export function adminUsersQueryOptions(
 }
 
 export function adminScholarshipsQueryOptions(
-	token: string,
 	params?: { search?: string },
 ) {
 	return queryOptions({
 		queryKey: ["admin", "scholarships", params],
-		queryFn: () => getAdminScholarships(token, params),
+		queryFn: () => getAdminScholarships(params),
 		staleTime: 60 * 1000,
 	});
 }
 
 export function adminScholarshipApplicantsQueryOptions(
-	token: string,
 	scholarshipId: string | null,
 ) {
 	return queryOptions({
 		queryKey: ["admin", "scholarships", scholarshipId, "applicants"],
-		queryFn: () => getAdminScholarshipApplicants(token, scholarshipId!),
+		queryFn: () => getAdminScholarshipApplicants(scholarshipId!),
 		enabled: !!scholarshipId,
 		staleTime: 60 * 1000,
 	});

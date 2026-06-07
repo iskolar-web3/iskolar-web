@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { useAuth } from "@/auth";
 import {
 	adminDashboardQueryOptions,
 	adminSignupTimelineQueryOptions,
@@ -26,18 +25,16 @@ export const Route = createFileRoute("/_admin/dashboard")({
 });
 
 function AdminDashboard() {
-	const auth = useAuth();
-	const token = auth.sessionToken;
 	const [timeRange, setTimeRange] = useState<TimeRange>("30d");
 
 	const { data: metrics, isLoading: metricsLoading } = useQuery(
-		adminDashboardQueryOptions(token),
+		adminDashboardQueryOptions(),
 	);
 	const { data: timeline, isLoading: timelineLoading } = useQuery(
-		adminSignupTimelineQueryOptions(token, timeRange),
+		adminSignupTimelineQueryOptions(timeRange),
 	);
 	const { data: studentDistribution, isLoading: studentDistributionLoading } =
-		useQuery(adminStudentDistributionQueryOptions(token));
+		useQuery(adminStudentDistributionQueryOptions());
 
 	const spotlightMetrics = metrics
 		? [

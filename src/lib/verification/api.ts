@@ -1,6 +1,4 @@
 import { BACKEND_URL, type ApiResponse } from "../api";
-import { getCookie } from "../cookie";
-import { ACCESS_TOKEN_KEY } from "../user/auth";
 import {
 	verificationRecordSchema,
 	publicVerificationSchema,
@@ -12,14 +10,13 @@ export async function startVerification(
 	role: "students" | "sponsors",
 	extraFields?: { registrationNumber: string; repName: string },
 ): Promise<{ verificationUrl: string }> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
 	const response = await fetch(`${BACKEND_URL}/${role}/me/verification`, {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
 		},
 		body: JSON.stringify(extraFields ?? {}),
+		credentials: "include",
 	});
 
 	const result: ApiResponse<{ verificationUrl: string }> =
@@ -34,10 +31,9 @@ export async function startVerification(
 export async function getVerificationStatus(
 	role: "students" | "sponsors",
 ): Promise<VerificationRecord | null> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
 	const response = await fetch(`${BACKEND_URL}/${role}/me/verification`, {
 		method: "GET",
-		headers: { Authorization: `Bearer ${token}` },
+		credentials: "include",
 	});
 
 	if (!response.ok) return null;

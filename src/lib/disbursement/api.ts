@@ -1,7 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
 import { BACKEND_URL, safeResponseJson, type ApiResponse } from "../api";
-import { getCookie } from "../cookie";
-import { ACCESS_TOKEN_KEY } from "../user/auth";
 import {
 	paymentMethodSchema,
 	type PaymentMethodDetail,
@@ -14,15 +12,6 @@ import {
 	type MarkSentRequest,
 } from "./model";
 
-function authHeaders(): Record<string, string> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
-	if (!token) {
-		throw new Error("Access token not found.");
-	}
-
-	return { Authorization: `Bearer ${token}` };
-}
-
 export async function createDisbursement(
 	value: CreateDisbursementRequest,
 ): Promise<ApiResponse<Disbursement>> {
@@ -31,7 +20,6 @@ export async function createDisbursement(
 		body: JSON.stringify(value),
 		headers: {
 			"Content-Type": "application/json",
-			...authHeaders(),
 		},
 		credentials: "include",
 	});
@@ -52,7 +40,6 @@ export async function markDisbursementSent(
 		body: JSON.stringify(value),
 		headers: {
 			"Content-Type": "application/json",
-			...authHeaders(),
 		},
 		credentials: "include",
 	});
@@ -73,7 +60,6 @@ export async function markDisbursementReceived(
 		body: JSON.stringify(value),
 		headers: {
 			"Content-Type": "application/json",
-			...authHeaders(),
 		},
 		credentials: "include",
 	});
@@ -88,7 +74,6 @@ export async function markDisbursementReceived(
 async function getDisbursement(id: string): Promise<Disbursement> {
 	const response = await fetch(`${BACKEND_URL}/disbursements/${id}`, {
 		method: "GET",
-		headers: authHeaders(),
 		credentials: "include",
 	});
 	const result: ApiResponse<Disbursement> = await safeResponseJson(response);
@@ -102,7 +87,6 @@ async function getDisbursement(id: string): Promise<Disbursement> {
 async function listSponsorDisbursements(): Promise<Disbursement[]> {
 	const response = await fetch(`${BACKEND_URL}/disbursements/sponsor/me`, {
 		method: "GET",
-		headers: authHeaders(),
 		credentials: "include",
 	});
 	const result: ApiResponse<Disbursement[]> = await safeResponseJson(response);
@@ -113,7 +97,6 @@ async function listSponsorDisbursements(): Promise<Disbursement[]> {
 async function listStudentDisbursements(): Promise<Disbursement[]> {
 	const response = await fetch(`${BACKEND_URL}/disbursements/student/me`, {
 		method: "GET",
-		headers: authHeaders(),
 		credentials: "include",
 	});
 	const result: ApiResponse<Disbursement[]> = await safeResponseJson(response);
@@ -128,7 +111,6 @@ async function getApplicationPaymentMethod(
 		`${BACKEND_URL}/disbursements/applications/${applicationId}/payment-method`,
 		{
 			method: "GET",
-			headers: authHeaders(),
 			credentials: "include",
 		},
 	);

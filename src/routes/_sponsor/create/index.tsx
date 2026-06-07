@@ -13,7 +13,6 @@ import {
 } from "@/hooks/useScholarshipForm";
 import { useScholarshipPreview } from "@/hooks/useScholarshipPreview";
 import { type ApiResponse, BACKEND_URL } from "@/lib/api";
-import { getCookie } from "@/lib/cookie";
 import {
 	type CreateFormFieldRequest,
 	FormFieldType,
@@ -27,7 +26,6 @@ import type { ScholarshipTemplate } from "@/lib/scholarship/templates";
 import { SponsorType, type AnySponsor } from "@/lib/sponsor/model";
 import { useVerificationStatus } from "@/hooks/useVerificationStatus";
 import { VerificationStatus } from "@/lib/verification/model";
-import { ACCESS_TOKEN_KEY } from "@/lib/user/auth";
 import type { AmountType } from "./-model";
 import ConfirmationDialog from "./-components/ConfirmationDialog";
 import TemplateSelectionStep from "./-components/TemplateSelectionStep";
@@ -49,14 +47,13 @@ export const Route = createFileRoute("/_sponsor/create/")({
 async function createScholarship(
 	value: ScholarshipFormData,
 ): Promise<ApiResponse<Scholarship>> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
 	const response = await fetch(`${BACKEND_URL}/scholarships`, {
 		method: "POST",
 		body: JSON.stringify(value),
 		headers: {
 			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
 		},
+		credentials: "include",
 	});
 	const result: ApiResponse<Scholarship> = await response.json();
 	if (!response.ok) throw new Error(result.message);

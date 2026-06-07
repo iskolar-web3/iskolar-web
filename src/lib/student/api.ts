@@ -1,7 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
 import { type ApiResponse, BACKEND_URL, safeResponseJson } from "../api";
-import { getCookie } from "../cookie";
-import { ACCESS_TOKEN_KEY } from "../user/auth";
 import {
 	type CreateStudentRequest,
 	type PaymentMethodDetail,
@@ -15,14 +13,13 @@ import {
 export async function createStudent(
 	value: CreateStudentRequest,
 ): Promise<Student> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
 	const response = await fetch(`${BACKEND_URL}/students`, {
 		method: "POST",
 		body: JSON.stringify(value),
 		headers: {
 			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
 		},
+		credentials: "include",
 	});
 	const result: ApiResponse<Student> = await safeResponseJson(response);
 	if (!response.ok) {
@@ -31,12 +28,9 @@ export async function createStudent(
 	return result.data;
 }
 
-export async function getMyStudentProfile(
-	token: string,
-): Promise<Student | null> {
+export async function getMyStudentProfile(): Promise<Student | null> {
 	const response = await fetch(`${BACKEND_URL}/students/me`, {
 		method: "GET",
-		headers: { Authorization: `Bearer ${token}` },
 		credentials: "include",
 	});
 	if (!response.ok) {
@@ -54,14 +48,13 @@ export async function getMyStudentProfile(
 export async function updateStudent(
 	value: UpdateStudentRequest,
 ): Promise<ApiResponse<Student>> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
 	const response = await fetch(`${BACKEND_URL}/students/me`, {
 		method: "PATCH",
 		body: JSON.stringify(value),
 		headers: {
 			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
 		},
+		credentials: "include",
 	});
 	const result: ApiResponse<Student> = await safeResponseJson(response);
 	if (!response.ok) {
@@ -74,14 +67,13 @@ export async function updateStudent(
 export async function upsertPaymentMethod(
 	value: UpsertPaymentMethodRequest,
 ): Promise<ApiResponse<PaymentMethodDetail>> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
 	const response = await fetch(`${BACKEND_URL}/students/me/payment`, {
 		method: "PUT",
 		body: JSON.stringify(value),
 		headers: {
 			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
 		},
+		credentials: "include",
 	});
 	const result: ApiResponse<PaymentMethodDetail> =
 		await safeResponseJson(response);
@@ -95,16 +87,10 @@ export async function upsertPaymentMethod(
 async function getPaymentMethod(
 	studentId: string,
 ): Promise<PaymentMethodDetail | null> {
-	const token = getCookie(ACCESS_TOKEN_KEY);
-	if (!token) {
-		throw new Error("Access token not found.");
-	}
-
 	const url = new URL(`${BACKEND_URL}/students/${studentId}/payment`);
 
 	const response = await fetch(url.toString(), {
 		method: "GET",
-		headers: { Authorization: `Bearer ${token}` },
 		credentials: "include",
 	});
 	const result: ApiResponse<PaymentMethodDetail | null> =
