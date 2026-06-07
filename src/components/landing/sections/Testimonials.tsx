@@ -144,7 +144,7 @@ export function Testimonials() {
 			</div>
 
 			<MotionContainer
-				className="relative z-30 mx-auto max-w-6xl px-6 md:px-12"
+				className="relative z-30 mx-auto max-w-6xl px-4 sm:px-12 lg:px-26"
 				viewportMargin="-50px"
 			>
 				{/* Header */}
@@ -193,7 +193,7 @@ export function Testimonials() {
 
 				<div
 					ref={scrollerRef}
-					className="no-scrollbar flex gap-5 overflow-x-auto snap-x snap-mandatory px-6 md:px-12 pt-2 pb-6"
+					className="no-scrollbar flex gap-5 overflow-x-auto snap-x snap-mandatory px-4 sm:px-12 lg:px-26 pt-2 pb-6"
 				>
 					{testimonials.map((item) => {
 						const hasPost = Boolean(item.embedUrl);

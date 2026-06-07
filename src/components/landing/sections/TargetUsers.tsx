@@ -57,7 +57,7 @@ export function TargetUsers() {
   return (
     <section
       id="about"
-      className="py-20 lg:py-32 px-4 sm:px-12 lg:px-26 relative overflow-hidden"
+      className="py-20 lg:py-28 px-4 sm:px-12 lg:px-26 relative overflow-hidden"
     >
       <MotionContainer className="relative z-30">
         {/* Section Header */}
@@ -71,7 +71,7 @@ export function TargetUsers() {
               Who it's for
             </span>
           </div>
-          <h2 className="text-3xl sm:text-4xl lg:text-[2.75rem] leading-tight text-secondary text-balance">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl leading-tight text-secondary text-balance">
             Built for the scholarship ecosystem
           </h2>
           <p className="mt-5 text-sm sm:text-base text-secondary/70 max-w-xl mx-auto text-pretty">

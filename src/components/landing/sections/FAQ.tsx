@@ -121,7 +121,7 @@ export function FAQ() {
   }
 
   return (
-    <section id="faqs" className="py-20 lg:py-32">
+    <section id="faqs" className="py-20 lg:py-28">
       <MotionContainer className="max-w-3xl mx-auto relative z-30">
         {/* Section Header */}
         <MotionItem className="flex flex-col items-center text-center mb-12">

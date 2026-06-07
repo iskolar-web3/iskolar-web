@@ -51,7 +51,7 @@ export function Roadmap() {
   const lineScale = useTransform(scrollYProgress, [0, 1], [0, 1])
 
   return (
-    <section id="roadmap" className="py-16 lg:py-24 px-4 sm:px-12 lg:px-26">
+    <section id="roadmap" className="py-20 lg:py-28 px-4 sm:px-12 lg:px-26">
       <MotionContainer className="relative z-30">
         {/* Section Header */}
         <MotionItem className="flex flex-col items-center text-center mb-14">

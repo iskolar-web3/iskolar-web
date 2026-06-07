@@ -106,7 +106,7 @@ export function Hero() {
             </div>
 
             <motion.div
-              className="flex flex-wrap items-center justify-center gap-x-9 gap-y-6"
+              className="grid grid-cols-3 place-items-center gap-x-6 gap-y-8 lg:flex lg:flex-wrap lg:items-center lg:justify-center lg:gap-x-9 lg:gap-y-6"
               initial={reduce ? "visible" : "hidden"}
               whileInView="visible"
               viewport={{ once: true, margin: "-80px" }}

@@ -10,6 +10,7 @@ const homeLinks = [
 		dropdown: [
 			{ name: "Home", href: "#home" },
 			{ name: "How it works", href: "#how-it-works" },
+			{ name: "Who it's for", href: "#about" },
 			{ name: "Roadmap", href: "#roadmap" },
 			{ name: "Ecosystem", href: "#ecosystem" },
 			{ name: "FAQs", href: "#faqs" },
@@ -34,6 +35,7 @@ const aboutLinks = [
 		dropdown: [
 			{ name: "Home", href: "/#home" },
 			{ name: "How it works", href: "/#how-it-works" },
+			{ name: "Who it's for", href: "/#about" },
 			{ name: "Roadmap", href: "/#roadmap" },
 			{ name: "Ecosystem", href: "/#ecosystem" },
 			{ name: "FAQs", href: "/#faqs" },

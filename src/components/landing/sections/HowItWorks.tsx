@@ -119,7 +119,7 @@ export function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="relative py-16 lg:py-28 px-4 sm:px-12 overflow-hidden"
+      className="relative py-20 lg:py-28 px-4 sm:px-12 lg:px-26 overflow-hidden"
     >
       <div className="relative z-30">
         {/* Section Header */}
@@ -159,21 +159,16 @@ export function HowItWorks() {
               </MotionItem>
               {persona.items.map((feature) => {
                 const Icon = feature.icon
-                const isLeft = feature.position === "left"
                 return (
                   <MotionItem
                     key={feature.title}
-                    className={`group relative flex items-start gap-4 bg-card border border-secondary/20 p-6 transition-all duration-300 hover:shadow-sm ${
-                      isLeft
-                        ? "rounded-tr-3xl rounded-bl-3xl"
-                        : "flex-row-reverse rounded-tl-3xl rounded-br-3xl"
-                    }`}
+                    className="group relative flex items-start gap-4 bg-card border border-secondary/20 p-6 transition-all duration-300 hover:shadow-sm rounded-tr-3xl rounded-bl-3xl"
                   >
                     <Icon
                       className="shrink-0 w-8 h-8 text-secondary/70 transition-colors duration-300 group-hover:text-secondary"
                       strokeWidth={1.5}
                     />
-                    <div className={`flex-1 ${isLeft ? "" : "text-right"}`}>
+                    <div className="flex-1">
                       <h3 className="text-lg text-secondary mb-1">{feature.title}</h3>
                       <p className="text-sm text-secondary/80 leading-relaxed">
                         {feature.description}
@@ -188,7 +183,7 @@ export function HowItWorks() {
 
         {/* Desktop: orbital layout */}
         <div className="hidden lg:block relative">
-          <div className="relative mx-auto max-w-6xl">
+          <div className="relative mx-auto max-w-7xl">
             {/* Central hub */}
             <motion.div
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
@@ -237,7 +232,7 @@ export function HowItWorks() {
               staggerDelay={0.12}
             >
               {/* Left = students */}
-              <div className="absolute left-[25px] top-1/2 -translate-y-1/2 w-[360px]">
+              <div className="absolute left-[25px] top-1/2 -translate-y-1/2 w-[420px]">
                 <MotionItem className="mb-6">
                   <PersonaLabel icon={GraduationCap} label="For students" />
                 </MotionItem>
@@ -249,7 +244,7 @@ export function HowItWorks() {
               </div>
 
               {/* Right = sponsors */}
-              <div className="absolute right-[25px] top-1/2 -translate-y-1/2 w-[360px]">
+              <div className="absolute right-[25px] top-1/2 -translate-y-1/2 w-[420px]">
                 <MotionItem className="mb-6 flex justify-end">
                   <PersonaLabel icon={Building2} label="For sponsors" />
                 </MotionItem>
