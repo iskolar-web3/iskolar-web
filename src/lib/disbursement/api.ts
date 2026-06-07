@@ -1,12 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { type ApiResponse, BACKEND_URL, safeResponseJson } from "../api";
 import { getCookie } from "../cookie";
-// MOCK DATA START — remove this import when removing landing-page mock data
-import {
-	getMockDisbursementById,
-	getMockStudentDisbursements,
-	MOCK_DATA_ENABLED,
-} from "../mockData";
 import {
 	type PaymentMethodDetail,
 	paymentMethodSchema,
@@ -19,8 +13,6 @@ import {
 	type MarkReceivedRequest,
 	type MarkSentRequest,
 } from "./model";
-
-// MOCK DATA END
 
 function authHeaders(): Record<string, string> {
 	const token = getCookie(ACCESS_TOKEN_KEY);
@@ -94,12 +86,6 @@ export async function markDisbursementReceived(
 }
 
 async function getDisbursement(id: string): Promise<Disbursement> {
-	// MOCK DATA START
-	if (MOCK_DATA_ENABLED) {
-		const mock = getMockDisbursementById(id);
-		if (mock) return mock;
-	}
-	// MOCK DATA END
 	const response = await fetch(`${BACKEND_URL}/disbursements/${id}`, {
 		method: "GET",
 		headers: authHeaders(),
@@ -125,9 +111,6 @@ async function listSponsorDisbursements(): Promise<Disbursement[]> {
 }
 
 async function listStudentDisbursements(): Promise<Disbursement[]> {
-	// MOCK DATA START
-	if (MOCK_DATA_ENABLED) return getMockStudentDisbursements();
-	// MOCK DATA END
 	const response = await fetch(`${BACKEND_URL}/disbursements/student/me`, {
 		method: "GET",
 		headers: authHeaders(),

@@ -1,14 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { type ApiResponse, BACKEND_URL, safeResponseJson } from "../api";
 import { getCookie } from "../cookie";
-// MOCK DATA START — remove this import when removing landing-page mock data
-import {
-	getMockApplicants,
-	getMockApplications,
-	getMockScholarshipById,
-	MOCK_DATA_ENABLED,
-	mockScholarships,
-} from "../mockData";
 import { anySponsorSchema } from "../sponsor/model";
 import { ACCESS_TOKEN_KEY } from "../user/auth";
 import {
@@ -27,17 +19,12 @@ import {
 	scholarshipSchema,
 } from "./model";
 
-// MOCK DATA END
-
 async function getMyScholarships(
 	token: string,
 	params?: GetScholarshipQueryParam,
 ): Promise<Scholarship[]> {
 	const resolvedToken = token || getCookie(ACCESS_TOKEN_KEY);
 	if (!resolvedToken) {
-		// MOCK DATA START
-		if (MOCK_DATA_ENABLED) return [...mockScholarships];
-		// MOCK DATA END
 		return [];
 	}
 	const url = new URL(`${BACKEND_URL}/scholarships`);
@@ -66,10 +53,6 @@ async function getMyScholarships(
 		.default([])
 		.parse(result.data);
 
-	// MOCK DATA START
-	if (MOCK_DATA_ENABLED) return [...mockScholarships, ...parsed];
-	// MOCK DATA END
-
 	return parsed;
 }
 
@@ -88,12 +71,6 @@ export const getMyScholarshipsQuery = (
 	});
 
 async function getScholarshipById(id: string): Promise<Scholarship> {
-	// MOCK DATA START
-	if (MOCK_DATA_ENABLED) {
-		const mock = getMockScholarshipById(id);
-		if (mock) return mock;
-	}
-	// MOCK DATA END
 	const token = getCookie(ACCESS_TOKEN_KEY);
 	if (!token) {
 		throw new Error("Access token not found.");
@@ -149,12 +126,6 @@ export async function updateScholarship(
 }
 
 async function getApplicants(id: string): Promise<Applicant[]> {
-	// MOCK DATA START
-	if (MOCK_DATA_ENABLED) {
-		const mock = getMockApplicants(id);
-		if (mock.length) return mock;
-	}
-	// MOCK DATA END
 	const token = getCookie(ACCESS_TOKEN_KEY);
 	if (!token) {
 		throw new Error("Access token not found.");
@@ -180,12 +151,6 @@ export const getApplicantsQuery = (id: string) =>
 async function getMyApplications(
 	param: GetApplicationsQueryParam,
 ): Promise<Application[]> {
-	// MOCK DATA START
-	if (MOCK_DATA_ENABLED) {
-		const mock = getMockApplications(param.status ?? "");
-		if (mock.length) return mock;
-	}
-	// MOCK DATA END
 	const token = getCookie(ACCESS_TOKEN_KEY);
 	if (!token) {
 		throw new Error("Access token not found.");
