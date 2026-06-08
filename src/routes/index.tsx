@@ -6,7 +6,6 @@ import Navbar from "@/components/landing/Navbar";
 import AnimatedBackground from "@/components/landing/AnimatedBackground";
 import { Hero } from "@/components/landing/sections/Hero";
 import { ScrollToTop } from "@/components/landing/ScrollToTop";
-import { LocalTimeClock } from "@/components/landing/LocalTimeClock";
 import { Suspense, lazy, useEffect } from "react";
 
 // Lazy load below-the-fold sections
@@ -118,7 +117,6 @@ function App() {
 				<Footer />
 			</Suspense>
 			<ScrollToTop />
-			<LocalTimeClock />
 		</main>
 	);
 }

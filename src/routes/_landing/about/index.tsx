@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect } from "react";
 import AnimatedBackground from "@/components/landing/AnimatedBackground";
-import { LocalTimeClock } from "@/components/landing/LocalTimeClock";
 import Navbar from "@/components/landing/Navbar";
 import { ScrollToTop } from "@/components/landing/ScrollToTop";
 import { SEO } from "@/components/SEO";
@@ -85,7 +84,6 @@ function About() {
 				</Suspense>
 			</div>
 			<ScrollToTop />
-			<LocalTimeClock />
 		</main>
 	);
 }
