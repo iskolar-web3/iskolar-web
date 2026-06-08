@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import type Lenis from "lenis";
 import { ArrowUp } from "lucide-react";
+import { useEffect, useState } from "react";
+import { onLenisChange } from "@/hooks/useSmoothScroll";
 
 const RADIUS = 22;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
@@ -9,17 +11,41 @@ export function ScrollToTop() {
 	const [visible, setVisible] = useState(false);
 
 	useEffect(() => {
-		const onScroll = () => {
-			const scrollTop = window.scrollY;
-			const docHeight =
-				document.documentElement.scrollHeight - window.innerHeight;
-			const pct = docHeight > 0 ? scrollTop / docHeight : 0;
-			setProgress(pct);
-			setVisible(scrollTop > 200);
+		const update = (scroll: number, limit: number) => {
+			setProgress(limit > 0 ? scroll / limit : 0);
+			setVisible(scroll > 200);
 		};
 
-		window.addEventListener("scroll", onScroll, { passive: true });
-		return () => window.removeEventListener("scroll", onScroll);
+		// Lenis emits on every animation frame, so the ring tracks the smoothed
+		// scroll position in real time rather than the native event's lag.
+		const onLenisScroll = (lenis: Lenis) => update(lenis.scroll, lenis.limit);
+
+		// Fallback for when smooth scroll isn't active (no Lenis instance).
+		const onNativeScroll = () => {
+			update(
+				window.scrollY,
+				document.documentElement.scrollHeight - window.innerHeight,
+			);
+		};
+
+		let current: Lenis | null = null;
+		const unsubscribe = onLenisChange((lenis) => {
+			current?.off("scroll", onLenisScroll);
+			current = lenis;
+			if (lenis) {
+				lenis.on("scroll", onLenisScroll);
+				update(lenis.scroll, lenis.limit);
+			} else {
+				onNativeScroll();
+			}
+		});
+
+		window.addEventListener("scroll", onNativeScroll, { passive: true });
+		return () => {
+			unsubscribe();
+			current?.off("scroll", onLenisScroll);
+			window.removeEventListener("scroll", onNativeScroll);
+		};
 	}, []);
 
 	const scrollToTop = () => {
@@ -69,7 +95,6 @@ export function ScrollToTop() {
 						strokeLinecap="round"
 						strokeDasharray={CIRCUMFERENCE}
 						strokeDashoffset={strokeDashoffset}
-						className="transition-[stroke-dashoffset] duration-100 ease-linear motion-reduce:transition-none"
 					/>
 				</svg>
 

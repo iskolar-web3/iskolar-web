@@ -11,9 +11,31 @@ const defaultOptions: LenisOptions = {
 	smoothWheel: true,
 };
 
+let activeLenis: Lenis | null = null;
+const lenisListeners = new Set<(lenis: Lenis | null) => void>();
+
+function setActiveLenis(lenis: Lenis | null) {
+	activeLenis = lenis;
+	for (const listener of lenisListeners) listener(lenis);
+}
+
+/**
+ * Subscribe to the active Lenis instance. Fires immediately with the current
+ * instance (which may be null before the smooth-scroll effect mounts) and again
+ * whenever it is created or destroyed. Returns an unsubscribe function.
+ */
+export function onLenisChange(listener: (lenis: Lenis | null) => void) {
+	lenisListeners.add(listener);
+	listener(activeLenis);
+	return () => {
+		lenisListeners.delete(listener);
+	};
+}
+
 export function useSmoothScroll(options?: LenisOptions) {
 	useEffect(() => {
 		const lenis = new Lenis({ ...defaultOptions, ...options });
+		setActiveLenis(lenis);
 
 		function raf(time: number) {
 			lenis.raf(time);
@@ -24,6 +46,7 @@ export function useSmoothScroll(options?: LenisOptions) {
 
 		return () => {
 			lenis.destroy();
+			setActiveLenis(null);
 		};
 	}, [options]);
 }
