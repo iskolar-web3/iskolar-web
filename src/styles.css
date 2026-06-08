@@ -402,6 +402,29 @@ code {
 	background-color: rgba(58, 82, 166, 0.25);
 }
 
+/* ---- Scholarly cursor (fountain-pen nib) — landing only ---- */
+.cursor-academic {
+	cursor: url("/cursors/nib.svg") 2 2, auto;
+}
+/* interactive elements get a brand-blue pointing hand (falls back to pointer) */
+.cursor-academic a,
+.cursor-academic button,
+.cursor-academic [role="button"],
+.cursor-academic summary,
+.cursor-academic label[for] {
+	cursor: url("/cursors/hand.svg") 11 2, pointer;
+}
+.cursor-academic input:not([type="checkbox"]):not([type="radio"]):not([type="button"]),
+.cursor-academic textarea {
+	cursor: text;
+}
+/* touch devices have no pointer — don't impose a custom cursor */
+@media (hover: none) {
+	.cursor-academic {
+		cursor: auto;
+	}
+}
+
 /* ---- Reduced motion: neutralize all decorative animation ---- */
 @media (prefers-reduced-motion: reduce) {
 	[style*="float-soothing"],

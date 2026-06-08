@@ -50,7 +50,7 @@ function About() {
 	}, []);
 
 	return (
-		<main className="relative min-h-screen bg-background text-secondary">
+		<main className="cursor-academic relative min-h-screen bg-background text-secondary">
 			<SEO
 				title="About Us"
 				description="Learn about iSkolar's mission, vision, and the team building the future of scholarship management."

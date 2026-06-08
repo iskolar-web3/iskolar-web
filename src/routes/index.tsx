@@ -98,7 +98,7 @@ function App() {
 	};
 
 	return (
-		<main className="relative min-h-screen bg-background">
+		<main className="cursor-academic relative min-h-screen bg-background">
 			<SEO canonicalPath="/" />
 			<JsonLd data={websiteSchema} />
 			<JsonLd data={organizationSchema} />

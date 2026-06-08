@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+	<g stroke-linejoin="round">
+		<!-- white outline halo -->
+		<g fill="#ffffff" stroke="#ffffff" stroke-width="3">
+			<rect x="9.5" y="2" width="3.4" height="13" rx="1.7" />
+			<rect x="12.9" y="10.5" width="2.7" height="6.5" rx="1.35" />
+			<rect x="15.3" y="10.5" width="2.7" height="6.5" rx="1.35" />
+			<rect x="17.7" y="11" width="2.7" height="6" rx="1.35" />
+			<rect x="5.4" y="13" width="3.3" height="7.6" rx="1.65" transform="rotate(-22 7 16.8)" />
+			<rect x="8.3" y="13.5" width="12.8" height="12" rx="4" />
+		</g>
+		<!-- brand-blue fill -->
+		<g fill="#3a52a6">
+			<rect x="9.5" y="2" width="3.4" height="13" rx="1.7" />
+			<rect x="12.9" y="10.5" width="2.7" height="6.5" rx="1.35" />
+			<rect x="15.3" y="10.5" width="2.7" height="6.5" rx="1.35" />
+			<rect x="17.7" y="11" width="2.7" height="6" rx="1.35" />
+			<rect x="5.4" y="13" width="3.3" height="7.6" rx="1.65" transform="rotate(-22 7 16.8)" />
+			<rect x="8.3" y="13.5" width="12.8" height="12" rx="4" />
+		</g>
+	</g>
+</svg>
