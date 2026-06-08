@@ -60,7 +60,6 @@ export function Footer() {
                   />
                 </div>
               </a>
-              <span className="block text-secondary text-sm mb-3">Built for students, built by students</span>
               <p className="text-secondary/80 text-sm leading-relaxed mb-6">
                 Empowering students with accessible, transparent, and efficient scholarship opportunities.
               </p>

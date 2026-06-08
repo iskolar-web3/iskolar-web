@@ -46,7 +46,13 @@ export function Partnerships() {
 									{...lift}
 									className="will-change-transform lg:col-span-4"
 								>
-									<div className="ruled-paper flex aspect-16/10 items-center justify-center rounded-2xl bg-background border border-secondary/15 p-8 shadow-[0_18px_45px_-30px_rgba(58,82,166,0.55)]">
+									<a
+										href={partner.href}
+										target="_blank"
+										rel="noopener noreferrer"
+										aria-label={`Visit ${partner.name}'s website`}
+										className="ruled-paper flex aspect-16/10 cursor-pointer items-center justify-center rounded-2xl bg-background border border-secondary/15 p-8 shadow-[0_18px_45px_-30px_rgba(58,82,166,0.55)]"
+									>
 										<img
 											src={partner.logo}
 											alt={partner.name}
@@ -58,7 +64,7 @@ export function Partnerships() {
 													: "max-h-24 max-w-[220px]"
 											}`}
 										/>
-									</div>
+									</a>
 								</MotionItem>
 
 								{/* Description + link */}

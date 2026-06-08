@@ -59,14 +59,13 @@ export const drawLineVariantsY: Variants = {
 }
 
 // The single hover-lift spec for every card on a white surface.
+// Restrained on purpose: a faint lift, no scaling or shadow swell.
 export const cardHoverLift = {
   whileHover: {
-    y: -6,
-    scale: 1.015,
-    boxShadow: "0 18px 40px -16px rgba(58, 82, 166, 0.28)",
-    transition: { type: "spring", stiffness: 260, damping: 22 },
+    y: -3,
+    transition: { type: "spring", stiffness: 300, damping: 26 },
   },
-  whileTap: { y: -2, scale: 1.0 },
+  whileTap: { y: -1 },
 } as const
 
 export function MotionContainer({
