@@ -13,11 +13,14 @@ type Coverage = {
 	image: string;
 };
 
-// Press and partner coverage of iSkolar. Cards link out to the original
-// publication (external sites block iframe embedding, so we open in a new tab).
-// Featured images are mirrored into public/press so the cards never depend on
-// the publishers' hotlink rules staying open.
 const coverage: Coverage[] = [
+	{
+		source: "BitPinas",
+		title:
+			"iSkolar Powers BYC Ventures' Tomorrow Fund Pilot for NCR IT Students",
+		href: "https://bitpinas.com/business/iskolar-byc-tomorrowfund/",
+		image: "/press/bitpinas-tomorrowfund.png",
+	},
 	{
 		source: "BitPinas",
 		title:
@@ -92,7 +95,7 @@ export function Spotlight() {
 				</MotionItem>
 
 				{/* Coverage cards */}
-				<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+				<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
 					{coverage.map((item) => (
 						<MotionItem
 							key={item.href}
@@ -103,7 +106,7 @@ export function Spotlight() {
 								href={item.href}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="ruled-paper group relative flex h-full flex-col overflow-hidden rounded-2xl bg-card border border-secondary/15 shadow-[0_18px_45px_-30px_rgba(58,82,166,0.55)] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-secondary/40"
+								className="ruled-paper group relative flex h-full flex-col overflow-hidden rounded-xs bg-card border border-secondary/15 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-secondary/40"
 							>
 								{/* Featured image */}
 								<div className="relative aspect-1200/630 overflow-hidden bg-secondary/5">
@@ -115,18 +118,12 @@ export function Spotlight() {
 									/>
 								</div>
 
-								<div className="flex grow flex-col p-7 lg:p-8">
-									<div className="flex items-start justify-between gap-3">
-										<h3 className="text-lg lg:text-xl text-secondary leading-snug text-balance">
-											{item.title}
-										</h3>
-										<ArrowUpRight
-											className="mt-0.5 w-5 h-5 shrink-0 text-secondary/40 transition-all group-hover:text-secondary group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-											strokeWidth={1.75}
-										/>
-									</div>
+								<div className="flex grow flex-col p-4 lg:p-6">
+									<h3 className="text-sm lg:text-base text-secondary leading-snug text-balance">
+										{item.title}
+									</h3>
 
-									<span className="inline-flex items-center gap-1.5 mt-auto pt-6 border-t border-secondary/10 text-sm text-secondary/60 transition-colors group-hover:text-secondary">
+									<span className="inline-flex items-center gap-1.5 mt-auto pt-6 border-t border-secondary/10 text-xs text-secondary/60 transition-colors group-hover:text-secondary">
 										Read on {item.source}
 										<ArrowUpRight className="w-4 h-4" strokeWidth={1.75} />
 									</span>
