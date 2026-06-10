@@ -44,6 +44,7 @@ export function AuthProvider(props: AuthProviderProps): JSX.Element {
 	const [error, setError] = useState<Error | null>(null);
 
 	async function getSession(): Promise<AuthSession | null> {
+		setError(null);
 		try {
 			let session: Awaited<ReturnType<typeof validateSession>>;
 			try {
