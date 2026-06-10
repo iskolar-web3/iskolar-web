@@ -1,8 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { type ApiResponse, BACKEND_URL, safeResponseJson } from "../api";
-import { getCookie } from "../cookie";
 import { anySponsorSchema } from "../sponsor/model";
-import { ACCESS_TOKEN_KEY } from "../user/auth";
 import {
 	type Applicant,
 	type Application,
@@ -22,10 +20,6 @@ import {
 async function getMyScholarships(
 	params?: GetScholarshipQueryParam,
 ): Promise<Scholarship[]> {
-	const resolvedToken = getCookie(ACCESS_TOKEN_KEY);
-	if (!resolvedToken) {
-		return [];
-	}
 	const url = new URL(`${BACKEND_URL}/scholarships`);
 	if (params?.status) {
 		url.searchParams.append("status", params.status);
