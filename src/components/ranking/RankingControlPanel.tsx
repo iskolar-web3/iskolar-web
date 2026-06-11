@@ -118,26 +118,21 @@ export function RankingControlPanel({
 
 				case RankingMode.AI: {
 					console.log('Using AI Insights mode');
-					const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-					if (!apiKey) {
-						throw new Error("Gemini API key not configured");
-					}
-					
 					// Determine how many to analyze with AI
 					const topNToAnalyze = isPremiumUnlocked ? applicants.length : Math.min(aiTopN, applicants.length);
 					console.log('AI Top N:', topNToAnalyze, 'Premium:', isPremiumUnlocked);
-					
+
 					// First, rank with Decision Tree
 					const dtResult = DecisionTreeRanker.rank(
 						scholarship.id,
 						applicants,
 						criterias,
 					);
-					
+
 					// Then only use AI for top N candidates
 					const topCandidates = dtResult.rankedApplicants.slice(0, topNToAnalyze);
 					console.log('Top candidates for AI analysis:', topCandidates.length);
-					const aiRanker = new AIRanker(apiKey);
+					const aiRanker = new AIRanker();
 					
 					try {
 						console.log('Calling AI ranker...');

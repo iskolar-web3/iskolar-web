@@ -1,18 +1,32 @@
-import type { Applicant } from "@/lib/scholarship/model";
+import { BACKEND_URL } from "@/lib/api";
 import type {
-	RankingCriteria,
+	CriterionAssessment,
 	RankedApplicant,
+	RankingCriteria,
 	RankingResult,
 	RankingSession,
 } from "@/lib/ranking/model";
-import { RankingMode } from "@/lib/ranking/model";
+import { AnalysisStatus, RankingMode } from "@/lib/ranking/model";
+import type { Applicant } from "@/lib/scholarship/model";
+import { DecisionTreeRanker } from "./DecisionTreeRanker";
+
+type BackendAIInsights = {
+	score: number;
+	recommendation: string;
+	strengths: string[];
+	concerns: string[];
+	confidence: number;
+	criteria: CriterionAssessment[];
+};
+
+type BackendRankedApplicant = {
+	applicant: Applicant;
+	aiInsights: BackendAIInsights | null;
+	analysisStatus: AnalysisStatus;
+	documentsWithText: Applicant["formFieldAnswers"];
+};
 
 export class AIRanker {
-	constructor(_apiKey: string) {
-		// API key is passed but not used in current backend-based implementation
-		// Kept for backwards compatibility
-	}
-
 	async rank(
 		scholarshipId: string,
 		applicants: Applicant[],
@@ -33,90 +47,108 @@ export class AIRanker {
 		criterias: RankingCriteria[],
 		scholarshipDescription?: string,
 	): Promise<RankingResult> {
-		// Call backend API for AI ranking with on-demand OCR
-		const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-
-		console.log('Starting AI ranking with backend:', BACKEND_URL);
-		console.log('Number of applicants:', applicants.length);
-		
 		try {
 			const response = await fetch(`${BACKEND_URL}/ranking/ai`, {
-				method: 'POST',
+				method: "POST",
 				headers: {
-					'Content-Type': 'application/json',
+					"Content-Type": "application/json",
 				},
-				credentials: 'include',
+				credentials: "include",
 				body: JSON.stringify({
+					scholarshipId,
 					applicants,
 					criterias,
 					scholarshipDescription,
-					topN: applicants.length // Process all for now
-				})
+					topN: applicants.length, // Server clamps to its free tier limit
+				}),
 			});
 
-			console.log('Backend response status:', response.status);
-
 			if (!response.ok) {
-				const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-				console.error('Backend error response:', errorData);
-				
-				// Handle specific AI unavailable errors
-				if (response.status === 503 && errorData.error === 'QUOTA_EXCEEDED') {
-					throw new Error('AI_QUOTA_EXCEEDED: AI ranking is temporarily unavailable due to quota limits. Please try again later or use Basic Ranking.');
+				const errorData = await response
+					.json()
+					.catch(() => ({ message: "Unknown error" }));
+				console.error("Backend error response:", errorData);
+
+				if (response.status === 503 && errorData.error === "QUOTA_EXCEEDED") {
+					throw new Error(
+						"AI_QUOTA_EXCEEDED: AI ranking is temporarily unavailable due to quota limits. Please try again later or use Basic Ranking.",
+					);
 				}
-				
-				if (errorData.error === 'AI_UNAVAILABLE') {
-					throw new Error('AI_UNAVAILABLE: AI ranking failed due to technical issues. Please try Basic Ranking instead.');
+
+				if (errorData.error === "AI_UNAVAILABLE") {
+					throw new Error(
+						"AI_UNAVAILABLE: AI ranking failed due to technical issues. Please try Basic Ranking instead.",
+					);
 				}
-				
-				throw new Error(`Backend ranking failed: ${response.status} ${response.statusText}`);
+
+				throw new Error(
+					`Backend ranking failed: ${response.status} ${response.statusText}`,
+				);
 			}
 
 			const result = await response.json();
-			console.log('Backend ranking result:', result);
-			console.log('Ranked applicants from backend:', result.data?.rankedApplicants);
-			console.log('First applicant AI insights:', result.data?.rankedApplicants?.[0]?.aiInsights);
-			const { rankedApplicants: backendRanked, remainingApplicants } = result.data;
+			const {
+				rankedApplicants: backendRanked,
+				remainingApplicants,
+				quotaExceeded,
+			} = result.data as {
+				rankedApplicants: BackendRankedApplicant[];
+				remainingApplicants: Applicant[];
+				quotaExceeded: boolean;
+			};
 
-			// Convert backend response to RankedApplicant format
-			const rankedApplicants: RankedApplicant[] = backendRanked.map((item: any, index: number) => {
-				const { applicant, aiInsights, documentsWithText } = item;
-				
-				console.log(`Processing applicant ${index + 1}:`, {
-					hasAiInsights: !!aiInsights,
-					aiInsights,
-					hasDocuments: !!documentsWithText,
-					documentCount: documentsWithText?.length
-				});
-				
-				return {
-					rank: index + 1,
-					applicant: {
-						...applicant,
-						formFieldAnswers: documentsWithText // Use documents with extracted text
-					},
-					score: aiInsights?.score || 50,
-					criteriaMet: this.getCriteriaMet(applicant, criterias, aiInsights),
-					criteriaNotMet: this.getCriteriaNotMet(applicant, criterias, aiInsights),
-					aiInsights: aiInsights ? {
-						recommendation: aiInsights.recommendation,
-						strengths: aiInsights.strengths || [],
-						concerns: aiInsights.concerns || [],
-						confidence: aiInsights.confidence || 0.5
-					} : undefined
-				};
-			});
+			if (quotaExceeded) {
+				console.warn(
+					"AI quota was hit during ranking; some applicants were not analyzed",
+				);
+			}
 
-			// Add remaining applicants without AI insights
-			remainingApplicants.forEach((applicant: Applicant, index: number) => {
-				rankedApplicants.push({
-					rank: backendRanked.length + index + 1,
-					applicant,
-					score: this.calculateBasicScore(applicant, criterias),
-					criteriaMet: this.getCriteriaMet(applicant, criterias),
-					criteriaNotMet: this.getCriteriaNotMet(applicant, criterias),
-				});
-			});
+			// AI-analyzed applicants come pre-sorted by score (failed analyses last)
+			const rankedApplicants: RankedApplicant[] = backendRanked.map(
+				(item, index) => {
+					const { applicant, aiInsights, analysisStatus, documentsWithText } =
+						item;
+					const assessments = aiInsights?.criteria ?? [];
+
+					return {
+						rank: index + 1,
+						applicant: {
+							...applicant,
+							formFieldAnswers: documentsWithText, // Use documents with extracted text
+						},
+						score: aiInsights ? Math.round(aiInsights.score) : 0,
+						analysisFailed: analysisStatus === AnalysisStatus.Failed,
+						criteriaMet: assessments.filter((a) => a.met).map((a) => a.name),
+						criteriaNotMet: assessments
+							.filter((a) => !a.met)
+							.map((a) => a.name),
+						criteriaAssessments: assessments,
+						aiInsights: aiInsights
+							? {
+									recommendation: aiInsights.recommendation,
+									strengths: aiInsights.strengths,
+									concerns: aiInsights.concerns,
+									confidence: aiInsights.confidence,
+								}
+							: undefined,
+					};
+				},
+			);
+
+			// Applicants beyond the AI limit are ranked algorithmically below them
+			if (remainingApplicants.length > 0) {
+				const dtRanked = DecisionTreeRanker.rank(
+					scholarshipId,
+					remainingApplicants,
+					criterias,
+				).rankedApplicants;
+				for (const ranked of dtRanked) {
+					rankedApplicants.push({
+						...ranked,
+						rank: rankedApplicants.length + 1,
+					});
+				}
+			}
 
 			const session: RankingSession = {
 				id: crypto.randomUUID(),
@@ -127,171 +159,50 @@ export class AIRanker {
 				totalApplicants: applicants.length,
 			};
 
-			const scores = rankedApplicants.map((a) => a.score);
-			const summary = {
-				averageScore: Math.round(
-					scores.reduce((sum, s) => sum + s, 0) / scores.length,
-				),
-				topScore: Math.max(...scores),
-				bottomScore: Math.min(...scores),
-				qualifiedCount: rankedApplicants.filter((a) => a.score >= 60).length,
-			};
-
 			return {
 				session,
 				rankedApplicants,
-				summary,
+				summary: summarize(rankedApplicants),
 			};
-
 		} catch (error) {
-			console.error('Backend ranking failed, using fallback:', error);
-			
-			// Check if it's an AI unavailable error
+			console.error("Backend ranking failed:", error);
+
 			if (error instanceof Error) {
-				if (error.message.includes('AI_QUOTA_EXCEEDED')) {
+				if (error.message.includes("AI_QUOTA_EXCEEDED")) {
 					// For quota errors, throw the error up to be handled by the UI
-					throw new Error('AI ranking is temporarily unavailable due to quota limits. Please try again later or use Basic Ranking.');
+					throw new Error(
+						"AI ranking is temporarily unavailable due to quota limits. Please try again later or use Basic Ranking.",
+					);
 				}
-				
-				if (error.message.includes('AI_UNAVAILABLE')) {
-					throw new Error('AI ranking failed due to technical issues. Please try Basic Ranking instead.');
-				}
-			}
-			
-			// For other errors, fallback to basic ranking
-			console.log('Using fallback ranking due to technical error');
-			return this.fallbackRanking(scholarshipId, applicants, criterias);
-		}
-	}
 
-	private calculateBasicScore(applicant: Applicant, criterias: RankingCriteria[]): number {
-		const met = this.getCriteriaMet(applicant, criterias).length;
-		const total = criterias.length;
-		return Math.round((met / total) * 100);
-	}
-
-	private getCriteriaMet(applicant: Applicant, criterias: RankingCriteria[], aiInsights?: any): string[] {
-		const criteriaMet: string[] = [];
-		
-		// If we have AI insights, use them to determine criteria matching
-		if (aiInsights && aiInsights.strengths) {
-			for (const criteria of criterias) {
-				const criteriaLower = criteria.name.toLowerCase();
-				
-				// Check if AI mentions this criteria as a strength or in positive context
-				const isPositivelyMentioned = aiInsights.strengths.some((strength: string) => 
-					strength.toLowerCase().includes(criteriaLower.split(' ').slice(-2).join(' ')) ||
-					this.checkCriteriaMatch(criteriaLower, strength.toLowerCase())
-				);
-				
-				// Also check if the recommendation mentions meeting this criteria
-				const isInRecommendation = aiInsights.recommendation && 
-					this.checkCriteriaMatch(criteriaLower, aiInsights.recommendation.toLowerCase());
-				
-				if (isPositivelyMentioned || isInRecommendation) {
-					criteriaMet.push(criteria.name);
+				if (error.message.includes("AI_UNAVAILABLE")) {
+					throw new Error(
+						"AI ranking failed due to technical issues. Please try Basic Ranking instead.",
+					);
 				}
 			}
+
+			// For other errors, fall back to algorithmic ranking
+			console.log("Using fallback ranking due to technical error");
+			return DecisionTreeRanker.rank(scholarshipId, applicants, criterias);
 		}
-		
-		// Fallback to basic evaluation if no AI insights
-		if (criteriaMet.length === 0) {
-			return this.evaluateBasicCriteria(applicant, criterias, true);
-		}
-		
-		return criteriaMet;
 	}
+}
 
-	private getCriteriaNotMet(applicant: Applicant, criterias: RankingCriteria[], aiInsights?: any): string[] {
-		const criteriaMet = this.getCriteriaMet(applicant, criterias, aiInsights);
-		return criterias.filter(c => !criteriaMet.includes(c.name)).map(c => c.name);
-	}
-	
-	private checkCriteriaMatch(criteria: string, text: string): boolean {
-		// Check for key terms in criteria
-		if (criteria.includes('full-time') || criteria.includes('full time')) {
-			return text.includes('full-time') || text.includes('full time') || text.includes('21.0 units');
-		}
-		if (criteria.includes('3rd year') || criteria.includes('third year')) {
-			return text.includes('third-year') || text.includes('third year') || text.includes('3rd year');
-		}
-		if (criteria.includes('certificate') && criteria.includes('registration')) {
-			return text.includes('certificate') || text.includes('registration') || text.includes('cor') || text.includes('document');
-		}
-		
-		// Generic keyword matching
-		const criteriaWords = criteria.split(' ').filter(word => word.length > 3);
-		return criteriaWords.some(word => text.includes(word.toLowerCase()));
-	}
-	
-	private evaluateBasicCriteria(applicant: Applicant, criterias: RankingCriteria[], returnMet: boolean): string[] {
-		// Basic fallback evaluation
-		const results: string[] = [];
-		
-		for (const criteria of criterias) {
-			const criteriaLower = criteria.name.toLowerCase();
-			let isMet = false;
-			
-			// Basic checks based on criteria content
-			if (criteriaLower.includes('full-time') || criteriaLower.includes('full time')) {
-				// Assume met if no specific data available
-				isMet = true;
-			}
-			if (criteriaLower.includes('3rd year') || criteriaLower.includes('third year')) {
-				// This would need document analysis
-				isMet = false;
-			}
-			if (criteriaLower.includes('certificate') && criteriaLower.includes('registration')) {
-				// Check if documents are submitted
-				isMet = applicant.formFieldAnswers?.some(answer => 
-					typeof answer.value === 'object' && answer.value?.url
-				) || false;
-			}
-			
-			if ((returnMet && isMet) || (!returnMet && !isMet)) {
-				results.push(criteria.name);
-			}
-		}
-		
-		return results;
-	}
+function summarize(
+	rankedApplicants: RankedApplicant[],
+): RankingResult["summary"] {
+	// Failed analyses carry no meaningful score, so they are excluded
+	const scored = rankedApplicants.filter((a) => !a.analysisFailed);
+	const scores = scored.map((a) => a.score);
 
-	private fallbackRanking(
-		scholarshipId: string,
-		applicants: Applicant[],
-		criterias: RankingCriteria[]
-	): RankingResult {
-		const rankedApplicants: RankedApplicant[] = applicants.map((applicant, index) => ({
-			rank: index + 1,
-			applicant,
-			score: this.calculateBasicScore(applicant, criterias),
-			criteriaMet: this.getCriteriaMet(applicant, criterias),
-			criteriaNotMet: this.getCriteriaNotMet(applicant, criterias),
-		}));
-
-		rankedApplicants.sort((a, b) => b.score - a.score);
-		rankedApplicants.forEach((a, i) => a.rank = i + 1);
-
-		const session: RankingSession = {
-			id: crypto.randomUUID(),
-			scholarshipId,
-			mode: RankingMode.AI,
-			criterias,
-			timestamp: new Date(),
-			totalApplicants: applicants.length,
-		};
-
-		const scores = rankedApplicants.map((a) => a.score);
-		return {
-			session,
-			rankedApplicants,
-			summary: {
-				averageScore: Math.round(scores.reduce((sum, s) => sum + s, 0) / scores.length),
-				topScore: Math.max(...scores),
-				bottomScore: Math.min(...scores),
-				qualifiedCount: rankedApplicants.filter((a) => a.score >= 60).length,
-			},
-		};
-	}
-
+	return {
+		averageScore:
+			scores.length > 0
+				? Math.round(scores.reduce((sum, s) => sum + s, 0) / scores.length)
+				: 0,
+		topScore: scores.length > 0 ? Math.max(...scores) : 0,
+		bottomScore: scores.length > 0 ? Math.min(...scores) : 0,
+		qualifiedCount: scored.filter((a) => a.score >= 60).length,
+	};
 }

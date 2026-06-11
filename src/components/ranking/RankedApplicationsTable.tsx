@@ -17,9 +17,9 @@ export function RankedApplicationsTable({
 	const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
 	const [activeTab, setActiveTab] = useState<'ai' | 'auto'>('ai');
 
-	// Split results into AI-reviewed and auto-ranked
-	const aiReviewed = results.filter(r => r.aiInsights);
-	const autoRanked = results.filter(r => !r.aiInsights);
+	// Split results into AI-reviewed (including failed AI analyses) and auto-ranked
+	const aiReviewed = results.filter(r => r.aiInsights || r.analysisFailed);
+	const autoRanked = results.filter(r => !r.aiInsights && !r.analysisFailed);
 	
 	// Show tabs only if there are both AI and auto-ranked results
 	const showTabs = aiReviewed.length > 0 && autoRanked.length > 0;
@@ -64,7 +64,7 @@ export function RankedApplicationsTable({
 			r.rank,
 			`${r.applicant.student.firstName} ${r.applicant.student.lastName}`,
 			r.applicant.student.email,
-			r.score,
+			r.analysisFailed ? "N/A" : r.score,
 			r.criteriaMet.join("; "),
 			r.criteriaNotMet.join("; "),
 		]);
@@ -171,9 +171,12 @@ export function RankedApplicationsTable({
 			<div className="divide-y divide-[#E5E7EB]">
 				{displayResults.map((result) => {
 					const score = result.score;
-					const scoreColor = score >= 80 ? "text-[#10B981]" : score >= 60 ? "text-[#F59E0B]" : "text-[#EF4444]";
-					const scoreBgLight = score >= 80 ? "bg-[#D1FAE5]" : score >= 60 ? "bg-[#FEF3C7]" : "bg-[#FEE2E2]";
-					
+					const failed = result.analysisFailed;
+					const scoreColor = failed ? "text-[#6B7280]" : score >= 80 ? "text-[#10B981]" : score >= 60 ? "text-[#F59E0B]" : "text-[#EF4444]";
+					const scoreBgLight = failed ? "bg-[#F3F4F6]" : score >= 80 ? "bg-[#D1FAE5]" : score >= 60 ? "bg-[#FEF3C7]" : "bg-[#FEE2E2]";
+					const noteFor = (name: string) =>
+						result.criteriaAssessments?.find((a) => a.name === name)?.note;
+
 					return (
 					<div
 						key={result.applicant.id}
@@ -189,11 +192,11 @@ export function RankedApplicationsTable({
 									</div>
 									<div className={`px-3 py-1 rounded-full ${scoreBgLight}`}>
 										<div className={`text-2xl ${scoreColor}`}>
-											{score}
+											{failed ? "—" : score}
 										</div>
 									</div>
 									<div className={`text-[10px] ${scoreColor} mt-1`}>
-										{getScoreLabel(score)}
+										{failed ? "Analysis Failed" : getScoreLabel(score)}
 									</div>
 								</div>
 							</div>
@@ -209,6 +212,18 @@ export function RankedApplicationsTable({
 										{result.applicant.student.email}
 									</p>
 								</div>
+
+								{/* Failed AI analysis notice */}
+								{failed && (
+									<div className="bg-[#FEF2F2] rounded-lg p-4 border border-[#FCA5A5] mb-4 flex items-start gap-2">
+										<AlertCircle className="w-4 h-4 text-[#EF4444] mt-0.5 shrink-0" />
+										<p className="text-sm text-[#7F1D1D]">
+											AI analysis could not be completed for this applicant.
+											Please review their application manually or re-run the
+											ranking.
+										</p>
+									</div>
+								)}
 
 								{/* AI Insights - MOVED TO TOP */}
 								{result.aiInsights && (
@@ -303,7 +318,12 @@ export function RankedApplicationsTable({
 															</div>
 															<div className="text-[#6B7280] space-y-0.5">
 																{result.criteriaMet.map((c, i) => (
-																	<div key={i} className="leading-relaxed">• {c}</div>
+																	<div key={i} className="leading-relaxed">
+																		• {c}
+																		{noteFor(c) && (
+																			<span className="text-[#9CA3AF]"> — {noteFor(c)}</span>
+																		)}
+																	</div>
 																))}
 															</div>
 														</div>
@@ -318,7 +338,12 @@ export function RankedApplicationsTable({
 															</div>
 															<div className="text-[#6B7280] space-y-0.5">
 																{result.criteriaNotMet.map((c, i) => (
-																	<div key={i} className="leading-relaxed">• {c}</div>
+																	<div key={i} className="leading-relaxed">
+																		• {c}
+																		{noteFor(c) && (
+																			<span className="text-[#9CA3AF]"> — {noteFor(c)}</span>
+																		)}
+																	</div>
 																))}
 															</div>
 														</div>

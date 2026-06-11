@@ -53,6 +53,7 @@ import {
 import { RankingControlPanel } from "@/components/ranking/RankingControlPanel";
 import { RankedApplicationsTable } from "@/components/ranking/RankedApplicationsTable";
 import type { RankingResult } from "@/lib/ranking/model";
+import { usePersistedRankingResult } from "@/hooks/useRankingResults";
 import { getSponsorDisbursementsQuery } from "@/lib/disbursement/api";
 import type { Disbursement } from "@/lib/disbursement/model";
 import { DisbursementStatusBadge } from "@/components/disbursement/DisbursementShared";
@@ -130,7 +131,22 @@ function ApplicantsListPage() {
 	// Ranking state
 	const [showRanking, setShowRanking] = useState(false);
 	const [rankingResult, setRankingResult] = useState<RankingResult | null>(null);
+	const [persistedDismissed, setPersistedDismissed] = useState(false);
 	const [showPremiumModal, setShowPremiumModal] = useState(false); // Premium modal state
+
+	const rankingEnabled =
+		import.meta.env.VITE_ENABLE_APPLICANT_RANKING === "true";
+
+	// Last saved ranking run, shown when the ranking panel is open and no
+	// fresh ranking has been produced in this session
+	const persistedRanking = usePersistedRankingResult(
+		params.id,
+		applicants,
+		rankingEnabled,
+	);
+	const displayedRanking =
+		rankingResult ??
+		(showRanking && !persistedDismissed ? persistedRanking : null);
 
 	// Disbursement state
 	const [activeScholar, setActiveScholar] = useState<ScholarInfo | null>(null);
@@ -541,7 +557,7 @@ function ApplicantsListPage() {
 						)}
 
 						{/* Rank Applicants Button */}
-						{import.meta.env.VITE_ENABLE_APPLICANT_RANKING === "true" && !bulkMode && (
+						{rankingEnabled && !bulkMode && (
 							<button
 								onClick={() => setShowRanking(!showRanking)}
 								className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-[#EFA508] text-tertiary rounded-md hover:bg-[#D89407] transition-colors text-[11px] md:text-xs"
@@ -608,12 +624,16 @@ function ApplicantsListPage() {
 					</div>
 
 					{/* Ranking Panel */}
-					{import.meta.env.VITE_ENABLE_APPLICANT_RANKING === "true" && showRanking && scholarship && (
+					{rankingEnabled && showRanking && scholarship && (
 						<RankingControlPanel
 							scholarship={scholarship}
 							applicants={filteredApplicants}
 							onRankingComplete={(result) => {
 								setRankingResult(result);
+								setPersistedDismissed(false);
+								queryClient.invalidateQueries({
+									queryKey: ["ranking", "latest", params.id],
+								});
 							}}
 							onShowSuccess={(title, message) => toast.success(title, message, 2000)}
 							onShowError={(title, message) => toast.error(title, message, 2500)}
@@ -621,19 +641,27 @@ function ApplicantsListPage() {
 					)}
 
 					{/* Ranking Results */}
-					{import.meta.env.VITE_ENABLE_APPLICANT_RANKING === "true" && rankingResult && (
+					{rankingEnabled && displayedRanking && (
 						<div className="mb-6">
-							<div className="mb-4">
+							<div className="mb-4 flex items-center justify-between">
 								<button
-									onClick={() => setRankingResult(null)}
+									onClick={() => {
+										setRankingResult(null);
+										setPersistedDismissed(true);
+									}}
 									className="flex items-center gap-2 px-4 py-2 text-sm text-[#6B7280] hover:text-[#3A52A6] transition-colors"
 								>
 									<ChevronDown className="w-4 h-4 rotate-90" />
 									Back to Applicants
 								</button>
+								{!rankingResult && (
+									<span className="text-xs text-[#9CA3AF]">
+										Last ranked {formatDateTime(displayedRanking.session.timestamp)}
+									</span>
+								)}
 							</div>
 							<RankedApplicationsTable
-								results={rankingResult.rankedApplicants}
+								results={displayedRanking.rankedApplicants}
 								onApplicationClick={(applicationId) => {
 									const applicant = applicants.find((a) => a.id === applicationId);
 									if (applicant) {
@@ -706,12 +734,12 @@ function ApplicantsListPage() {
 					)}
 
 					{/* Applicants List */}
-					{!rankingResult && filteredApplicants.length === 0 ? (
+					{!displayedRanking && filteredApplicants.length === 0 ? (
 						<div className="flex flex-col items-center justify-center py-16 bg-card rounded-lg shadow-sm">
 							<Users className="w-14 h-14 text-[#D1D5DB]" />
 							<p className="mt-4 text-[#9CA3AF]">No applicants found</p>
 						</div>
-					) : !rankingResult ? (
+					) : !displayedRanking ? (
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							{filteredApplicants.map((applicant) => {
 								if (!applicant.student) return null;
