@@ -5,14 +5,11 @@ import type { RankedApplicant } from "@/lib/ranking/model";
 interface RankedApplicationsTableProps {
 	results: RankedApplicant[];
 	onApplicationClick?: (applicationId: string) => void;
-	aiReviewedCount?: number; // Number of applicants that were AI-reviewed
-	onUpgradePremium?: () => void; // Callback to show premium modal
 }
 
 export function RankedApplicationsTable({
 	results,
 	onApplicationClick,
-	onUpgradePremium,
 }: RankedApplicationsTableProps) {
 	const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
 	const [activeTab, setActiveTab] = useState<'ai' | 'auto'>('ai');
@@ -20,15 +17,17 @@ export function RankedApplicationsTable({
 	// Split results into AI-reviewed (including failed AI analyses) and auto-ranked
 	const aiReviewed = results.filter(r => r.aiInsights || r.analysisFailed);
 	const autoRanked = results.filter(r => !r.aiInsights && !r.analysisFailed);
-	
+	const failedCount = aiReviewed.filter(r => r.analysisFailed).length;
+
 	// Show tabs only if there are both AI and auto-ranked results
 	const showTabs = aiReviewed.length > 0 && autoRanked.length > 0;
-	
+
 	// Determine which results to show based on active tab
 	// If no tabs, show all results
-	const displayResults = showTabs 
+	const displayResults = showTabs
 		? (activeTab === 'ai' ? aiReviewed : autoRanked)
 		: results;
+	const showingAiTab = showTabs ? activeTab === 'ai' : aiReviewed.length > 0;
 	const toggleCard = (applicantId: string, e: React.MouseEvent) => {
 		e.stopPropagation();
 		setExpandedCards(prev => {
@@ -112,7 +111,7 @@ export function RankedApplicationsTable({
 							}`}
 						>
 							<Sparkles className="w-4 h-4" />
-							AI Ranking ({aiReviewed.length})
+							AI Analyzed ({aiReviewed.length})
 						</button>
 						<button
 							onClick={() => setActiveTab('auto')}
@@ -122,48 +121,29 @@ export function RankedApplicationsTable({
 									: 'text-[#6B7280] hover:text-[#374151] hover:bg-[#F3F4F6]'
 							}`}
 						>
-							Normal Ranking ({autoRanked.length})
+							Auto Ranked ({autoRanked.length})
 						</button>
 					</div>
 				</div>
 			)}
 
-			{/* Premium Promotion Banner for Normal Ranking */}
+			{/* Some AI analyses failed — tell the sponsor how to retry */}
+			{showingAiTab && failedCount > 0 && (
+				<div className="px-4 py-2.5 bg-[#FEF3C7] border-b border-[#E5E7EB] flex items-center gap-2 text-xs text-[#92400E]">
+					<AlertCircle className="w-4 h-4 shrink-0" />
+					{failedCount === 1
+						? "1 applicant could not be analyzed."
+						: `${failedCount} applicants could not be analyzed.`}{" "}
+					Wait a minute, then rank again to retry. Completed analyses are
+					reused.
+				</div>
+			)}
+
+			{/* Auto-ranked explainer */}
 			{showTabs && activeTab === 'auto' && (
-				<div className="bg-[#F9FAFB] border-b border-[#E5E7EB] p-4">
-					<div className="flex items-start gap-3">
-						<div className="p-2 bg-[#FEF3C7] rounded-lg">
-							<AlertCircle className="w-5 h-5 text-[#F59E0B]" />
-						</div>
-						<div className="flex-1">
-							<h4 className="text-sm text-[#374151] mb-1">Manual Review Recommended</h4>
-							<p className="text-xs text-[#6B7280] mb-2">
-								These applicants were ranked using basic criteria matching only. For better decision-making, consider upgrading to AI-powered ranking.
-							</p>
-							<div className="flex items-center gap-4 text-xs text-[#6B7280]">
-								<span className="flex items-center gap-1">
-									<XCircle className="w-3 h-3 text-[#EF4444]" />
-									No document analysis
-								</span>
-								<span className="flex items-center gap-1">
-									<XCircle className="w-3 h-3 text-[#EF4444]" />
-									No detailed insights
-								</span>
-								<span className="flex items-center gap-1">
-									<XCircle className="w-3 h-3 text-[#EF4444]" />
-									Limited verification
-								</span>
-							</div>
-						</div>
-						{onUpgradePremium && (
-							<button 
-								onClick={onUpgradePremium}
-								className="px-4 py-2 bg-[#8B5CF6] text-white text-sm rounded-lg hover:bg-[#7C3AED] transition-colors whitespace-nowrap"
-							>
-								Upgrade to Premium
-							</button>
-						)}
-					</div>
+				<div className="px-4 py-2.5 bg-[#F9FAFB] border-b border-[#E5E7EB] text-xs text-[#6B7280]">
+					These applicants were ranked from their form answers only. Documents
+					were not analyzed. Click one to review it manually.
 				</div>
 			)}
 
@@ -192,7 +172,7 @@ export function RankedApplicationsTable({
 									</div>
 									<div className={`px-3 py-1 rounded-full ${scoreBgLight}`}>
 										<div className={`text-2xl ${scoreColor}`}>
-											{failed ? "—" : score}
+											{failed ? "N/A" : score}
 										</div>
 									</div>
 									<div className={`text-[10px] ${scoreColor} mt-1`}>
@@ -219,8 +199,8 @@ export function RankedApplicationsTable({
 										<AlertCircle className="w-4 h-4 text-[#EF4444] mt-0.5 shrink-0" />
 										<p className="text-sm text-[#7F1D1D]">
 											AI analysis could not be completed for this applicant.
-											Please review their application manually or re-run the
-											ranking.
+											Please review their application manually or run the
+											ranking again.
 										</p>
 									</div>
 								)}
@@ -321,7 +301,7 @@ export function RankedApplicationsTable({
 																	<div key={i} className="leading-relaxed">
 																		• {c}
 																		{noteFor(c) && (
-																			<span className="text-[#9CA3AF]"> — {noteFor(c)}</span>
+																			<span className="text-[#9CA3AF]">: {noteFor(c)}</span>
 																		)}
 																	</div>
 																))}
@@ -341,7 +321,7 @@ export function RankedApplicationsTable({
 																	<div key={i} className="leading-relaxed">
 																		• {c}
 																		{noteFor(c) && (
-																			<span className="text-[#9CA3AF]"> — {noteFor(c)}</span>
+																			<span className="text-[#9CA3AF]">: {noteFor(c)}</span>
 																		)}
 																	</div>
 																))}
