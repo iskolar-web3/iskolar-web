@@ -143,6 +143,7 @@ export function RankingControlPanel({
 				scholarship.id,
 				applicants,
 				criterias,
+				scholarship.formFields,
 			);
 
 			if (selectedMode === RankingMode.AI) {
