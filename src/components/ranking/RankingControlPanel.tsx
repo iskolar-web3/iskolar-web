@@ -1,10 +1,19 @@
-import { useState, useEffect } from "react";
-import { AlertCircle, Sparkles, GitBranch, Clock, CheckCircle, Star, Lock, Unlock } from "lucide-react";
-import type { Applicant, Scholarship } from "@/lib/scholarship/model";
+import {
+	ChevronDown,
+	ChevronUp,
+	GitBranch,
+	Loader2,
+	Lock,
+	Sparkles,
+	Star,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import type { RankingCriteria, RankingResult } from "@/lib/ranking/model";
 import { RankingMode } from "@/lib/ranking/model";
-import { DecisionTreeRanker } from "@/services/ranking/DecisionTreeRanker";
+import type { Applicant, Scholarship } from "@/lib/scholarship/model";
 import { AIRanker } from "@/services/ranking/AIRanker";
+import { DecisionTreeRanker } from "@/services/ranking/DecisionTreeRanker";
+
 interface RankingControlPanelProps {
 	scholarship: Scholarship;
 	applicants: Applicant[];
@@ -13,8 +22,16 @@ interface RankingControlPanelProps {
 	onShowError: (title: string, message: string) => void;
 }
 
-const COOLDOWN_DURATION = 30000; // 30 seconds
+const COOLDOWN_DURATION = 30000; // 30 seconds between AI runs
 const COOLDOWN_KEY_PREFIX = "ranking_cooldown_";
+
+// AI analyzes at most this many applicants; also enforced server-side
+const AI_TOP_N = 10;
+
+// Ranking is a paid feature; the unlock is stored per scholarship.
+// TODO: replace the demo unlock with a real payment flow once a payment
+// provider is integrated — there is no billing backend yet.
+const UNLOCK_KEY_PREFIX = "ranking_unlocked_";
 
 export function RankingControlPanel({
 	scholarship,
@@ -27,17 +44,23 @@ export function RankingControlPanel({
 		RankingMode.DecisionTree,
 	);
 	const [isRanking, setIsRanking] = useState(false);
-	const [showAIConfirm, setShowAIConfirm] = useState(false);
 	const [cooldownRemaining, setCooldownRemaining] = useState(0);
-	const [criteriaWeights, setCriteriaWeights] = useState<Record<string, number>>(
-		{},
-	);
+	const [criteriaWeights, setCriteriaWeights] = useState<
+		Record<string, number>
+	>({});
 	const [criteriaStars, setCriteriaStars] = useState<Record<string, number>>(
 		{},
 	);
-	const [aiTopN, setAiTopN] = useState(10); // Default to 10 for free tier
-	const [isPremiumUnlocked, setIsPremiumUnlocked] = useState(false); // Premium feature flag
-	const [showPremiumModal, setShowPremiumModal] = useState(false); // Payment modal
+	const [showCriteria, setShowCriteria] = useState(false);
+	const [isUnlocked, setIsUnlocked] = useState(false);
+	const [showPaymentModal, setShowPaymentModal] = useState(false);
+
+	// Ranking stays locked until the sponsor pays for this scholarship
+	useEffect(() => {
+		setIsUnlocked(
+			localStorage.getItem(`${UNLOCK_KEY_PREFIX}${scholarship.id}`) === "true",
+		);
+	}, [scholarship.id]);
 
 	// Initialize criteria weights when scholarship changes
 	useEffect(() => {
@@ -56,27 +79,27 @@ export function RankingControlPanel({
 
 	// Check cooldown on mount and set up interval
 	useEffect(() => {
+		const checkCooldown = () => {
+			const cooldownKey = `${COOLDOWN_KEY_PREFIX}${scholarship.id}`;
+			const lastRankingTime = localStorage.getItem(cooldownKey);
+
+			if (lastRankingTime) {
+				const elapsed = Date.now() - parseInt(lastRankingTime, 10);
+				const remaining = Math.max(0, COOLDOWN_DURATION - elapsed);
+
+				if (remaining > 0) {
+					setCooldownRemaining(Math.ceil(remaining / 1000));
+				} else {
+					setCooldownRemaining(0);
+					localStorage.removeItem(cooldownKey);
+				}
+			}
+		};
+
 		checkCooldown();
 		const interval = setInterval(checkCooldown, 1000);
 		return () => clearInterval(interval);
 	}, [scholarship.id]);
-
-	const checkCooldown = () => {
-		const cooldownKey = `${COOLDOWN_KEY_PREFIX}${scholarship.id}`;
-		const lastRankingTime = localStorage.getItem(cooldownKey);
-
-		if (lastRankingTime) {
-			const elapsed = Date.now() - parseInt(lastRankingTime, 10);
-			const remaining = Math.max(0, COOLDOWN_DURATION - elapsed);
-
-			if (remaining > 0) {
-				setCooldownRemaining(Math.ceil(remaining / 1000));
-			} else {
-				setCooldownRemaining(0);
-				localStorage.removeItem(cooldownKey);
-			}
-		}
-	};
 
 	const setCooldown = () => {
 		const cooldownKey = `${COOLDOWN_KEY_PREFIX}${scholarship.id}`;
@@ -84,18 +107,29 @@ export function RankingControlPanel({
 		setCooldownRemaining(COOLDOWN_DURATION / 1000);
 	};
 
+	const aiCount = Math.min(AI_TOP_N, applicants.length);
+
+	const handleUnlock = () => {
+		// TODO: collect the payment through a real provider before unlocking;
+		// until then this unlocks immediately for demo purposes.
+		localStorage.setItem(`${UNLOCK_KEY_PREFIX}${scholarship.id}`, "true");
+		setIsUnlocked(true);
+		setShowPaymentModal(false);
+		onShowSuccess(
+			"Ranking Unlocked",
+			"You can now rank applicants for this scholarship.",
+		);
+	};
+
 	const handleRank = async () => {
-		// Check if AI mode requires confirmation
-		if (selectedMode === RankingMode.AI && !showAIConfirm) {
-			setShowAIConfirm(true);
+		if (!isUnlocked) {
+			setShowPaymentModal(true);
 			return;
 		}
 
-		setShowAIConfirm(false);
 		setIsRanking(true);
 
 		try {
-			// Parse criteria from scholarship with custom weights
 			const criterias: RankingCriteria[] = scholarship.criterias.map(
 				(name) => ({
 					name,
@@ -104,78 +138,45 @@ export function RankingControlPanel({
 				}),
 			);
 
-			let result: RankingResult;
+			// Always rank everyone with the decision tree first
+			let result = DecisionTreeRanker.rank(
+				scholarship.id,
+				applicants,
+				criterias,
+				scholarship.formFields,
+			);
 
-			switch (selectedMode) {
-				case RankingMode.DecisionTree:
-					console.log('Using Quick Ranking (Decision Tree) mode');
-					result = DecisionTreeRanker.rank(
-						scholarship.id,
-						applicants,
-						criterias,
-					);
-					break;
+			if (selectedMode === RankingMode.AI) {
+				const topCandidates = result.rankedApplicants.slice(0, aiCount);
 
-				case RankingMode.AI: {
-					console.log('Using AI Insights mode');
-					const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-					if (!apiKey) {
-						throw new Error("Gemini API key not configured");
-					}
-					
-					// Determine how many to analyze with AI
-					const topNToAnalyze = isPremiumUnlocked ? applicants.length : Math.min(aiTopN, applicants.length);
-					console.log('AI Top N:', topNToAnalyze, 'Premium:', isPremiumUnlocked);
-					
-					// First, rank with Decision Tree
-					const dtResult = DecisionTreeRanker.rank(
+				try {
+					const aiResult = await new AIRanker().rankTopCandidates(
 						scholarship.id,
-						applicants,
+						topCandidates.map((r) => r.applicant),
 						criterias,
+						scholarship.description || undefined,
 					);
-					
-					// Then only use AI for top N candidates
-					const topCandidates = dtResult.rankedApplicants.slice(0, topNToAnalyze);
-					console.log('Top candidates for AI analysis:', topCandidates.length);
-					const aiRanker = new AIRanker(apiKey);
-					
-					try {
-						console.log('Calling AI ranker...');
-						const aiResult = await aiRanker.rankTopCandidates(
-							scholarship.id,
-							topCandidates.map(r => r.applicant),
-							criterias,
-							scholarship.description || undefined,
-						);
-						
-						console.log('AI ranking completed successfully');
-						
-						// Merge: AI-ranked top candidates + remaining DT-ranked candidates
-						result = {
-							...aiResult,
-							rankedApplicants: [
-								...aiResult.rankedApplicants,
-								...dtResult.rankedApplicants.slice(topNToAnalyze).map((r, idx) => ({
-									...r,
-									rank: topNToAnalyze + idx + 1,
-								})),
-							],
-						};
-					} catch (error) {
-						console.error("AI ranking failed, using Decision Tree only:", error);
-						result = dtResult;
-						onShowError(
-							"AI Unavailable",
-							"Using algorithmic ranking instead. AI service is currently overloaded.",
-						);
-					}
-					
-					setCooldown();
-					break;
+
+					// AI-ranked top candidates + remaining auto-ranked candidates
+					result = {
+						...aiResult,
+						rankedApplicants: [
+							...aiResult.rankedApplicants,
+							...result.rankedApplicants.slice(aiCount).map((r, idx) => ({
+								...r,
+								rank: aiCount + idx + 1,
+							})),
+						],
+					};
+				} catch (error) {
+					console.error("AI ranking failed, using automatic ranking:", error);
+					onShowError(
+						"AI Unavailable",
+						"Showing automatic ranking instead. Please try AI again in a few minutes.",
+					);
 				}
 
-				default:
-					throw new Error("Invalid ranking mode");
+				setCooldown();
 			}
 
 			onRankingComplete(result);
@@ -194,19 +195,16 @@ export function RankingControlPanel({
 		}
 	};
 
-	const canRank = applicants.length > 0 && !isRanking && cooldownRemaining === 0;
+	const canRank =
+		applicants.length > 0 && !isRanking && cooldownRemaining === 0;
 
 	const handleStarChange = (criteriaName: string, stars: number) => {
-		// Update stars
 		const newStars = { ...criteriaStars, [criteriaName]: stars };
 		setCriteriaStars(newStars);
-		
-		// Convert stars to weights (1-5 stars)
-		// Calculate total stars
+
 		const totalStars = Object.values(newStars).reduce((sum, s) => sum + s, 0);
-		
+
 		if (totalStars === 0) {
-			// All are 0 stars, reset to equal
 			const equalWeight = 100 / scholarship.criterias.length;
 			const weights: Record<string, number> = {};
 			scholarship.criterias.forEach((criteria) => {
@@ -215,24 +213,27 @@ export function RankingControlPanel({
 			setCriteriaWeights(weights);
 			return;
 		}
-		
+
 		// Convert stars to percentage weights
 		const newWeights: Record<string, number> = {};
 		scholarship.criterias.forEach((criteria) => {
-			const criteriaStars = newStars[criteria] || 0;
-			newWeights[criteria] = Math.round((criteriaStars / totalStars) * 100);
+			const starCount = newStars[criteria] || 0;
+			newWeights[criteria] = Math.round((starCount / totalStars) * 100);
 		});
-		
+
 		// Fix rounding errors to ensure total is exactly 100
-		const currentTotal = Object.values(newWeights).reduce((sum, w) => sum + w, 0);
+		const currentTotal = Object.values(newWeights).reduce(
+			(sum, w) => sum + w,
+			0,
+		);
 		if (currentTotal !== 100) {
-			// Find the criterion with the most stars and adjust it
-			const maxStarCriteria = scholarship.criterias.reduce((max, c) => 
-				newStars[c] > newStars[max] ? c : max
-			, scholarship.criterias[0]);
-			newWeights[maxStarCriteria] += (100 - currentTotal);
+			const maxStarCriteria = scholarship.criterias.reduce(
+				(max, c) => (newStars[c] > newStars[max] ? c : max),
+				scholarship.criterias[0],
+			);
+			newWeights[maxStarCriteria] += 100 - currentTotal;
 		}
-		
+
 		setCriteriaWeights(newWeights);
 	};
 
@@ -242,433 +243,263 @@ export function RankingControlPanel({
 		const stars: Record<string, number> = {};
 		scholarship.criterias.forEach((criteria) => {
 			weights[criteria] = Math.round(equalWeight);
-			stars[criteria] = 3; // Reset to 3 stars
+			stars[criteria] = 3;
 		});
 		setCriteriaWeights(weights);
 		setCriteriaStars(stars);
 	};
 
-	const totalWeight = Object.values(criteriaWeights).reduce(
-		(sum, w) => sum + w,
-		0,
-	);
-
 	return (
 		<div className="bg-card rounded-lg shadow-sm p-4 mb-4">
-			<h3 className="text-lg text-primary mb-4">
-				Applicant Ranking
-			</h3>
-
-			{/* Mode Selection */}
-			<div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-				{/* Basic Ranking */}
-				<button
-					onClick={() => setSelectedMode(RankingMode.DecisionTree)}
-					disabled={isRanking}
-					className={`p-5 rounded-lg border-2 transition-all text-left ${
-						selectedMode === RankingMode.DecisionTree
-							? "border-[#3A52A6] bg-[#EFF6FF] shadow-md"
-							: "border-[#E5E7EB] hover:border-[#3A52A6] hover:shadow-sm"
-					} ${isRanking ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
-				>
-					<div className="flex items-center justify-between mb-3">
-						<div className="flex items-center gap-2">
-							<div className="p-2 bg-[#3A52A6] rounded-lg">
-								<GitBranch className="w-5 h-5 text-white" />
-							</div>
-							<div>
-								<span className="text-primary text-base block">Basic Ranking</span>
-								<span className="text-[10px] px-2 py-0.5 bg-[#E5E7EB] text-[#6B7280] rounded-full mt-1 inline-block">FREE</span>
-							</div>
-						</div>
-						{selectedMode === RankingMode.DecisionTree && (
-							<CheckCircle className="w-5 h-5 text-[#3A52A6]" />
-						)}
-					</div>
-					<p className="text-sm text-[#6B7280] leading-relaxed mb-2">
-						Quick automatic ranking based on form answers
+			{/* Header: title + the primary action, always visible without scrolling */}
+			<div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+				<div>
+					<h3 className="text-lg text-primary">Rank Applicants</h3>
+					<p className="text-xs text-[#6B7280]">
+						Sorts the {applicants.length}{" "}
+						{applicants.length === 1 ? "applicant" : "applicants"} shown from
+						most to least eligible
 					</p>
-					<ul className="text-xs text-[#6B7280] space-y-1">
-						<li className="flex items-center gap-1">
-							<span className="text-[#10B981]">✓</span> Instant results
-						</li>
-						<li className="flex items-center gap-1">
-							<span className="text-[#10B981]">✓</span> Checks all requirements
-						</li>
-						<li className="flex items-center gap-1">
-							<span className="text-[#10B981]">✓</span> No document reading
-						</li>
-					</ul>
-				</button>
-
-				{/* AI Ranking */}
+				</div>
 				<button
-					onClick={() => setSelectedMode(RankingMode.AI)}
-					disabled={isRanking}
-					className={`p-5 rounded-lg border-2 transition-all text-left ${
-						selectedMode === RankingMode.AI
-							? "border-[#8B5CF6] bg-[#F5F3FF] shadow-md"
-							: "border-[#E5E7EB] hover:border-[#8B5CF6] hover:shadow-sm"
-					} ${isRanking ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+					type="button"
+					onClick={handleRank}
+					disabled={isUnlocked && !canRank}
+					className={`shrink-0 flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm transition-colors ${
+						!isUnlocked
+							? "bg-[#8B5CF6] text-white hover:bg-[#7C3AED]"
+							: canRank
+								? selectedMode === RankingMode.AI
+									? "bg-[#8B5CF6] text-white hover:bg-[#7C3AED]"
+									: "bg-[#3A52A6] text-white hover:bg-[#2A4296]"
+								: "bg-[#E5E7EB] text-[#9CA3AF] cursor-not-allowed"
+					}`}
 				>
-					<div className="flex items-center justify-between mb-3">
-						<div className="flex items-center gap-2">
-							<div className="p-2 bg-gradient-to-br from-[#8B5CF6] to-[#A78BFA] rounded-lg">
-								<Sparkles className="w-5 h-5 text-white" />
-							</div>
-							<div>
-								<span className="text-primary text-base block">AI-Powered Ranking</span>
-								<span className="text-[10px] px-2 py-0.5 bg-gradient-to-r from-[#8B5CF6] to-[#A78BFA] text-white rounded-full mt-1 inline-block">PREMIUM</span>
-							</div>
-						</div>
-						{selectedMode === RankingMode.AI && (
-							<CheckCircle className="w-5 h-5 text-[#8B5CF6]" />
-						)}
-					</div>
-					<p className="text-sm text-[#6B7280] leading-relaxed mb-2">
-						AI reads documents and gives detailed insights
-					</p>
-					<ul className="text-xs text-[#6B7280] space-y-1">
-						<li className="flex items-center gap-1">
-							<span className="text-[#8B5CF6]">✓</span> Reads uploaded documents
-						</li>
-						<li className="flex items-center gap-1">
-							<span className="text-[#8B5CF6]">✓</span> Detailed recommendations
-						</li>
-						<li className="flex items-center gap-1">
-							<span className="text-[#8B5CF6]">✓</span> {isPremiumUnlocked ? `All ${applicants.length} applicants` : 'Top 10 applicants'}
-						</li>
-					</ul>
+					{!isUnlocked ? (
+						<>
+							<Lock className="w-4 h-4" />
+							Unlock to Rank
+						</>
+					) : isRanking ? (
+						<>
+							<Loader2 className="w-4 h-4 animate-spin" />
+							Ranking...
+						</>
+					) : cooldownRemaining > 0 ? (
+						`Wait ${cooldownRemaining}s`
+					) : selectedMode === RankingMode.AI ? (
+						<>
+							<Sparkles className="w-4 h-4" />
+							Rank with AI
+						</>
+					) : (
+						<>
+							<GitBranch className="w-4 h-4" />
+							Rank Now
+						</>
+					)}
 				</button>
 			</div>
 
-			{/* AI Mode - Top N Selector and Premium Unlock */}
-			{selectedMode === RankingMode.AI && (
-				<div className="mb-4 space-y-3">
-					{/* Premium Unlock Card - Subtle design */}
-					{!isPremiumUnlocked && (
-						<div className="p-4 bg-white rounded-lg border-2 border-[#8B5CF6] shadow-sm">
-							<div className="flex items-start gap-3 mb-3">
-								<div className="p-2 bg-[#F5F3FF] rounded-lg">
-									<Lock className="w-5 h-5 text-[#8B5CF6]" />
-								</div>
-								<div className="flex-1">
-									<h4 className="text-base text-[#374151] mb-1">Premium Feature Available</h4>
-									<p className="text-sm text-[#6B7280]">Unlock to rank ALL candidates with AI</p>
-								</div>
+			{/* Paid-feature notice while locked */}
+			{!isUnlocked && (
+				<div className="mb-3 p-3 bg-[#FEF3C7] rounded-lg flex items-center gap-2 text-sm text-[#92400E]">
+					<Lock className="w-4 h-4 shrink-0" />
+					Ranking is a paid feature. Unlock it once for this scholarship to use
+					both ranking modes.
+				</div>
+			)}
+
+			{/* Mode selection */}
+			<div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+				<button
+					type="button"
+					onClick={() => setSelectedMode(RankingMode.DecisionTree)}
+					disabled={isRanking}
+					className={`p-3 rounded-lg border-2 text-left transition-colors ${
+						selectedMode === RankingMode.DecisionTree
+							? "border-[#3A52A6] bg-[#EFF6FF]"
+							: "border-[#E5E7EB] hover:border-[#9CA3AF]"
+					} ${isRanking ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+				>
+					<div className="flex items-center gap-2 mb-1">
+						<GitBranch className="w-4 h-4 text-[#3A52A6]" />
+						<span className="text-sm text-primary">Quick Rank</span>
+					</div>
+					<p className="text-xs text-[#6B7280]">
+						Instant results from form answers
+					</p>
+				</button>
+
+				<button
+					type="button"
+					onClick={() => setSelectedMode(RankingMode.AI)}
+					disabled={isRanking}
+					className={`p-3 rounded-lg border-2 text-left transition-colors ${
+						selectedMode === RankingMode.AI
+							? "border-[#8B5CF6] bg-[#F5F3FF]"
+							: "border-[#E5E7EB] hover:border-[#9CA3AF]"
+					} ${isRanking ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+				>
+					<div className="flex items-center gap-2 mb-1">
+						<Sparkles className="w-4 h-4 text-[#8B5CF6]" />
+						<span className="text-sm text-primary">AI Analysis</span>
+						<span className="text-[10px] px-1.5 py-0.5 bg-[#F5F3FF] border border-[#8B5CF6] text-[#8B5CF6] rounded-full">
+							Top {AI_TOP_N}
+						</span>
+					</div>
+					<p className="text-xs text-[#6B7280]">
+						Reads documents and explains each result
+					</p>
+				</button>
+			</div>
+
+			<p className="text-xs text-[#6B7280] mt-2">
+				{selectedMode === RankingMode.AI
+					? `AI reviews the documents of your top ${aiCount} ${aiCount === 1 ? "applicant" : "applicants"}; the rest are ranked automatically.`
+					: "Ranks everyone instantly using their form answers. Documents are not read."}
+			</p>
+
+			{/* Progress note while the AI run is in flight */}
+			{isRanking && selectedMode === RankingMode.AI && (
+				<div className="mt-3 p-3 bg-[#F5F3FF] rounded-lg flex items-center gap-2 text-sm text-[#5B21B6]">
+					<Loader2 className="w-4 h-4 animate-spin shrink-0" />
+					Analyzing documents. This can take a minute or two, so keep this page
+					open.
+				</div>
+			)}
+
+			{/* Criteria importance, collapsed by default */}
+			{scholarship.criterias.length > 0 && (
+				<div className="mt-3 border-t border-[#E5E7EB] pt-3">
+					<button
+						type="button"
+						onClick={() => setShowCriteria(!showCriteria)}
+						className="w-full flex items-center justify-between text-sm text-[#374151] hover:text-[#3A52A6] transition-colors"
+					>
+						<span className="flex items-center gap-2">
+							<Star className="w-4 h-4 text-[#F59E0B]" />
+							Criteria importance
+							<span className="text-xs text-[#9CA3AF]">(optional)</span>
+						</span>
+						{showCriteria ? (
+							<ChevronUp className="w-4 h-4" />
+						) : (
+							<ChevronDown className="w-4 h-4" />
+						)}
+					</button>
+
+					{showCriteria && (
+						<div className="mt-2">
+							<div className="flex items-center justify-between gap-3 mb-1">
+								<p className="text-xs text-[#6B7280]">
+									More stars = more weight in the score.
+								</p>
+								<button
+									type="button"
+									onClick={resetWeights}
+									disabled={isRanking}
+									className="text-xs text-[#3A52A6] hover:text-[#2A4296] disabled:opacity-50 whitespace-nowrap"
+								>
+									Reset
+								</button>
 							</div>
-							<div className="bg-[#F9FAFB] rounded-lg p-3 mb-3 space-y-2">
-								<div className="flex items-center justify-between text-sm">
-									<span className="text-[#6B7280]">Free Tier</span>
-									<span className="text-[#374151]">Top 10 applicants only</span>
-								</div>
-								<div className="flex items-center justify-between text-sm">
-									<span className="text-[#6B7280]">Premium</span>
-									<span className="text-[#8B5CF6]">ALL {applicants.length} applicants analyzed</span>
-								</div>
+
+							<div className="divide-y divide-[#F3F4F6]">
+								{scholarship.criterias.map((criteria) => {
+									const stars = criteriaStars[criteria] || 3;
+									const weight = criteriaWeights[criteria] || 0;
+
+									return (
+										<div
+											key={criteria}
+											className="flex items-center gap-3 py-2"
+										>
+											<span
+												className="text-sm text-[#374151] flex-1 min-w-0 truncate"
+												title={criteria}
+											>
+												{criteria}
+											</span>
+											<div className="flex items-center">
+												{[1, 2, 3, 4, 5].map((starValue) => (
+													<button
+														key={starValue}
+														type="button"
+														onClick={() =>
+															handleStarChange(criteria, starValue)
+														}
+														disabled={isRanking}
+														aria-label={`Set importance of "${criteria}" to ${starValue} of 5`}
+														className="p-0.5 hover:scale-110 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+													>
+														<Star
+															className={`w-4 h-4 ${
+																starValue <= stars
+																	? "fill-[#F59E0B] text-[#F59E0B]"
+																	: "text-[#D1D5DB]"
+															}`}
+														/>
+													</button>
+												))}
+											</div>
+											<span className="text-xs text-[#3A52A6] w-9 text-right">
+												{weight}%
+											</span>
+										</div>
+									);
+								})}
 							</div>
-							<button
-								onClick={() => setShowPremiumModal(true)}
-								disabled={isRanking}
-								className="w-full py-3 bg-[#8B5CF6] text-white rounded-lg hover:bg-[#7C3AED] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-							>
-								<Unlock className="w-4 h-4" />
-								Unlock Premium - Rank All {applicants.length} Candidates
-							</button>
 						</div>
 					)}
-
-					{/* Current Settings Display */}
-					<div className={`p-4 rounded-lg border-2 ${isPremiumUnlocked ? 'bg-[#F0FDF4] border-[#10B981]' : 'bg-[#F5F3FF] border-[#8B5CF6]'}`}>
-						<div className="flex items-start justify-between mb-3">
-							<div className="flex-1">
-								<div className="flex items-center gap-2 mb-2">
-									{isPremiumUnlocked ? (
-										<>
-											<Unlock className="w-5 h-5 text-[#10B981]" />
-											<span className="text-base text-[#065F46]">Premium Active</span>
-										</>
-									) : (
-										<>
-											<Sparkles className="w-5 h-5 text-[#8B5CF6]" />
-											<span className="text-base text-[#5B21B6]">Free Tier</span>
-										</>
-									)}
-								</div>
-								<p className="text-sm text-[#6B7280] mb-2">
-									{isPremiumUnlocked 
-										? `AI will analyze all ${applicants.length} applicants with full document review and detailed insights.`
-										: `AI will analyze your top ${Math.min(aiTopN, applicants.length)} applicants. Remaining applicants will be ranked automatically.`
-									}
-								</p>
-								{isPremiumUnlocked && (
-									<div className="flex items-center gap-2 text-sm text-[#10B981]">
-										<CheckCircle className="w-4 h-4" />
-										<span>Full AI analysis for all applicants</span>
-									</div>
-								)}
-							</div>
-							{isPremiumUnlocked && (
-								<button
-									onClick={() => setIsPremiumUnlocked(false)}
-									disabled={isRanking}
-									className="text-xs text-[#6B7280] hover:text-[#374151] ml-3 whitespace-nowrap underline"
-								>
-									Switch to Free
-								</button>
-							)}
-						</div>
-						
-						{!isPremiumUnlocked && (
-							<div className="space-y-3">
-								<div className="flex items-center justify-between">
-									<span className="text-sm text-[#374151]">Number of applicants to analyze:</span>
-									<span className="text-2xl text-[#8B5CF6]">{Math.min(aiTopN, applicants.length)}</span>
-								</div>
-								<input
-									type="range"
-									min="3"
-									max={Math.min(10, applicants.length)}
-									value={aiTopN}
-									onChange={(e) => setAiTopN(parseInt(e.target.value))}
-									disabled={isRanking}
-									className="w-full h-2 bg-[#E5E7EB] rounded-lg appearance-none cursor-pointer accent-[#8B5CF6]"
-								/>
-								<div className="flex justify-between text-xs text-[#6B7280]">
-									<span>3 applicants (faster)</span>
-									<span>10 applicants (slower)</span>
-								</div>
-							</div>
-						)}
-					</div>
 				</div>
 			)}
 
-			{/* Criteria Weights Configuration */}
-			{scholarship.criterias.length > 0 && (
-				<div className="mb-4 p-4 bg-[#F9FAFB] rounded-lg border border-[#E5E7EB]">
-					<div className="flex items-center justify-between mb-3">
-						<div>
-							<h4 className="text-sm text-primary flex items-center gap-2">
-								<Star className="w-4 h-4 text-[#F59E0B]" />
-								Rate Importance
-							</h4>
-							<p className="text-xs text-[#6B7280] mt-0.5">
-								Click stars to show how important each requirement is. More stars = more important.
-							</p>
-						</div>
-						<button
-							onClick={resetWeights}
-							disabled={isRanking}
-							className="text-xs text-[#3A52A6] hover:text-[#2A4296] disabled:opacity-50 whitespace-nowrap ml-3"
-						>
-							Reset All
-						</button>
-					</div>
-
-					<div className="space-y-3">
-						{scholarship.criterias.map((criteria) => {
-							const stars = criteriaStars[criteria] || 3;
-							const weight = criteriaWeights[criteria] || 0;
-							
-							return (
-								<div key={criteria} className="p-3 bg-white rounded-lg border border-[#E5E7EB]">
-									<div className="flex items-start justify-between gap-3 mb-2">
-										<label className="text-sm text-[#374151] flex-1">
-											{criteria}
-										</label>
-										<span className="text-sm text-[#3A52A6] whitespace-nowrap">
-											{weight}%
-										</span>
-									</div>
-									
-									<div className="flex items-center gap-1">
-										{[1, 2, 3, 4, 5].map((starValue) => (
-											<button
-												key={starValue}
-												type="button"
-												onClick={() => handleStarChange(criteria, starValue)}
-												disabled={isRanking}
-												className="p-1 hover:scale-110 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
-											>
-												<Star
-													className={`w-6 h-6 ${
-														starValue <= stars
-															? "fill-[#F59E0B] text-[#F59E0B]"
-															: "text-[#D1D5DB]"
-													}`}
-												/>
-											</button>
-										))}
-										<span className="ml-2 text-xs text-[#6B7280]">
-											{stars === 1 && "Low"}
-											{stars === 2 && "Medium-Low"}
-											{stars === 3 && "Medium"}
-											{stars === 4 && "High"}
-											{stars === 5 && "Very High"}
-										</span>
-									</div>
-								</div>
-							);
-						})}
-					</div>
-
-					<div className="mt-3 pt-3 border-t border-[#E5E7EB] flex items-center justify-between">
-						<span className="text-xs text-[#6B7280]">
-							Weights are calculated automatically based on your star ratings
-						</span>
-						<div className="flex items-center gap-2">
-							<CheckCircle className="w-4 h-4 text-[#10B981]" />
-							<span className="text-sm text-[#10B981]">
-								Total: {totalWeight}%
-							</span>
-						</div>
-					</div>
-				</div>
-			)}
-
-			{/* Cooldown Warning */}
-			{cooldownRemaining > 0 && (
-				<div className="mb-4 p-3 bg-[#FEF3C7] rounded-lg flex items-center gap-2">
-					<Clock className="w-4 h-4 text-[#F59E0B]" />
-					<span className="text-sm text-[#92400E]">
-						Please wait {cooldownRemaining}s before ranking again
-					</span>
-				</div>
-			)}
-
-			{/* Rank Button */}
-			<button
-				onClick={handleRank}
-				disabled={!canRank}
-				className={`w-full py-3 rounded-lg transition-all ${
-					canRank
-						? "bg-[#3A52A6] text-white hover:bg-[#2A4296]"
-						: "bg-[#E5E7EB] text-[#9CA3AF] cursor-not-allowed"
-				}`}
-			>
-				{isRanking ? (
-					<span className="flex items-center justify-center gap-2">
-						<div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-						Ranking...
-					</span>
-				) : selectedMode === RankingMode.AI ? (
-					isPremiumUnlocked 
-						? `Rank All ${applicants.length} with AI (Premium)`
-						: `Rank Top ${Math.min(aiTopN, applicants.length)} with AI`
-				) : (
-					`Rank ${applicants.length} Applicants`
-				)}
-			</button>
-
-			{/* AI Confirmation Dialog */}
-			{showAIConfirm && (
+			{/* Payment gate modal */}
+			{showPaymentModal && (
 				<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-					<div className="bg-white rounded-lg p-6 max-w-md mx-4">
+					<div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
 						<div className="flex items-center gap-3 mb-4">
-							<AlertCircle className="w-6 h-6 text-[#F59E0B]" />
-							<h4 className="text-lg text-primary">
-								Confirm AI Ranking
-							</h4>
-						</div>
-						<p className="text-sm text-[#6B7280] mb-4">
-							{isPremiumUnlocked 
-								? `This will analyze all ${applicants.length} applicants with AI and may take several minutes.`
-								: `This will analyze ${Math.min(aiTopN, applicants.length)} applicants with AI and may take a few moments.`
-							}
-						</p>
-						{isPremiumUnlocked && (
-							<div className="mb-4 p-3 bg-[#F0FDF4] rounded-lg border border-[#10B981]">
-								<div className="flex items-center gap-2 text-sm text-[#065F46]">
-									<Sparkles className="w-4 h-4" />
-									<span>Premium AI Analysis Active</span>
-								</div>
+							<div className="p-2 bg-[#F5F3FF] rounded-lg">
+								<Lock className="w-6 h-6 text-[#8B5CF6]" />
 							</div>
-						)}
+							<h4 className="text-lg text-primary">Unlock Applicant Ranking</h4>
+						</div>
+
+						<p className="text-sm text-[#6B7280] mb-4">
+							Ranking is a paid feature. A single payment unlocks both ranking
+							modes for this scholarship.
+						</p>
+
+						<ul className="text-sm text-[#6B7280] space-y-2 bg-[#F9FAFB] rounded-lg p-4 mb-4">
+							<li className="flex items-center gap-2">
+								<GitBranch className="w-4 h-4 text-[#3A52A6] shrink-0" />
+								Instant ranking of all applicants
+							</li>
+							<li className="flex items-center gap-2">
+								<Sparkles className="w-4 h-4 text-[#8B5CF6] shrink-0" />
+								AI document analysis for your top {AI_TOP_N} applicants
+							</li>
+							<li className="flex items-center gap-2">
+								<Star className="w-4 h-4 text-[#F59E0B] shrink-0" />
+								Detailed criteria results you can export
+							</li>
+						</ul>
+
 						<div className="flex gap-3">
 							<button
-								onClick={() => setShowAIConfirm(false)}
+								type="button"
+								onClick={() => setShowPaymentModal(false)}
 								className="flex-1 py-2 px-4 border border-[#E5E7EB] rounded-lg text-[#6B7280] hover:bg-[#F9FAFB]"
 							>
 								Cancel
 							</button>
 							<button
-								onClick={handleRank}
-								className="flex-1 py-2 px-4 bg-[#3A52A6] text-white rounded-lg hover:bg-[#2A4296]"
-							>
-								Proceed
-							</button>
-						</div>
-					</div>
-				</div>
-			)}
-
-			{/* Premium Payment Modal */}
-			{showPremiumModal && (
-				<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-					<div className="bg-white rounded-lg p-6 max-w-md mx-4">
-						<div className="flex items-center gap-3 mb-4">
-							<div className="p-2 bg-[#F5F3FF] rounded-lg">
-								<Sparkles className="w-6 h-6 text-[#8B5CF6]" />
-							</div>
-							<h4 className="text-lg text-primary">
-								Upgrade to Premium
-							</h4>
-						</div>
-						
-						<div className="mb-4">
-							<p className="text-sm text-[#6B7280] mb-4">
-								Unlock AI-powered ranking for all {applicants.length} applicants with detailed document analysis and insights.
-							</p>
-							
-							<div className="bg-[#F9FAFB] rounded-lg p-4 mb-4">
-								<div className="text-sm text-[#374151] mb-3">Premium Features:</div>
-								<ul className="text-sm text-[#6B7280] space-y-2">
-									<li className="flex items-center gap-2">
-										<CheckCircle className="w-4 h-4 text-[#10B981]" />
-										<span>Rank unlimited applicants with AI</span>
-									</li>
-									<li className="flex items-center gap-2">
-										<CheckCircle className="w-4 h-4 text-[#10B981]" />
-										<span>Full document reading and analysis</span>
-									</li>
-									<li className="flex items-center gap-2">
-										<CheckCircle className="w-4 h-4 text-[#10B981]" />
-										<span>Detailed AI recommendations</span>
-									</li>
-									<li className="flex items-center gap-2">
-										<CheckCircle className="w-4 h-4 text-[#10B981]" />
-										<span>Priority support</span>
-									</li>
-								</ul>
-							</div>
-							
-							<div className="bg-[#EFF6FF] border border-[#3A52A6] rounded-lg p-4 text-center">
-								<div className="text-2xl text-[#3A52A6] mb-1">Contact Sales</div>
-								<div className="text-sm text-[#6B7280]">
-									Premium pricing available on request
-								</div>
-							</div>
-						</div>
-						
-						<div className="flex gap-3">
-							<button
-								onClick={() => setShowPremiumModal(false)}
-								className="flex-1 py-2 px-4 border border-[#E5E7EB] rounded-lg text-[#6B7280] hover:bg-[#F9FAFB]"
-							>
-								Maybe Later
-							</button>
-							<button
-								onClick={() => {
-									// TODO: Integrate with payment system
-									// For now, just unlock for demo purposes
-									setIsPremiumUnlocked(true);
-									setShowPremiumModal(false);
-									onShowSuccess("Premium Activated", "You can now rank all applicants with AI");
-								}}
+								type="button"
+								onClick={handleUnlock}
 								className="flex-1 py-2 px-4 bg-[#8B5CF6] text-white rounded-lg hover:bg-[#7C3AED]"
 							>
-								Contact Sales
+								Pay to Unlock
 							</button>
 						</div>
 					</div>

@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect } from "react";
 import AnimatedBackground from "@/components/landing/AnimatedBackground";
-import { LocalTimeClock } from "@/components/landing/LocalTimeClock";
 import Navbar from "@/components/landing/Navbar";
 import { ScrollToTop } from "@/components/landing/ScrollToTop";
 import { SEO } from "@/components/SEO";
@@ -15,7 +14,7 @@ const MissionVisionSection = lazy(
 	() => import("@/components/landing/about/MissionVision"),
 );
 const TeamSection = lazy(() => import("@/components/landing/about/Team"));
-const Partnerships = lazy(() =>
+const PartnershipsSection = lazy(() =>
 	import("@/components/landing/about/Partnerships").then((m) => ({
 		default: m.Partnerships,
 	})),
@@ -51,7 +50,7 @@ function About() {
 	}, []);
 
 	return (
-		<main className="relative min-h-screen bg-background text-secondary">
+		<main className="cursor-academic relative min-h-screen bg-background text-secondary">
 			<SEO
 				title="About Us"
 				description="Learn about iSkolar's mission, vision, and the team building the future of scholarship management."
@@ -79,13 +78,12 @@ function About() {
 				<Suspense fallback={<div className="min-h-[50vh]" />}>
 					<CompanyOverviewSection />
 					<MissionVisionSection />
+					<PartnershipsSection />
 					<TeamSection />
-					<Partnerships />
 					<Footer />
 				</Suspense>
 			</div>
 			<ScrollToTop />
-			<LocalTimeClock />
 		</main>
 	);
 }

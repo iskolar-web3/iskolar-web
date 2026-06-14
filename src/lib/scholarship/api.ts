@@ -1,20 +1,20 @@
 import { queryOptions } from "@tanstack/react-query";
-import { BACKEND_URL, safeResponseJson, type ApiResponse } from "../api";
+import { type ApiResponse, BACKEND_URL, safeResponseJson } from "../api";
 import { anySponsorSchema } from "../sponsor/model";
 import {
-	applicantSchema,
-	applicationSchema,
-	applicationStatusSchema,
-	scholarshipSchema,
 	type Applicant,
 	type Application,
 	type ApplicationStatus,
+	applicantSchema,
+	applicationSchema,
+	applicationStatusSchema,
 	type CreateApplicationRequest,
 	type EditScholarshipFormData,
 	type GetApplicationsQueryParam,
 	type GetScholarshipQueryParam,
 	type Scholarship,
 	type SelectScholarRequest,
+	scholarshipSchema,
 } from "./model";
 
 async function getMyScholarships(
@@ -40,10 +40,12 @@ async function getMyScholarships(
 	});
 	const result: ApiResponse<Scholarship[]> = await safeResponseJson(response);
 
-	return scholarshipSchema(anySponsorSchema)
+	const parsed = scholarshipSchema(anySponsorSchema)
 		.array()
 		.default([])
 		.parse(result.data);
+
+	return parsed;
 }
 
 export const getMyScholarshipsQuery = (

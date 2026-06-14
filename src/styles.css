@@ -171,6 +171,15 @@ code {
 	background: #9ca3af;
 }
 
+/* Hide scrollbar while keeping scroll (used by the testimonials carousel) */
+.no-scrollbar {
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+	display: none;
+}
+
 .role-card {
 	animation: fadeInUp 1s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 	opacity: 0;
@@ -246,5 +255,199 @@ code {
 	to {
 		opacity: 1;
 		transform: translateY(0);
+	}
+}
+
+/* =============================================================
+   ACADEMIC DESIGN SYSTEM
+   Strictly blue (#3a52a6 / --secondary) + white. No new hues.
+   ============================================================= */
+
+/* ---- Decorative keyframes ---- */
+@keyframes float-soothing {
+	0% {
+		transform: translateY(0) rotate(0deg);
+	}
+	50% {
+		transform: translateY(-16px) rotate(1.5deg);
+	}
+	100% {
+		transform: translateY(0) rotate(0deg);
+	}
+}
+
+@keyframes soft-pulse {
+	0%,
+	100% {
+		opacity: 0.5;
+	}
+	50% {
+		opacity: 0.9;
+	}
+}
+
+@keyframes draw-in-line {
+	from {
+		transform: scaleX(0);
+	}
+	to {
+		transform: scaleX(1);
+	}
+}
+
+@keyframes highlighter-sweep {
+	from {
+		background-size: 0% 100%;
+	}
+	to {
+		background-size: 100% 100%;
+	}
+}
+
+/* ---- Highlighter-marker accent (brand blue, for white/light bg) ---- */
+.hl-marker {
+	position: relative;
+	display: inline;
+	background-image: linear-gradient(
+		104deg,
+		rgba(58, 82, 166, 0) 0.5%,
+		rgba(58, 82, 166, 0.16) 2%,
+		rgba(58, 82, 166, 0.22) 50%,
+		rgba(58, 82, 166, 0.16) 98%,
+		rgba(58, 82, 166, 0) 99.5%
+	);
+	background-repeat: no-repeat;
+	background-size: 100% 62%;
+	background-position: 0 78%;
+	border-radius: 0.08em;
+	padding: 0 0.12em;
+	color: inherit;
+}
+.hl-marker--bold {
+	background-image: linear-gradient(
+		104deg,
+		rgba(58, 82, 166, 0) 0.5%,
+		rgba(58, 82, 166, 0.22) 2%,
+		rgba(58, 82, 166, 0.3) 50%,
+		rgba(58, 82, 166, 0.22) 98%,
+		rgba(58, 82, 166, 0) 99.5%
+	);
+}
+.hl-marker--animate {
+	background-size: 0% 62%;
+	animation: highlighter-sweep 0.7s cubic-bezier(0.65, 0, 0.35, 1) 0.15s forwards;
+}
+
+/* ---- Ruled / notebook hairline ---- */
+.ruled-line {
+	border: 0;
+	height: 1px;
+	background-color: rgba(58, 82, 166, 0.14);
+}
+.ruled-draw {
+	transform: scaleX(0);
+	transform-origin: left center;
+	animation: draw-in-line 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.ruled-paper {
+	background-image: repeating-linear-gradient(
+		to bottom,
+		transparent 0,
+		transparent 31px,
+		rgba(58, 82, 166, 0.07) 31px,
+		rgba(58, 82, 166, 0.07) 32px
+	);
+}
+
+/* ---- Dotted syllabus connector ---- */
+.dotted-connector {
+	background-image: radial-gradient(
+		rgba(58, 82, 166, 0.45) 1.4px,
+		transparent 1.6px
+	);
+}
+.dotted-connector--v {
+	width: 2px;
+	background-size: 2px 12px;
+	background-repeat: repeat-y;
+	background-position: center top;
+}
+.dotted-connector--h {
+	height: 2px;
+	background-size: 12px 2px;
+	background-repeat: repeat-x;
+	background-position: left center;
+}
+.dotted-draw {
+	transform: scaleY(0);
+	transform-origin: top center;
+	animation: draw-in-line 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ---- Section eyebrow (ruled, uppercase, syllabus-style) ---- */
+.eyebrow {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.625rem;
+	font-size: 0.75rem;
+	line-height: 1;
+	text-transform: uppercase;
+	letter-spacing: 0.2em;
+	color: rgba(58, 82, 166, 0.55);
+}
+.eyebrow::before {
+	content: "";
+	width: 1.75rem;
+	height: 1px;
+	background-color: rgba(58, 82, 166, 0.25);
+}
+
+/* ---- Scholarly cursor (fountain-pen nib) — landing only ---- */
+.cursor-academic {
+	cursor: url("/cursors/nib.svg") 2 2, auto;
+}
+/* interactive elements get a brand-blue pointing hand (falls back to pointer) */
+.cursor-academic a,
+.cursor-academic button,
+.cursor-academic [role="button"],
+.cursor-academic summary,
+.cursor-academic label[for] {
+	cursor: url("/cursors/hand.svg") 11 2, pointer;
+}
+.cursor-academic input:not([type="checkbox"]):not([type="radio"]):not([type="button"]),
+.cursor-academic textarea {
+	cursor: text;
+}
+/* touch devices have no pointer — don't impose a custom cursor */
+@media (hover: none) {
+	.cursor-academic {
+		cursor: auto;
+	}
+}
+
+/* ---- Reduced motion: neutralize all decorative animation ---- */
+@media (prefers-reduced-motion: reduce) {
+	[style*="float-soothing"],
+	[style*="float-complex"],
+	[style*="soft-pulse"],
+	.hl-marker--animate,
+	.ruled-draw,
+	.dotted-draw {
+		animation: none !important;
+	}
+	.hl-marker--animate {
+		background-size: 100% 100% !important;
+	}
+	.ruled-draw,
+	.dotted-draw {
+		transform: none !important;
+	}
+	.role-card,
+	.fade-in,
+	.fade-in-down,
+	.fade-in-left,
+	.fade-in-up {
+		animation: none !important;
+		opacity: 1 !important;
 	}
 }

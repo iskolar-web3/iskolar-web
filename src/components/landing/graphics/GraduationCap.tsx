@@ -1,34 +1,40 @@
 
 
-export function GraduationCapBg() {
+export function GraduationCapBg({ reduced }: { reduced?: boolean }) {
   return (
     <svg viewBox="0 0 200 150" className="w-full h-full" preserveAspectRatio="xMidYMid meet">
       <defs>
-        {/* Animated gradient for the cap */}
+        {/* Animated gradient for the cap (static for reduced motion) */}
         <linearGradient id="capGradient" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#3A52A6">
-            <animate
-              attributeName="stop-color"
-              values="#3A52A6;#efa508;#F8FAFC;#3A52A6"
-              dur="8s"
-              repeatCount="indefinite"
-            />
+            {!reduced && (
+              <animate
+                attributeName="stop-color"
+                values="#3A52A6;#5C76C4;#F8FAFC;#3A52A6"
+                dur="8s"
+                repeatCount="indefinite"
+              />
+            )}
           </stop>
-          <stop offset="50%" stopColor="#efa508">
-            <animate
-              attributeName="stop-color"
-              values="#efa508;#F8FAFC;#3A52A6;#efa508"
-              dur="8s"
-              repeatCount="indefinite"
-            />
+          <stop offset="50%" stopColor="#5C76C4">
+            {!reduced && (
+              <animate
+                attributeName="stop-color"
+                values="#5C76C4;#F8FAFC;#3A52A6;#5C76C4"
+                dur="8s"
+                repeatCount="indefinite"
+              />
+            )}
           </stop>
           <stop offset="100%" stopColor="#F8FAFC">
-            <animate
-              attributeName="stop-color"
-              values="#F8FAFC;#3A52A6;#efa508;#F8FAFC"
-              dur="8s"
-              repeatCount="indefinite"
-            />
+            {!reduced && (
+              <animate
+                attributeName="stop-color"
+                values="#F8FAFC;#3A52A6;#5C76C4;#F8FAFC"
+                dur="8s"
+                repeatCount="indefinite"
+              />
+            )}
           </stop>
         </linearGradient>
         {/* Glow filter */}
@@ -46,8 +52,7 @@ export function GraduationCapBg() {
         points="100,20 180,55 100,90 20,55"
         fill="url(#capGradient)"
         filter="url(#glow)"
-        className="animate-pulse"
-        style={{ animationDuration: "4s" }}
+        style={{ animation: "soft-pulse 4s ease-in-out infinite" }}
       />
 
       {/* Cap base/head part */}
@@ -61,24 +66,30 @@ export function GraduationCapBg() {
         fill="none"
         strokeLinecap="round"
       >
-        <animate
-          attributeName="d"
-          values="M100,55 Q115,70 110,100;M100,55 Q120,75 115,105;M100,55 Q115,70 110,100"
-          dur="3s"
-          repeatCount="indefinite"
-        />
+        {!reduced && (
+          <animate
+            attributeName="d"
+            values="M100,55 Q115,70 110,100;M100,55 Q120,75 115,105;M100,55 Q115,70 110,100"
+            dur="3s"
+            repeatCount="indefinite"
+          />
+        )}
       </path>
 
       {/* Tassel end */}
       <circle cx="110" cy="105" r="6" fill="url(#capGradient)">
-        <animate attributeName="cx" values="110;115;110" dur="3s" repeatCount="indefinite" />
-        <animate attributeName="cy" values="105;110;105" dur="3s" repeatCount="indefinite" />
+        {!reduced && (
+          <>
+            <animate attributeName="cx" values="110;115;110" dur="3s" repeatCount="indefinite" />
+            <animate attributeName="cy" values="105;110;105" dur="3s" repeatCount="indefinite" />
+          </>
+        )}
       </circle>
     </svg>
   )
 }
 
-export function GraduationCap3D() {
+export function GraduationCap3D({ reduced }: { reduced?: boolean }) {
   return (
     <svg viewBox="0 0 400 300" className="w-full h-full drop-shadow-2xl" preserveAspectRatio="xMidYMid meet">
       <defs>
@@ -94,10 +105,10 @@ export function GraduationCap3D() {
           <stop offset="100%" stopColor="#172554" /> {/* Blue-950 */}
         </linearGradient>
 
-        <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#FCD34D" /> {/* Amber-300 */}
-          <stop offset="50%" stopColor="#F59E0B" /> {/* Amber-500 */}
-          <stop offset="100%" stopColor="#B45309" /> {/* Amber-700 */}
+        <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#93C5FD" /> {/* Blue-300 highlight */}
+          <stop offset="50%" stopColor="#3B82F6" /> {/* Blue-500 */}
+          <stop offset="100%" stopColor="#1E40AF" /> {/* Blue-800 shadow */}
         </linearGradient>
 
         <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
@@ -129,36 +140,38 @@ export function GraduationCap3D() {
         />
 
         {/* Central Button */}
-        <circle cx="0" cy="0" r="6" fill="url(#goldGradient)" filter="url(#softGlow)" />
+        <circle cx="0" cy="0" r="6" fill="url(#accentGradient)" filter="url(#softGlow)" />
 
-        {/* Tassel Cord - Animated Physics */}
+        {/* Tassel Cord - Animated Physics (static for reduced motion) */}
         <g>
-           <animateTransform 
-              attributeName="transform" 
-              type="rotate" 
-              values="-2 0 0; 2 0 0; -2 0 0" 
-              dur="4s" 
-              repeatCount="indefinite" 
-              calcMode="spline"
-              keySplines="0.4 0 0.6 1; 0.4 0 0.6 1"
-              opacity="0.7"
-           />
+           {!reduced && (
+             <animateTransform
+                attributeName="transform"
+                type="rotate"
+                values="-2 0 0; 2 0 0; -2 0 0"
+                dur="4s"
+                repeatCount="indefinite"
+                calcMode="spline"
+                keySplines="0.4 0 0.6 1; 0.4 0 0.6 1"
+                opacity="0.7"
+             />
+           )}
            
            {/* String */}
-           <path 
-            d="M0,0 Q30,20 60,60" 
-            fill="none" 
-            stroke="#F59E0B" 
+           <path
+            d="M0,0 Q30,20 60,60"
+            fill="none"
+            stroke="#1E40AF"
             strokeWidth="3"
             strokeLinecap="round"
             opacity="0.8"
            />
-           
+
            {/* Tassel Fringe */}
-           <circle cx="60" cy="60" r="8" fill="url(#goldGradient)" />
-           <path 
-            d="M55,65 L52,90 M60,68 L60,95 M65,65 L68,90" 
-            stroke="#F59E0B" 
+           <circle cx="60" cy="60" r="8" fill="url(#accentGradient)" />
+           <path
+            d="M55,65 L52,90 M60,68 L60,95 M65,65 L68,90"
+            stroke="#1E40AF"
             strokeWidth="2"
             opacity="0.7"
            />

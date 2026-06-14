@@ -65,6 +65,7 @@ const DEFAULT_SCHOLARSHIP_IMAGE = "/scholarship-banner-placeholder.png";
 function CreateScholarship() {
 	const auth = useAuth<AnySponsor>();
 	const queryClient = useQueryClient();
+	const navigate = Route.useNavigate();
 
 	const verificationEnabled =
 		import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true";
@@ -242,11 +243,11 @@ function CreateScholarship() {
 	const mutation = useMutation({
 		mutationFn: createScholarship,
 		onSuccess: async (res) => {
-			console.log(res.data);
 			await queryClient.invalidateQueries({ queryKey: ["scholarships"] });
 			toast.success("Success", res.message, 1250);
 			resetCreateFormState();
 			setLoading(false);
+			await navigate({ to: "/scholarships" });
 		},
 		onError: (err) => {
 			toast.error("Error", err.message);

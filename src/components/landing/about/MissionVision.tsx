@@ -5,7 +5,7 @@ export default function MissionVisionSection() {
   return (
     <section id="mission-vision" className="py-36 text-secondary w-full overflow-hidden">
       <MotionContainer>
-        <div className="px-4 sm:px-12 lg:px-26 max-w-7xl mx-auto relative z-26">
+        <div className="px-4 sm:px-12 lg:px-26 relative z-26">
           <h2 className="text-4xl md:text-5xl mb-12 text-center text-secondary">
             Mission & Vision
           </h2>
@@ -45,34 +45,62 @@ export default function MissionVisionSection() {
                 iSkolar contributes directly to multiple SDGs, especially:
               </p>
             </div>
-            
+
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-background/30 rounded-xl p-6 border border-secondary/5">
-                <h4 className="text-xl mb-3 text-secondary">SDG 4 – Quality Education</h4>
-                <p className="text-secondary/80">
-                  Central goal: expanding access to scholarships and digitalizing access to education funding
-                </p>
+              <div className="bg-background/30 rounded-xl p-6 border border-secondary/5 flex items-center gap-5">
+                <img
+                  src="/sdg/sdg4.png"
+                  alt="SDG 4: Quality Education"
+                  className="w-24 h-24 shrink-0 rounded-xl"
+                />
+                <div>
+                  <h4 className="text-xl mb-2 text-secondary">SDG 4: Quality Education</h4>
+                  <p className="text-secondary/80">
+                    Central goal: expanding access to scholarships and digitalizing access to education funding
+                  </p>
+                </div>
               </div>
-              
-              <div className="bg-background/30 rounded-xl p-6 border border-secondary/5">
-                <h4 className="text-xl mb-3 text-secondary ">SDG 10 – Reduced Inequalities</h4>
-                <p className="text-secondary/80">
-                  Enables fair access to scholarships regardless of background or location
-                </p>
+
+              <div className="bg-background/30 rounded-xl p-6 border border-secondary/5 flex items-center gap-5">
+                <img
+                  src="/sdg/sdg10.png"
+                  alt="SDG 10: Reduced Inequalities"
+                  className="w-24 h-24 shrink-0 rounded-xl"
+                />
+                <div>
+                  <h4 className="text-xl mb-2 text-secondary">SDG 10: Reduced Inequalities</h4>
+                  <p className="text-secondary/80">
+                    Enables fair access to scholarships regardless of background or location
+                  </p>
+                </div>
               </div>
-              
-              <div className="bg-background/30 rounded-xl p-6 border border-secondary/5">
-                <h4 className="text-xl mb-3 text-secondary ">SDG 9 – Innovation & Infrastructure</h4>
-                <p className="text-secondary/80">
-                  Provides a digital ecosystem for scholarship management and application
-                </p>
+
+              <div className="bg-background/30 rounded-xl p-6 border border-secondary/5 flex items-center gap-5">
+                <img
+                  src="/sdg/sdg9.png"
+                  alt="SDG 9: Innovation and Infrastructure"
+                  className="w-24 h-24 shrink-0 rounded-xl"
+                />
+                <div>
+                  <h4 className="text-xl mb-2 text-secondary">SDG 9: Innovation and Infrastructure</h4>
+                  <p className="text-secondary/80">
+                    Provides a digital ecosystem for scholarship management and application
+                  </p>
+                </div>
               </div>
-              
-              <div className="bg-background/30 rounded-xl p-6 border border-secondary/5">
-                <h4 className="text-xl mb-3 text-secondary ">SDG 17 – Partnerships for the Goals</h4>
-                <p className="text-secondary/80">
-                  Collaborates with schools, government, NGOs, and corporate sponsors
-                </p>
+
+              <div className="bg-background/30 rounded-xl p-6 border border-secondary/5 flex items-center gap-5">
+                <img
+                  src="/sdg/sdg17.png"
+                  alt="SDG 17: Partnerships for the Goals"
+                  className="w-24 h-24 shrink-0 rounded-xl"
+                />
+                <div>
+                  <h4 className="text-xl mb-2 text-secondary">SDG 17: Partnerships for the Goals</h4>
+                  <p className="text-secondary/80">
+                    Collaborates with schools, government, NGOs, and corporate sponsors
+                  </p>
+                </div>
               </div>
             </div>
           </div>

@@ -4,6 +4,12 @@ import {
 } from "@/components/landing/MotionContainer";
 import { Linkedin } from "lucide-react";
 
+// Flex cells that keep the 1 / 2 / 4 column rhythm but let an incomplete
+// final row (e.g. 3 cards under a 4-up layout) center instead of left-align,
+// which CSS grid can't do on its own.
+const cellClass =
+	"w-full sm:w-[calc(50%-1rem)] lg:w-[calc(25%-1.5rem)] flex justify-center";
+
 const Card = ({
 	image,
 	name,
@@ -21,7 +27,7 @@ const Card = ({
 		className={`
     relative bg-background backdrop-blur-sm border border-secondary/10 shadow-lg rounded-xl
     flex flex-col items-center text-center p-6
-    w-full min-w-60 max-w-[280px]
+    w-full min-w-60 max-w-[280px] h-[320px]
     transition-transform hover:-translate-y-1 duration-300 group
   `}
 	>
@@ -38,7 +44,7 @@ const Card = ({
 		<a
 			href={link}
 			target="_blank"
-			className="p-2 text-secondary/80 hover:text-secondary rounded-full transition-all"
+			className="mt-auto p-2 text-secondary/80 hover:text-secondary rounded-full transition-all"
 		>
 			<Linkedin className="w-5 h-5" />
 		</a>
@@ -66,8 +72,8 @@ export default function TeamSection() {
 							<h3 className="text-3xl text-center text-secondary mb-7">
 								Founders
 							</h3>
-							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full max-w-5xl mx-auto justify-items-center">
-								<MotionItem>
+							<div className="flex flex-wrap justify-center gap-8 w-full max-w-5xl mx-auto">
+								<MotionItem className={cellClass}>
 									<Card
 										image="/team/CEO.jpg"
 										name="Justin Luzano"
@@ -77,7 +83,7 @@ export default function TeamSection() {
 									/>
 								</MotionItem>
 
-								<MotionItem>
+								<MotionItem className={cellClass}>
 									<Card
 										image="/team/CTO.jpg"
 										name="Louigie Caminoy"
@@ -87,7 +93,7 @@ export default function TeamSection() {
 									/>
 								</MotionItem>
 
-								<MotionItem>
+								<MotionItem className={cellClass}>
 									<Card
 										image="/team/COO.jpg"
 										name="Adam Ruadilla"
@@ -97,7 +103,7 @@ export default function TeamSection() {
 									/>
 								</MotionItem>
 
-								<MotionItem>
+								<MotionItem className={cellClass}>
 									<Card
 										image="/team/CFO.jpg"
 										name="Jeselle Francisco"
@@ -115,9 +121,9 @@ export default function TeamSection() {
 								<h3 className="text-3xl text-center text-secondary mb-7">
 									Core Team
 								</h3>
-								<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full max-w-5xl mx-auto justify-items-center">
-									{/* Technical */}
-									<MotionItem>
+								<div className="flex flex-wrap justify-center gap-8 w-full max-w-5xl mx-auto">
+									{/* Directors */}
+									<MotionItem className={cellClass}>
 										<Card
 											image="/team/Tech-Lead.jpg"
 											name="Giordan Nuez"
@@ -127,38 +133,7 @@ export default function TeamSection() {
 										/>
 									</MotionItem>
 
-									<MotionItem>
-										<Card
-											image="/team/AI-Lead.jpg"
-											name="John Richie Campo"
-											role="AI Lead"
-											university="University of Makati"
-											link="https://www.linkedin.com/in/john-richie-campo/"
-										/>
-									</MotionItem>
-
-									<MotionItem>
-										<Card
-											image="/team/Blockchain-Lead.jpg"
-											name="Karen Pearl  Pabilando"
-											role="Blockchain Lead"
-											university="National University"
-											link="https://www.linkedin.com/in/pabilandokarenpv/"
-										/>
-									</MotionItem>
-
-									<MotionItem>
-										<Card
-											image="/team/Cybersecurity-Lead.jpg"
-											name="Emmanuel Mutas"
-											role="Cybersecurity Lead"
-											university="PUP Sta. Mesa"
-											link="https://www.linkedin.com/in/manel04/"
-										/>
-									</MotionItem>
-
-									{/* Research, Design, Community, Operations */}
-									<MotionItem>
+									<MotionItem className={cellClass}>
 										<Card
 											image="/team/Research-Lead.jpg"
 											name="Cristian Obida"
@@ -168,27 +143,48 @@ export default function TeamSection() {
 										/>
 									</MotionItem>
 
-									<MotionItem>
+									<MotionItem className={cellClass}>
+										<Card
+											image="/team/Community-Manager.jpg"
+											name="Juliet Tariman"
+											role="Community Manager"
+											university="Polytechnic University of the Philippines"
+											link="https://www.linkedin.com/in/juliet-daphne-e-tariman-2022b1236/"
+										/>
+									</MotionItem>
+
+									<MotionItem className={cellClass}>
 										<Card
 											image="/team/Design-Lead.jpg"
 											name="Arah Mejidana"
-											role="Design Lead"
+											role="Creative Director"
 											university="Taguig City University"
 											link="https://www.linkedin.com/in/arah-mejidana-a12945398/"
 										/>
 									</MotionItem>
 
-									<MotionItem>
+									{/* Technical & Operations */}
+									<MotionItem className={cellClass}>
 										<Card
-											image="/team/Community-Manager.jpg"
-											name="Juliet Tariman"
-											role="Community Manager"
-											university="PUP Sta. Mesa"
-											link="https://www.linkedin.com/in/juliet-daphne-e-tariman-2022b1236/"
+											image="/team/AI-Lead.jpg"
+											name="John Richie Campo"
+											role="AI Lead"
+											university="University of Makati"
+											link="https://www.linkedin.com/in/john-richie-campo/"
 										/>
 									</MotionItem>
 
-									<MotionItem>
+									<MotionItem className={cellClass}>
+										<Card
+											image="/team/Cybersecurity-Lead.jpg"
+											name="Emmanuel Mutas"
+											role="Cybersecurity Lead"
+											university="Polytechnic University of the Philippines"
+											link="https://www.linkedin.com/in/manel04/"
+										/>
+									</MotionItem>
+
+									<MotionItem className={cellClass}>
 										<Card
 											image="/team/Business-Operations-Associate.jpg"
 											name="Aj Goze"

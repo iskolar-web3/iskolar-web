@@ -4,18 +4,26 @@ import { ChevronDown, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const homeLinks = [
-	{ name: "Overview", href: "#home" },
-	{ name: "Features", href: "#features" },
-	{ name: "Roadmap", href: "#roadmap" },
-	{ name: "FAQs", href: "#faqs" },
+	{
+		name: "Home",
+		href: "/",
+		dropdown: [
+			{ name: "Home", href: "#home" },
+			{ name: "Overview", href: "#how-it-works" },
+			{ name: "Roadmap", href: "#roadmap" },
+			{ name: "Ecosystem", href: "#ecosystem" },
+			{ name: "Stories", href: "#testimonials" },
+			{ name: "FAQs", href: "#faqs" },
+		],
+	},
 	{
 		name: "About",
 		href: "/about",
 		dropdown: [
 			{ name: "Company Overview", href: "/about#company-overview" },
 			{ name: "Mission & Vision", href: "/about#mission-vision" },
-			{ name: "Our Team", href: "/about#team" },
 			{ name: "Partnerships", href: "/about#partnerships" },
+			{ name: "Our Team", href: "/about#team" },
 		],
 	},
 ];
@@ -25,16 +33,24 @@ const aboutLinks = [
 		name: "Home",
 		href: "/",
 		dropdown: [
-			{ name: "Overview", href: "/#home" },
-			{ name: "Features", href: "/#features" },
+			{ name: "Home", href: "/#home" },
+			{ name: "Overview", href: "/#how-it-works" },
 			{ name: "Roadmap", href: "/#roadmap" },
+			{ name: "Ecosystem", href: "/#ecosystem" },
+			{ name: "Stories", href: "/#testimonials" },
 			{ name: "FAQs", href: "/#faqs" },
 		],
 	},
-	{ name: "Company Overview", href: "/about#company-overview" },
-	{ name: "Mission & Vision", href: "/about#mission-vision" },
-	{ name: "Our Team", href: "/about#team" },
-	{ name: "Partnerships", href: "/about#partnerships" },
+	{
+		name: "About",
+		href: "/about",
+		dropdown: [
+			{ name: "Company Overview", href: "#company-overview" },
+			{ name: "Mission & Vision", href: "#mission-vision" },
+			{ name: "Partnerships", href: "#partnerships" },
+			{ name: "Our Team", href: "#team" },
+		],
+	},
 ];
 
 export default function Navbar() {
@@ -89,7 +105,9 @@ export default function Navbar() {
 	return (
 		<nav
 			className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-				isScrolled ? "bg-card shadow-md" : "bg-transparent"
+				isScrolled
+					? "bg-card/90 shadow-lg shadow-secondary/10 border-b border-secondary/15"
+					: "bg-transparent border-b border-transparent"
 			}`}
 			style={{ backdropFilter: isScrolled ? "blur(12px)" : "none" }}
 		>
@@ -136,7 +154,7 @@ export default function Navbar() {
 													handleNavClick(e, link.href);
 												}
 											}}
-											className={`flex items-center gap-1 text-md transition-colors hover:text-secondary/80 text-secondary ${activeDropdown === link.name ? "text-secondary/80" : ""}`}
+											className={`relative flex items-center gap-1 text-md text-secondary transition-colors hover:text-secondary/80 after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:rounded-full after:bg-secondary/40 after:transition-transform after:duration-300 hover:after:scale-x-100 motion-reduce:after:transition-none ${activeDropdown === link.name ? "text-secondary/80 after:scale-x-100" : ""}`}
 										>
 											{link.name}
 											{link.dropdown && (
@@ -151,7 +169,7 @@ export default function Navbar() {
 										<a
 											href={link.href}
 											onClick={(e) => handleNavClick(e, link.href)}
-											className="flex items-center gap-1 text-md transition-colors hover:text-secondary/80 text-secondary"
+											className="relative flex items-center gap-1 text-md text-secondary transition-colors hover:text-secondary/80 after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:rounded-full after:bg-secondary/40 after:transition-transform after:duration-300 hover:after:scale-x-100 motion-reduce:after:transition-none"
 										>
 											{link.name}
 										</a>
@@ -165,7 +183,7 @@ export default function Navbar() {
 												animate={{ opacity: 1, y: 0 }}
 												exit={{ opacity: 0, y: -8 }}
 												transition={{ duration: 0.2, ease: "easeOut" }}
-												className="absolute top-full left-0 mt-2 w-56 bg-card rounded-md shadow-lg border border-gray-200 py-2"
+												className="absolute top-full left-0 mt-2 w-56 bg-card rounded-md shadow-lg shadow-secondary/10 border border-secondary/15 py-2"
 											>
 												{link.dropdown.map((item) => (
 													<a
@@ -221,7 +239,7 @@ export default function Navbar() {
 			<AnimatePresence>
 				{isMobileMenuOpen && (
 					<motion.div
-						className="lg:hidden bg-card border-t border-gray-200"
+						className="lg:hidden bg-card border-t border-secondary/15"
 						initial={{ opacity: 0, y: -10 }}
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: -10 }}

@@ -2,8 +2,8 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import type { JSX } from "react";
-import { SEO } from "@/components/SEO";
 import { JsonLd } from "@/components/JsonLd";
+import { SEO } from "@/components/SEO";
 import { UserRole } from "@/lib/user/model";
 
 export const Route = createFileRoute("/terms-conditions")({
@@ -80,10 +80,13 @@ function TermsConditionsPage(): JSX.Element {
 									Terms and Conditions
 								</h1>
 								<p className="text-[11px] sm:text-xs xl:text-sm text-[#8C8C8C]">
-									Acceptance of Terms. By downloading, installing, or using the
-									iSkolar mobile application, you agree to be bound by these
-									Terms and Conditions. If you do not agree, please do not use
-									the app.
+									Acceptance of Terms. By accessing or using the iSkolar
+									platform (web application and related services), you agree to
+									be bound by these Terms and Conditions. If you do not agree,
+									please do not use the platform.
+								</p>
+								<p className="text-[11px] sm:text-xs xl:text-sm text-[#8C8C8C]">
+									Last updated: June 7, 2026.
 								</p>
 							</div>
 
@@ -101,12 +104,13 @@ function TermsConditionsPage(): JSX.Element {
 										<li>
 											Security. You are responsible for maintaining the
 											confidentiality of your login credentials. You agree not
-											to share your password or OTP with others.
+											to share your password, OTP, or wallet keys with others.
 										</li>
 										<li>
 											Eligibility. You must be a bona fide student or a
 											legitimate representative of a scholarship-providing
-											organization.
+											organization. Certain features may require you to complete
+											identity verification (see Section 3).
 										</li>
 									</ul>
 								</section>
@@ -139,7 +143,39 @@ function TermsConditionsPage(): JSX.Element {
 
 								<section className="space-y-3">
 									<h2 className="text-sm sm:text-base xl:text-lg font-semibold text-[#3F58B2]">
-										3. Acceptable Use
+										3. Identity Verification
+									</h2>
+									<ul className="list-disc pl-5 text-xs sm:text-[11px] xl:text-sm space-y-1">
+										<li>
+											To reduce fraud, iSkolar uses Didit, a third-party
+											identity verification provider. Students and individual
+											sponsors may be required to complete identity verification
+											before using certain features, such as creating a
+											scholarship.
+										</li>
+										<li>
+											During verification you will be redirected to Didit and
+											may be asked to present a government-issued ID and a
+											selfie/liveness check. You agree to provide genuine,
+											accurate identity information. Your use of Didit is also
+											subject to Didit's own terms and privacy policy.
+										</li>
+										<li>
+											iSkolar receives only the verification result (verified,
+											rejected, pending, or expired) and does not store your ID
+											images or biometric data. Submitting forged or fraudulent
+											identity documents may result in suspension or a permanent
+											ban. Repeated failed attempts may be subject to a
+											temporary cooldown.
+										</li>
+									</ul>
+								</section>
+
+								<hr className="my-4 border-[#C4CBD5]" />
+
+								<section className="space-y-3">
+									<h2 className="text-sm sm:text-base xl:text-lg font-semibold text-[#3F58B2]">
+										4. Acceptable Use
 									</h2>
 									<p className="text-xs sm:text-[11px] xl:text-sm">
 										You agree not to:
@@ -164,7 +200,7 @@ function TermsConditionsPage(): JSX.Element {
 
 								<section className="space-y-3">
 									<h2 className="text-sm sm:text-base xl:text-lg font-semibold text-[#3F58B2]">
-										4. Platform Role and Disclaimers
+										5. Platform Role and Disclaimers
 									</h2>
 									<p className="text-xs sm:text-[11px] xl:text-sm">
 										We provide the platform to connect Students and Sponsors. We
@@ -181,7 +217,7 @@ function TermsConditionsPage(): JSX.Element {
 
 								<section className="space-y-3">
 									<h2 className="text-sm sm:text-base xl:text-lg font-semibold text-[#3F58B2]">
-										5. Account Termination
+										6. Account Termination
 									</h2>
 									<p className="text-xs sm:text-[11px] xl:text-sm">
 										Admin Rights. iSkolar Administrators reserve the right to
@@ -196,7 +232,7 @@ function TermsConditionsPage(): JSX.Element {
 
 								<section className="space-y-3">
 									<h2 className="text-sm sm:text-base xl:text-lg font-semibold text-[#3F58B2]">
-										6. Intellectual Property
+										7. Intellectual Property
 									</h2>
 									<p className="text-xs sm:text-[11px] xl:text-sm">
 										The design, source code, and "iSkolar" branding are the
@@ -211,7 +247,7 @@ function TermsConditionsPage(): JSX.Element {
 
 								<section className="space-y-3">
 									<h2 className="text-sm sm:text-base xl:text-lg font-semibold text-[#3F58B2]">
-										7. Limitation of Liability
+										8. Limitation of Liability
 									</h2>
 									<p className="text-xs sm:text-[11px] xl:text-sm">
 										To the fullest extent permitted by law, iSkolar and its
@@ -226,7 +262,7 @@ function TermsConditionsPage(): JSX.Element {
 
 								<section className="space-y-3">
 									<h2 className="text-sm sm:text-base xl:text-lg font-semibold text-[#3F58B2]">
-										8. Governing Law
+										9. Governing Law
 									</h2>
 									<p className="text-xs sm:text-[11px] xl:text-sm">
 										These Terms are governed by the laws of the Republic of the
@@ -239,7 +275,7 @@ function TermsConditionsPage(): JSX.Element {
 
 								<section className="space-y-3">
 									<h2 className="text-sm sm:text-base xl:text-lg font-semibold text-[#3F58B2]">
-										9. Changes to Terms
+										10. Changes to Terms
 									</h2>
 									<p className="text-xs sm:text-[11px] xl:text-sm">
 										We reserve the right to modify these Terms at any time.
@@ -252,15 +288,14 @@ function TermsConditionsPage(): JSX.Element {
 
 								<section className="space-y-2">
 									<h2 className="text-sm sm:text-base xl:text-lg font-semibold text-[#3F58B2]">
-										10. Contact Us
+										11. Contact Us
 									</h2>
 									<p className="text-xs sm:text-[11px] xl:text-sm">
-										If you have questions about this Privacy Policy or wish to
-										exercise your privacy rights, please contact our Data
-										Protection Officer at:
+										If you have questions about these Terms and Conditions,
+										please contact us at:
 									</p>
 									<p className="text-xs sm:text-[11px] xl:text-sm font-medium">
-										scholarpass23@gmail.com
+										hello@iskolar.io
 									</p>
 								</section>
 							</div>
