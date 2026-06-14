@@ -32,7 +32,7 @@ export const partners: Partner[] = [
 		category: "Strategic Incubation Partner",
 		logo: "/partnerships/byc-ventures.png",
 		description:
-			"BYC Ventures is a venture studio working with iSkolar to design and scale verifiable credential infrastructure, turning student records into portable, tamper proof proof of achievement.",
+			"BYC Ventures is working with iSkolar to design and scale verifiable credential infrastructure, turning student records into portable, tamper proof proof of achievement.",
 		href: "https://byc.ventures",
 		linkLabel: "byc.ventures",
 		filter: BLUE_TINT,
@@ -62,7 +62,7 @@ export const partners: Partner[] = [
 		category: "Community Partner",
 		logo: "/partnerships/cryptita-plays.png",
 		description:
-			"Cryptita Plays runs an engaged Web3 and gaming community that helps iSkolar introduce transparent, blockchain backed scholarships to a wider student audience.",
+			"Cryptita Plays runs an engaged Web3 community that helps iSkolar introduce transparent, blockchain backed scholarships to a wider student audience.",
 		href: "https://cryptitaplays.org",
 		linkLabel: "cryptitaplays.org",
 		filter: BLUE_TINT,
@@ -72,7 +72,7 @@ export const partners: Partner[] = [
 		category: "Community Partner",
 		logo: "/partnerships/tech-kubo.png",
 		description:
-			"Tech Kubo brings together a grassroots community of student developers and builders, helping iSkolar reach the learners shaping the next wave of Filipino tech.",
+			"Tech Kubo extends iSkolar's reach to student developers through its free hands-on labs platform, connecting scholarship opportunities with learners actively building technical skills and portfolios.",
 		href: "https://techkubo.com/",
 		linkLabel: "techkubo.com",
 		filter: BLUE_DUOTONE,
@@ -82,7 +82,7 @@ export const partners: Partner[] = [
 		category: "Community Partner",
 		logo: "/partnerships/aws-learning-club-heron.png",
 		description:
-			"The AWS Learning Club Heron is a student cloud community that connects iSkolar with learners pursuing cloud skills and certifications across partner campuses.",
+			"AWS Learning Club Heron is a student-led cloud community, founded alongside iSkolar, that connects the platform with learners building practical AWS skills and cloud expertise.",
 		href: "https://www.facebook.com/awslearningclubheron",
 		linkLabel: "awslearningclub.org",
 		filter: BLUE_DUOTONE,
