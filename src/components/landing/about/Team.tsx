@@ -4,6 +4,12 @@ import {
 } from "@/components/landing/MotionContainer";
 import { Linkedin } from "lucide-react";
 
+// Flex cells that keep the 1 / 2 / 4 column rhythm but let an incomplete
+// final row (e.g. 3 cards under a 4-up layout) center instead of left-align,
+// which CSS grid can't do on its own.
+const cellClass =
+	"w-full sm:w-[calc(50%-1rem)] lg:w-[calc(25%-1.5rem)] flex justify-center";
+
 const Card = ({
 	image,
 	name,
@@ -66,8 +72,8 @@ export default function TeamSection() {
 							<h3 className="text-3xl text-center text-secondary mb-7">
 								Founders
 							</h3>
-							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full max-w-5xl mx-auto justify-items-center">
-								<MotionItem>
+							<div className="flex flex-wrap justify-center gap-8 w-full max-w-5xl mx-auto">
+								<MotionItem className={cellClass}>
 									<Card
 										image="/team/CEO.jpg"
 										name="Justin Luzano"
@@ -77,7 +83,7 @@ export default function TeamSection() {
 									/>
 								</MotionItem>
 
-								<MotionItem>
+								<MotionItem className={cellClass}>
 									<Card
 										image="/team/CTO.jpg"
 										name="Louigie Caminoy"
@@ -87,7 +93,7 @@ export default function TeamSection() {
 									/>
 								</MotionItem>
 
-								<MotionItem>
+								<MotionItem className={cellClass}>
 									<Card
 										image="/team/COO.jpg"
 										name="Adam Ruadilla"
@@ -97,7 +103,7 @@ export default function TeamSection() {
 									/>
 								</MotionItem>
 
-								<MotionItem>
+								<MotionItem className={cellClass}>
 									<Card
 										image="/team/CFO.jpg"
 										name="Jeselle Francisco"
@@ -115,39 +121,39 @@ export default function TeamSection() {
 								<h3 className="text-3xl text-center text-secondary mb-7">
 									Core Team
 								</h3>
-								<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full max-w-5xl mx-auto justify-items-center">
+								<div className="flex flex-wrap justify-center gap-8 w-full max-w-5xl mx-auto">
 									{/* Directors */}
-									<MotionItem>
+									<MotionItem className={cellClass}>
 										<Card
 											image="/team/Tech-Lead.jpg"
 											name="Giordan Nuez"
-											role="Director of Engineering"
+											role="Tech Lead"
 											university="University of Makati"
 											link="https://www.linkedin.com/in/giordan-nuez-b8924838b/"
 										/>
 									</MotionItem>
 
-									<MotionItem>
+									<MotionItem className={cellClass}>
 										<Card
 											image="/team/Research-Lead.jpg"
 											name="Cristian Obida"
-											role="Director of Research & Compliance"
+											role="Research Lead"
 											university="Asia Pacific College"
 											link="https://www.linkedin.com/in/cristian-r-obida-96a36b28a/"
 										/>
 									</MotionItem>
 
-									<MotionItem>
+									<MotionItem className={cellClass}>
 										<Card
 											image="/team/Community-Manager.jpg"
 											name="Juliet Tariman"
-											role="Director of Community & Growth"
-											university="PUP Sta. Mesa"
+											role="Community Manager"
+											university="Polytechnic University of the Philippines"
 											link="https://www.linkedin.com/in/juliet-daphne-e-tariman-2022b1236/"
 										/>
 									</MotionItem>
 
-									<MotionItem>
+									<MotionItem className={cellClass}>
 										<Card
 											image="/team/Design-Lead.jpg"
 											name="Arah Mejidana"
@@ -158,7 +164,7 @@ export default function TeamSection() {
 									</MotionItem>
 
 									{/* Technical & Operations */}
-									<MotionItem>
+									<MotionItem className={cellClass}>
 										<Card
 											image="/team/AI-Lead.jpg"
 											name="John Richie Campo"
@@ -168,27 +174,17 @@ export default function TeamSection() {
 										/>
 									</MotionItem>
 
-									<MotionItem>
-										<Card
-											image="/team/Blockchain-Lead.jpg"
-											name="Karen Pearl  Pabilando"
-											role="Blockchain Lead"
-											university="National University"
-											link="https://www.linkedin.com/in/pabilandokarenpv/"
-										/>
-									</MotionItem>
-
-									<MotionItem>
+									<MotionItem className={cellClass}>
 										<Card
 											image="/team/Cybersecurity-Lead.jpg"
 											name="Emmanuel Mutas"
 											role="Cybersecurity Lead"
-											university="PUP Sta. Mesa"
+											university="Polytechnic University of the Philippines"
 											link="https://www.linkedin.com/in/manel04/"
 										/>
 									</MotionItem>
 
-									<MotionItem>
+									<MotionItem className={cellClass}>
 										<Card
 											image="/team/Business-Operations-Associate.jpg"
 											name="Aj Goze"
