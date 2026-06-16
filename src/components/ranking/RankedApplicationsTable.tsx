@@ -12,22 +12,7 @@ export function RankedApplicationsTable({
 	onApplicationClick,
 }: RankedApplicationsTableProps) {
 	const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
-	const [activeTab, setActiveTab] = useState<'ai' | 'auto'>('ai');
 
-	// Split results into AI-reviewed (including failed AI analyses) and auto-ranked
-	const aiReviewed = results.filter(r => r.aiInsights || r.analysisFailed);
-	const autoRanked = results.filter(r => !r.aiInsights && !r.analysisFailed);
-	const failedCount = aiReviewed.filter(r => r.analysisFailed).length;
-
-	// Show tabs only if there are both AI and auto-ranked results
-	const showTabs = aiReviewed.length > 0 && autoRanked.length > 0;
-
-	// Determine which results to show based on active tab
-	// If no tabs, show all results
-	const displayResults = showTabs
-		? (activeTab === 'ai' ? aiReviewed : autoRanked)
-		: results;
-	const showingAiTab = showTabs ? activeTab === 'ai' : aiReviewed.length > 0;
 	const toggleCard = (applicantId: string, e: React.MouseEvent) => {
 		e.stopPropagation();
 		setExpandedCards(prev => {
@@ -87,7 +72,7 @@ export function RankedApplicationsTable({
 			{/* Header */}
 			<div className="p-4 border-b border-[#E5E7EB] flex items-center justify-between">
 				<h3 className="text-lg text-primary">
-					Ranking Results ({displayResults.length})
+					Ranking Results ({results.length})
 				</h3>
 				<button
 					onClick={exportToCSV}
@@ -98,58 +83,9 @@ export function RankedApplicationsTable({
 				</button>
 			</div>
 
-			{/* Tabs - Only show if there are both AI and auto-ranked results */}
-			{showTabs && (
-				<div className="border-b border-[#E5E7EB] bg-[#F9FAFB]">
-					<div className="flex">
-						<button
-							onClick={() => setActiveTab('ai')}
-							className={`flex-1 px-4 py-3 text-sm transition-all flex items-center justify-center gap-2 ${
-								activeTab === 'ai'
-									? 'text-[#8B5CF6] border-b-2 border-[#8B5CF6] bg-white'
-									: 'text-[#6B7280] hover:text-[#374151] hover:bg-[#F3F4F6]'
-							}`}
-						>
-							<Sparkles className="w-4 h-4" />
-							AI Analyzed ({aiReviewed.length})
-						</button>
-						<button
-							onClick={() => setActiveTab('auto')}
-							className={`flex-1 px-4 py-3 text-sm transition-all ${
-								activeTab === 'auto'
-									? 'text-[#3A52A6] border-b-2 border-[#3A52A6] bg-white'
-									: 'text-[#6B7280] hover:text-[#374151] hover:bg-[#F3F4F6]'
-							}`}
-						>
-							Auto Ranked ({autoRanked.length})
-						</button>
-					</div>
-				</div>
-			)}
-
-			{/* Some AI analyses failed — tell the sponsor how to retry */}
-			{showingAiTab && failedCount > 0 && (
-				<div className="px-4 py-2.5 bg-[#FEF3C7] border-b border-[#E5E7EB] flex items-center gap-2 text-xs text-[#92400E]">
-					<AlertCircle className="w-4 h-4 shrink-0" />
-					{failedCount === 1
-						? "1 applicant could not be analyzed."
-						: `${failedCount} applicants could not be analyzed.`}{" "}
-					Wait a minute, then rank again to retry. Completed analyses are
-					reused.
-				</div>
-			)}
-
-			{/* Auto-ranked explainer */}
-			{showTabs && activeTab === 'auto' && (
-				<div className="px-4 py-2.5 bg-[#F9FAFB] border-b border-[#E5E7EB] text-xs text-[#6B7280]">
-					These applicants were ranked from their form answers only. Documents
-					were not analyzed. Click one to review it manually.
-				</div>
-			)}
-
 			{/* Results as Cards for better mobile/desktop experience */}
 			<div className="divide-y divide-[#E5E7EB]">
-				{displayResults.map((result) => {
+				{results.map((result) => {
 					const score = result.score;
 					const failed = result.analysisFailed;
 					const scoreColor = failed ? "text-[#6B7280]" : score >= 80 ? "text-[#10B981]" : score >= 60 ? "text-[#F59E0B]" : "text-[#EF4444]";
