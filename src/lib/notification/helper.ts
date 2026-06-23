@@ -44,6 +44,8 @@ export function getNotificationTitle(notif: Notification): string {
 			return "Application approved";
 		case NotificationType.ApplicationGranted:
 			return "Scholarship granted";
+		case NotificationType.ApplicationReceived:
+			return "New applicant";
 		default:
 			return "Notification";
 	}
@@ -59,7 +61,8 @@ export function getNotificationSubtitle(notif: Notification): string {
 		case NotificationType.ScholarshipEndedNotSelected:
 		case NotificationType.ApplicationShortlisted:
 		case NotificationType.ApplicationApproved:
-		case NotificationType.ApplicationGranted: {
+		case NotificationType.ApplicationGranted:
+		case NotificationType.ApplicationReceived: {
 			const meta = notif.metadata as ApplicationStatusChangedEvent | null;
 			return meta?.scholarshipName ?? "";
 		}
@@ -82,6 +85,8 @@ export function getNotificationMessage(notif: Notification): string {
 			return "Your application has been approved";
 		case NotificationType.ApplicationGranted:
 			return "Scholarship funds have been granted";
+		case NotificationType.ApplicationReceived:
+			return "A student has applied for your scholarship";
 		default:
 			return "";
 	}

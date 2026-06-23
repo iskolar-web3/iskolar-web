@@ -8,8 +8,6 @@ import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { getMyNotificationsQuery } from "@/lib/notification/api";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { NotificationType } from "@/lib/notification/model";
-import type { ScholarshipCreatedEvent } from "@/lib/scholarship/model";
-
 export const Route = createFileRoute("/_student")({
 	component: StudentLayout,
 	beforeLoad: async ({ context }) => {
@@ -39,11 +37,11 @@ function StudentLayout(): JSX.Element {
 		const url = new URL(`${BACKEND_URL}/sse/scholarships`);
 		const es = new EventSource(url.toString(), { withCredentials: true });
 
-		es.addEventListener(NotificationType.ScholarshipCreated, (e) => {
-			const data = JSON.parse(e.data) as ScholarshipCreatedEvent;
-			queryClient.invalidateQueries(getMyNotificationsQuery());
-			console.log(data);
-		});
+		for (const type of Object.values(NotificationType)) {
+			es.addEventListener(type, () => {
+				queryClient.invalidateQueries(getMyNotificationsQuery());
+			});
+		}
 
 		return () => es.close();
 	}, []);
