@@ -14,5 +14,6 @@ export const verificationRecordSchema = z.object({
 	diditSessionUrl: z.url(),
 	status: z.enum(VerificationStatus),
 	cooldownUntil: z.coerce.date().nullable(),
+	remarks: z.array(z.string()).default([]),
 });
 export type VerificationRecord = z.infer<typeof verificationRecordSchema>;

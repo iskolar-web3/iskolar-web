@@ -36,6 +36,5 @@ export async function getVerificationStatus(): Promise<VerificationRecord | null
 export const getVerificationStatusQuery = queryOptions({
 	queryKey: ["verification-status"],
 	queryFn: () => getVerificationStatus(),
-	staleTime: 30_000,
 	enabled: true,
 });

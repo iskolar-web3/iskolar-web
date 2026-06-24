@@ -155,7 +155,9 @@ export default function VerificationStatus(): JSX.Element {
 								Verification rejected
 							</p>
 							<p className="text-xs text-red-600">
-								{"Your verification was not approved."}
+								{record.remarks.length > 0
+									? record.remarks.join(". ")
+									: "Your verification was not approved."}
 							</p>
 							{cooldownActive && (
 								<p className="text-xs text-red-500 mt-1">
