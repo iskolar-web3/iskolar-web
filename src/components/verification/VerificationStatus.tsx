@@ -5,7 +5,7 @@ import {
 	ShieldCheck,
 	ShieldX,
 } from "lucide-react";
-import { useState, type JSX } from "react";
+import { type JSX } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/lib/toast";
 import {
@@ -13,26 +13,25 @@ import {
 	startVerification,
 } from "@/lib/verification/api";
 import { VerificationStatus as Status } from "@/lib/verification/model";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 export default function VerificationStatus(): JSX.Element {
-	const [starting, setStarting] = useState(false);
-
 	const verificationStatusQuery = useQuery(getVerificationStatusQuery);
 	const record = verificationStatusQuery.data;
 
-	async function handleVerify() {
-		setStarting(true);
-		try {
-			const result = await startVerification();
-			window.location.href = result.verificationUrl;
-		} catch (err) {
+	const verifyMutation = useMutation({
+		mutationFn: startVerification,
+		onSuccess: (res) => (window.location.href = res.verificationUrl),
+		onError: (err) => {
 			toast.error(
 				"Verification Error",
-				err instanceof Error ? err.message : "Failed to start verification.",
+				err.message || "Failed to start verification.",
 			);
-			setStarting(false);
-		}
+		},
+	});
+
+	async function handleVerify(): Promise<void> {
+		verifyMutation.mutate();
 	}
 
 	if (verificationStatusQuery.isLoading) {
@@ -62,11 +61,11 @@ export default function VerificationStatus(): JSX.Element {
 					</div>
 					<Button
 						onClick={handleVerify}
-						disabled={starting}
+						disabled={verifyMutation.isPending}
 						size="sm"
 						className="cursor-pointer bg-[#3B5AA8] hover:bg-[#2f4389] text-white"
 					>
-						{starting ? (
+						{verifyMutation.isPending ? (
 							<Loader2 className="w-4 h-4 animate-spin" />
 						) : (
 							"Verify Now"
@@ -80,21 +79,6 @@ export default function VerificationStatus(): JSX.Element {
 	// Pending
 	if (record.status === Status.Pending) {
 		const hasActiveSession = !!record.diditSessionUrl;
-
-		async function handleResume() {
-			if (!record) return;
-			setStarting(true);
-			try {
-				const result = await startVerification();
-				window.location.href = result.verificationUrl;
-			} catch (err) {
-				toast.error(
-					"Verification Error",
-					err instanceof Error ? err.message : "Failed to resume verification.",
-				);
-				setStarting(false);
-			}
-		}
 
 		return (
 			<>
@@ -114,12 +98,12 @@ export default function VerificationStatus(): JSX.Element {
 					</div>
 					{hasActiveSession ? (
 						<Button
-							onClick={handleResume}
-							disabled={starting}
+							onClick={handleVerify}
+							disabled={verifyMutation.isPending}
 							size="sm"
 							className="cursor-pointer bg-[#3B5AA8] hover:bg-[#2f4389] text-white"
 						>
-							{starting ? (
+							{verifyMutation.isPending ? (
 								<Loader2 className="w-4 h-4 animate-spin" />
 							) : (
 								"Continue"
@@ -183,12 +167,16 @@ export default function VerificationStatus(): JSX.Element {
 					</div>
 					<Button
 						onClick={handleVerify}
-						disabled={starting || !!cooldownActive}
+						disabled={verifyMutation.isPending || !!cooldownActive}
 						size="sm"
 						variant="outline"
 						className="cursor-pointer border-red-300 text-red-700 hover:bg-red-100"
 					>
-						{starting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Retry"}
+						{verifyMutation.isPending ? (
+							<Loader2 className="w-4 h-4 animate-spin" />
+						) : (
+							"Retry"
+						)}
 					</Button>
 				</div>
 			</>
@@ -212,11 +200,11 @@ export default function VerificationStatus(): JSX.Element {
 				</div>
 				<Button
 					onClick={handleVerify}
-					disabled={starting}
+					disabled={verifyMutation.isPending}
 					size="sm"
 					className="cursor-pointer bg-[#3B5AA8] hover:bg-[#2f4389] text-white"
 				>
-					{starting ? (
+					{verifyMutation.isPending ? (
 						<Loader2 className="w-4 h-4 animate-spin" />
 					) : (
 						"Start Again"
