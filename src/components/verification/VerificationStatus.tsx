@@ -5,7 +5,7 @@ import {
 	ShieldCheck,
 	ShieldX,
 } from "lucide-react";
-import { useRef, useState, type JSX } from "react";
+import { useState, type JSX } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/lib/toast";
 import {
@@ -19,11 +19,6 @@ import { useQuery } from "@tanstack/react-query";
 
 export default function VerificationStatus(): JSX.Element {
 	const [starting, setStarting] = useState(false);
-	const pollCountRef = useRef(0);
-
-	// Check for ?verified=1 to enable polling mode
-	const searchParams = new URLSearchParams(window.location.search);
-	const isReturningFromDidit = searchParams.get("verified") === "1";
 
     const verificationStatusQuery = useQuery(getVerificationStatusQuery);
     const record = verificationStatusQuery.data;
@@ -113,17 +108,13 @@ export default function VerificationStatus(): JSX.Element {
 								Verification in progress
 							</p>
 							<p className="text-xs text-blue-600">
-								{isReturningFromDidit && pollCountRef.current < 12
-									? "Waiting for confirmation..."
-									: hasActiveSession
+								{ hasActiveSession
 										? "Your session is still active. Continue where you left off."
 										: "Your verification is being processed. Check back shortly."}
 							</p>
 						</div>
 					</div>
-					{isReturningFromDidit && pollCountRef.current < 12 ? (
-						<Loader2 className="w-4 h-4 animate-spin text-blue-600" />
-					) : hasActiveSession ? (
+					{hasActiveSession ? (
 						<Button
 							onClick={handleResume}
 							disabled={starting}
