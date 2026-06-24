@@ -8,6 +8,7 @@ import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { getMyNotificationsQuery } from "@/lib/notification/api";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { NotificationType } from "@/lib/notification/model";
+import { getVerificationStatusQuery } from "@/lib/verification/api";
 export const Route = createFileRoute("/_student")({
 	component: StudentLayout,
 	beforeLoad: async ({ context }) => {
@@ -40,6 +41,15 @@ function StudentLayout(): JSX.Element {
 		for (const type of Object.values(NotificationType)) {
 			es.addEventListener(type, () => {
 				queryClient.invalidateQueries(getMyNotificationsQuery());
+			});
+		}
+
+		for (const type of [
+			NotificationType.VerificationApproved,
+			NotificationType.VerificationDeclined,
+		]) {
+			es.addEventListener(type, () => {
+				queryClient.invalidateQueries(getVerificationStatusQuery);
 			});
 		}
 

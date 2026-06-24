@@ -46,6 +46,10 @@ export function getNotificationTitle(notif: Notification): string {
 			return "Scholarship granted";
 		case NotificationType.ApplicationReceived:
 			return "New applicant";
+		case NotificationType.VerificationApproved:
+			return "Identity verified";
+		case NotificationType.VerificationDeclined:
+			return "Verification declined";
 		default:
 			return "Notification";
 	}
@@ -66,6 +70,9 @@ export function getNotificationSubtitle(notif: Notification): string {
 			const meta = notif.metadata as ApplicationStatusChangedEvent | null;
 			return meta?.scholarshipName ?? "";
 		}
+		case NotificationType.VerificationApproved:
+		case NotificationType.VerificationDeclined:
+			return "";
 		default:
 			return "";
 	}
@@ -87,6 +94,10 @@ export function getNotificationMessage(notif: Notification): string {
 			return "Scholarship funds have been granted";
 		case NotificationType.ApplicationReceived:
 			return "A student has applied for your scholarship";
+		case NotificationType.VerificationApproved:
+			return "Your identity has been verified successfully";
+		case NotificationType.VerificationDeclined:
+			return "Your identity verification was not approved";
 		default:
 			return "";
 	}

@@ -7,6 +7,7 @@ import { BACKEND_URL, getDefaultPathOfRole } from "@/lib/api";
 import { getMyNotificationsQuery } from "@/lib/notification/api";
 import { NotificationType } from "@/lib/notification/model";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getVerificationStatusQuery } from "@/lib/verification/api";
 
 export const Route = createFileRoute("/_sponsor")({
 	component: SponsorLayout,
@@ -40,6 +41,15 @@ function SponsorLayout(): JSX.Element {
 		for (const type of Object.values(NotificationType)) {
 			es.addEventListener(type, () => {
 				queryClient.invalidateQueries(getMyNotificationsQuery());
+			});
+		}
+
+		for (const type of [
+			NotificationType.VerificationApproved,
+			NotificationType.VerificationDeclined,
+		]) {
+			es.addEventListener(type, () => {
+				queryClient.invalidateQueries(getVerificationStatusQuery);
 			});
 		}
 
