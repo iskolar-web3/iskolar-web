@@ -16,9 +16,3 @@ export const verificationRecordSchema = z.object({
 	cooldownUntil: z.coerce.date().nullable(),
 });
 export type VerificationRecord = z.infer<typeof verificationRecordSchema>;
-
-export const publicVerificationSchema = z.object({
-	status: z.enum(VerificationStatus),
-	verifiedAt: z.coerce.date().nullable(),
-});
-export type PublicVerification = z.infer<typeof publicVerificationSchema>;

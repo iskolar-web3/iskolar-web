@@ -1,11 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { BACKEND_URL, type ApiResponse } from "../api";
-import {
-	verificationRecordSchema,
-	publicVerificationSchema,
-	type VerificationRecord,
-	type PublicVerification,
-} from "./model";
+import { verificationRecordSchema, type VerificationRecord } from "./model";
 
 export async function startVerification(): Promise<{
 	verificationUrl: string;
@@ -44,16 +39,3 @@ export const getVerificationStatusQuery = queryOptions({
 	staleTime: 30_000,
 	enabled: true,
 });
-
-export async function getPublicVerificationStatus(
-	userId: string,
-): Promise<PublicVerification | null> {
-	const response = await fetch(`${BACKEND_URL}/users/${userId}/verification`);
-
-	if (!response.ok) return null;
-
-	const result: ApiResponse<PublicVerification | null> = await response.json();
-	if (!result.data) return null;
-
-	return publicVerificationSchema.parse(result.data);
-}
