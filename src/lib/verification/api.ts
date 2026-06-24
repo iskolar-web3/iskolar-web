@@ -7,7 +7,9 @@ import {
 	type PublicVerification,
 } from "./model";
 
-export async function startVerification(): Promise<{ verificationUrl: string }> {
+export async function startVerification(): Promise<{
+	verificationUrl: string;
+}> {
 	const response = await fetch(`${BACKEND_URL}/verifications/me`, {
 		method: "POST",
 		credentials: "include",
@@ -30,31 +32,27 @@ export async function getVerificationStatus(): Promise<VerificationRecord | null
 
 	if (!response.ok) return null;
 
-	const result: ApiResponse<VerificationRecord> =
-		await response.json();
+	const result: ApiResponse<VerificationRecord> = await response.json();
 	if (!result.data) return null;
 
 	return verificationRecordSchema.parse(result.data);
 }
 
 export const getVerificationStatusQuery = queryOptions({
-    queryKey: ["verification-status"],
-    queryFn: () => getVerificationStatus(),
-    staleTime: 30_000,
-    enabled: true,
-})
+	queryKey: ["verification-status"],
+	queryFn: () => getVerificationStatus(),
+	staleTime: 30_000,
+	enabled: true,
+});
 
 export async function getPublicVerificationStatus(
 	userId: string,
 ): Promise<PublicVerification | null> {
-	const response = await fetch(
-		`${BACKEND_URL}/users/${userId}/verification`,
-	);
+	const response = await fetch(`${BACKEND_URL}/users/${userId}/verification`);
 
 	if (!response.ok) return null;
 
-	const result: ApiResponse<PublicVerification | null> =
-		await response.json();
+	const result: ApiResponse<PublicVerification | null> = await response.json();
 	if (!result.data) return null;
 
 	return publicVerificationSchema.parse(result.data);

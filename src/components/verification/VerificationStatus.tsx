@@ -12,16 +12,14 @@ import {
 	getVerificationStatusQuery,
 	startVerification,
 } from "@/lib/verification/api";
-import {
-	VerificationStatus as Status,
-} from "@/lib/verification/model";
+import { VerificationStatus as Status } from "@/lib/verification/model";
 import { useQuery } from "@tanstack/react-query";
 
 export default function VerificationStatus(): JSX.Element {
 	const [starting, setStarting] = useState(false);
 
-    const verificationStatusQuery = useQuery(getVerificationStatusQuery);
-    const record = verificationStatusQuery.data;
+	const verificationStatusQuery = useQuery(getVerificationStatusQuery);
+	const record = verificationStatusQuery.data;
 
 	async function handleVerify() {
 		setStarting(true);
@@ -108,9 +106,9 @@ export default function VerificationStatus(): JSX.Element {
 								Verification in progress
 							</p>
 							<p className="text-xs text-blue-600">
-								{ hasActiveSession
-										? "Your session is still active. Continue where you left off."
-										: "Your verification is being processed. Check back shortly."}
+								{hasActiveSession
+									? "Your session is still active. Continue where you left off."
+									: "Your verification is being processed. Check back shortly."}
 							</p>
 						</div>
 					</div>
@@ -142,7 +140,7 @@ export default function VerificationStatus(): JSX.Element {
 					<p className="text-sm font-medium text-green-800">
 						Identity verified
 					</p>
-                    {/* NOTE: Disable verifiedAt timestamp since the Didit API doesn't have a built-in way for getting it. */}
+					{/* NOTE: Disable verifiedAt timestamp since the Didit API doesn't have a built-in way for getting it. */}
 					{/* {record.verifiedAt && ( */}
 					{/* 	<p className="text-xs text-green-600"> */}
 					{/* 		Verified on{" "} */}
