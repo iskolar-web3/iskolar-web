@@ -185,7 +185,7 @@ function StudentProfilePage() {
 				</motion.div>
 
 				{import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true" && (
-					<VerificationStatus role="students" />
+					<VerificationStatus />
 				)}
 
 				{/* Personal Information */}

@@ -5,74 +5,28 @@ import {
 	ShieldCheck,
 	ShieldX,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState, type JSX } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/lib/toast";
 import {
-	getVerificationStatus,
+	getVerificationStatusQuery,
 	startVerification,
 } from "@/lib/verification/api";
 import {
 	VerificationStatus as Status,
-	type VerificationRecord,
 } from "@/lib/verification/model";
+import { useQuery } from "@tanstack/react-query";
 
-type Props = {
-	role: "students" | "sponsors";
-};
-
-export default function VerificationStatus({ role }: Props) {
-	const [record, setRecord] = useState<VerificationRecord | null>(null);
-	const [loading, setLoading] = useState(true);
+export default function VerificationStatus(): JSX.Element {
 	const [starting, setStarting] = useState(false);
-	const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const pollCountRef = useRef(0);
 
 	// Check for ?verified=1 to enable polling mode
 	const searchParams = new URLSearchParams(window.location.search);
 	const isReturningFromDidit = searchParams.get("verified") === "1";
 
-	async function fetchStatus() {
-		const result = await getVerificationStatus(role);
-		setRecord(result);
-		setLoading(false);
-		return result;
-	}
-
-	useEffect(() => {
-		fetchStatus();
-	}, []);
-
-	useEffect(() => {
-		if (record?.status !== Status.Pending) return;
-		if (pollRef.current) return;
-
-		const interval = isReturningFromDidit ? 5000 : 10000;
-		const maxCount = isReturningFromDidit ? 12 : 18; // 60s fast, 3min slow
-
-		pollCountRef.current = 0;
-		pollRef.current = setInterval(async () => {
-			pollCountRef.current += 1;
-			const result = await fetchStatus();
-
-			if (
-				(result && result.status !== Status.Pending) ||
-				pollCountRef.current >= maxCount
-			) {
-				if (pollRef.current) {
-					clearInterval(pollRef.current);
-					pollRef.current = null;
-				}
-			}
-		}, interval);
-
-		return () => {
-			if (pollRef.current) {
-				clearInterval(pollRef.current);
-				pollRef.current = null;
-			}
-		};
-	}, [isReturningFromDidit, record?.status]);
+    const verificationStatusQuery = useQuery(getVerificationStatusQuery);
+    const record = verificationStatusQuery.data;
 
 	async function handleVerify() {
 		setStarting(true);
@@ -88,7 +42,7 @@ export default function VerificationStatus({ role }: Props) {
 		}
 	}
 
-	if (loading) {
+	if (verificationStatusQuery.isLoading) {
 		return (
 			<div className="flex items-center gap-2 text-muted-foreground text-sm py-3">
 				<Loader2 className="w-4 h-4 animate-spin" />
@@ -197,16 +151,17 @@ export default function VerificationStatus({ role }: Props) {
 					<p className="text-sm font-medium text-green-800">
 						Identity verified
 					</p>
-					{record.verifiedAt && (
-						<p className="text-xs text-green-600">
-							Verified on{" "}
-							{new Date(record.verifiedAt).toLocaleDateString(undefined, {
-								year: "numeric",
-								month: "long",
-								day: "numeric",
-							})}
-						</p>
-					)}
+                    {/* NOTE: Disable verifiedAt timestamp since the Didit API doesn't have a built-in way for getting it. */}
+					{/* {record.verifiedAt && ( */}
+					{/* 	<p className="text-xs text-green-600"> */}
+					{/* 		Verified on{" "} */}
+					{/* 		{new Date(record.verifiedAt).toLocaleDateString(undefined, { */}
+					{/* 			year: "numeric", */}
+					{/* 			month: "long", */}
+					{/* 			day: "numeric", */}
+					{/* 		})} */}
+					{/* 	</p> */}
+					{/* )} */}
 				</div>
 			</div>
 		);
@@ -227,7 +182,7 @@ export default function VerificationStatus({ role }: Props) {
 								Verification rejected
 							</p>
 							<p className="text-xs text-red-600">
-								{record.remarks || "Your verification was not approved."}
+								{"Your verification was not approved."}
 							</p>
 							{cooldownActive && (
 								<p className="text-xs text-red-500 mt-1">

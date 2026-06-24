@@ -172,7 +172,7 @@ function SponsorProfile() {
 				</motion.div>
 
 				{import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true" &&
-					isIndividual && <VerificationStatus role="sponsors" />}
+					isIndividual && <VerificationStatus />}
 
 				{/* Information Section */}
 				<motion.div
