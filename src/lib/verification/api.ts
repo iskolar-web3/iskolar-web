@@ -6,16 +6,9 @@ import {
 	type PublicVerification,
 } from "./model";
 
-export async function startVerification(
-	role: "students" | "sponsors",
-	extraFields?: { registrationNumber: string; repName: string },
-): Promise<{ verificationUrl: string }> {
-	const response = await fetch(`${BACKEND_URL}/${role}/me/verification`, {
+export async function startVerification(): Promise<{ verificationUrl: string }> {
+	const response = await fetch(`${BACKEND_URL}/verifications/me`, {
 		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify(extraFields ?? {}),
 		credentials: "include",
 	});
 

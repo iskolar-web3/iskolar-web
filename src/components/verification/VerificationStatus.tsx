@@ -77,7 +77,7 @@ export default function VerificationStatus({ role }: Props) {
 	async function handleVerify() {
 		setStarting(true);
 		try {
-			const result = await startVerification(role);
+			const result = await startVerification();
 			window.location.href = result.verificationUrl;
 		} catch (err) {
 			toast.error(
@@ -138,7 +138,7 @@ export default function VerificationStatus({ role }: Props) {
 			if (!record) return;
 			setStarting(true);
 			try {
-				const result = await startVerification(role);
+				const result = await startVerification();
 				window.location.href = result.verificationUrl;
 			} catch (err) {
 				toast.error(
