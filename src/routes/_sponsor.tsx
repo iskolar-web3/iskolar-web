@@ -1,13 +1,12 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { useEffect, type JSX } from "react";
+import { type JSX } from "react";
 import HeaderNav from "@/components/HeaderNav";
 import { FeedbackWidget } from "@/components/FeedbackWidget";
 import { UserRole } from "@/lib/user/model";
-import { BACKEND_URL, getDefaultPathOfRole } from "@/lib/api";
+import { getDefaultPathOfRole } from "@/lib/api";
 import { getMyNotificationsQuery } from "@/lib/notification/api";
-import { NotificationType } from "@/lib/notification/model";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getVerificationStatusQuery } from "@/lib/verification/api";
+import { useQuery } from "@tanstack/react-query";
+import { useNotificationListener } from "@/lib/notification/hook";
 
 export const Route = createFileRoute("/_sponsor")({
 	component: SponsorLayout,
@@ -32,29 +31,8 @@ export const Route = createFileRoute("/_sponsor")({
 
 function SponsorLayout(): JSX.Element {
 	const notifications = useQuery(getMyNotificationsQuery());
-	const queryClient = useQueryClient();
 
-	useEffect(() => {
-		const url = new URL(`${BACKEND_URL}/sse/scholarships`);
-		const es = new EventSource(url.toString(), { withCredentials: true });
-
-		for (const type of Object.values(NotificationType)) {
-			es.addEventListener(type, () => {
-				queryClient.invalidateQueries(getMyNotificationsQuery());
-			});
-		}
-
-		for (const type of [
-			NotificationType.VerificationApproved,
-			NotificationType.VerificationDeclined,
-		]) {
-			es.addEventListener(type, () => {
-				queryClient.invalidateQueries(getVerificationStatusQuery);
-			});
-		}
-
-		return () => es.close();
-	}, []);
+	useNotificationListener();
 
 	return (
 		<div className="min-h-screen bg-background">
