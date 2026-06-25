@@ -28,7 +28,6 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Notification } from "@/lib/notification/model";
 import {
 	formatTimeAgo,
@@ -409,7 +408,7 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 									)}
 								</div>
 
-								<ScrollArea className="max-h-[420px]">
+								<div className="max-h-[420px] overflow-y-auto">
 									{notifications.length === 0 ? (
 										<div className="flex flex-col items-center justify-center py-12 px-4 gap-2 text-muted-foreground">
 											<Bell className="w-7 h-7 opacity-25" />
@@ -445,7 +444,7 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 											);
 										})
 									)}
-								</ScrollArea>
+								</div>
 							</PopoverContent>
 						</Popover>
 
