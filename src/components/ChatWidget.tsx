@@ -1,12 +1,12 @@
 import { Loader2, Send, X } from "lucide-react";
 import type { FormEvent, JSX, ReactNode } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCornerWidgetVisible } from "@/hooks/useCornerWidgets";
 import { SUGGESTED_QUESTIONS } from "@/lib/faq";
-import { askFaqBot, warmUpFaqBot } from "@/lib/faqBot";
+import { askFaqBot, isFaqBotReady, warmUpFaqBot } from "@/lib/faqBot";
 import { cn } from "@/lib/utils";
 
 interface ChatMessage {
@@ -81,6 +81,11 @@ export function ChatWidget(): JSX.Element {
 	const [messages, setMessages] = useState<ChatMessage[]>([
 		{ id: 0, role: "bot", text: GREETING },
 	]);
+	// First-open loading: show a full-panel loading screen while the model and FAQ
+	// embeddings download/build. Initialised from the shared bot state so reopening
+	// after the first load skips the screen entirely.
+	const [botReady, setBotReady] = useState(() => isFaqBotReady());
+	const [botError, setBotError] = useState(false);
 
 	const nextId = useRef(1);
 	const bottomRef = useRef<HTMLDivElement>(null);
@@ -92,10 +97,29 @@ export function ChatWidget(): JSX.Element {
 	// overlap in the corner.
 	const cornerWidgetVisible = useCornerWidgetVisible();
 
-	// Preload the model the first time the chat opens so the first answer is fast.
+	// Reveal instantly if the model finished loading (e.g. via the hover preload)
+	// before the panel opened, so reopening never flashes the loading screen.
+	useLayoutEffect(() => {
+		if (open && !botReady && isFaqBotReady()) setBotReady(true);
+	}, [open, botReady]);
+
+	// On first open, load the model and build the FAQ index, then reveal the chat.
 	useEffect(() => {
-		if (open) void warmUpFaqBot();
-	}, [open]);
+		if (!open || botReady || isFaqBotReady()) return;
+		let cancelled = false;
+		setBotError(false);
+		warmUpFaqBot().then(
+			() => {
+				if (!cancelled) setBotReady(true);
+			},
+			() => {
+				if (!cancelled) setBotError(true);
+			},
+		);
+		return () => {
+			cancelled = true;
+		};
+	}, [open, botReady]);
 
 	// Keep the latest message in view whenever messages or loading state change.
 	// biome-ignore lint/correctness/useExhaustiveDependencies: deps are the change triggers, not values read in the effect
@@ -107,8 +131,8 @@ export function ChatWidget(): JSX.Element {
 	// user can keep typing without clicking the box again. (Sending disables the
 	// input while loading, which blurs it; refocus once it's re-enabled.)
 	useEffect(() => {
-		if (open && !loading) inputRef.current?.focus();
-	}, [open, loading]);
+		if (open && botReady && !loading) inputRef.current?.focus();
+	}, [open, botReady, loading]);
 
 	// Close the chat when the user clicks (or taps) anywhere outside the panel.
 	useEffect(() => {
@@ -160,13 +184,19 @@ export function ChatWidget(): JSX.Element {
 		void send(input);
 	}
 
+	function retryLoad(): void {
+		setBotError(false);
+		warmUpFaqBot().then(
+			() => setBotReady(true),
+			() => setBotError(true),
+		);
+	}
+
 	if (!open) {
 		return (
 			<button
 				type="button"
 				onClick={() => setOpen(true)}
-				onPointerEnter={() => void warmUpFaqBot()}
-				onFocus={() => void warmUpFaqBot()}
 				aria-label="Open the iSkolar assistant"
 				className={cn(
 					"fixed right-2 z-50 rounded-full transition-transform duration-300 ease-out hover:scale-105 active:scale-98 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100",
@@ -272,6 +302,54 @@ export function ChatWidget(): JSX.Element {
 			<p className="bg-card px-3 pb-2 text-center text-[10px] text-muted-foreground">
 				Answers may not cover everything.
 			</p>
+
+			{/* Full-panel loading screen shown until the model is ready. */}
+			{!botReady && (
+				<div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-card px-6 text-center">
+					<button
+						type="button"
+						onClick={() => setOpen(false)}
+						aria-label="Close the iSkolar assistant"
+						className="absolute right-3 top-3 rounded-full p-1 text-muted-foreground transition-colors hover:bg-muted"
+					>
+						<X className="size-4" />
+					</button>
+
+					{botError ? (
+						<>
+							<p className="text-sm text-muted-foreground">
+								The assistant could not load. Check your connection and try
+								again.
+							</p>
+							<Button
+								type="button"
+								variant="secondary"
+								size="sm"
+								onClick={retryLoad}
+							>
+								Try again
+							</Button>
+						</>
+					) : (
+						<>
+							<img
+								src="/chatbot.png"
+								alt=""
+								className="size-16 animate-pulse object-contain"
+							/>
+							<Loader2 className="size-6 animate-spin text-muted-foreground" />
+							<div className="space-y-1">
+								<p className="text-sm font-medium text-foreground">
+									Loading the assistant…
+								</p>
+								<p className="text-xs text-muted-foreground">
+									This can take a moment the first time.
+								</p>
+							</div>
+						</>
+					)}
+				</div>
+			)}
 		</div>
 	);
 }

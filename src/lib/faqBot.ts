@@ -105,6 +105,11 @@ function getExtractor(): Promise<Embedder> {
 			});
 			return extractor as unknown as Embedder;
 		})();
+		// If loading fails, clear the cache so a later call can retry instead of
+		// re-awaiting the same rejected promise.
+		extractorPromise.catch(() => {
+			extractorPromise = null;
+		});
 	}
 	return extractorPromise;
 }
@@ -154,6 +159,14 @@ export async function warmUpFaqBot(): Promise<void> {
 		oosVectors = await embedBatch(extractor, OUT_OF_SCOPE_ANCHORS);
 		faqIndex = index;
 	}
+}
+
+/**
+ * Whether the model and FAQ embeddings are fully loaded and ready to answer.
+ * The chat widget uses this to decide between its loading screen and the chat.
+ */
+export function isFaqBotReady(): boolean {
+	return faqIndex !== null && oosVectors !== null;
 }
 
 export interface FaqAnswer {
