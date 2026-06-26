@@ -1,12 +1,20 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { JSX } from "react";
 import { X, MessageCircle } from "lucide-react";
+import { setCornerWidgetVisible } from "@/hooks/useCornerWidgets";
 
 const FEEDBACK_FORM_URL =
 	"https://forms.gle/gd57DyADrYEq8cbx8";
 
 export function FeedbackWidget(): JSX.Element | null {
 	const [dismissed, setDismissed] = useState(false);
+
+	// Publish visibility so the global chat launcher lifts above this pill
+	// instead of overlapping it (mirrors the landing scroll-to-top arrow).
+	useEffect(() => {
+		setCornerWidgetVisible("feedback", !dismissed);
+		return () => setCornerWidgetVisible("feedback", false);
+	}, [dismissed]);
 
 	if (dismissed) return null;
 
