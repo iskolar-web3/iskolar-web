@@ -19,3 +19,5 @@ count.txt
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+src/routeTree.gen.ts
