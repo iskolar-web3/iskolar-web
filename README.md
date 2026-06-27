@@ -6,12 +6,12 @@ Centralized and transparent scholarship application and management platform.
 
 To install dependencies:
 ```sh
-bun install
+pnpm install
 ```
 
 To run:
 ```sh
-bun dev
+pnpm dev
 ```
 
 open http://localhost:3000
