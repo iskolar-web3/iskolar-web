@@ -142,12 +142,18 @@ export const updateFormFieldRequestSchema = baseFormFieldSchema
 		options: updateFormFieldOptionRequestSchema.array(),
 		id: z.uuidv4(),
 	})
-	.refine((data) => validateFormField(data.fieldType, data.options.length), {
-		error:
-			"Options are required for choice-based fields and must be empty for others",
-		path: ["options"],
-	})
-	.partial();
+	.partial()
+	.refine(
+		(data) => {
+			if (!data.fieldType || !data.options) return true;
+			return validateFormField(data.fieldType, data.options.length);
+		},
+		{
+			error:
+				"Options are required for choice-based fields and must be empty for others",
+			path: ["options"],
+		},
+	);
 
 export const updateScholarshipRequestSchema = createScholarshipRequestSchema
 	.omit({
