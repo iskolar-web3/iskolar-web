@@ -1,11 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
 import type { JSX } from "react";
-
-export const Route = createFileRoute("/__404")({
-	component: NotFoundPage,
-});
 
 export function NotFoundPage(): JSX.Element {
 	return (

@@ -4,7 +4,7 @@ import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import type { JSX } from "react";
 import type { AuthContextValue } from "@/auth";
 import { Toaster } from "@/components/Toast";
-import { NotFoundPage } from "./__404";
+import { NotFoundPage } from "@/components/NotFound";
 
 type RouterContext = {
 	queryClient: QueryClient;

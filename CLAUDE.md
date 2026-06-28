@@ -4,19 +4,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
-**Package manager:** Bun
+**Package manager:** pnpm
 
 ```bash
-bun dev          # Start dev server on port 3000
-bun build        # Production build (vite build && tsc)
-bun serve        # Preview production build
-bun test         # Run unit tests (Vitest)
-bun lint         # Lint with Biome
-bun format       # Format with Biome
-bun check        # Lint + format check
+pnpm dev          # Start dev server on port 3000
+pnpm build        # Production build (vite build && tsc)
+pnpm serve        # Preview production build
+pnpm test         # Run unit tests (Vitest)
+pnpm lint         # Lint with Biome
+pnpm format       # Format with Biome
+pnpm check        # Lint + format check
 ```
 
-Run a single test file: `bun test src/path/to/file.test.ts`
+Run a single test file: `pnpm test src/path/to/file.test.ts`
 
 ## Architecture
 
@@ -86,10 +86,10 @@ VITE_ENABLE_LUMEN_CREDENTIALS=true
 
 ## Code Style
 
-- **Linter/Formatter:** Biome (tabs, double quotes) — run `bun check` before committing
+- **Linter/Formatter:** Biome (tabs, double quotes) — run `pnpm check` before committing
 - **Path alias:** `@/*` maps to `./src/*`
 - **Strict TypeScript:** `strict: true`, `noUnusedLocals`, `noUnusedParameters`
-- **UI components:** Shadcn/ui (style: new-york, base color: zinc) — add new components via `bunx shadcn@latest add <component>`
+- **UI components:** Shadcn/ui (style: new-york, base color: zinc) — add new components via `pnpm dlx shadcn@latest add <component>`
 
 ## Key Domain Concepts
 
