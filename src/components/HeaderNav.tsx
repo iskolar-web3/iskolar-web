@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import {
 	Search,
 	Home,
@@ -112,9 +112,7 @@ const sponsorNavItems: NavItem[] = [
  * @returns Header navigation component
  */
 export default function HeaderNav({ role, notifications }: HeaderNavProps) {
-	const router = useRouterState();
 	const navigate = useNavigate();
-	const currentPath = router.location.pathname;
 	const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
 	const [isSearchExpanded, setIsSearchExpanded] = useState(false);
@@ -196,40 +194,6 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 	const handleSearchClose = () => {
 		setIsSearchExpanded(false);
 		setSearchQuery("");
-	};
-
-	/**
-	 * Determines if a navigation route is currently active
-	 * @param path - Route path to check
-	 * @returns True if the route is active
-	 */
-	const isActiveRoute = (path: string) => {
-		// Handle exact matches
-		if (path === "/home") {
-			return currentPath === "/home";
-		}
-		if (path === "/discover") {
-			return currentPath === "/discover";
-		}
-		if (path === "/scholarships") {
-			return (
-				currentPath === "/scholarships" ||
-				currentPath.startsWith("/scholarship/")
-			);
-		}
-		if (path === "/scholars") {
-			return currentPath === "/scholars";
-		}
-		if (path === "/create") {
-			return currentPath === "/create";
-		}
-		if (path === "/disbursements") {
-			return currentPath === "/disbursements";
-		}
-		if (path === "/transactions") {
-			return currentPath === "/transactions";
-		}
-		return false;
 	};
 
 	const [isNotifOpen, setIsNotifOpen] = useState(false);
@@ -350,20 +314,16 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 					<div className="flex items-center gap-6 absolute left-1/2 transform -translate-x-1/2">
 						{navItems.map((item) => {
 							const Icon = item.icon;
-							const isActive = isActiveRoute(item.path);
 
 							return (
 								<Link
 									key={item.path}
 									to={item.path}
-									className="flex flex-col items-center gap-0.5 md:gap-1 transition-colors"
+									className="group flex flex-col items-center gap-0.5 md:gap-1 transition-colors"
+									activeProps={{ className: "active" }}
 								>
 									<span className="relative">
-										<Icon
-											className={`w-4 md:w-5 h-4 md:h-5 ${
-												isActive ? "text-primary" : "text-[#9CA3AF]"
-											}`}
-										/>
+										<Icon className="w-4 md:w-5 h-4 md:h-5 text-[#9CA3AF] group-[.active]:text-primary" />
 										{item.path === "/disbursements" &&
 											pendingDisbursementCount > 0 && (
 												<span className="absolute -top-1.5 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] text-white">
@@ -371,11 +331,7 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 												</span>
 											)}
 									</span>
-									<span
-										className={`text-[11px] md:text-xs ${
-											isActive ? "text-primary" : "text-inactive"
-										}`}
-									>
+									<span className="text-[11px] md:text-xs text-inactive group-[.active]:text-primary">
 										{item.label}
 									</span>
 								</Link>
