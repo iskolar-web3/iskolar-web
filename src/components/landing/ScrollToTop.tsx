@@ -1,6 +1,7 @@
 import type Lenis from "lenis";
 import { ArrowUp } from "lucide-react";
 import { useEffect, useState } from "react";
+import { setCornerWidgetVisible } from "@/hooks/useCornerWidgets";
 import { onLenisChange } from "@/hooks/useSmoothScroll";
 
 const RADIUS = 22;
@@ -13,7 +14,10 @@ export function ScrollToTop() {
 	useEffect(() => {
 		const update = (scroll: number, limit: number) => {
 			setProgress(limit > 0 ? scroll / limit : 0);
-			setVisible(scroll > 200);
+			const isVisible = scroll > 200;
+			setVisible(isVisible);
+			// Publish so the global chat widget can move out of the way.
+			setCornerWidgetVisible("scroll-to-top", isVisible);
 		};
 
 		// Lenis emits on every animation frame, so the ring tracks the smoothed
@@ -45,6 +49,8 @@ export function ScrollToTop() {
 			unsubscribe();
 			current?.off("scroll", onLenisScroll);
 			window.removeEventListener("scroll", onNativeScroll);
+			// Reset when the arrow leaves the page (e.g. navigating away).
+			setCornerWidgetVisible("scroll-to-top", false);
 		};
 	}, []);
 

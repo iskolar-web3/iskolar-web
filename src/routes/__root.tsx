@@ -3,6 +3,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
 import type { JSX } from "react";
 import type { AuthContextValue } from "@/auth";
+import { ChatWidget } from "@/components/ChatWidget";
 import { Toaster } from "@/components/Toast";
 import { NotFoundPage } from "@/components/NotFound";
 
@@ -21,6 +22,7 @@ function RouteComponent(): JSX.Element {
 		<>
 			<Outlet />
 			<Toaster />
+			<ChatWidget />
 			{import.meta.env.DEV && <ReactQueryDevtools />}
 		</>
 	);
