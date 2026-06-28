@@ -21,7 +21,15 @@ const MODEL_ID = "Xenova/paraphrase-multilingual-MiniLM-L12-v2";
 
 // Minimum cosine similarity to count as a confident match. Tune to taste:
 // lower = more answers but more wrong matches; higher = stricter, more "not sure".
-const SIMILARITY_THRESHOLD = 0.40;
+const SIMILARITY_THRESHOLD = 0.35;
+
+// How much closer the best FAQ must be than the best off-topic anchor to count as
+// a real match. Its job is to reject coherent *off-topic* questions ("tell me a
+// joke"), which sit closer to an off-topic anchor than to any FAQ (a negative
+// margin). Gibberish is handled earlier by isGibberish(), so this stays low: some
+// real Tagalog questions ("sino kayo") only clear an off-topic anchor by ~0.09
+// because the anchors include Tagalog, so a higher bar would reject them.
+const CONFIDENCE_MARGIN = 0.05;
 
 const FALLBACK_ANSWER: Record<FaqLanguage, string> = {
 	en: "Sorry, I can only answer questions about iSkolar, and I'm not sure about that one. Try rephrasing it, or email our team at hello@iskolar.io and we'll be glad to help.",
@@ -72,6 +80,95 @@ function detectLanguage(query: string): FaqLanguage {
 		if (word.length > 0 && TAGALOG_MARKERS.has(word)) return "tl";
 	}
 	return "en";
+}
+
+// Letters that act as vowels for the word-shape check. "y" is included because
+// it carries vowel duty in many English words ("apply", "why").
+const VOWELS = new Set(["a", "e", "i", "o", "u", "y"]);
+
+// QWERTY rows, used to spot "keyboard walks" — runs of neighbouring keys like
+// "asdf" or "qwerty" that real words never string together.
+const KEYBOARD_ROWS = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
+const KEY_POSITION = new Map<string, [number, number]>();
+for (let row = 0; row < KEYBOARD_ROWS.length; row++) {
+	const keys = KEYBOARD_ROWS[row];
+	for (let col = 0; col < keys.length; col++) {
+		KEY_POSITION.set(keys[col], [row, col]);
+	}
+}
+
+// Two letters are keyboard-adjacent when they sit side by side on the same row
+// ("a"/"s", "k"/"l"). The same key or different rows don't count.
+function areAdjacentKeys(a: string, b: string): boolean {
+	const pa = KEY_POSITION.get(a);
+	const pb = KEY_POSITION.get(b);
+	if (!pa || !pb) return false;
+	return pa[0] === pb[0] && Math.abs(pa[1] - pb[1]) === 1;
+}
+
+// True when the token strings four or more neighbouring keys together ("asdf",
+// "qwert", "lkjh", "poiuyt"). Real words don't walk across the keyboard like this.
+function hasKeyboardWalk(token: string): boolean {
+	let run = 1;
+	for (let i = 1; i < token.length; i++) {
+		if (areAdjacentKeys(token[i - 1], token[i])) {
+			run = run + 1;
+			if (run >= 4) return true;
+		} else {
+			run = 1;
+		}
+	}
+	return false;
+}
+
+// True when the token is just a short unit repeated ("aaaa", "xyzxyz", "lolol").
+function isRepeatedUnit(token: string): boolean {
+	if (token.length < 4) return false;
+	for (let unit = 1; unit <= token.length / 2; unit++) {
+		if (token.length % unit !== 0) continue;
+		if (token.slice(0, unit).repeat(token.length / unit) === token) return true;
+	}
+	return false;
+}
+
+// A token has word shape when it has at least one vowel, no improbably long run
+// of consonants, and isn't starved of vowels. Random keystrokes ("zxcvbnm",
+// "wjdkalf") fail at least one of these; real English and Tagalog words pass.
+function hasWordShape(token: string): boolean {
+	let vowels = 0;
+	let run = 0;
+	let longestRun = 0;
+	for (const ch of token) {
+		if (VOWELS.has(ch)) {
+			vowels = vowels + 1;
+			run = 0;
+		} else {
+			run = run + 1;
+			if (run > longestRun) longestRun = run;
+		}
+	}
+	if (vowels === 0) return false; // "zxcvbnm", "hjkl"
+	if (longestRun >= 4) return false; // "wjdkalf"
+	if (vowels / token.length < 0.25) return false; // vowel-starved mashing
+	return true;
+}
+
+// A single token looks like keyboard-mashing rather than a real word. Tokens of
+// 1–2 letters are too short to judge, so we never treat them as mash ("hi", "ok").
+function isMashToken(token: string): boolean {
+	if (token.length <= 2) return false;
+	return hasKeyboardWalk(token) || isRepeatedUnit(token) || !hasWordShape(token);
+}
+
+// A query is gibberish when it contains letters but every alphabetic token looks
+// like mashing — random keystrokes, keyboard walks, or repeated characters. We
+// answer these with the fallback instead of the nearest (meaningless) FAQ, and
+// can do so without even loading the model. Exported for unit testing.
+export function isGibberish(query: string): boolean {
+	const tokens = query.toLowerCase().match(/[a-zñ]+/g);
+	// Nothing alphabetic (digits/punctuation only) — let the matcher decide.
+	if (!tokens) return false;
+	return tokens.every((token) => isMashToken(token));
 }
 
 // Minimal structural type for the bits of the feature-extraction pipeline we use.
@@ -183,11 +280,18 @@ export interface FaqAnswer {
  * or a fallback if nothing is confident enough.
  */
 export async function askFaqBot(query: string): Promise<FaqAnswer> {
+	const language = detectLanguage(query);
+
+	// Reject obvious keyboard-mashing up front — no need to load the model or
+	// embed it just to return the fallback.
+	if (isGibberish(query)) {
+		return { answer: FALLBACK_ANSWER[language], matched: false, score: 0, language };
+	}
+
 	const extractor = await getExtractor();
 	await warmUpFaqBot();
 	// faqIndex is guaranteed populated by warmUpFaqBot above.
 	const index = faqIndex as IndexedFaq[];
-	const language = detectLanguage(query);
 
 	const queryVector = await embedOne(extractor, query);
 
@@ -205,18 +309,23 @@ export async function askFaqBot(query: string): Promise<FaqAnswer> {
 		}
 	}
 
-	// Off-topic guard: if the query is closer to a known out-of-scope example
-	// than to any FAQ, treat it as unrelated and fall back.
+	// Off-topic guard: how close is the query to a known out-of-scope example?
 	let bestOffTopicScore = Number.NEGATIVE_INFINITY;
 	for (const vector of oosVectors ?? []) {
 		const score = dotProduct(queryVector, vector);
 		if (score > bestOffTopicScore) bestOffTopicScore = score;
 	}
 
+	// A match counts only if it clears the absolute floor AND beats the best
+	// off-topic anchor by a clear margin. The margin rejects coherent off-topic
+	// questions, which sit closer to an off-topic anchor than to any FAQ (a
+	// negative margin), even when their raw score clears the floor. (Keyboard
+	// gibberish was already filtered by isGibberish above.) See CONFIDENCE_MARGIN.
+	const confidenceMargin = bestScore - bestOffTopicScore;
 	if (
 		!bestFaq ||
 		bestScore < SIMILARITY_THRESHOLD ||
-		bestOffTopicScore > bestScore
+		confidenceMargin < CONFIDENCE_MARGIN
 	) {
 		return {
 			answer: FALLBACK_ANSWER[language],

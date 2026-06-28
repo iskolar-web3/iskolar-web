@@ -29,6 +29,8 @@ export const FAQS: Faq[] = [
 			answer:
 				"iSkolar is a centralized scholarship hub that connects students with scholarship providers. It streamlines everything from finding scholarships to receiving funds, making education funding accessible and transparent.",
 			aliases: [
+				"iskolar",
+				"iSkolar",
 				"what's iSkolar",
 				"tell me about iSkolar",
 				"what is this platform",
@@ -68,10 +70,46 @@ export const FAQS: Faq[] = [
 				"Ako ang iSkolar assistant, isang chatbot na sumasagot sa mga karaniwang tanong tungkol sa iSkolar, tulad ng kung paano mag-apply, sino ang pwedeng sumali, at paano gumagana ang scholarship. Magtanong ka lang!",
 			aliases: [
 				"sino ka",
+				"sino kayo",
+				"sino po kayo",
 				"ano ka",
 				"bot ka ba",
 				"ano ang kaya mong gawin",
 				"kanino ako nakikipag-usap",
+			],
+		},
+	},
+	{
+		en: {
+			question: "Hi there!",
+			answer:
+				"Hello! I'm the iSkolar assistant. You can ask me anything about iSkolar anytime, like how to apply, who can join, or how scholarships work.",
+			aliases: [
+				"hi",
+				"hello",
+				"hey",
+				"yo",
+				"good morning",
+				"good afternoon",
+				"good evening",
+				"greetings",
+				"hello there",
+				"hi there",
+			],
+		},
+		tl: {
+			question: "Kumusta!",
+			answer:
+				"Kumusta! Ako ang iSkolar assistant. Maaari kang magtanong tungkol sa iSkolar anumang oras, tulad ng kung paano mag-apply, sino ang pwedeng sumali, o paano gumagana ang scholarship.",
+			aliases: [
+				"kumusta",
+				"kamusta",
+				"hello po",
+				"uy",
+				"magandang umaga",
+				"magandang hapon",
+				"magandang gabi",
+				"kumusta po",
 			],
 		},
 	},
@@ -224,7 +262,7 @@ export const FAQS: Faq[] = [
 	},
 	{
 		en: {
-			question: "What role do schools play on iSkolar?",
+			question: "What role do schools play?",
 			answer:
 				"Schools can:\n- Monitor student scholarships\n- Receive tuition in fiat or crypto\n- Verify enrollment\n- Support transparency between students and sponsors",
 			aliases: [
@@ -241,6 +279,60 @@ export const FAQS: Faq[] = [
 				"ano ang ginagawa ng mga paaralan",
 				"paano ginagamit ng paaralan ang iSkolar",
 				"papel ng paaralan",
+			],
+		},
+	},
+	{
+		en: {
+			question: "What can students do on iSkolar?",
+			answer:
+				"As a student, you can:\n- Discover scholarships matched to you\n- Apply and upload your documents in the app\n- Track each application in real time\n- Receive approved funds in your linked wallet",
+			aliases: [
+				"what do students do",
+				"what is the student role",
+				"what can I do as a student",
+				"student features",
+				"how do students use iSkolar",
+				"I am a student",
+			],
+		},
+		tl: {
+			question: "Ano ang magagawa ng estudyante sa iSkolar?",
+			answer:
+				"Bilang estudyante, maaari mong:\n- Tuklasin ang mga scholarship na bagay sa iyo\n- Mag-apply at mag-upload ng dokumento sa app\n- Subaybayan ang bawat application nang real time\n- Matanggap ang aprubadong pondo sa iyong naka-link na wallet",
+			aliases: [
+				"ano ang ginagawa ng estudyante",
+				"ano ang papel ng estudyante",
+				"ano ang magagawa ko bilang estudyante",
+				"paano ginagamit ng estudyante ang iSkolar",
+				"estudyante ako",
+			],
+		},
+	},
+	{
+		en: {
+			question: "What can sponsors do on iSkolar?",
+			answer:
+				"As a sponsor, you can:\n- Create and customize scholarship programs\n- Review, shortlist, and select applicants\n- Verify your identity to build trust\n- Disburse funds transparently to your scholars",
+			aliases: [
+				"what do sponsors do",
+				"what is the sponsor role",
+				"what can I do as a sponsor",
+				"sponsor features",
+				"how do sponsors use iSkolar",
+				"I am a sponsor",
+			],
+		},
+		tl: {
+			question: "Ano ang magagawa ng sponsor sa iSkolar?",
+			answer:
+				"Bilang sponsor, maaari mong:\n- Gumawa at i-customize ang mga scholarship program\n- Suriin, i-shortlist, at piliin ang mga aplikante\n- I-verify ang iyong pagkakakilanlan para sa tiwala\n- Ipamahagi ang pondo nang transparent sa iyong mga scholar",
+			aliases: [
+				"ano ang ginagawa ng sponsor",
+				"ano ang papel ng sponsor",
+				"ano ang magagawa ko bilang sponsor",
+				"paano ginagamit ng sponsor ang iSkolar",
+				"sponsor ako",
 			],
 		},
 	},
@@ -395,7 +487,7 @@ export const FAQS: Faq[] = [
 		en: {
 			question: "Who is the team behind iSkolar?",
 			answer:
-				"iSkolar is built by a team of Filipino students. The founders:\n- [Justin Luzano](https://www.linkedin.com/in/justinluzano23/), CEO\n- [Louigie Caminoy](https://www.linkedin.com/in/louie1221), CTO\n- [Adam Ruadilla](https://www.linkedin.com/in/adam-ruadilla/), COO\n- [Jeselle Francisco](https://www.linkedin.com/in/maria-jeselle-francisco-736491369/), CFO\nMeet the full team on our About page.",
+				"iSkolar is built by a team of Filipino students. The founders:\n- [Justin Luzano](https://www.linkedin.com/in/justinluzano23/), CEO\n- [Louigie Caminoy](https://www.linkedin.com/in/louie1221), CTO\n- [Adam Ruadilla](https://www.linkedin.com/in/adam-ruadilla/), COO\n- [Jeselle Francisco](https://www.linkedin.com/in/maria-jeselle-francisco-736491369/), CFO\nMeet the full team on our [About page](https://iskolar.io/about#team).",
 			aliases: [
 				"who are the team",
 				"who are the teams",
@@ -412,7 +504,7 @@ export const FAQS: Faq[] = [
 		tl: {
 			question: "Sino ang team sa likod ng iSkolar?",
 			answer:
-				"Binuo ang iSkolar ng isang team ng mga Pilipinong estudyante. Ang mga founder:\n- [Justin Luzano](https://www.linkedin.com/in/justinluzano23/), CEO\n- [Louigie Caminoy](https://www.linkedin.com/in/louie1221), CTO\n- [Adam Ruadilla](https://www.linkedin.com/in/adam-ruadilla/), COO\n- [Jeselle Francisco](https://www.linkedin.com/in/maria-jeselle-francisco-736491369/), CFO\nMakikilala mo ang buong team sa aming About page.",
+				"Binuo ang iSkolar ng isang team ng mga Pilipinong estudyante. Ang mga founder:\n- [Justin Luzano](https://www.linkedin.com/in/justinluzano23/), CEO\n- [Louigie Caminoy](https://www.linkedin.com/in/louie1221), CTO\n- [Adam Ruadilla](https://www.linkedin.com/in/adam-ruadilla/), COO\n- [Jeselle Francisco](https://www.linkedin.com/in/maria-jeselle-francisco-736491369/), CFO\nMakikilala mo ang buong team sa aming [About page](https://iskolar.io/about#team).",
 			aliases: [
 				"sino ang team",
 				"sino ang mga team",
@@ -510,6 +602,40 @@ export const FAQS: Faq[] = [
 				"paano kita makakausap",
 				"support email",
 				"makipag-ugnayan",
+			],
+		},
+	},
+	{
+		en: {
+			question: "Is iSkolar on social media?",
+			answer:
+				"Follow iSkolar to stay updated:\n- [Facebook](https://www.facebook.com/profile.php?id=61575967087555)\n- [LinkedIn](https://www.linkedin.com/company/107364901)\n- [Instagram](https://www.instagram.com/iskolar_web3?igsh=NDNvZmkwNmxwbDl2)",
+			aliases: [
+				"what are your socials",
+				"what's your social media",
+				"iSkolar social media",
+				"do you have facebook",
+				"do you have instagram",
+				"do you have linkedin",
+				"where can I follow iSkolar",
+				"social media links",
+				"follow iSkolar",
+			],
+		},
+		tl: {
+			question: "Nasa social media ba ang iSkolar?",
+			answer:
+				"Oo! Sundan ang iSkolar para sa mga update:\n- [Facebook](https://www.facebook.com/profile.php?id=61575967087555)\n- [LinkedIn](https://www.linkedin.com/company/107364901)\n- [Instagram](https://www.instagram.com/iskolar_web3?igsh=NDNvZmkwNmxwbDl2)",
+			aliases: [
+				"ano ang socials ninyo",
+				"ano ang social media ninyo",
+				"social media ng iSkolar",
+				"may facebook ba kayo",
+				"may instagram ba kayo",
+				"may linkedin ba kayo",
+				"saan ko masusundan ang iSkolar",
+				"mga social media link",
+				"sundan ang iSkolar",
 			],
 		},
 	},
