@@ -39,10 +39,10 @@ import { handleError } from "@/lib/errorHandler";
 import { logger } from "@/lib/logger";
 import { formatDateTime } from "@/utils/formatting.utils";
 import {
-	ScholarshipApplicationStatus,
 	ScholarshipStatus,
 	type Applicant,
 } from "@/lib/scholarship/model";
+import { ScholarshipApplicationStatus } from "@/lib/scholarship/status";
 import {
 	endScholarship,
 	getApplicantsQuery,

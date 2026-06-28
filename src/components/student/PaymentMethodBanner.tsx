@@ -4,7 +4,7 @@ import { TriangleAlert } from "lucide-react";
 import { useAuth } from "@/auth";
 import { getPaymentMethodQuery } from "@/lib/student/api";
 import { getMyApplicationsQuery } from "@/lib/scholarship/api";
-import { ScholarshipApplicationStatus } from "@/lib/scholarship/model";
+import { ScholarshipApplicationStatus } from "@/lib/scholarship/status";
 import type { Student } from "@/lib/student/model";
 
 export function PaymentMethodBanner() {
