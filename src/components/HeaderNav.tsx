@@ -15,6 +15,7 @@ import {
 	Star,
 	BadgeCheck,
 	Trophy,
+	LayoutDashboard,
 } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -98,6 +99,7 @@ const studentNavItems: NavItem[] = [
  * Navigation items for sponsor users
  */
 const sponsorNavItems: NavItem[] = [
+	{ label: "Dashboard", path: "/overview", icon: LayoutDashboard },
 	{ label: "Scholarships", path: "/scholarships", icon: WalletCards },
 	{ label: "Scholars", path: "/scholars", icon: GraduationCap },
 	{ label: "Create", path: "/create", icon: Plus },
