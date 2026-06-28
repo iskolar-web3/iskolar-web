@@ -28,7 +28,6 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Notification } from "@/lib/notification/model";
 import {
 	formatTimeAgo,
@@ -401,15 +400,20 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 									) : null}
 								</button>
 							</PopoverTrigger>
-							<PopoverContent align="end" className="w-80 p-0 overflow-clip shadow-lg border border-border">
+							<PopoverContent
+								align="end"
+								className="w-80 p-0 overflow-clip shadow-lg border border-border"
+							>
 								<div className="px-4 py-3 border-b border-border">
 									<h2 className="text-sm text-primary">Notifications</h2>
 									{unreadCount > 0 && (
-										<p className="text-xs text-muted-foreground mt-0.5">{unreadCount} unread</p>
+										<p className="text-xs text-muted-foreground mt-0.5">
+											{unreadCount} unread
+										</p>
 									)}
 								</div>
 
-								<ScrollArea className="max-h-[420px]">
+								<div className="max-h-[420px] overflow-y-auto">
 									{notifications.length === 0 ? (
 										<div className="flex flex-col items-center justify-center py-12 px-4 gap-2 text-muted-foreground">
 											<Bell className="w-7 h-7 opacity-25" />
@@ -428,9 +432,13 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 														{getNotificationIcon(notif)}
 													</div>
 													<div className="flex-1 min-w-0">
-														<p className="text-sm font-medium text-primary leading-snug">{title}</p>
+														<p className="text-sm font-medium text-primary leading-snug">
+															{title}
+														</p>
 														{subtitle && (
-															<p className="text-xs text-muted-foreground mt-0.5 leading-snug">{subtitle}</p>
+															<p className="text-xs text-muted-foreground mt-0.5 leading-snug">
+																{subtitle}
+															</p>
 														)}
 													</div>
 													<div className="flex flex-col items-end gap-1 shrink-0">
@@ -445,7 +453,7 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 											);
 										})
 									)}
-								</ScrollArea>
+								</div>
 							</PopoverContent>
 						</Popover>
 

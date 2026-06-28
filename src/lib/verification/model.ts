@@ -9,19 +9,11 @@ export enum VerificationStatus {
 
 export const verificationRecordSchema = z.object({
 	id: z.string(),
-	userId: z.string(),
-	diditSessionId: z.string().nullable(),
-	diditSessionUrl: z.string().nullable(),
+	userId: z.uuidv4(),
+	diditSessionId: z.uuid(),
+	diditSessionUrl: z.url(),
 	status: z.enum(VerificationStatus),
-	verifiedAt: z.coerce.date().nullable(),
-	remarks: z.string(),
-	resubmissionCount: z.number(),
 	cooldownUntil: z.coerce.date().nullable(),
+	remarks: z.array(z.string()).default([]),
 });
 export type VerificationRecord = z.infer<typeof verificationRecordSchema>;
-
-export const publicVerificationSchema = z.object({
-	status: z.enum(VerificationStatus),
-	verifiedAt: z.coerce.date().nullable(),
-});
-export type PublicVerification = z.infer<typeof publicVerificationSchema>;

@@ -37,10 +37,7 @@ export default function EntityVerificationForm({
 
 		setSubmitting(true);
 		try {
-			const result = await startVerification("sponsors", {
-				registrationNumber: registrationNumber.trim(),
-				repName: repName.trim(),
-			});
+			const result = await startVerification();
 			window.location.href = result.verificationUrl;
 		} catch (err: any) {
 			setError(err.message || "Failed to start verification.");

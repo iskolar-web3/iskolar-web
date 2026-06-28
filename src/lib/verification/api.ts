@@ -1,21 +1,12 @@
+import { queryOptions } from "@tanstack/react-query";
 import { BACKEND_URL, type ApiResponse } from "../api";
-import {
-	verificationRecordSchema,
-	publicVerificationSchema,
-	type VerificationRecord,
-	type PublicVerification,
-} from "./model";
+import { verificationRecordSchema, type VerificationRecord } from "./model";
 
-export async function startVerification(
-	role: "students" | "sponsors",
-	extraFields?: { registrationNumber: string; repName: string },
-): Promise<{ verificationUrl: string }> {
-	const response = await fetch(`${BACKEND_URL}/${role}/me/verification`, {
+export async function startVerification(): Promise<{
+	verificationUrl: string;
+}> {
+	const response = await fetch(`${BACKEND_URL}/verifications/me`, {
 		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify(extraFields ?? {}),
 		credentials: "include",
 	});
 
@@ -28,35 +19,22 @@ export async function startVerification(
 	return result.data;
 }
 
-export async function getVerificationStatus(
-	role: "students" | "sponsors",
-): Promise<VerificationRecord | null> {
-	const response = await fetch(`${BACKEND_URL}/${role}/me/verification`, {
+export async function getVerificationStatus(): Promise<VerificationRecord | null> {
+	const response = await fetch(`${BACKEND_URL}/verifications/me`, {
 		method: "GET",
 		credentials: "include",
 	});
 
 	if (!response.ok) return null;
 
-	const result: ApiResponse<VerificationRecord | null> =
-		await response.json();
+	const result: ApiResponse<VerificationRecord> = await response.json();
 	if (!result.data) return null;
 
 	return verificationRecordSchema.parse(result.data);
 }
 
-export async function getPublicVerificationStatus(
-	userId: string,
-): Promise<PublicVerification | null> {
-	const response = await fetch(
-		`${BACKEND_URL}/users/${userId}/verification`,
-	);
-
-	if (!response.ok) return null;
-
-	const result: ApiResponse<PublicVerification | null> =
-		await response.json();
-	if (!result.data) return null;
-
-	return publicVerificationSchema.parse(result.data);
-}
+export const getVerificationStatusQuery = queryOptions({
+	queryKey: ["verification-status"],
+	queryFn: () => getVerificationStatus(),
+	enabled: true,
+});

@@ -4,15 +4,23 @@ Centralized and transparent scholarship application and management platform.
 
 ## Getting Started
 
-To install dependencies:
+### Prerequisites
+
+- [pnpm](https://pnpm.io/)
+- [NodeJS](https://nodejs.org/en)
+
+1. Install the [prerequisites](#prerequisites).
+2. Clone the repository.
+3. Install dependencies.
+
 ```sh
-bun install
+pnpm install
 ```
 
-To run:
+4. Then run using pnpm:
+
 ```sh
-bun dev
+pnpm dev
 ```
 
-open http://localhost:3000
-
+5. Open `http://localhost:3000`

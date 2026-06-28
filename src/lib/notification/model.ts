@@ -8,6 +8,9 @@ export enum NotificationType {
 	ApplicationShortlisted = "application:shortlisted",
 	ApplicationApproved = "application:approved",
 	ApplicationGranted = "application:granted",
+	ApplicationReceived = "application:received",
+	VerificationApproved = "verification:approved",
+	VerificationDeclined = "verification:declined",
 }
 
 export const notificationSchema = z.object({

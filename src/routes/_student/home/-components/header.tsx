@@ -12,7 +12,7 @@ export function HomeHeader(): JSX.Element {
 	];
 
 	const search = useSearch({ from: "/_student/home/" });
-	const navigate = useNavigate({ from: "/home" });
+	const navigate = useNavigate({ from: "/home/" });
 	const activeLabel = filters.find((f) => f.key === search.status)?.label ?? "All";
 
 	return (
