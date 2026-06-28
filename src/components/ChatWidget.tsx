@@ -240,7 +240,7 @@ export function ChatWidget(): JSX.Element {
 							className={cn(
 								"max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed",
 								m.role === "user"
-									? "self-end bg-primary text-primary-foreground rounded-br-sm"
+									? "self-end bg-blue-600 text-white rounded-br-sm"
 									: "self-start bg-muted text-foreground rounded-bl-sm",
 							)}
 						>
@@ -263,7 +263,7 @@ export function ChatWidget(): JSX.Element {
 									key={q}
 									type="button"
 									onClick={() => void send(q)}
-									className="rounded-full border border-black bg-black px-3 py-1.5 text-left text-xs text-white transition-colors hover:bg-black/80"
+									className="rounded-full bg-blue-600 px-3 py-1.5 text-left text-xs text-white transition-colors hover:bg-blue-700"
 								>
 									{q}
 								</button>
@@ -294,6 +294,7 @@ export function ChatWidget(): JSX.Element {
 					size="icon"
 					disabled={loading || !input.trim()}
 					aria-label="Send message"
+					className="bg-blue-600 text-white hover:bg-blue-700"
 				>
 					<Send className="size-4" />
 				</Button>
