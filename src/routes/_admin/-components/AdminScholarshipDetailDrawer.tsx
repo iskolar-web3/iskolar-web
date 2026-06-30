@@ -22,10 +22,10 @@ import { deleteScholarship } from "@/lib/scholarship/api";
 import {
 	FormFieldType,
 	type Scholarship,
-	ScholarshipApplicationStatus,
 	ScholarshipStatus,
 	ScholarshipType,
 } from "@/lib/scholarship/model";
+import { ScholarshipApplicationStatus } from "@/lib/scholarship/status";
 import { getSponsorName } from "@/lib/sponsor/api";
 import { toast } from "@/lib/toast";
 import { formatCurrency, formatDeadline } from "@/utils/formatting.utils";

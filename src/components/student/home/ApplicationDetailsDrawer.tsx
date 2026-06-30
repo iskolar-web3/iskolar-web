@@ -16,10 +16,8 @@ import {
 	formatDate,
 	formatDateTime,
 } from "@/utils/formatting.utils";
-import type {
-	Application,
-	ScholarshipApplicationStatus,
-} from "@/lib/scholarship/model";
+import type { Application } from "@/lib/scholarship/model";
+import { ScholarshipApplicationStatus } from "@/lib/scholarship/status";
 import { getSponsorName } from "@/lib/sponsor/api";
 import SubmittedFormsModal from "./SubmittedFormsModal";
 

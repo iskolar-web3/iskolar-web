@@ -1,6 +1,7 @@
 import z from "zod";
 import { enumDetailSchema } from "../api";
 import { contactDetailSchema, createContactRequestSchema } from "../user/model";
+import { ScholarshipApplicationStatus } from "../scholarship/status";
 
 export enum SponsorType {
 	Individual = "individual",
@@ -140,6 +141,31 @@ export const updateGovernmentSponsorRequestSchema =
 export type UpdateGovernmentSponsorRequest = z.infer<
 	typeof updateGovernmentSponsorRequestSchema
 >;
+
+export const applicantStatusEntrySchema = z.object({
+	status: enumDetailSchema(ScholarshipApplicationStatus),
+	count: z.number(),
+});
+export type ApplicantStatusEntry = z.infer<typeof applicantStatusEntrySchema>;
+
+export const slotFillRateSchema = z.object({
+	scholarshipId: z.uuidv4(),
+	name: z.string(),
+	granted: z.number(),
+	totalSlots: z.number(),
+});
+export type SlotFillRate = z.infer<typeof slotFillRateSchema>;
+
+export const sponsorDashboardSchema = z.object({
+	totalScholarships: z.number(),
+	activeScholarships: z.number(),
+	totalApplicants: z.number(),
+	totalScholarsGranted: z.number(),
+	totalDisbursementAmount: z.number(),
+	applicantsByStatus: applicantStatusEntrySchema.array(),
+	slotFillRates: slotFillRateSchema.array(),
+});
+export type SponsorDashboard = z.infer<typeof sponsorDashboardSchema>;
 
 export const anySponsorSchema = z.union([
 	individualSponsorSchema,
