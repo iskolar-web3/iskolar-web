@@ -1,45 +1,46 @@
-import { useState, useRef, useEffect } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { AnimatePresence } from "framer-motion";
 import {
-	Search,
-	Home,
-	Compass,
-	WalletCards,
-	Plus,
+	BadgeCheck,
 	Bell,
-	User,
-	X,
+	BookOpen,
+	Compass,
 	GraduationCap,
 	HandCoins,
-	BookOpen,
-	Star,
-	BadgeCheck,
-	Trophy,
+	Home,
 	LayoutDashboard,
+	MessageSquareQuote,
+	Plus,
+	Search,
+	Star,
+	Trophy,
+	User,
+	WalletCards,
+	X,
 } from "lucide-react";
-import { AnimatePresence } from "framer-motion";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import ProfileDropdown from "./profile/ProfileDropdown";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/auth";
-import { getStudentDisbursementsQuery } from "@/lib/disbursement/api";
-import { DisbursementStatus } from "@/lib/disbursement/model";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import type { Notification } from "@/lib/notification/model";
-import {
-	formatTimeAgo,
-	getNotificationTitle,
-	getNotificationSubtitle,
-} from "@/lib/notification/helper";
+import { getStudentDisbursementsQuery } from "@/lib/disbursement/api";
+import { DisbursementStatus } from "@/lib/disbursement/model";
 import {
 	getMyNotificationsQuery,
 	markMyNotificationsAsReadMutation,
 } from "@/lib/notification/api";
+import {
+	formatTimeAgo,
+	getNotificationSubtitle,
+	getNotificationTitle,
+} from "@/lib/notification/helper";
+import type { Notification } from "@/lib/notification/model";
 import { NotificationType } from "@/lib/notification/model";
+import ProfileDropdown from "./profile/ProfileDropdown";
 
 function getNotificationIcon(notif: Notification) {
 	switch (notif.notificationType.code) {
@@ -93,6 +94,7 @@ const studentNavItems: NavItem[] = [
 	{ label: "Home", path: "/home", icon: Home },
 	{ label: "Discover", path: "/discover", icon: Compass },
 	{ label: "Funds", path: "/disbursements", icon: HandCoins },
+	{ label: "Testimonials", path: "/testimonials", icon: MessageSquareQuote },
 ];
 
 /**
