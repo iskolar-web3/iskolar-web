@@ -104,6 +104,11 @@ const sponsorNavItems: NavItem[] = [
 	{ label: "Dashboard", path: "/overview", icon: LayoutDashboard },
 	{ label: "Scholarships", path: "/scholarships", icon: WalletCards },
 	{ label: "Scholars", path: "/scholars", icon: GraduationCap },
+	{
+		label: "Testimonials",
+		path: "/scholar-testimonials",
+		icon: MessageSquareQuote,
+	},
 	{ label: "Create", path: "/create", icon: Plus },
 ];
 

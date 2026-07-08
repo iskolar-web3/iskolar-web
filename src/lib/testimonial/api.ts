@@ -23,6 +23,29 @@ export const getMyTestimonialsQuery = () =>
 		queryFn: getMyTestimonials,
 	});
 
+async function getSponsorTestimonials(
+	scholarshipId?: string,
+): Promise<Testimonial[]> {
+	const url = new URL(`${BACKEND_URL}/testimonials`);
+	if (scholarshipId) {
+		url.searchParams.append("scholarshipId", scholarshipId);
+	}
+
+	const response = await fetch(url.toString(), {
+		method: "GET",
+		credentials: "include",
+	});
+	const result: ApiResponse<Testimonial[]> = await safeResponseJson(response);
+
+	return testimonialSchema.array().default([]).parse(result.data);
+}
+
+export const getSponsorTestimonialsQuery = (scholarshipId?: string) =>
+	queryOptions({
+		queryKey: ["testimonials", "sponsor", scholarshipId ?? "all"],
+		queryFn: () => getSponsorTestimonials(scholarshipId),
+	});
+
 export async function createTestimonial(
 	data: CreateTestimonialRequest,
 ): Promise<ApiResponse<Testimonial>> {
