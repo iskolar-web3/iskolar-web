@@ -1,4 +1,5 @@
 import z from "zod";
+import { studentSchema } from "@/lib/student/model";
 
 export enum ReportStatus {
 	Pending = "pending",
@@ -43,12 +44,17 @@ const reportAttachmentSchema = z.object({
 	url: z.string(),
 });
 
+const reportScholarshipSchema = z.object({
+	id: z.uuidv4(),
+	name: z.string(),
+	sponsorId: z.uuidv4(),
+});
+
 export const reportSchema = z.object({
 	id: z.uuidv4(),
 	createdAt: z.coerce.date(),
 	updatedAt: z.coerce.date(),
 	scholarshipApplicationId: z.uuidv4(),
-	studentId: z.uuidv4(),
 	title: z.string(),
 	description: z.string(),
 	startedAt: z.coerce.date(),
@@ -57,7 +63,17 @@ export const reportSchema = z.object({
 	remarks: z.string().nullable(),
 	reviewedBy: z.uuidv4().nullable(),
 	reviewedAt: z.coerce.date().nullable(),
-	scholarshipName: z.string(),
+	scholarship: reportScholarshipSchema,
+	student: studentSchema,
 	attachments: reportAttachmentSchema.array(),
 });
 export type Report = z.output<typeof reportSchema>;
+
+export const getReportsQueryParamSchema = z
+	.object({
+		scholarshipId: z.uuidv4(),
+		studentId: z.uuidv4(),
+		status: z.enum(ReportStatus),
+	})
+	.partial();
+export type GetReportsQueryParam = z.infer<typeof getReportsQueryParamSchema>;
