@@ -32,6 +32,12 @@ export const createReportRequestSchema = z
 	);
 export type CreateReportRequest = z.infer<typeof createReportRequestSchema>;
 
+export const updateReportRequestSchema = z.object({
+	id: z.uuidv4(),
+	reportingPeriodEnd: z.coerce.date({ error: "End date is required" }),
+});
+export type UpdateReportRequest = z.infer<typeof updateReportRequestSchema>;
+
 const reportAttachmentSchema = z.object({
 	id: z.uuidv4(),
 	url: z.string(),

@@ -28,6 +28,7 @@ import { ReportStatus } from "@/lib/report/model";
 import { getMyApplicationsQuery } from "@/lib/scholarship/api";
 import { ScholarshipApplicationStatus } from "@/lib/scholarship/status";
 import { ReportFormDialog } from "./-components/ReportFormDialog";
+import { SetEndDateDialog } from "./-components/SetEndDateDialog";
 
 export const Route = createFileRoute("/_student/reports/")({
 	component: ReportsPage,
@@ -56,7 +57,15 @@ const STATUS_LABEL: Record<ReportStatus, string> = {
 	[ReportStatus.Rejected]: "Rejected",
 };
 
-function ReportCard({ report }: { report: Report }) {
+function ReportCard({
+	report,
+	onSetEndDate,
+}: {
+	report: Report;
+	onSetEndDate: () => void;
+}) {
+	const isOngoing = !report.endedAt;
+
 	return (
 		<Card>
 			<CardHeader>
@@ -68,9 +77,14 @@ function ReportCard({ report }: { report: Report }) {
 				</CardAction>
 			</CardHeader>
 			<CardContent className="flex flex-col gap-2">
-				<p className="text-sm text-muted-foreground">
-					{report.scholarshipName} &middot; {formatDate(report.startedAt)}
-					{report.endedAt ? ` - ${formatDate(report.endedAt)}` : ""}
+				<p className="flex items-center gap-2 text-sm text-muted-foreground">
+					{report.scholarshipName} &middot; {formatDate(report.startedAt)} -{" "}
+					{report.endedAt ? formatDate(report.endedAt) : "Present"}
+					{isOngoing && report.status === ReportStatus.Pending && (
+						<Button variant="outline" size="sm" onClick={onSetEndDate}>
+							Set end date
+						</Button>
+					)}
 				</p>
 				<p className="text-sm text-muted-foreground">{report.description}</p>
 				{report.remarks && (
@@ -108,6 +122,9 @@ function ReportCard({ report }: { report: Report }) {
 
 function ReportsPage() {
 	const [formOpen, setFormOpen] = useState(false);
+	const [settingEndDateFor, setSettingEndDateFor] = useState<Report | null>(
+		null,
+	);
 
 	const grantedQuery = useQuery(
 		getMyApplicationsQuery({ status: ScholarshipApplicationStatus.Granted }),
@@ -172,7 +189,11 @@ function ReportsPage() {
 				) : (
 					<div className="space-y-3">
 						{reports.map((report) => (
-							<ReportCard key={report.id} report={report} />
+							<ReportCard
+								key={report.id}
+								report={report}
+								onSetEndDate={() => setSettingEndDateFor(report)}
+							/>
 						))}
 					</div>
 				)}
@@ -182,6 +203,12 @@ function ReportsPage() {
 				open={formOpen}
 				onOpenChange={setFormOpen}
 				grantedApplications={grantedApplications}
+			/>
+
+			<SetEndDateDialog
+				open={!!settingEndDateFor}
+				onOpenChange={(next) => !next && setSettingEndDateFor(null)}
+				report={settingEndDateFor}
 			/>
 		</div>
 	);
