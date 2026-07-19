@@ -11,4 +11,4 @@ Disallow: /create
 Disallow: /scholarship/
 Disallow: /profile/
 
-Sitemap: https://iskolar.io/sitemap.xml
+Sitemap: https://www.iskolar.io/sitemap.xml
