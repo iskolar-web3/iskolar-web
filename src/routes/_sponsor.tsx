@@ -40,7 +40,7 @@ function SponsorLayout(): JSX.Element {
 			<HeaderNav role="sponsor" notifications={notifications.data || []} />
 			<SponsorSidebar />
 			<div className="pl-16 md:pl-60">
-				<div className="w-full px-4 md:px-14 pt-21 md:pt-24 pb-6">
+				<div className="w-full px-2 md:px-6 pt-18 md:pt-21 pb-6">
 					<Outlet />
 				</div>
 			</div>
