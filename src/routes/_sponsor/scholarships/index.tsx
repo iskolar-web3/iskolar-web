@@ -468,7 +468,7 @@ function Scholarships() {
 			</AnimatePresence>
 
 			<div className="space-y-4 mt-4 lg:mt-0">
-				<div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-4">
+				<div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-0">
 					<motion.aside
 						initial={filtersAnim.shouldAnimate ? { opacity: 0, x: -20 } : false}
 						animate={{ opacity: 1, x: 0 }}
@@ -476,13 +476,7 @@ function Scholarships() {
 						onAnimationComplete={filtersAnim.markAnimated}
 						className="hidden lg:block"
 					>
-						<div className="h-fit sticky top-4">
-							<div className="bg-card rounded-md text-center p-4 border border-[#D3DCF6] shadow-sm mb-2">
-								<p className="text-xl text-primary tracking-wide">
-									My Scholarships
-								</p>
-							</div>
-
+						<div className="h-fit sticky top-4 pr-4">
 							<div className="bg-card rounded-md border border-[#D3DCF6] shadow-[0_20px_40px_rgba(17,24,39,0.04)]">
 								<div className="p-6">
 									<div className="flex items-center gap-2 mb-6">
