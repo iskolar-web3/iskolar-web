@@ -6,7 +6,6 @@ import {
 	CheckCircle2,
 	GraduationCap,
 	TrendingUp,
-	Wallet,
 } from "lucide-react";
 import {
 	Cell,
@@ -134,12 +133,6 @@ export default function SponsorOverview() {
 			value: data.totalScholarsGranted,
 			icon: CheckCircle2,
 			description: "Students successfully awarded.",
-		},
-		{
-			title: "Total Disbursed",
-			value: formatPeso(data.totalDisbursementAmount),
-			icon: Wallet,
-			description: "Total funds sent to scholars.",
 		},
 	];
 
