@@ -97,22 +97,6 @@ const studentNavItems: NavItem[] = [
 ];
 
 /**
- * Navigation items for sponsor users
- */
-const sponsorNavItems: NavItem[] = [
-	{ label: "Dashboard", path: "/overview", icon: LayoutDashboard },
-	{ label: "Scholarships", path: "/scholarships", icon: WalletCards },
-	{ label: "Scholars", path: "/scholars", icon: GraduationCap },
-	{
-		label: "Testimonials",
-		path: "/scholar-testimonials",
-		icon: MessageSquareQuote,
-	},
-	{ label: "Reports", path: "/scholar-reports", icon: FileText },
-	{ label: "Create", path: "/create", icon: Plus },
-];
-
-/**
  * Main navigation header component
  * Provides role-based navigation, search functionality, notifications, and profile access
  * @param props - Component props
