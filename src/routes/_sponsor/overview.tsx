@@ -79,8 +79,8 @@ function DashboardSkeleton() {
 	return (
 		<div className="space-y-6">
 			<Skeleton className="h-52 rounded-4xl" />
-			<div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
-				{Array.from({ length: 5 }).map((_, i) => (
+			<div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+				{Array.from({ length: 4 }).map((_, i) => (
 					<Skeleton key={i} className="h-36 rounded-3xl" />
 				))}
 			</div>
@@ -199,7 +199,7 @@ export default function SponsorOverview() {
 			</div>
 
 			{/* Metric cards */}
-			<div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
+			<div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
 				{metricCards.map((m) => (
 					<MetricCard key={m.title} {...m} />
 				))}
