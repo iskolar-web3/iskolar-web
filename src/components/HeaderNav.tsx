@@ -6,17 +6,13 @@ import {
 	Bell,
 	BookOpen,
 	Compass,
-	GraduationCap,
 	HandCoins,
 	Home,
-	LayoutDashboard,
 	MessageSquareQuote,
-	Plus,
 	Search,
 	Star,
 	Trophy,
 	User,
-	WalletCards,
 	X,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -98,21 +94,6 @@ const studentNavItems: NavItem[] = [
 ];
 
 /**
- * Navigation items for sponsor users
- */
-const sponsorNavItems: NavItem[] = [
-	{ label: "Dashboard", path: "/overview", icon: LayoutDashboard },
-	{ label: "Scholarships", path: "/scholarships", icon: WalletCards },
-	{ label: "Scholars", path: "/scholars", icon: GraduationCap },
-	{
-		label: "Testimonials",
-		path: "/scholar-testimonials",
-		icon: MessageSquareQuote,
-	},
-	{ label: "Create", path: "/create", icon: Plus },
-];
-
-/**
  * Main navigation header component
  * Provides role-based navigation, search functionality, notifications, and profile access
  * @param props - Component props
@@ -127,7 +108,6 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 	const searchInputRef = useRef<HTMLInputElement>(null);
 	const searchContainerRef = useRef<HTMLDivElement>(null);
 
-	const navItems = role === "student" ? studentNavItems : sponsorNavItems;
 	const logoRedirectPath = role === "student" ? "/home" : "/scholarships";
 
 	// Close dropdown when clicking outside
@@ -317,34 +297,36 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 						</div>
 					)}
 
-					{/* Navigation Links */}
-					<div className="flex items-center gap-6 absolute left-1/2 transform -translate-x-1/2">
-						{navItems.map((item) => {
-							const Icon = item.icon;
+					{/* Navigation Links (student only — sponsor nav lives in the sidebar) */}
+					{role === "student" && (
+						<div className="flex items-center gap-6 absolute left-1/2 transform -translate-x-1/2">
+							{studentNavItems.map((item) => {
+								const Icon = item.icon;
 
-							return (
-								<Link
-									key={item.path}
-									to={item.path}
-									className="group flex flex-col items-center gap-0.5 md:gap-1 transition-colors"
-									activeProps={{ className: "active" }}
-								>
-									<span className="relative">
-										<Icon className="w-4 md:w-5 h-4 md:h-5 text-[#9CA3AF] group-[.active]:text-primary" />
-										{item.path === "/disbursements" &&
-											pendingDisbursementCount > 0 && (
-												<span className="absolute -top-1.5 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] text-white">
-													{pendingDisbursementCount}
-												</span>
-											)}
-									</span>
-									<span className="text-[11px] md:text-xs text-inactive group-[.active]:text-primary">
-										{item.label}
-									</span>
-								</Link>
-							);
-						})}
-					</div>
+								return (
+									<Link
+										key={item.path}
+										to={item.path}
+										className="group flex flex-col items-center gap-0.5 md:gap-1 transition-colors"
+										activeProps={{ className: "active" }}
+									>
+										<span className="relative">
+											<Icon className="w-4 md:w-5 h-4 md:h-5 text-[#9CA3AF] group-[.active]:text-primary" />
+											{item.path === "/disbursements" &&
+												pendingDisbursementCount > 0 && (
+													<span className="absolute -top-1.5 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] text-white">
+														{pendingDisbursementCount}
+													</span>
+												)}
+										</span>
+										<span className="text-[11px] md:text-xs text-inactive group-[.active]:text-primary">
+											{item.label}
+										</span>
+									</Link>
+								);
+							})}
+						</div>
+					)}
 
 					{/* Notifications and Profile */}
 					<div className="flex items-center gap-1 md:gap-2 shrink-0">
