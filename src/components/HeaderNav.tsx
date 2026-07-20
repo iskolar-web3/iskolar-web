@@ -7,7 +7,6 @@ import {
 	BookOpen,
 	Compass,
 	FileText,
-	GraduationCap,
 	HandCoins,
 	Home,
 	MessageSquareQuote,
