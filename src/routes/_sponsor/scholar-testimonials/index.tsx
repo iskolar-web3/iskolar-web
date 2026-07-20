@@ -23,12 +23,73 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { getMyScholarshipsQuery } from "@/lib/scholarship/api";
 import type { AnySponsor } from "@/lib/sponsor/model";
+import { Gender, type Student } from "@/lib/student/model";
 import { getSponsorTestimonialsQuery } from "@/lib/testimonial/api";
 import type { Testimonial } from "@/lib/testimonial/model";
+import { ContactType } from "@/lib/user/model";
 
 export const Route = createFileRoute("/_sponsor/scholar-testimonials/")({
 	component: SponsorTestimonialsPage,
 });
+
+// #region TEMP_MOCK_DATA — delete this block plus the line tagged
+// "TEMP: mock" below to remove the design preview data.
+function mockStudent(firstName: string, lastName: string): Student {
+	return {
+		id: `mock-student-${firstName}`,
+		userId: `mock-user-${firstName}`,
+		firstName,
+		middleName: null,
+		lastName,
+		birthDate: new Date("2003-05-14"),
+		gender: { id: 1, name: "Female", code: Gender.Female },
+		school: null,
+		educationLevel: null,
+		schoolName: "Polytechnic University of the Philippines",
+		contact: {
+			id: `mock-contact-${firstName}`,
+			name: "Mobile",
+			code: ContactType.Phone,
+			value: "09171234567",
+		},
+		avatarUrl: null,
+		email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@example.com`,
+	};
+}
+
+const MOCK_TESTIMONIALS: Testimonial[] = [
+	{
+		id: "mock-testimonial-1",
+		createdAt: new Date("2026-05-02"),
+		updatedAt: new Date("2026-05-02"),
+		content:
+			"This scholarship covered my tuition and gave me room to focus on my thesis instead of picking up part-time work. I'm graduating on time because of it.",
+		isSharedWithSponsor: true,
+		scholarship: { id: "mock-scholarship-1", name: "Tomorrow Fund Scholarship" },
+		student: mockStudent("Maria", "Santos"),
+	},
+	{
+		id: "mock-testimonial-2",
+		createdAt: new Date("2026-03-18"),
+		updatedAt: new Date("2026-03-18"),
+		content:
+			"Applying was straightforward and the funds came through faster than I expected. It made a real difference for my family this semester.",
+		isSharedWithSponsor: true,
+		scholarship: { id: "mock-scholarship-2", name: "STEM Access Grant" },
+		student: mockStudent("Juan", "Dela Cruz"),
+	},
+	{
+		id: "mock-testimonial-3",
+		createdAt: new Date("2026-01-27"),
+		updatedAt: new Date("2026-01-27"),
+		content:
+			"Beyond the funding, the mentorship check-ins kept me accountable. I wouldn't have finished my capstone project without that support.",
+		isSharedWithSponsor: true,
+		scholarship: { id: "mock-scholarship-1", name: "Tomorrow Fund Scholarship" },
+		student: mockStudent("Angelica", "Reyes"),
+	},
+];
+// #endregion TEMP_MOCK_DATA
 
 function formatDate(date: Date): string {
 	return date.toLocaleDateString("en-PH", {
@@ -54,7 +115,7 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
 						</AvatarFallback>
 					</Avatar>
 					<div className="min-w-0">
-						<CardTitle className="truncate">
+						<CardTitle className="truncate font-normal">
 							{student.firstName} {student.lastName}
 						</CardTitle>
 						<p className="truncate text-xs text-muted-foreground">
@@ -85,7 +146,7 @@ function SponsorTestimonialsPage() {
 	);
 
 	const scholarships = scholarshipsQuery.data ?? [];
-	const testimonials = testimonialsQuery.data ?? [];
+	const testimonials = MOCK_TESTIMONIALS; // TEMP: mock — restore to `testimonialsQuery.data ?? []`
 
 	return (
 		<div className="min-h-screen">

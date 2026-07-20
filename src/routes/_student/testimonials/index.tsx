@@ -35,18 +35,66 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { getMyApplicationsQuery } from "@/lib/scholarship/api";
 import { ScholarshipApplicationStatus } from "@/lib/scholarship/status";
-import type { Student } from "@/lib/student/model";
+import { Gender, type Student } from "@/lib/student/model";
 import {
 	getMyTestimonialsQuery,
 	withdrawTestimonial,
 } from "@/lib/testimonial/api";
 import type { Testimonial } from "@/lib/testimonial/model";
 import { toast } from "@/lib/toast";
+import { ContactType } from "@/lib/user/model";
 import { TestimonialFormDialog } from "./-components/TestimonialFormDialog";
 
 export const Route = createFileRoute("/_student/testimonials/")({
 	component: TestimonialsPage,
 });
+
+// #region TEMP_MOCK_DATA — delete this block plus the two lines tagged
+// "TEMP: mock" below to remove the design preview data.
+const MOCK_STUDENT: Student = {
+	id: "mock-student",
+	userId: "mock-user",
+	firstName: "Maria",
+	middleName: null,
+	lastName: "Santos",
+	birthDate: new Date("2003-05-14"),
+	gender: { id: 1, name: "Female", code: Gender.Female },
+	school: null,
+	educationLevel: null,
+	schoolName: "Polytechnic University of the Philippines",
+	contact: {
+		id: "mock-contact",
+		name: "Mobile",
+		code: ContactType.Phone,
+		value: "09171234567",
+	},
+	avatarUrl: null,
+	email: "maria.santos@example.com",
+};
+
+const MOCK_TESTIMONIALS: Testimonial[] = [
+	{
+		id: "mock-testimonial-1",
+		createdAt: new Date("2026-05-02"),
+		updatedAt: new Date("2026-05-02"),
+		content:
+			"This scholarship covered my tuition and gave me room to focus on my thesis instead of picking up part-time work. I'm graduating on time because of it.",
+		isSharedWithSponsor: true,
+		scholarship: { id: "mock-scholarship-1", name: "Tomorrow Fund Scholarship" },
+		student: MOCK_STUDENT,
+	},
+	{
+		id: "mock-testimonial-2",
+		createdAt: new Date("2026-03-18"),
+		updatedAt: new Date("2026-03-18"),
+		content:
+			"Applying was straightforward and the funds came through faster than I expected. It made a real difference for my family this semester.",
+		isSharedWithSponsor: false,
+		scholarship: { id: "mock-scholarship-2", name: "STEM Access Grant" },
+		student: MOCK_STUDENT,
+	},
+];
+// #endregion TEMP_MOCK_DATA
 
 function formatDate(date: Date): string {
 	return date.toLocaleDateString("en-PH", {
@@ -113,8 +161,8 @@ function TestimonialsPage() {
 	const testimonialsQuery = useQuery(getMyTestimonialsQuery());
 
 	const grantedApplications = grantedQuery.data ?? [];
-	const testimonials = testimonialsQuery.data ?? [];
-	const isEligible = grantedApplications.length > 0;
+	const testimonials = MOCK_TESTIMONIALS; // TEMP: mock — restore to `testimonialsQuery.data ?? []`
+	const isEligible = true; // TEMP: mock — restore to `grantedApplications.length > 0`
 
 	const withdrawMutation = useMutation({
 		mutationFn: withdrawTestimonial,
