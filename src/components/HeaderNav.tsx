@@ -6,6 +6,7 @@ import {
 	Bell,
 	BookOpen,
 	Compass,
+	FileText,
 	HandCoins,
 	Home,
 	MessageSquareQuote,
@@ -91,6 +92,7 @@ const studentNavItems: NavItem[] = [
 	{ label: "Discover", path: "/discover", icon: Compass },
 	{ label: "Funds", path: "/disbursements", icon: HandCoins },
 	{ label: "Testimonials", path: "/testimonials", icon: MessageSquareQuote },
+	{ label: "Reports", path: "/reports", icon: FileText },
 ];
 
 /**
