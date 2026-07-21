@@ -225,34 +225,44 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 							className="shrink-0 cursor-pointer transition-opacity"
 							aria-label="Go to home"
 						>
-							<img
-								src="/logo.png"
-								alt="iSkolar Logo"
-								className="w-9 h-9 md:w-12 md:h-12"
-							/>
+							{role === "sponsor" ? (
+								<img
+									src="/logo2.png"
+									alt="iSkolar Logo"
+									className="h-8 w-auto md:h-10"
+								/>
+							) : (
+								<img
+									src="/logo.png"
+									alt="iSkolar Logo"
+									className="w-9 h-9 md:w-12 md:h-12"
+								/>
+							)}
 						</button>
 
 						{/* Search Bar - Desktop */}
-						<div className="hidden md:block md:w-64">
-							<div className="relative">
-								<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
-								<input
-									type="text"
-									placeholder="Search"
-									value={searchQuery}
-									onChange={(e) => setSearchQuery(e.target.value)}
-									onKeyDown={(e) => {
-										if (e.key === "Enter") {
-											handleSearchSubmit(e);
-										}
-									}}
-									className="w-full pl-10 pr-4 py-2 rounded-lg border border-border text-sm text-primary placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#3A52A6] focus:border-transparent"
-								/>
+						{role !== "sponsor" && (
+							<div className="hidden md:block md:w-64">
+								<div className="relative">
+									<Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
+									<input
+										type="text"
+										placeholder="Search"
+										value={searchQuery}
+										onChange={(e) => setSearchQuery(e.target.value)}
+										onKeyDown={(e) => {
+											if (e.key === "Enter") {
+												handleSearchSubmit(e);
+											}
+										}}
+										className="w-full pl-10 pr-4 py-2 rounded-lg border border-border text-sm text-primary placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#3A52A6] focus:border-transparent"
+									/>
+								</div>
 							</div>
-						</div>
+						)}
 
 						{/* Search Icon - Mobile */}
-						{!isSearchExpanded && (
+						{role !== "sponsor" && !isSearchExpanded && (
 							<button
 								type="button"
 								onClick={handleSearchIconClick}
@@ -265,7 +275,7 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 					</div>
 
 					{/* Expanded Search Bar - Mobile */}
-					{isSearchExpanded && (
+					{role !== "sponsor" && isSearchExpanded && (
 						<div
 							ref={searchContainerRef}
 							className="absolute left-0 right-0 top-0 h-16 bg-white z-50 px-4 flex items-center gap-2 md:hidden"
