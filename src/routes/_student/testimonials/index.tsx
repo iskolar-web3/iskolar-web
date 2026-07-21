@@ -193,7 +193,7 @@ function TestimonialsPage() {
 			<div className="mx-auto max-w-3xl space-y-5">
 				<div className="flex items-center justify-between">
 					<div>
-						<h1 className="text-2xl text-primary">My Testimonials</h1>
+						<h1 className="text-2xl font-normal text-primary">My Testimonials</h1>
 						<p className="mt-0.5 text-sm text-muted-foreground">
 							Share how your scholarship made an impact, and give feedback to
 							your sponsor.
