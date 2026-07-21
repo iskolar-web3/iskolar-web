@@ -27,110 +27,12 @@ import type { Report } from "@/lib/report/model";
 import { ReportStatus } from "@/lib/report/model";
 import { getMyApplicationsQuery } from "@/lib/scholarship/api";
 import { ScholarshipApplicationStatus } from "@/lib/scholarship/status";
-import { Gender, type Student } from "@/lib/student/model";
-import { ContactType } from "@/lib/user/model";
 import { ReportFormDialog } from "./-components/ReportFormDialog";
 import { SetEndDateDialog } from "./-components/SetEndDateDialog";
 
 export const Route = createFileRoute("/_student/reports/")({
 	component: ReportsPage,
 });
-
-// #region TEMP_MOCK_DATA — delete this block plus the two lines tagged
-// "TEMP: mock" below to remove the design preview data.
-const MOCK_STUDENT: Student = {
-	id: "mock-student",
-	userId: "mock-user",
-	firstName: "Maria",
-	middleName: null,
-	lastName: "Santos",
-	birthDate: new Date("2003-05-14"),
-	gender: { id: 1, name: "Female", code: Gender.Female },
-	school: null,
-	educationLevel: null,
-	schoolName: "Polytechnic University of the Philippines",
-	contact: {
-		id: "mock-contact",
-		name: "Mobile",
-		code: ContactType.Phone,
-		value: "09171234567",
-	},
-	avatarUrl: null,
-	email: "maria.santos@example.com",
-};
-
-const MOCK_REPORTS: Report[] = [
-	{
-		id: "mock-report-1",
-		createdAt: new Date("2026-06-10"),
-		updatedAt: new Date("2026-06-12"),
-		scholarshipApplicationId: "mock-application-1",
-		title: "First Semester Progress Report",
-		description:
-			"Completed the first semester with a GPA of 1.5. Used the scholarship funds for tuition and a new laptop for my thesis work.",
-		startedAt: new Date("2026-01-06"),
-		endedAt: new Date("2026-05-30"),
-		status: ReportStatus.Approved,
-		remarks: "Great progress, keep it up!",
-		reviewedBy: "mock-reviewer",
-		reviewedAt: new Date("2026-06-12"),
-		scholarship: {
-			id: "mock-scholarship-1",
-			name: "Tomorrow Fund Scholarship",
-			sponsorId: "mock-sponsor-1",
-		},
-		student: MOCK_STUDENT,
-		attachments: [
-			{ id: "mock-attachment-1", url: "https://example.com/grades.pdf" },
-			{ id: "mock-attachment-2", url: "https://example.com/coe.pdf" },
-		],
-	},
-	{
-		id: "mock-report-2",
-		createdAt: new Date("2026-07-01"),
-		updatedAt: new Date("2026-07-01"),
-		scholarshipApplicationId: "mock-application-1",
-		title: "Second Semester Progress Report",
-		description:
-			"Currently enrolled in second semester, on track to graduate on time. Balancing coursework with a part-time research assistantship.",
-		startedAt: new Date("2026-06-01"),
-		endedAt: null,
-		status: ReportStatus.Pending,
-		remarks: null,
-		reviewedBy: null,
-		reviewedAt: null,
-		scholarship: {
-			id: "mock-scholarship-1",
-			name: "Tomorrow Fund Scholarship",
-			sponsorId: "mock-sponsor-1",
-		},
-		student: MOCK_STUDENT,
-		attachments: [],
-	},
-	{
-		id: "mock-report-3",
-		createdAt: new Date("2025-12-05"),
-		updatedAt: new Date("2025-12-08"),
-		scholarshipApplicationId: "mock-application-2",
-		title: "Enrollment Verification Report",
-		description:
-			"Submitted proof of enrollment for the current term along with updated contact details.",
-		startedAt: new Date("2025-11-01"),
-		endedAt: new Date("2025-11-30"),
-		status: ReportStatus.Rejected,
-		remarks: "Missing certificate of registration, please resubmit.",
-		reviewedBy: "mock-reviewer",
-		reviewedAt: new Date("2025-12-08"),
-		scholarship: {
-			id: "mock-scholarship-2",
-			name: "STEM Access Grant",
-			sponsorId: "mock-sponsor-2",
-		},
-		student: MOCK_STUDENT,
-		attachments: [],
-	},
-];
-// #endregion TEMP_MOCK_DATA
 
 function formatDate(date: Date): string {
 	return date.toLocaleDateString("en-PH", {
@@ -230,8 +132,8 @@ function ReportsPage() {
 	const reportsQuery = useQuery(getMyReportsQuery());
 
 	const grantedApplications = grantedQuery.data ?? [];
-	const reports = MOCK_REPORTS; // TEMP: mock — restore to `reportsQuery.data ?? []`
-	const isEligible = true; // TEMP: mock — restore to `grantedApplications.length > 0`
+	const reports = reportsQuery.data ?? [];
+	const isEligible = grantedApplications.length > 0;
 
 	return (
 		<div className="min-h-screen">
