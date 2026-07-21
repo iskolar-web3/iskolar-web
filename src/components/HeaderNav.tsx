@@ -68,7 +68,7 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 	const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 	const profileDropdownRef = useRef<HTMLDivElement>(null);
 
-	const logoRedirectPath = role === "student" ? "/home" : "/scholarships";
+	const logoRedirectPath = role === "student" ? "/home" : "/overview";
 
 	// Close dropdown when clicking outside
 	useEffect(() => {
@@ -116,24 +116,23 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 
 	return (
 		<header className="fixed top-0 left-0 right-0 w-full bg-white border-b border-[#E0ECFF] z-50">
-			<div className="w-full mx-auto px-4 md:px-14">
-				<div className="flex items-center justify-between h-16 gap-4 relative">
-					{/* Logo */}
-					<button
-						type="button"
-						onClick={handleLogoClick}
-						className="shrink-0 cursor-pointer transition-opacity"
-						aria-label="Go to home"
-					>
-						<img
-							src="/logo2.png"
-							alt="iSkolar Logo"
-							className="h-8 w-auto md:h-10"
-						/>
-					</button>
+			<div className="flex items-center justify-between h-16 gap-4">
+				{/* Logo */}
+				<button
+					type="button"
+					onClick={handleLogoClick}
+					className="shrink-0 cursor-pointer pl-3 md:pl-4 transition-opacity"
+					aria-label="Go to home"
+				>
+					<img
+						src="/logo2.png"
+						alt="iSkolar Logo"
+						className="h-11 w-auto md:h-15"
+					/>
+				</button>
 
-					{/* Notifications and Profile */}
-					<div className="flex items-center gap-1 md:gap-2 shrink-0">
+				{/* Notifications and Profile */}
+				<div className="flex items-center gap-1 md:gap-2 shrink-0 pr-4 md:pr-14">
 						<Popover open={isNotifOpen} onOpenChange={handleNotifOpenChange}>
 							<PopoverTrigger asChild>
 								{/* Notification Bell */}
@@ -234,7 +233,6 @@ export default function HeaderNav({ role, notifications }: HeaderNavProps) {
 						</div>
 					</div>
 				</div>
-			</div>
 		</header>
 	);
 }
