@@ -26,7 +26,7 @@ async function getSponsorDashboard(): Promise<SponsorDashboard> {
 	if (!response.ok) {
 		throw new Error(result.message || "Failed to fetch dashboard.");
 	}
-	return sponsorDashboardSchema.parse(result.data);
+	return sponsorDashboardSchema.parse(result.data ?? {});
 }
 
 export const getSponsorDashboardQuery = () =>
