@@ -22,6 +22,9 @@ async function getSponsorDashboard(): Promise<SponsorDashboard> {
 		method: "GET",
 		credentials: "include",
 	});
+	if (response.status === 404) {
+		return sponsorDashboardSchema.parse({});
+	}
 	const result: ApiResponse<SponsorDashboard> = await safeResponseJson(response);
 	if (!response.ok) {
 		throw new Error(result.message || "Failed to fetch dashboard.");
