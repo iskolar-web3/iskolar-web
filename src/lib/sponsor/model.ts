@@ -157,13 +157,13 @@ export const slotFillRateSchema = z.object({
 export type SlotFillRate = z.infer<typeof slotFillRateSchema>;
 
 export const sponsorDashboardSchema = z.object({
-	totalScholarships: z.number(),
-	activeScholarships: z.number(),
-	totalApplicants: z.number(),
-	totalScholarsGranted: z.number(),
-	totalDisbursementAmount: z.number(),
-	applicantsByStatus: applicantStatusEntrySchema.array(),
-	slotFillRates: slotFillRateSchema.array(),
+	totalScholarships: z.number().catch(0),
+	activeScholarships: z.number().catch(0),
+	totalApplicants: z.number().catch(0),
+	totalScholarsGranted: z.number().catch(0),
+	totalDisbursementAmount: z.number().catch(0),
+	applicantsByStatus: applicantStatusEntrySchema.array().catch([]),
+	slotFillRates: slotFillRateSchema.array().catch([]),
 });
 export type SponsorDashboard = z.infer<typeof sponsorDashboardSchema>;
 
