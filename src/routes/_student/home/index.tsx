@@ -4,10 +4,8 @@ import { AnimatePresence } from "framer-motion";
 import { SEO } from "@/components/SEO";
 import ApplicationDetailsModal from "@/components/student/home/ApplicationDetailsDrawer";
 import { toast } from "@/lib/toast";
-import {
-	ScholarshipApplicationStatus,
-	type Application,
-} from "@/lib/scholarship/model";
+import { type Application } from "@/lib/scholarship/model";
+import { ScholarshipApplicationStatus } from "@/lib/scholarship/status";
 import { useQuery } from "@tanstack/react-query";
 import { getMyApplicationsQuery } from "@/lib/scholarship/api";
 import z from "zod";

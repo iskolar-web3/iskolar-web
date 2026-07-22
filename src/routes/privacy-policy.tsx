@@ -37,11 +37,11 @@ function PrivacyPolicyPage(): JSX.Element {
 					"@context": "https://schema.org",
 					"@type": "WebPage",
 					name: "Privacy Policy",
-					url: "https://iskolar.io/privacy-policy",
+					url: "https://www.iskolar.io/privacy-policy",
 					isPartOf: {
 						"@type": "WebSite",
 						name: "iSkolar",
-						url: "https://iskolar.io",
+						url: "https://www.iskolar.io",
 					},
 				}}
 			/>

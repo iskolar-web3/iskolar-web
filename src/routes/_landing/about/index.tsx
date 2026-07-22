@@ -61,13 +61,13 @@ function About() {
 					"@context": "https://schema.org",
 					"@type": "AboutPage",
 					name: "About iSkolar",
-					url: "https://iskolar.io/about",
+					url: "https://www.iskolar.io/about",
 					description:
 						"Learn about iSkolar's mission, vision, and the team building the future of scholarship management.",
 					isPartOf: {
 						"@type": "WebSite",
 						name: "iSkolar",
-						url: "https://iskolar.io",
+						url: "https://www.iskolar.io",
 					},
 				}}
 			/>

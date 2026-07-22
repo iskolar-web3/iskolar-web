@@ -72,6 +72,14 @@ function clearDraft(sponsorId: string) {
 	}
 }
 
+const DEFAULT_DEADLINE_DAYS_FROM_NOW = 30;
+
+function getDefaultApplicationDeadline(): Date {
+	const deadline = new Date();
+	deadline.setDate(deadline.getDate() + DEFAULT_DEADLINE_DAYS_FROM_NOW);
+	return deadline;
+}
+
 export function useScholarshipForm(sponsorId: string) {
 	const defaultFormValues: Partial<ScholarshipFormData> = {
 		name: "",
@@ -82,7 +90,7 @@ export function useScholarshipForm(sponsorId: string) {
 		totalAmountMin: undefined,
 		totalAmountMax: undefined,
 		totalSlots: undefined,
-		applicationDeadline: undefined,
+		applicationDeadline: getDefaultApplicationDeadline(),
 		imageUrl: undefined,
 		criterias: [],
 		requirements: [],

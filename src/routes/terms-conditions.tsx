@@ -37,11 +37,11 @@ function TermsConditionsPage(): JSX.Element {
 					"@context": "https://schema.org",
 					"@type": "WebPage",
 					name: "Terms and Conditions",
-					url: "https://iskolar.io/terms-conditions",
+					url: "https://www.iskolar.io/terms-conditions",
 					isPartOf: {
 						"@type": "WebSite",
 						name: "iSkolar",
-						url: "https://iskolar.io",
+						url: "https://www.iskolar.io",
 					},
 				}}
 			/>

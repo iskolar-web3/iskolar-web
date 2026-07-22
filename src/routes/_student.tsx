@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { type JSX } from "react";
 import HeaderNav from "@/components/HeaderNav";
+import StudentSidebar from "@/components/student/StudentSidebar";
 import { UserRole } from "@/lib/user/model";
 import { getDefaultPathOfRole } from "@/lib/api";
 import { PaymentMethodBanner } from "@/components/student/PaymentMethodBanner";
@@ -38,9 +39,12 @@ function StudentLayout(): JSX.Element {
 	return (
 		<div className="min-h-screen bg-background">
 			<HeaderNav role="student" notifications={notifications.data || []} />
-			<div className="w-full px-4 md:px-14 pt-21 md:pt-24 pb-6">
-				<PaymentMethodBanner />
-				<Outlet />
+			<StudentSidebar />
+			<div className="pl-16 md:pl-60">
+				<div className="w-full px-2 md:px-6 pt-18 md:pt-21 pb-6">
+					<PaymentMethodBanner />
+					<Outlet />
+				</div>
 			</div>
 			<FeedbackWidget />
 		</div>

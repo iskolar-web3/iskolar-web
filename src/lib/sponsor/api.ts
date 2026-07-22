@@ -1,3 +1,4 @@
+import { queryOptions } from "@tanstack/react-query";
 import { type ApiResponse, BACKEND_URL, safeResponseJson } from "../api";
 import {
 	type AnySponsor,
@@ -8,11 +9,32 @@ import {
 	type GovernmentSponsor,
 	type IndividualSponsor,
 	type OrganizationSponsor,
+	type SponsorDashboard,
+	sponsorDashboardSchema,
 	SponsorType,
 	type UpdateGovernmentSponsorRequest,
 	type UpdateIndividualSponsorRequest,
 	type UpdateOrganizationSponsorRequest,
 } from "./model";
+
+async function getSponsorDashboard(): Promise<SponsorDashboard> {
+	const response = await fetch(`${BACKEND_URL}/sponsors/me/dashboard`, {
+		method: "GET",
+		credentials: "include",
+	});
+	const result: ApiResponse<SponsorDashboard> = await safeResponseJson(response);
+	if (!response.ok) {
+		throw new Error(result.message || "Failed to fetch dashboard.");
+	}
+	return sponsorDashboardSchema.parse(result.data);
+}
+
+export const getSponsorDashboardQuery = () =>
+	queryOptions({
+		queryKey: ["sponsor", "dashboard"],
+		queryFn: getSponsorDashboard,
+		staleTime: 60 * 1000,
+	});
 
 export async function createIndividualSponsor(
 	value: CreateIndividualSponsorRequest,

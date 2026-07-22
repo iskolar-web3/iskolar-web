@@ -487,7 +487,7 @@ export const FAQS: Faq[] = [
 		en: {
 			question: "Who is the team behind iSkolar?",
 			answer:
-				"iSkolar is built by a team of Filipino students. The founders:\n- [Justin Luzano](https://www.linkedin.com/in/justinluzano23/), CEO\n- [Louigie Caminoy](https://www.linkedin.com/in/louie1221), CTO\n- [Adam Ruadilla](https://www.linkedin.com/in/adam-ruadilla/), COO\n- [Jeselle Francisco](https://www.linkedin.com/in/maria-jeselle-francisco-736491369/), CFO\nMeet the full team on our [About page](https://iskolar.io/about#team).",
+				"iSkolar is built by a team of Filipino students. The founders:\n- [Justin Luzano](https://www.linkedin.com/in/justinluzano23/), CEO\n- [Louigie Caminoy](https://www.linkedin.com/in/louie1221), CTO\n- [Adam Ruadilla](https://www.linkedin.com/in/adam-ruadilla/), COO\n- [Jeselle Francisco](https://www.linkedin.com/in/maria-jeselle-francisco-736491369/), CFO\nMeet the full team on our [About page](https://www.iskolar.io/about#team).",
 			aliases: [
 				"who are the team",
 				"who are the teams",
@@ -504,7 +504,7 @@ export const FAQS: Faq[] = [
 		tl: {
 			question: "Sino ang team sa likod ng iSkolar?",
 			answer:
-				"Binuo ang iSkolar ng isang team ng mga Pilipinong estudyante. Ang mga founder:\n- [Justin Luzano](https://www.linkedin.com/in/justinluzano23/), CEO\n- [Louigie Caminoy](https://www.linkedin.com/in/louie1221), CTO\n- [Adam Ruadilla](https://www.linkedin.com/in/adam-ruadilla/), COO\n- [Jeselle Francisco](https://www.linkedin.com/in/maria-jeselle-francisco-736491369/), CFO\nMakikilala mo ang buong team sa aming [About page](https://iskolar.io/about#team).",
+				"Binuo ang iSkolar ng isang team ng mga Pilipinong estudyante. Ang mga founder:\n- [Justin Luzano](https://www.linkedin.com/in/justinluzano23/), CEO\n- [Louigie Caminoy](https://www.linkedin.com/in/louie1221), CTO\n- [Adam Ruadilla](https://www.linkedin.com/in/adam-ruadilla/), COO\n- [Jeselle Francisco](https://www.linkedin.com/in/maria-jeselle-francisco-736491369/), CFO\nMakikilala mo ang buong team sa aming [About page](https://www.iskolar.io/about#team).",
 			aliases: [
 				"sino ang team",
 				"sino ang mga team",
