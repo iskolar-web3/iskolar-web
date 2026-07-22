@@ -61,8 +61,7 @@ function PHTimeClock() {
 
 	return (
 		<p className="text-sm text-muted-foreground">
-			{display}{" "}
-			<span className="font-medium text-secondary">PHT</span>
+			{display} <span className="font-medium text-secondary">PHT</span>
 		</p>
 	);
 }
@@ -78,15 +77,74 @@ function formatPeso(value: number): string {
 function DashboardSkeleton() {
 	return (
 		<div className="space-y-6">
-			<Skeleton className="h-52 rounded-4xl" />
+			{/* Header panel */}
+			<div className="relative overflow-hidden rounded-4xl border border-border bg-gradient-to-br from-card via-background to-card px-6 py-6 shadow-sm sm:px-8 sm:py-7">
+				<div className="relative flex flex-col gap-6">
+					<div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+						<div>
+							<Skeleton className="h-8 w-40 bg-muted-foreground" />
+							<Skeleton className="mt-2 h-4 w-64 bg-muted-foreground" />
+						</div>
+						<Skeleton className="h-4 w-56 bg-muted-foreground" />
+					</div>
+
+					<div className="grid gap-3 sm:grid-cols-3">
+						{Array.from({ length: 3 }).map((_, i) => (
+							<div
+								key={i}
+								className="rounded-3xl border border-border/60 bg-card/90 p-4 shadow-sm"
+							>
+								<Skeleton className="h-3 w-24 bg-muted-foreground" />
+								<Skeleton className="mt-2 h-7 w-16 bg-muted-foreground" />
+								<Skeleton className="mt-1 h-3.5 w-28 bg-muted-foreground" />
+							</div>
+						))}
+					</div>
+				</div>
+			</div>
+
+			{/* Metric cards */}
 			<div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
 				{Array.from({ length: 4 }).map((_, i) => (
-					<Skeleton key={i} className="h-36 rounded-3xl" />
+					<div
+						key={i}
+						className="rounded-[28px] border border-[#E0ECFF] bg-white/95 p-5 shadow-sm"
+					>
+						<div className="mb-4 flex items-start justify-between gap-4">
+							<Skeleton className="h-4 w-20 bg-muted-foreground" />
+							<Skeleton className="h-11 w-11 rounded-2xl bg-muted-foreground" />
+						</div>
+						<Skeleton className="h-8 w-14 bg-muted-foreground" />
+						<Skeleton className="mt-2 h-3 w-32 bg-muted-foreground" />
+					</div>
 				))}
 			</div>
+
+			{/* Charts + slot fill rates */}
 			<div className="grid gap-4 lg:grid-cols-2">
-				<Skeleton className="h-96 rounded-3xl" />
-				<Skeleton className="h-96 rounded-3xl" />
+				<div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
+					<Skeleton className="mb-1 h-4 w-40 bg-muted-foreground" />
+					<Skeleton className="mb-4 h-3 w-48 bg-muted-foreground" />
+					<div className="flex h-64 items-center justify-center">
+						<Skeleton className="h-48 w-48 rounded-full bg-muted-foreground" />
+					</div>
+				</div>
+
+				<div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
+					<Skeleton className="mb-1 h-4 w-32 bg-muted-foreground" />
+					<Skeleton className="mb-4 h-3 w-56 bg-muted-foreground" />
+					<div className="space-y-4">
+						{Array.from({ length: 4 }).map((_, i) => (
+							<div key={i}>
+								<div className="mb-1 flex items-center justify-between gap-2">
+									<Skeleton className="h-3.5 w-32 bg-muted-foreground" />
+									<Skeleton className="h-3 w-16 bg-muted-foreground" />
+								</div>
+								<Skeleton className="h-2 w-full rounded-full bg-muted-foreground" />
+							</div>
+						))}
+					</div>
+				</div>
 			</div>
 		</div>
 	);
@@ -142,8 +200,14 @@ export default function SponsorOverview() {
 		color: STATUS_COLORS[entry.status.code] ?? "#9CA3AF",
 	}));
 
-	const totalSlots = data.slotFillRates.reduce((sum, r) => sum + r.totalSlots, 0);
-	const totalGranted = data.slotFillRates.reduce((sum, r) => sum + r.granted, 0);
+	const totalSlots = data.slotFillRates.reduce(
+		(sum, r) => sum + r.totalSlots,
+		0,
+	);
+	const totalGranted = data.slotFillRates.reduce(
+		(sum, r) => sum + r.granted,
+		0,
+	);
 	const overallFillRate =
 		totalSlots > 0 ? Math.round((totalGranted / totalSlots) * 100) : 0;
 
@@ -192,7 +256,9 @@ export default function SponsorOverview() {
 							<p className="mt-2 text-2xl text-primary">
 								{formatPeso(data.totalDisbursementAmount)}
 							</p>
-							<p className="mt-1 text-sm text-muted-foreground">Total funds sent</p>
+							<p className="mt-1 text-sm text-muted-foreground">
+								Total funds sent
+							</p>
 						</div>
 					</div>
 				</div>

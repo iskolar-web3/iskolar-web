@@ -57,6 +57,29 @@ const STATUS_LABEL: Record<ReportStatus, string> = {
 	[ReportStatus.Rejected]: "Rejected",
 };
 
+function ReportCardSkeleton() {
+	return (
+		<Card>
+			<CardHeader>
+				<CardTitle>
+					<Skeleton className="h-5 w-48 bg-muted-foreground" />
+				</CardTitle>
+				<CardAction>
+					<Skeleton className="h-5 w-16 rounded-full bg-muted-foreground" />
+				</CardAction>
+			</CardHeader>
+			<CardContent className="flex flex-col gap-2">
+				<Skeleton className="h-4 w-56 bg-muted-foreground" />
+				<Skeleton className="h-4 w-full bg-muted-foreground" />
+				<Skeleton className="h-4 w-2/3 bg-muted-foreground" />
+			</CardContent>
+			<CardFooter>
+				<Skeleton className="h-3 w-32 bg-muted-foreground" />
+			</CardFooter>
+		</Card>
+	);
+}
+
 function ReportCard({
 	report,
 	onSetEndDate,
@@ -131,6 +154,7 @@ function ReportsPage() {
 	);
 	const reportsQuery = useQuery(getMyReportsQuery());
 
+	const isLoading = grantedQuery.isLoading || reportsQuery.isLoading;
 	const grantedApplications = grantedQuery.data ?? [];
 	const reports = reportsQuery.data ?? [];
 	const isEligible = grantedApplications.length > 0;
@@ -147,15 +171,19 @@ function ReportsPage() {
 							Keep your sponsor updated on your academic progress.
 						</p>
 					</div>
-					{isEligible && (
-						<Button onClick={() => setFormOpen(true)}>Submit Report</Button>
+					{isLoading ? (
+						<Skeleton className="h-9 w-32 rounded-md bg-muted-foreground" />
+					) : (
+						isEligible && (
+							<Button onClick={() => setFormOpen(true)}>Submit Report</Button>
+						)
 					)}
 				</div>
 
-				{grantedQuery.isLoading || reportsQuery.isLoading ? (
+				{isLoading ? (
 					<div className="space-y-3">
-						{["skel-1", "skel-2"].map((key) => (
-							<Skeleton key={key} className="h-40 w-full rounded-lg" />
+						{Array.from({ length: 3 }).map((_, index) => (
+							<ReportCardSkeleton key={`skel-${index}`} />
 						))}
 					</div>
 				) : !isEligible ? (

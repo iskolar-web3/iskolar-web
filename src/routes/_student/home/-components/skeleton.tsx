@@ -1,5 +1,5 @@
-import ScholarshipCardSkeleton from "@/components/ScholarshipCardSkeleton";
 import { Skeleton } from "@/components/ui/skeleton";
+import ApplicationCardSkeleton from "./ApplicationCardSkeleton";
 import type { JSX } from "react";
 
 type Props = {
@@ -47,7 +47,7 @@ export function HomeSkeleton(props: Props): JSX.Element {
 					<Skeleton className="h-[11px] w-16 bg-muted-foreground" />
 				</div>
 
-				<ScholarshipCardSkeleton index={props.index} />
+				<ApplicationCardSkeleton index={props.index} />
 			</div>
 		</div>
 	);

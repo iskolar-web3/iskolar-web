@@ -119,8 +119,23 @@ function SponsorTestimonialsPage() {
 
 				{testimonialsQuery.isLoading ? (
 					<div className="space-y-3">
-						{["skel-1", "skel-2"].map((key) => (
-							<Skeleton key={key} className="h-32 w-full rounded-lg" />
+						{["skel-1", "skel-2", "skel-3"].map((key) => (
+							<Card key={key}>
+								<CardHeader>
+									<div className="flex items-center gap-3">
+										<Skeleton className="size-10 shrink-0 rounded-full bg-muted-foreground" />
+										<div className="min-w-0 flex-1 space-y-1.5">
+											<Skeleton className="h-4 w-32 bg-muted-foreground" />
+											<Skeleton className="h-3 w-48 bg-muted-foreground" />
+										</div>
+									</div>
+								</CardHeader>
+								<CardContent className="space-y-2">
+									<Skeleton className="h-3 w-full bg-muted-foreground" />
+									<Skeleton className="h-3 w-full bg-muted-foreground" />
+									<Skeleton className="h-3 w-2/3 bg-muted-foreground" />
+								</CardContent>
+							</Card>
 						))}
 					</div>
 				) : testimonials.length === 0 ? (

@@ -11,6 +11,12 @@ import MetricCard from "@/components/admin/MetricCard";
 import SignupChart from "@/components/admin/SignupChart";
 import StudentDistributionChart from "@/components/admin/StudentDistributionChart";
 import { LocalTimeClock } from "@/components/landing/LocalTimeClock";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+	MetricCardsSkeleton,
+	SignupChartSkeleton,
+	StudentDistributionChartSkeleton,
+} from "./-components/DashboardSkeleton";
 import {
 	Users,
 	GraduationCap,
@@ -99,26 +105,44 @@ function AdminDashboard() {
 							<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
 								This week
 							</p>
-							<p className="mt-2 text-2xl text-primary">
-								{metrics?.signupsLast7Days ?? "--"}
+							{metricsLoading ? (
+								<Skeleton className="mt-2 h-8 w-12 bg-muted-foreground" />
+							) : (
+								<p className="mt-2 text-2xl text-primary">
+									{metrics?.signupsLast7Days ?? "--"}
+								</p>
+							)}
+							<p className="mt-1 text-sm text-[#6B7280]">
+								New signups recorded
 							</p>
-							<p className="mt-1 text-sm text-[#6B7280]">New signups recorded</p>
 						</div>
 						<div className="rounded-3xl border border-white/70 bg-white/90 p-4 shadow-[0_16px_35px_-28px_rgba(58,82,166,0.7)]">
 							<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
 								Peak day
 							</p>
-							<p className="mt-2 text-2xl text-primary">
-								{peakSignupDay?.count ?? "--"}
-							</p>
-							<p className="mt-1 text-sm text-[#6B7280]">
-								{peakSignupDay
-									? new Date(peakSignupDay.date).toLocaleDateString("en-US", {
-											month: "short",
-											day: "numeric",
-										})
-									: "Waiting for timeline"}
-							</p>
+							{timelineLoading ? (
+								<>
+									<Skeleton className="mt-2 h-8 w-12 bg-muted-foreground" />
+									<Skeleton className="mt-1 h-5 w-20 bg-muted-foreground" />
+								</>
+							) : (
+								<>
+									<p className="mt-2 text-2xl text-primary">
+										{peakSignupDay?.count ?? "--"}
+									</p>
+									<p className="mt-1 text-sm text-[#6B7280]">
+										{peakSignupDay
+											? new Date(peakSignupDay.date).toLocaleDateString(
+													"en-US",
+													{
+														month: "short",
+														day: "numeric",
+													},
+												)
+											: "Waiting for timeline"}
+									</p>
+								</>
+							)}
 						</div>
 						<div className="rounded-3xl border border-white/70 bg-white/90 p-4 shadow-[0_16px_35px_-28px_rgba(58,82,166,0.7)]">
 							<div className="flex items-start justify-between gap-3">
@@ -126,13 +150,19 @@ function AdminDashboard() {
 									<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
 										Engagement
 									</p>
-									<p className="mt-2 text-2xl">
-										{metrics?.activeUsersLast7Days ?? "--"}
-									</p>
+									{metricsLoading ? (
+										<Skeleton className="mt-2 h-8 w-12 bg-muted-foreground" />
+									) : (
+										<p className="mt-2 text-2xl">
+											{metrics?.activeUsersLast7Days ?? "--"}
+										</p>
+									)}
 								</div>
 								<ArrowUpRight className="mt-1 h-4 w-4 text-primary/80" />
 							</div>
-							<p className="mt-1 text-sm text-primary/70">Active in the last 7 days</p>
+							<p className="mt-1 text-sm text-primary/70">
+								Active in the last 7 days
+							</p>
 						</div>
 					</div>
 				</div>
@@ -140,14 +170,7 @@ function AdminDashboard() {
 
 			{/* Metric cards */}
 			{metricsLoading ? (
-				<div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
-					{Array.from({ length: 5 }).map((_, i) => (
-						<div
-							key={i}
-							className="h-36 animate-pulse rounded-[28px] border border-[#E0ECFF] bg-white"
-						/>
-					))}
-				</div>
+				<MetricCardsSkeleton />
 			) : metrics ? (
 				<div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
 					{spotlightMetrics.map((metric) => (
@@ -158,17 +181,18 @@ function AdminDashboard() {
 
 			{/* Signup timeline chart */}
 			{timelineLoading ? (
-				<div className="h-80 animate-pulse rounded-4xl border border-[#E0ECFF] bg-white" />
+				<SignupChartSkeleton />
 			) : timeline ? (
-				<SignupChart data={timeline} timeRange={timeRange} onTimeRangeChange={setTimeRange} />
+				<SignupChart
+					data={timeline}
+					timeRange={timeRange}
+					onTimeRangeChange={setTimeRange}
+				/>
 			) : null}
 
 			{/* Student school & education level distribution */}
 			{studentDistributionLoading ? (
-				<div className="grid gap-4 lg:grid-cols-2">
-					<div className="h-96 animate-pulse rounded-4xl border border-[#E0ECFF] bg-white" />
-					<div className="h-96 animate-pulse rounded-4xl border border-[#E0ECFF] bg-white" />
-				</div>
+				<StudentDistributionChartSkeleton />
 			) : studentDistribution ? (
 				<StudentDistributionChart data={studentDistribution} />
 			) : null}

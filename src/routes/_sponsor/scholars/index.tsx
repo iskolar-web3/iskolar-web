@@ -8,7 +8,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/auth";
 import { useAnimateOnce } from "@/hooks/useAnimateOnce";
-import { getMyScholarshipsQuery, getApplicantsQuery } from "@/lib/scholarship/api";
+import {
+	getMyScholarshipsQuery,
+	getApplicantsQuery,
+} from "@/lib/scholarship/api";
 import { type Applicant } from "@/lib/scholarship/model";
 import { ScholarshipApplicationStatus } from "@/lib/scholarship/status";
 import type { AnySponsor } from "@/lib/sponsor/model";
@@ -38,7 +41,13 @@ function formatDate(date: Date): string {
 	});
 }
 
-function ScholarCardSkeleton({ index, shouldAnimate }: { index: number; shouldAnimate: boolean }) {
+function ScholarCardSkeleton({
+	index,
+	shouldAnimate,
+}: {
+	index: number;
+	shouldAnimate: boolean;
+}) {
 	return (
 		<motion.div
 			initial={shouldAnimate ? { opacity: 0, y: 10 } : false}
@@ -47,16 +56,26 @@ function ScholarCardSkeleton({ index, shouldAnimate }: { index: number; shouldAn
 			className="bg-card border border-[#D3DCF6] rounded-md p-4 shadow-sm"
 		>
 			<div className="flex items-start gap-3">
-				<Skeleton className="w-12 h-12 rounded-full shrink-0" />
+				<Skeleton className="w-12 h-12 rounded-full bg-muted-foreground shrink-0" />
 				<div className="flex-1 space-y-2">
-					<Skeleton className="h-4 w-32" />
-					<Skeleton className="h-3 w-48" />
-					<Skeleton className="h-3 w-28" />
+					<Skeleton className="h-4 w-32 bg-muted-foreground" />
+					<Skeleton className="h-3 w-48 bg-muted-foreground" />
+					<Skeleton className="h-3 w-28 bg-muted-foreground" />
 				</div>
 			</div>
 			<div className="mt-3 pt-3 border-t border-border space-y-1.5">
-				<Skeleton className="h-3 w-40" />
-				<Skeleton className="h-3 w-24" />
+				<div className="flex items-center justify-between gap-2">
+					<Skeleton className="h-3 w-20 bg-muted-foreground" />
+					<Skeleton className="h-3 w-24 bg-muted-foreground" />
+				</div>
+				<div className="flex items-center justify-between gap-2">
+					<Skeleton className="h-3 w-16 bg-muted-foreground" />
+					<Skeleton className="h-3 w-20 bg-muted-foreground" />
+				</div>
+			</div>
+			<div className="mt-3 flex items-center justify-between gap-2">
+				<Skeleton className="h-3 w-20 bg-muted-foreground" />
+				<Skeleton className="h-7 w-32 rounded-md bg-muted-foreground" />
 			</div>
 		</motion.div>
 	);
@@ -76,7 +95,8 @@ function ScholarCard({
 	shouldAnimate: boolean;
 }) {
 	const { student } = scholar;
-	const initials = `${student.firstName[0]}${student.lastName[0]}`.toUpperCase();
+	const initials =
+		`${student.firstName[0]}${student.lastName[0]}`.toUpperCase();
 
 	return (
 		<motion.div
@@ -231,10 +251,11 @@ function ScholarsPage() {
 					className="bg-card rounded-md text-center p-3 border border-[#D3DCF6] shadow-sm"
 				>
 					<p className="text-xl text-primary tracking-wide">My Scholars</p>
-					{!isLoading && (
+					{isLoading ? (
+						<Skeleton className="h-3 w-20 mx-auto mt-1.5 bg-muted-foreground" />
+					) : (
 						<p className="text-xs text-[#6B7280] mt-0.5">
-							{scholars.length}{" "}
-							{scholars.length === 1 ? "scholar" : "scholars"}
+							{scholars.length} {scholars.length === 1 ? "scholar" : "scholars"}
 						</p>
 					)}
 				</motion.div>
@@ -243,7 +264,10 @@ function ScholarsPage() {
 				<motion.div
 					initial={filtersAnim.shouldAnimate ? { opacity: 0, y: -10 } : false}
 					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.4, delay: filtersAnim.shouldAnimate ? 0.1 : 0 }}
+					transition={{
+						duration: 0.4,
+						delay: filtersAnim.shouldAnimate ? 0.1 : 0,
+					}}
 					onAnimationComplete={filtersAnim.markAnimated}
 					className="flex flex-col sm:flex-row gap-2"
 				>
@@ -281,41 +305,45 @@ function ScholarsPage() {
 					transition={{ duration: 0.4 }}
 					onAnimationComplete={sectionAnim.markAnimated}
 				>
-				<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-					{isLoading ? (
-						Array.from({ length: 6 }).map((_, i) => (
-							<ScholarCardSkeleton key={`skel-${i}`} index={i} shouldAnimate={sectionAnim.shouldAnimate} />
-						))
-					) : scholars.length === 0 ? (
-						<div className="col-span-full flex flex-col items-center justify-center pt-24 pb-16">
-							<GraduationCap className="w-24 h-24 text-[#D1D5DB]" />
-							<p className="mt-5 text-lg text-[#9CA3AF]">No scholars yet</p>
-							<p className="max-w-sm text-sm text-[#9CA3AF] mt-2 text-center">
-								{search || filterScholarshipId !== "all"
-									? "No scholars match your current filters."
-									: "Approve applicants from your scholarships to see them listed here."}
-							</p>
-						</div>
-					) : (
-						scholars.map((scholar, index) => (
-							<ScholarCard
-								key={`${scholar.scholarshipId}-${scholar.id}`}
-								scholar={scholar}
-								index={index}
-								disbursement={disbursementsByApplication.get(scholar.id)}
-								shouldAnimate={sectionAnim.shouldAnimate}
-								onDisburse={(s) =>
-									setActiveScholar({
-										applicationId: s.id,
-										studentId: s.student.id,
-										studentName: `${s.student.firstName} ${s.student.lastName}`,
-										scholarshipName: s.scholarshipName,
-									})
-								}
-							/>
-						))
-					)}
-				</div>
+					<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+						{isLoading ? (
+							Array.from({ length: 6 }).map((_, i) => (
+								<ScholarCardSkeleton
+									key={`skel-${i}`}
+									index={i}
+									shouldAnimate={sectionAnim.shouldAnimate}
+								/>
+							))
+						) : scholars.length === 0 ? (
+							<div className="col-span-full flex flex-col items-center justify-center pt-24 pb-16">
+								<GraduationCap className="w-24 h-24 text-[#D1D5DB]" />
+								<p className="mt-5 text-lg text-[#9CA3AF]">No scholars yet</p>
+								<p className="max-w-sm text-sm text-[#9CA3AF] mt-2 text-center">
+									{search || filterScholarshipId !== "all"
+										? "No scholars match your current filters."
+										: "Approve applicants from your scholarships to see them listed here."}
+								</p>
+							</div>
+						) : (
+							scholars.map((scholar, index) => (
+								<ScholarCard
+									key={`${scholar.scholarshipId}-${scholar.id}`}
+									scholar={scholar}
+									index={index}
+									disbursement={disbursementsByApplication.get(scholar.id)}
+									shouldAnimate={sectionAnim.shouldAnimate}
+									onDisburse={(s) =>
+										setActiveScholar({
+											applicationId: s.id,
+											studentId: s.student.id,
+											studentName: `${s.student.firstName} ${s.student.lastName}`,
+											scholarshipName: s.scholarshipName,
+										})
+									}
+								/>
+							))
+						)}
+					</div>
 				</motion.div>
 			</div>
 

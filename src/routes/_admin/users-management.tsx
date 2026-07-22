@@ -1,11 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useRef } from "react";
-import { adminUsersQueryOptions, adminDashboardQueryOptions } from "@/lib/admin/queries";
+import {
+	adminUsersQueryOptions,
+	adminDashboardQueryOptions,
+} from "@/lib/admin/queries";
 import UserTable from "@/components/admin/UserTable";
 import { LocalTimeClock } from "@/components/landing/LocalTimeClock";
-import { Search, Users, ShieldCheck, GraduationCap, HeartHandshake } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+	Search,
+	Users,
+	ShieldCheck,
+	GraduationCap,
+	HeartHandshake,
+} from "lucide-react";
 import type { UserListQuery } from "@/lib/admin/model";
+import UsersTableSkeleton from "./-components/UsersTableSkeleton";
 
 export const Route = createFileRoute("/_admin/users-management")({
 	component: AdminUsers,
@@ -29,7 +40,9 @@ function AdminUsers() {
 	};
 
 	const { data, isLoading } = useQuery(adminUsersQueryOptions(params));
-	const { data: metrics } = useQuery(adminDashboardQueryOptions());
+	const { data: metrics, isLoading: metricsLoading } = useQuery(
+		adminDashboardQueryOptions(),
+	);
 
 	const searchTimeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
 	const handleSearchChange = (value: string) => {
@@ -78,9 +91,13 @@ function AdminUsers() {
 									<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
 										Visible users
 									</p>
-									<p className="mt-2 text-2xl text-primary">
-										{data?.total ?? "--"}
-									</p>
+									{isLoading ? (
+										<Skeleton className="mt-2 h-8 w-10 bg-muted-foreground" />
+									) : (
+										<p className="mt-2 text-2xl text-primary">
+											{data?.total ?? "--"}
+										</p>
+									)}
 								</div>
 								<div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#D9E7FF] bg-[#F3F8FF]">
 									<Users className="h-4 w-4 text-[#3A52A6]" />
@@ -93,9 +110,13 @@ function AdminUsers() {
 									<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
 										Students
 									</p>
-									<p className="mt-2 text-2xl text-primary">
-										{metrics?.studentCount ?? "--"}
-									</p>
+									{metricsLoading ? (
+										<Skeleton className="mt-2 h-8 w-10 bg-muted-foreground" />
+									) : (
+										<p className="mt-2 text-2xl text-primary">
+											{metrics?.studentCount ?? "--"}
+										</p>
+									)}
 								</div>
 								<div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#D9E7FF] bg-[#F3F8FF]">
 									<GraduationCap className="mt-1 h-4 w-4 text-[#4B63B4]" />
@@ -108,9 +129,13 @@ function AdminUsers() {
 									<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
 										Sponsors
 									</p>
-									<p className="mt-2 text-2xl text-primary">
-										{metrics?.sponsorCount ?? "--"}
-									</p>
+									{metricsLoading ? (
+										<Skeleton className="mt-2 h-8 w-10 bg-muted-foreground" />
+									) : (
+										<p className="mt-2 text-2xl text-primary">
+											{metrics?.sponsorCount ?? "--"}
+										</p>
+									)}
 								</div>
 								<div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#D9E7FF] bg-[#F3F8FF]">
 									<HeartHandshake className="mt-1 h-4 w-4 text-[#5B67C2]" />
@@ -123,9 +148,13 @@ function AdminUsers() {
 									<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
 										Admins
 									</p>
-									<p className="mt-2 text-2xl">
-										{metrics?.adminCount ?? "--"}
-									</p>
+									{metricsLoading ? (
+										<Skeleton className="mt-2 h-8 w-10 bg-muted-foreground" />
+									) : (
+										<p className="mt-2 text-2xl">
+											{metrics?.adminCount ?? "--"}
+										</p>
+									)}
 								</div>
 								<div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#D9E7FF] bg-[#F3F8FF]">
 									<ShieldCheck className="mt-1 h-4 w-4 text-[#5B67C2]" />
@@ -171,7 +200,7 @@ function AdminUsers() {
 			</div>
 
 			{isLoading ? (
-				<div className="h-96 animate-pulse rounded-4xl border border-[#E0ECFF] bg-white" />
+				<UsersTableSkeleton />
 			) : data ? (
 				<UserTable
 					data={data}

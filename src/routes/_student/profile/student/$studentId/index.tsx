@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { SEO } from "@/components/SEO";
 import { useRef, useState } from "react";
 import { toast } from "@/lib/toast";
-import ProfileSkeleton from "@/components/profile/ProfileSkeleton";
 import ProfileError from "@/components/profile/ProfileError";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import EditHeader from "@/components/profile/EditHeader";
@@ -26,6 +25,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import StudentProfileForm from "@/components/student/profile/ProfileForm";
 import VerificationStatus from "@/components/verification/VerificationStatus";
 import ProfileAvatar from "./-components/ProfileAvatar";
+import ProfileSkeleton from "./-components/ProfileSkeleton";
 import { useVerificationStatus } from "@/hooks/useVerificationStatus";
 import { VerificationStatus as VerStatus } from "@/lib/verification/model";
 import PaymentMethodForm from "@/components/student/profile/PaymentMethodForm";
@@ -90,7 +90,7 @@ function StudentProfilePage() {
 		},
 	});
 
-	if (auth.isLoading) {
+	if (auth.isLoading || paymentMethod.isLoading) {
 		return <ProfileSkeleton />;
 	}
 

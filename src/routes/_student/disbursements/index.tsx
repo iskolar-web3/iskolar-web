@@ -17,6 +17,22 @@ export const Route = createFileRoute("/_student/disbursements/")({
 	component: DisbursementsPage,
 });
 
+function SummaryCardSkeleton() {
+	return (
+		<div className="flex w-full items-center justify-between gap-3 rounded-lg border border-[#E0ECFF] bg-card p-4 shadow-sm">
+			<div className="min-w-0 flex-1">
+				<Skeleton className="h-3 w-24 mb-2 bg-muted-foreground" />
+				<Skeleton className="h-6 w-32 mb-2 bg-muted-foreground" />
+				<Skeleton className="h-3 w-16 bg-muted-foreground" />
+			</div>
+			<div className="flex shrink-0 items-center gap-1">
+				<Skeleton className="h-4 w-20 bg-muted-foreground" />
+				<Skeleton className="h-4 w-4 rounded bg-muted-foreground" />
+			</div>
+		</div>
+	);
+}
+
 function SummaryCard({
 	disbursement,
 	index,
@@ -83,8 +99,8 @@ function DisbursementsPage() {
 
 				<div className="space-y-3">
 					{disbursementsQuery.isLoading ? (
-						["skel-1", "skel-2", "skel-3"].map((key) => (
-							<Skeleton key={key} className="h-24 w-full rounded-lg" />
+						Array.from({ length: 3 }).map((_, index) => (
+							<SummaryCardSkeleton key={`skel-${index}`} />
 						))
 					) : disbursements.length === 0 ? (
 						<div className="flex flex-col items-center justify-center pt-24 pb-16">

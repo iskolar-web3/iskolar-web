@@ -8,6 +8,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
 	createDisbursement,
 	getApplicationPaymentMethodQuery,
@@ -167,10 +168,7 @@ export function DisbursementDialog({
 
 		setUploading(true);
 		try {
-			const uploadRes = await uploadFile(
-				proofFile,
-				"disbursement-files",
-			);
+			const uploadRes = await uploadFile(proofFile, "disbursement-files");
 			if (!uploadRes.data?.url) {
 				setFormError(uploadRes.message || "Failed to upload proof.");
 				return;
@@ -206,9 +204,23 @@ export function DisbursementDialog({
 						{!disbursement ? (
 							<div className="space-y-4">
 								{paymentQuery.isLoading ? (
-									<p className="text-sm text-[#6B7280]">
-										Loading payment details...
-									</p>
+									<div className="rounded-lg border border-[#E0ECFF] bg-[#F8FAFF] p-4">
+										<Skeleton className="mb-3 h-2.5 w-24 bg-muted-foreground" />
+										<div className="space-y-2.5">
+											<div className="flex items-center justify-between gap-2">
+												<Skeleton className="h-3.5 w-16 bg-muted-foreground" />
+												<Skeleton className="h-3.5 w-24 bg-muted-foreground" />
+											</div>
+											<div className="flex items-center justify-between gap-2">
+												<Skeleton className="h-3.5 w-24 bg-muted-foreground" />
+												<Skeleton className="h-3.5 w-28 bg-muted-foreground" />
+											</div>
+											<div className="flex items-center justify-between gap-2">
+												<Skeleton className="h-3.5 w-28 bg-muted-foreground" />
+												<Skeleton className="h-3.5 w-20 bg-muted-foreground" />
+											</div>
+										</div>
+									</div>
 								) : paymentQuery.data ? (
 									<PaymentDetailsCard
 										method={paymentQuery.data.method.name}
