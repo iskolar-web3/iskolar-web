@@ -93,7 +93,7 @@ function LoginPage(): JSX.Element {
                 break;
 
             case UserRole.Sponsor:
-                await navigate({ to: "/scholarships" });
+                await navigate({ to: "/overview" });
                 break;
 
             case UserRole.Admin:

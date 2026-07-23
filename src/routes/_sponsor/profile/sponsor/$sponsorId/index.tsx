@@ -4,7 +4,6 @@ import { SEO } from "@/components/SEO";
 import { useRef, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "@/lib/toast";
-import ProfileSkeleton from "@/components/profile/ProfileSkeleton";
 import ProfileError from "@/components/profile/ProfileError";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import EditHeader from "@/components/profile/EditHeader";
@@ -31,13 +30,13 @@ import {
 import { UserRole } from "@/lib/user/model";
 import VerificationStatus from "@/components/verification/VerificationStatus";
 import ProfileAvatar from "./-components/ProfileAvatar";
+import ProfileSkeleton from "./-components/ProfileSkeleton";
 
 export const Route = createFileRoute("/_sponsor/profile/sponsor/$sponsorId/")({
 	component: SponsorProfile,
 });
 
 function SponsorProfile() {
-
 	const auth = useAuth<AnySponsor>();
 
 	const isIndividual = auth.profile.sponsorType.code === SponsorType.Individual;
@@ -230,4 +229,3 @@ function SponsorProfile() {
 		</div>
 	);
 }
-

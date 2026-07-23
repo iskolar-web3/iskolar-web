@@ -3,28 +3,47 @@ import { useQuery } from "@tanstack/react-query";
 import { useState, useRef } from "react";
 import { adminScholarshipsQueryOptions } from "@/lib/admin/queries";
 import { LocalTimeClock } from "@/components/landing/LocalTimeClock";
-import { Search, GraduationCap, BookOpen, CheckCircle2, ChevronRight } from "lucide-react";
-import { ScholarshipStatus, ScholarshipType, type Scholarship } from "@/lib/scholarship/model";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+	Search,
+	GraduationCap,
+	BookOpen,
+	CheckCircle2,
+	ChevronRight,
+} from "lucide-react";
+import {
+	ScholarshipStatus,
+	ScholarshipType,
+	type Scholarship,
+} from "@/lib/scholarship/model";
 import { getSponsorName } from "@/lib/sponsor/api";
 import AdminScholarshipDetailDrawer from "./-components/AdminScholarshipDetailDrawer";
+import ScholarshipsTableSkeleton from "./-components/ScholarshipsTableSkeleton";
 
 export const Route = createFileRoute("/_admin/scholarships-management")({
 	component: AdminScholarships,
 });
 
 const STATUS_STYLES: Record<string, string> = {
-	[ScholarshipStatus.Active]: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+	[ScholarshipStatus.Active]:
+		"bg-emerald-50 text-emerald-700 border border-emerald-200",
 	[ScholarshipStatus.Draft]: "bg-gray-100 text-gray-600 border border-gray-200",
-	[ScholarshipStatus.Inactive]: "bg-yellow-50 text-yellow-700 border border-yellow-200",
+	[ScholarshipStatus.Inactive]:
+		"bg-yellow-50 text-yellow-700 border border-yellow-200",
 	[ScholarshipStatus.Closed]: "bg-red-50 text-red-600 border border-red-200",
-	[ScholarshipStatus.Suspended]: "bg-orange-50 text-orange-700 border border-orange-200",
-	[ScholarshipStatus.Archived]: "bg-slate-100 text-slate-500 border border-slate-200",
+	[ScholarshipStatus.Suspended]:
+		"bg-orange-50 text-orange-700 border border-orange-200",
+	[ScholarshipStatus.Archived]:
+		"bg-slate-100 text-slate-500 border border-slate-200",
 };
 
 const TYPE_STYLES: Record<string, string> = {
-	[ScholarshipType.MeritBased]: "bg-blue-50 text-blue-700 border border-blue-200",
-	[ScholarshipType.NeedBased]: "bg-violet-50 text-violet-700 border border-violet-200",
-	[ScholarshipType.Combined]: "bg-indigo-50 text-indigo-700 border border-indigo-200",
+	[ScholarshipType.MeritBased]:
+		"bg-blue-50 text-blue-700 border border-blue-200",
+	[ScholarshipType.NeedBased]:
+		"bg-violet-50 text-violet-700 border border-violet-200",
+	[ScholarshipType.Combined]:
+		"bg-indigo-50 text-indigo-700 border border-indigo-200",
 };
 
 function formatDeadline(date: Date) {
@@ -46,7 +65,8 @@ function AdminScholarships() {
 	const [search, setSearch] = useState("");
 	const [debouncedSearch, setDebouncedSearch] = useState("");
 	const [statusFilter, setStatusFilter] = useState("all");
-	const [selectedScholarship, setSelectedScholarship] = useState<Scholarship | null>(null);
+	const [selectedScholarship, setSelectedScholarship] =
+		useState<Scholarship | null>(null);
 
 	const { data, isLoading } = useQuery(
 		adminScholarshipsQueryOptions({
@@ -94,9 +114,13 @@ function AdminScholarships() {
 									<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
 										Total
 									</p>
-									<p className="mt-2 text-2xl text-primary">
-										{data?.length ?? "--"}
-									</p>
+									{isLoading ? (
+										<Skeleton className="mt-2 h-8 w-10 bg-muted-foreground" />
+									) : (
+										<p className="mt-2 text-2xl text-primary">
+											{data?.length ?? "--"}
+										</p>
+									)}
 								</div>
 								<div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#D9E7FF] bg-[#F3F8FF]">
 									<BookOpen className="h-4 w-4 text-[#3A52A6]" />
@@ -109,7 +133,11 @@ function AdminScholarships() {
 									<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
 										Active
 									</p>
-									<p className="mt-2 text-2xl text-primary">{activeCount}</p>
+									{isLoading ? (
+										<Skeleton className="mt-2 h-8 w-10 bg-muted-foreground" />
+									) : (
+										<p className="mt-2 text-2xl text-primary">{activeCount}</p>
+									)}
 								</div>
 								<div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#D9E7FF] bg-[#F3F8FF]">
 									<CheckCircle2 className="h-4 w-4 text-emerald-600" />
@@ -122,7 +150,11 @@ function AdminScholarships() {
 									<p className="text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
 										Drafts
 									</p>
-									<p className="mt-2 text-2xl text-primary">{draftCount}</p>
+									{isLoading ? (
+										<Skeleton className="mt-2 h-8 w-10 bg-muted-foreground" />
+									) : (
+										<p className="mt-2 text-2xl text-primary">{draftCount}</p>
+									)}
 								</div>
 								<div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-[#D9E7FF] bg-[#F3F8FF]">
 									<GraduationCap className="h-4 w-4 text-[#4B63B4]" />
@@ -138,7 +170,9 @@ function AdminScholarships() {
 				<div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
 					<div>
 						<h2 className="text-base text-primary">Filters</h2>
-						<p className="text-sm text-[#6B7280]">Search and narrow by status.</p>
+						<p className="text-sm text-[#6B7280]">
+							Search and narrow by status.
+						</p>
 					</div>
 					<div className="flex flex-col gap-3 sm:flex-row">
 						<div className="relative flex-1 sm:min-w-[260px]">
@@ -170,7 +204,7 @@ function AdminScholarships() {
 
 			{/* Table */}
 			{isLoading ? (
-				<div className="h-96 animate-pulse rounded-4xl border border-[#E0ECFF] bg-white" />
+				<ScholarshipsTableSkeleton />
 			) : filtered.length === 0 ? (
 				<div className="rounded-4xl border border-[#E0ECFF] bg-white p-10 text-center text-sm text-[#9CA3AF]">
 					No scholarships found.
@@ -202,7 +236,10 @@ function AdminScholarships() {
 									<th className="px-5 py-3 text-left text-[11px] uppercase tracking-[0.18em] text-[#8CA2D6]">
 										Deadline
 									</th>
-									<th className="px-5 py-3 text-[11px] text-[#8CA2D6]" aria-hidden="true" />
+									<th
+										className="px-5 py-3 text-[11px] text-[#8CA2D6]"
+										aria-hidden="true"
+									/>
 								</tr>
 							</thead>
 							<tbody className="divide-y divide-[#F0F5FF]">
@@ -267,7 +304,9 @@ function AdminScholarships() {
 												<span className="text-[#3A52A6]">/∞</span>
 											)}
 										</td>
-										<td className="px-5 py-3.5 text-primary">{formatAmount(s)}</td>
+										<td className="px-5 py-3.5 text-primary">
+											{formatAmount(s)}
+										</td>
 										<td className="px-5 py-3.5 text-primary">
 											{formatDeadline(s.applicationDeadline)}
 										</td>
@@ -283,7 +322,8 @@ function AdminScholarships() {
 						</table>
 					</div>
 					<div className="border-t border-[#E0ECFF] px-5 py-3 text-xs text-[#9CA3AF]">
-						Showing {filtered.length} of {data?.length ?? 0} scholarships · Click a row to view full details
+						Showing {filtered.length} of {data?.length ?? 0} scholarships ·
+						Click a row to view full details
 					</div>
 				</div>
 			)}

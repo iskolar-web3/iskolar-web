@@ -1,20 +1,20 @@
 import { useState, useEffect, useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import ScholarshipCard from "./-components/ScholarshipCard";
-import ScholarshipCardSkeleton from "@/components/ScholarshipCardSkeleton";
+import ScholarshipCardSkeleton from "./-components/ScholarshipCardSkeleton";
 import Filters from "./-components/Filters";
 import { Filter, X, GraduationCap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "@/lib/toast";
 import ScholarshipDetailsModal from "./-components/ScholarshipDetailsDrawer";
 import { SEO } from "@/components/SEO";
-import {
-	ScholarshipType,
-	type Scholarship,
-} from "@/lib/scholarship/model";
+import { ScholarshipType, type Scholarship } from "@/lib/scholarship/model";
 import { SponsorType } from "@/lib/sponsor/model";
 import { useQuery } from "@tanstack/react-query";
-import { getMyApplicationsQuery, getMyScholarshipsQuery } from "@/lib/scholarship/api";
+import {
+	getMyApplicationsQuery,
+	getMyScholarshipsQuery,
+} from "@/lib/scholarship/api";
 import { useVerificationStatus } from "@/hooks/useVerificationStatus";
 import { useAnimateOnce } from "@/hooks/useAnimateOnce";
 import { VerificationStatus } from "@/lib/verification/model";
@@ -39,14 +39,18 @@ function DiscoverScholarship() {
 	const mobileFiltersAnim = useAnimateOnce("discover:mobile-filters");
 	const filtersAnim = useAnimateOnce("discover:filters");
 
-
-	const verificationEnabled = import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true";
-	const verificationQuery = useVerificationStatus("students", verificationEnabled);
-	const isVerified = !verificationEnabled || verificationQuery.isLoading || verificationQuery.data?.status === VerificationStatus.Verified;
-
-	const scholarshipsQuery = useQuery(
-		getMyScholarshipsQuery(),
+	const verificationEnabled =
+		import.meta.env.VITE_ENABLE_IDENTITY_VERIFICATION === "true";
+	const verificationQuery = useVerificationStatus(
+		"students",
+		verificationEnabled,
 	);
+	const isVerified =
+		!verificationEnabled ||
+		verificationQuery.isLoading ||
+		verificationQuery.data?.status === VerificationStatus.Verified;
+
+	const scholarshipsQuery = useQuery(getMyScholarshipsQuery());
 	const scholarships = scholarshipsQuery.data || [];
 
 	const applicationsQuery = useQuery(getMyApplicationsQuery({}));
@@ -81,30 +85,23 @@ function DiscoverScholarship() {
 				(!amountRange.max || amountPerScholar <= Number(amountRange.max));
 
 			const matchesSlots =
-				(!slotRange.min || (scholarship.totalSlots ?? 0) >= Number(slotRange.min)) &&
-				(!slotRange.max || (scholarship.totalSlots ?? 0) <= Number(slotRange.max));
+				(!slotRange.min ||
+					(scholarship.totalSlots ?? 0) >= Number(slotRange.min)) &&
+				(!slotRange.max ||
+					(scholarship.totalSlots ?? 0) <= Number(slotRange.max));
 
-			return (
-				matchesType &&
-				matchesSponsorType &&
-				matchesAmount &&
-				matchesSlots
-			);
+			return matchesType && matchesSponsorType && matchesAmount && matchesSlots;
 		});
-	}, [
-		scholarshipsQuery,
-		scholarshipType,
-		sponsorType,
-		amountRange,
-		slotRange,
-	]);
+	}, [scholarshipsQuery, scholarshipType, sponsorType, amountRange, slotRange]);
 
 	return (
 		<div className="min-h-screen">
 			<SEO title="Discover Scholarships" noindex={true} />
 			{/* Mobile/Tablet Layout */}
 			<motion.div
-				initial={mobileFiltersAnim.shouldAnimate ? { opacity: 0, y: -20 } : false}
+				initial={
+					mobileFiltersAnim.shouldAnimate ? { opacity: 0, y: -20 } : false
+				}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.4 }}
 				onAnimationComplete={mobileFiltersAnim.markAnimated}

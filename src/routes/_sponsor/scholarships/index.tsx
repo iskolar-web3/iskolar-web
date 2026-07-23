@@ -22,7 +22,6 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/auth";
-import ScholarshipCardSkeleton from "@/components/ScholarshipCardSkeleton";
 import { SEO } from "@/components/SEO";
 import {
 	Dialog,
@@ -50,10 +49,12 @@ import { VerificationStatus } from "@/lib/verification/model";
 import FilterSelect from "./-components/Filters";
 import ScholarshipCard from "./-components/ScholarshipCard";
 import ScholarshipDetailsModal from "./-components/ScholarshipDetailsDrawer";
+import ScholarshipsSkeleton from "./-components/ScholarshipsSkeleton";
 
 export const Route = createFileRoute("/_sponsor/scholarships/")({
 	component: Scholarships,
 	validateSearch: getScholarshipQueryParamSchema,
+	pendingComponent: ScholarshipsSkeleton,
 });
 
 function Scholarships() {
@@ -626,14 +627,7 @@ function Scholarships() {
 						className="space-y-5"
 					>
 						<div className="grid grid-cols-1 xl:grid-cols-2 gap-2.5">
-							{scholarships.isLoading ? (
-								Array.from({ length: 6 }).map((_, index) => (
-									<ScholarshipCardSkeleton
-										key={`skeleton-${index}`}
-										index={index}
-									/>
-								))
-							) : filteredScholarships.length === 0 ? (
+							{filteredScholarships.length === 0 ? (
 								<div className="xl:col-span-2 flex flex-col items-center justify-center pt-24 md:pt-32">
 									<GraduationCap className="w-24 md:w-30 h-24 md:h-30 text-[#D1D5DB]" />
 									<p className="mt-5 text-lg md:text-xl text-[#9CA3AF]">

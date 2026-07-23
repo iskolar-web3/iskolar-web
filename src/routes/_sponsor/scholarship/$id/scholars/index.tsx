@@ -13,7 +13,10 @@ import {
 import { SEO } from "@/components/SEO";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getApplicantsQuery, getScholarshipByIdQuery } from "@/lib/scholarship/api";
+import {
+	getApplicantsQuery,
+	getScholarshipByIdQuery,
+} from "@/lib/scholarship/api";
 import { type Applicant } from "@/lib/scholarship/model";
 import { ScholarshipApplicationStatus } from "@/lib/scholarship/status";
 import { getSponsorDisbursementsQuery } from "@/lib/disbursement/api";
@@ -45,20 +48,22 @@ function ScholarCardSkeleton({ index }: { index: number }) {
 			className="bg-card border border-[#D3DCF6] rounded-md p-4 shadow-sm"
 		>
 			<div className="flex items-start gap-3">
-				<Skeleton className="w-12 h-12 rounded-full shrink-0" />
+				<Skeleton className="w-12 h-12 rounded-full bg-muted-foreground shrink-0" />
 				<div className="flex-1 space-y-2">
-					<Skeleton className="h-4 w-32" />
-					<Skeleton className="h-3 w-48" />
-					<Skeleton className="h-3 w-28" />
+					<Skeleton className="h-4 w-32 bg-muted-foreground" />
+					<Skeleton className="h-3 w-48 bg-muted-foreground" />
+					<Skeleton className="h-3 w-28 bg-muted-foreground" />
 				</div>
 			</div>
-			<div className="mt-3 pt-3 border-t border-border space-y-1.5">
-				<Skeleton className="h-3 w-40" />
-				<Skeleton className="h-3 w-24" />
+			<div className="mt-3 pt-3 border-t border-border">
+				<div className="flex items-center justify-between gap-2">
+					<Skeleton className="h-3 w-20 bg-muted-foreground" />
+					<Skeleton className="h-3 w-16 bg-muted-foreground" />
+				</div>
 			</div>
 			<div className="mt-3 flex items-center justify-between">
-				<Skeleton className="h-5 w-20 rounded-full" />
-				<Skeleton className="h-7 w-32 rounded-md" />
+				<Skeleton className="h-5 w-20 rounded-full bg-muted-foreground" />
+				<Skeleton className="h-7 w-32 rounded-md bg-muted-foreground" />
 			</div>
 		</motion.div>
 	);
@@ -76,7 +81,8 @@ function ScholarCard({
 	onDisburse: (scholar: Applicant) => void;
 }) {
 	const { student } = scholar;
-	const initials = `${student.firstName[0]}${student.lastName[0]}`.toUpperCase();
+	const initials =
+		`${student.firstName[0]}${student.lastName[0]}`.toUpperCase();
 
 	return (
 		<motion.div
@@ -202,15 +208,21 @@ function ScholarshipScholarsPage() {
 						<div>
 							<p className="text-xl text-primary">
 								{isLoading ? (
-									<Skeleton className="h-6 w-48 inline-block" />
+									<Skeleton className="h-6 w-48 inline-block bg-muted-foreground" />
 								) : (
 									scholarshipName
 								)}
 							</p>
-							<p className="text-xs text-[#6B7280] mt-0.5">Scholars Directory</p>
+							<p className="text-xs text-[#6B7280] mt-0.5">
+								Scholars Directory
+							</p>
 						</div>
 					</div>
-					{!isLoading && (
+					{isLoading ? (
+						<div className="mt-2 pl-11">
+							<Skeleton className="h-3 w-40 bg-muted-foreground" />
+						</div>
+					) : (
 						<p className="text-xs text-[#6B7280] mt-2 pl-11">
 							{scholars.length}{" "}
 							{scholars.length === 1 ? "approved scholar" : "approved scholars"}
@@ -227,9 +239,12 @@ function ScholarshipScholarsPage() {
 					) : scholars.length === 0 ? (
 						<div className="col-span-full flex flex-col items-center justify-center pt-24 pb-16">
 							<GraduationCap className="w-24 h-24 text-[#D1D5DB]" />
-							<p className="mt-5 text-lg text-[#9CA3AF]">No approved scholars yet</p>
+							<p className="mt-5 text-lg text-[#9CA3AF]">
+								No approved scholars yet
+							</p>
 							<p className="max-w-sm text-sm text-[#9CA3AF] mt-2 text-center">
-								Approve applicants from this scholarship to see them listed here.
+								Approve applicants from this scholarship to see them listed
+								here.
 							</p>
 							<Link
 								to="/scholarship/$id/applicants"

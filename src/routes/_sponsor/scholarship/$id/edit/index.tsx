@@ -52,6 +52,7 @@ import ScholarshipFullPreviewModal from "@/routes/_sponsor/create/-components/pr
 
 export const Route = createFileRoute("/_sponsor/scholarship/$id/edit/")({
 	component: EditScholarshipPage,
+	pendingComponent: EditScholarshipSkeleton,
 });
 
 function EditScholarshipPage() {

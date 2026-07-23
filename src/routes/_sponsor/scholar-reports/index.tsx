@@ -173,8 +173,17 @@ function SponsorReportsPage() {
 
 				{reportsQuery.isLoading ? (
 					<div className="space-y-3">
-						{["skel-1", "skel-2"].map((key) => (
-							<Skeleton key={key} className="h-28 w-full rounded-lg" />
+						{["skel-1", "skel-2", "skel-3"].map((key) => (
+							<Card key={key}>
+								<CardHeader>
+									<Skeleton className="h-5 w-48 bg-muted-foreground" />
+									<CardAction>
+										<Skeleton className="h-5 w-16 rounded-full bg-muted-foreground" />
+									</CardAction>
+									<Skeleton className="h-4 w-56 bg-muted-foreground" />
+									<Skeleton className="h-3 w-64 bg-muted-foreground" />
+								</CardHeader>
+							</Card>
 						))}
 					</div>
 				) : reports.length === 0 ? (

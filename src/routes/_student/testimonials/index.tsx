@@ -56,6 +56,35 @@ function formatDate(date: Date): string {
 	});
 }
 
+function TestimonialCardSkeleton() {
+	return (
+		<Card>
+			<CardHeader>
+				<CardTitle>
+					<Skeleton className="h-5 w-40 bg-muted-foreground" />
+				</CardTitle>
+				<CardAction>
+					<Skeleton className="h-5 w-16 rounded-full bg-muted-foreground" />
+				</CardAction>
+			</CardHeader>
+			<CardContent>
+				<div className="space-y-2">
+					<Skeleton className="h-4 w-full bg-muted-foreground" />
+					<Skeleton className="h-4 w-full bg-muted-foreground" />
+					<Skeleton className="h-4 w-2/3 bg-muted-foreground" />
+				</div>
+			</CardContent>
+			<CardFooter className="justify-between">
+				<Skeleton className="h-3 w-28 bg-muted-foreground" />
+				<div className="flex gap-2">
+					<Skeleton className="h-8 w-16 rounded-md bg-muted-foreground" />
+					<Skeleton className="h-8 w-20 rounded-md bg-muted-foreground" />
+				</div>
+			</CardFooter>
+		</Card>
+	);
+}
+
 function TestimonialCard({
 	testimonial,
 	onEdit,
@@ -112,6 +141,7 @@ function TestimonialsPage() {
 	);
 	const testimonialsQuery = useQuery(getMyTestimonialsQuery());
 
+	const isLoading = grantedQuery.isLoading || testimonialsQuery.isLoading;
 	const grantedApplications = grantedQuery.data ?? [];
 	const testimonials = testimonialsQuery.data ?? [];
 	const isEligible = grantedApplications.length > 0;
@@ -151,15 +181,19 @@ function TestimonialsPage() {
 							your sponsor.
 						</p>
 					</div>
-					{isEligible && (
-						<Button onClick={openCreateDialog}>Share Testimonial</Button>
+					{isLoading ? (
+						<Skeleton className="h-9 w-40 rounded-md bg-muted-foreground" />
+					) : (
+						isEligible && (
+							<Button onClick={openCreateDialog}>Share Testimonial</Button>
+						)
 					)}
 				</div>
 
-				{grantedQuery.isLoading || testimonialsQuery.isLoading ? (
+				{isLoading ? (
 					<div className="space-y-3">
-						{["skel-1", "skel-2"].map((key) => (
-							<Skeleton key={key} className="h-40 w-full rounded-lg" />
+						{Array.from({ length: 3 }).map((_, index) => (
+							<TestimonialCardSkeleton key={`skel-${index}`} />
 						))}
 					</div>
 				) : !isEligible ? (

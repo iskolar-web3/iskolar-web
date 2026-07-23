@@ -38,10 +38,7 @@ import { SEO } from "@/components/SEO";
 import { handleError } from "@/lib/errorHandler";
 import { logger } from "@/lib/logger";
 import { formatDateTime } from "@/utils/formatting.utils";
-import {
-	ScholarshipStatus,
-	type Applicant,
-} from "@/lib/scholarship/model";
+import { ScholarshipStatus, type Applicant } from "@/lib/scholarship/model";
 import { ScholarshipApplicationStatus } from "@/lib/scholarship/status";
 import {
 	endScholarship,
@@ -79,7 +76,6 @@ export const Route = createFileRoute("/_sponsor/scholarship/$id/applicants")({
 });
 
 function ApplicantsListPage() {
-
 	const params = Route.useParams();
 	const router = useRouter();
 	const queryClient = useQueryClient();
@@ -129,7 +125,9 @@ function ApplicantsListPage() {
 
 	// Ranking state
 	const [showRanking, setShowRanking] = useState(false);
-	const [rankingResult, setRankingResult] = useState<RankingResult | null>(null);
+	const [rankingResult, setRankingResult] = useState<RankingResult | null>(
+		null,
+	);
 	const [persistedDismissed, setPersistedDismissed] = useState(false);
 
 	const rankingEnabled =
@@ -157,7 +155,6 @@ function ApplicantsListPage() {
 		return map;
 	}, [disbursementsQuery.data]);
 
-
 	// End scholarship state
 	const [showEndConfirmation, setShowEndConfirmation] = useState(false);
 	const [ending, setEnding] = useState(false);
@@ -165,9 +162,13 @@ function ApplicantsListPage() {
 	const endMutation = useMutation({
 		mutationFn: () => endScholarship(params.id),
 		onSuccess: async (res) => {
-			await queryClient.invalidateQueries({ queryKey: ["scholarships", params.id] });
+			await queryClient.invalidateQueries({
+				queryKey: ["scholarships", params.id],
+			});
 			await queryClient.invalidateQueries({ queryKey: ["scholarships"] });
-			await queryClient.invalidateQueries({ queryKey: ["scholarships", "applicants", params.id] });
+			await queryClient.invalidateQueries({
+				queryKey: ["scholarships", "applicants", params.id],
+			});
 			toast.success("Scholarship ended", res.message, 1250);
 			setEnding(false);
 			setShowEndConfirmation(false);
@@ -411,8 +412,13 @@ function ApplicantsListPage() {
 				<div className="max-w-3xl mx-auto">
 					{/* Scholarship Info Header Skeleton */}
 					<div className="bg-[#F9FAFB] rounded-lg shadow-sm p-4 md:p-5 mb-3">
-						<Skeleton className="h-8 w-full mb-2 bg-muted-foreground" />
-						<Skeleton className="h-4 w-32 bg-muted-foreground" />
+						<div className="flex items-start justify-between gap-4">
+							<div className="flex-1">
+								<Skeleton className="h-8 w-2/3 mb-2 bg-muted-foreground" />
+								<Skeleton className="h-4 w-32 bg-muted-foreground" />
+							</div>
+							<Skeleton className="h-6 w-28 rounded-lg bg-muted-foreground shrink-0" />
+						</div>
 					</div>
 
 					{/* Toolbar Skeleton */}
@@ -622,21 +628,28 @@ function ApplicantsListPage() {
 					</div>
 
 					{/* Ranking Panel — swapped out for the results once a ranking is shown */}
-					{rankingEnabled && showRanking && !displayedRanking && scholarship && (
-						<RankingControlPanel
-							scholarship={scholarship}
-							applicants={filteredApplicants}
-							onRankingComplete={(result) => {
-								setRankingResult(result);
-								setPersistedDismissed(false);
-								queryClient.invalidateQueries({
-									queryKey: ["ranking", "latest", params.id],
-								});
-							}}
-							onShowSuccess={(title, message) => toast.success(title, message, 2000)}
-							onShowError={(title, message) => toast.error(title, message, 2500)}
-						/>
-					)}
+					{rankingEnabled &&
+						showRanking &&
+						!displayedRanking &&
+						scholarship && (
+							<RankingControlPanel
+								scholarship={scholarship}
+								applicants={filteredApplicants}
+								onRankingComplete={(result) => {
+									setRankingResult(result);
+									setPersistedDismissed(false);
+									queryClient.invalidateQueries({
+										queryKey: ["ranking", "latest", params.id],
+									});
+								}}
+								onShowSuccess={(title, message) =>
+									toast.success(title, message, 2000)
+								}
+								onShowError={(title, message) =>
+									toast.error(title, message, 2500)
+								}
+							/>
+						)}
 
 					{/* Ranking Results */}
 					{rankingEnabled && displayedRanking && (
@@ -653,7 +666,8 @@ function ApplicantsListPage() {
 								<div className="flex items-center gap-3">
 									{!rankingResult && (
 										<span className="text-xs text-[#9CA3AF]">
-											Last ranked {formatDateTime(displayedRanking.session.timestamp)}
+											Last ranked{" "}
+											{formatDateTime(displayedRanking.session.timestamp)}
 										</span>
 									)}
 									<button
@@ -672,7 +686,9 @@ function ApplicantsListPage() {
 							<RankedApplicationsTable
 								results={displayedRanking.rankedApplicants}
 								onApplicationClick={(applicationId) => {
-									const applicant = applicants.find((a) => a.id === applicationId);
+									const applicant = applicants.find(
+										(a) => a.id === applicationId,
+									);
 									if (applicant) {
 										openApplicantModal(applicant);
 									}
@@ -820,18 +836,24 @@ function ApplicantsListPage() {
 										</div>
 
 										{/* Disburse Funds — approved/granted scholars only */}
-										{(applicant.status.code === ScholarshipApplicationStatus.Approved ||
-											applicant.status.code === ScholarshipApplicationStatus.Granted) && (
+										{(applicant.status.code ===
+											ScholarshipApplicationStatus.Approved ||
+											applicant.status.code ===
+												ScholarshipApplicationStatus.Granted) && (
 											<div
 												className="mt-3 pt-3 border-t border-[#E5E7EB] flex items-center justify-between gap-2"
 												onClick={(e) => e.stopPropagation()}
 											>
 												{(() => {
-													const d = disbursementsByApplication.get(applicant.id);
+													const d = disbursementsByApplication.get(
+														applicant.id,
+													);
 													return d ? (
 														<DisbursementStatusBadge status={d.status} />
 													) : (
-														<span className="text-xs text-[#9CA3AF]">Not disbursed</span>
+														<span className="text-xs text-[#9CA3AF]">
+															Not disbursed
+														</span>
 													);
 												})()}
 												<button
@@ -1007,12 +1029,18 @@ function ApplicantsListPage() {
 																	{(() => {
 																		// Handle different value formats
 																		const value = item.value;
-																		
+
 																		// Check if it's an object with url property
-																		if (value && typeof value === "object" && !Array.isArray(value) && (value as any).url) {
+																		if (
+																			value &&
+																			typeof value === "object" &&
+																			!Array.isArray(value) &&
+																			(value as any).url
+																		) {
 																			const docData = value as any;
-																			const isPlaceholder = docData.url.includes('example.com');
-																			
+																			const isPlaceholder =
+																				docData.url.includes("example.com");
+
 																			return (
 																				<div className="space-y-2 mt-2">
 																					{isPlaceholder ? (
@@ -1021,15 +1049,23 @@ function ApplicantsListPage() {
 																								<FileText className="w-5 h-5 text-[#F59E0B] shrink-0" />
 																								<div className="flex-1">
 																									<p className="text-[11px] text-[#92400E] font-medium">
-																										📄 {docData.url.split("/").pop() || "Document"} (Test Data)
+																										📄{" "}
+																										{docData.url
+																											.split("/")
+																											.pop() || "Document"}{" "}
+																										(Test Data)
 																									</p>
 																									{docData.extractedText && (
 																										<p className="text-[10px] text-[#10B981] mt-1">
-																											✓ Contains extracted text for AI analysis
+																											✓ Contains extracted text
+																											for AI analysis
 																										</p>
 																									)}
 																									<p className="text-[10px] text-[#92400E] mt-1 italic">
-																										This is placeholder test data. In production, this would link to the actual uploaded file.
+																										This is placeholder test
+																										data. In production, this
+																										would link to the actual
+																										uploaded file.
 																									</p>
 																								</div>
 																							</div>
@@ -1045,11 +1081,18 @@ function ApplicantsListPage() {
 																								<FileText className="w-5 h-5 text-secondary shrink-0" />
 																								<div className="flex-1 min-w-0">
 																									<p className="text-[11px] text-primary truncate">
-																										{docData.url.split("/").pop() || "Document"}
+																										{docData.url
+																											.split("/")
+																											.pop() || "Document"}
 																									</p>
 																									{docData.extractedText && (
 																										<p className="text-[10px] text-[#10B981] mt-0.5">
-																											✓ Text extracted ({docData.extractedText.length} chars)
+																											✓ Text extracted (
+																											{
+																												docData.extractedText
+																													.length
+																											}{" "}
+																											chars)
 																										</p>
 																									)}
 																								</div>
@@ -1060,39 +1103,50 @@ function ApplicantsListPage() {
 																				</div>
 																			);
 																		}
-																		
+
 																		// Handle array of URLs (strings)
-																		if (Array.isArray(value) && value.length > 0 && typeof value[0] === "string" && value[0].startsWith("http")) {
+																		if (
+																			Array.isArray(value) &&
+																			value.length > 0 &&
+																			typeof value[0] === "string" &&
+																			value[0].startsWith("http")
+																		) {
 																			return (
 																				<div className="space-y-2 mt-2">
-																					{value.map((url: string, idx: number) => (
-																						<div
-																							key={idx}
-																							className="flex items-center justify-between bg-[#F3F4F6] px-4 py-3 rounded-lg border-l-4 border-[#3A52A6]"
-																						>
-																							<div className="flex items-center gap-3 flex-1 min-w-0">
-																								<FileText className="w-5 h-5 text-secondary shrink-0" />
-																								<p className="text-[11px] text-primary truncate">
-																									{url.split("/").pop() || "Document"}
-																								</p>
-																							</div>
-																							<button
-																								onClick={(e) => {
-																									e.stopPropagation();
-																									handleFileOpen(url);
-																								}}
-																								className="p-2 hover:bg-[#E0ECFF] rounded-lg transition-colors shrink-0"
+																					{value.map(
+																						(url: string, idx: number) => (
+																							<div
+																								key={idx}
+																								className="flex items-center justify-between bg-[#F3F4F6] px-4 py-3 rounded-lg border-l-4 border-[#3A52A6]"
 																							>
-																								<ExternalLink className="w-4 h-4 text-primary" />
-																							</button>
-																						</div>
-																					))}
+																								<div className="flex items-center gap-3 flex-1 min-w-0">
+																									<FileText className="w-5 h-5 text-secondary shrink-0" />
+																									<p className="text-[11px] text-primary truncate">
+																										{url.split("/").pop() ||
+																											"Document"}
+																									</p>
+																								</div>
+																								<button
+																									onClick={(e) => {
+																										e.stopPropagation();
+																										handleFileOpen(url);
+																									}}
+																									className="p-2 hover:bg-[#E0ECFF] rounded-lg transition-colors shrink-0"
+																								>
+																									<ExternalLink className="w-4 h-4 text-primary" />
+																								</button>
+																							</div>
+																						),
+																					)}
 																				</div>
 																			);
 																		}
-																		
+
 																		// Handle single string URL
-																		if (typeof value === "string" && value.startsWith("http")) {
+																		if (
+																			typeof value === "string" &&
+																			value.startsWith("http")
+																		) {
 																			return (
 																				<div className="space-y-2 mt-2">
 																					<a
@@ -1104,7 +1158,8 @@ function ApplicantsListPage() {
 																						<div className="flex items-center gap-3 flex-1 min-w-0">
 																							<FileText className="w-5 h-5 text-secondary shrink-0" />
 																							<p className="text-[11px] text-primary truncate">
-																								{value.split("/").pop() || "Document"}
+																								{value.split("/").pop() ||
+																									"Document"}
 																							</p>
 																						</div>
 																						<ExternalLink className="w-4 h-4 text-primary" />
@@ -1112,7 +1167,7 @@ function ApplicantsListPage() {
 																				</div>
 																			);
 																		}
-																		
+
 																		// Handle null or empty
 																		if (value === null || value === "") {
 																			return (
@@ -1121,11 +1176,13 @@ function ApplicantsListPage() {
 																				</p>
 																			);
 																		}
-																		
+
 																		// Handle other values (text, etc.)
 																		return (
 																			<p className="text-xs text-[#6B7280] leading-relaxed mt-1">
-																				{Array.isArray(value) ? value.join(", ") : String(value)}
+																				{Array.isArray(value)
+																					? value.join(", ")
+																					: String(value)}
 																			</p>
 																		);
 																	})()}
@@ -1402,7 +1459,10 @@ function ApplicantsListPage() {
 					<DialogHeader>
 						<DialogTitle className="font-normal">End Scholarship</DialogTitle>
 						<DialogDescription>
-							This will permanently end the {scholarship?.name} scholarship and notify all applicants. Selected applicants will receive a congratulatory message; others will receive a closing notice. This action cannot be undone.
+							This will permanently end the {scholarship?.name} scholarship and
+							notify all applicants. Selected applicants will receive a
+							congratulatory message; others will receive a closing notice. This
+							action cannot be undone.
 						</DialogDescription>
 					</DialogHeader>
 					<DialogFooter>

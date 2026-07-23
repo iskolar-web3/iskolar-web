@@ -29,6 +29,7 @@ import {
 import { toast } from "@/lib/toast";
 import { SEO } from "@/components/SEO";
 import SubmitConfirmationModal from "./-components/SubmitConfirmationModal";
+import ApplyScholarshipSkeleton from "./-components/ApplyScholarshipSkeleton";
 import { compressFile } from "@/utils/fileCompression.utils";
 import { handleError } from "@/lib/errorHandler";
 import { logger } from "@/lib/logger";
@@ -56,6 +57,7 @@ import type { Student } from "@/lib/student/model";
 
 export const Route = createFileRoute("/_student/scholarship/$id/apply/")({
 	component: ApplyScholarshipPage,
+	pendingComponent: ApplyScholarshipSkeleton,
 	loader: async ({ params }) => {
 		const applicationStatus = await getMyApplicationStatus(params.id);
 		return { applicationStatus };
@@ -612,80 +614,6 @@ function ApplyScholarshipPage() {
 		)
 	}
 
-	// if (loading) {
-	//   return (
-	//     <div className="min-h-screen bg-[#F8F9FC]">
-	//       <div className="max-w-[40rem] mx-auto space-y-4">
-	//         {/* Scholarship Details Skeleton */}
-	//         <div className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-[#E0ECFF]">
-	//           {/* Title Skeleton */}
-	//           <Skeleton className="h-7 w-full md:h-8 mb-3 bg-muted-foreground" />
-	//
-	//           {/* Sponsor Info Skeleton */}
-	//           <div className="flex items-center gap-2 mb-2">
-	//             <Skeleton className="w-4 h-4 rounded-full bg-muted-foreground" />
-	//             <Skeleton className="h-4 w-48 md:h-5 md:w-56 bg-muted-foreground" />
-	//           </div>
-	//
-	//           {/* Deadline Skeleton */}
-	//           <div className="flex items-center gap-2">
-	//             <Skeleton className="w-4 h-4 rounded bg-muted-foreground" />
-	//             <Skeleton className="h-4 w-40 md:h-5 md:w-48 bg-muted-foreground" />
-	//           </div>
-	//         </div>
-	//
-	//         {/* Application Form Skeleton */}
-	//         <div className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-[#E0ECFF]">
-	//           {/* Form Header Skeleton */}
-	//           <Skeleton className="h-5 w-36 md:h-6 md:w-40 mb-1 bg-muted-foreground" />
-	//           <Skeleton className="h-4 w-64 md:h-5 md:w-72 mb-6 md:mb-8 bg-muted-foreground" />
-	//
-	//           {/* Form Fields Skeleton */}
-	//           <div className="space-y-5">
-	//             {/* Text Field Skeleton */}
-	//             <div className="space-y-2">
-	//               <Skeleton className="h-4 w-24 md:h-5 md:w-28 bg-muted-foreground" />
-	//               <Skeleton className="h-11 w-full rounded-lg bg-muted-foreground" />
-	//             </div>
-	//
-	//             {/* Email Field Skeleton */}
-	//             <div className="space-y-2">
-	//               <Skeleton className="h-4 w-32 md:h-5 md:w-36 bg-muted-foreground" />
-	//               <Skeleton className="h-11 w-full rounded-lg bg-muted-foreground" />
-	//             </div>
-	//
-	//             {/* File Upload Field Skeleton */}
-	//             <div className="space-y-2">
-	//               <Skeleton className="h-4 w-48 md:h-5 md:w-56 bg-muted-foreground" />
-	//               <Skeleton className="h-12 w-full rounded-lg border-2 border-dashed bg-muted-foreground" />
-	//             </div>
-	//           </div>
-	//         </div>
-	//
-	//         <Skeleton className="h-10 md:h-12 w-full rounded-lg bg-muted-foreground" />
-	//       </div>
-	//     </div>
-	//   );
-	// }
-	//
-	// if (error) {
-	//   return (
-	//     <div className="min-h-screen flex items-center justify-center p-4">
-	//       <div className="text-center max-w-md">
-	//         <AlertCircle className="w-12 h-12 text-[#EF4444] mx-auto mb-4" />
-	//         <h3 className="text-lg text-primary mb-2">Something went wrong</h3>
-	//         <p className="text-[#5D6673] mb-6">{error}</p>
-	//         <button
-	//           onClick={() => queryClient.refetchQueries(getScholarshipByIdQuery(auth.sessionToken, params.id))}
-	//           className="px-6 py-2.5 bg-[#3A52A6] text-tertiary rounded-lg hover:bg-[#2A4296] transition-colors"
-	//         >
-	//           Try Again
-	//         </button>
-	//       </div>
-	//     </div>
-	//   );
-	// }
-	//
 	if (applicationStatus !== null) {
 		return (
 			<div className="min-h-screen bg-[#F8F9FC] flex items-center justify-center p-4">
