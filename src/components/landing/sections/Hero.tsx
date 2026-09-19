@@ -4,10 +4,14 @@ import { useRef } from "react"
 import { GraduationCapBg, GraduationCap3D } from "@/components/landing/graphics/GraduationCap"
 import { BLUE_DUOTONE, BLUE_TINT } from "@/components/landing/partners"
 
-const partners = [
+const partnerRow = [
   { src: "/partnerships/byc-ventures.png", alt: "BYC Ventures", size: "h-11 sm:h-12", filter: BLUE_TINT },
   { src: "/partnerships/qbo-innovation.png", alt: "QBO Innovation", size: "h-13 sm:h-15", filter: BLUE_DUOTONE },
   { src: "/partnerships/tutorials-dojo.png", alt: "Tutorials Dojo", size: "h-11 sm:h-12", filter: BLUE_TINT },
+  { src: "/partnerships/jia-whitecloak.png", alt: "Jia Talent Vault", size: "h-8 sm:h-9", filter: BLUE_TINT },
+]
+
+const communityRow = [
   { src: "/partnerships/cryptita-plays.png", alt: "Cryptita Plays", size: "h-18 sm:h-22", filter: BLUE_TINT },
   { src: "/partnerships/aws-learning-club-heron.png", alt: "AWS Learning Club - Heron", size: "h-17 sm:h-21", filter: BLUE_DUOTONE },
   { src: "/partnerships/tech-kubo.png", alt: "Tech Kubo", size: "h-20 sm:h-24", filter: BLUE_DUOTONE },
@@ -105,48 +109,51 @@ export function Hero() {
               <div className="h-px w-10 bg-secondary/20" />
             </div>
 
-            <motion.div
-              className="grid grid-cols-3 place-items-center gap-x-6 gap-y-8 lg:flex lg:flex-wrap lg:items-center lg:justify-center lg:gap-x-9 lg:gap-y-6"
-              initial={reduce ? "visible" : "hidden"}
-              whileInView="visible"
-              viewport={{ once: true, margin: "-80px" }}
-              variants={{
-                visible: {
-                  transition: { staggerChildren: 0.08, delayChildren: 0.1 },
-                },
-              }}
-            >
-              {partners.map((partner) => (
-                <motion.img
-                  key={partner.src}
-                  src={partner.src}
-                  alt={partner.alt}
-                  className={`${partner.size} w-auto object-contain will-change-transform`}
-                  style={{ filter: partner.filter }}
-                  variants={{
-                    hidden: { opacity: 0, y: 12 },
-                    visible: {
-                      opacity: 1,
-                      y: 0,
-                      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
-                    },
-                  }}
-                  whileHover={
-                    reduce
-                      ? undefined
-                      : {
-                          y: -3,
-                          scale: 1.04,
-                          transition: {
-                            type: "spring",
-                            stiffness: 260,
-                            damping: 22,
-                          },
-                        }
-                  }
-                />
-              ))}
-            </motion.div>
+            {[partnerRow, communityRow].map((row, rowIndex) => (
+              <motion.div
+                key={rowIndex}
+                className="grid grid-cols-3 place-items-center gap-x-6 gap-y-8 lg:flex lg:flex-wrap lg:items-center lg:justify-center lg:gap-x-9 lg:gap-y-6 mb-8 last:mb-0"
+                initial={reduce ? "visible" : "hidden"}
+                whileInView="visible"
+                viewport={{ once: true, margin: "-80px" }}
+                variants={{
+                  visible: {
+                    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+                  },
+                }}
+              >
+                {row.map((partner) => (
+                  <motion.img
+                    key={partner.src}
+                    src={partner.src}
+                    alt={partner.alt}
+                    className={`${partner.size} w-auto object-contain will-change-transform`}
+                    style={{ filter: partner.filter }}
+                    variants={{
+                      hidden: { opacity: 0, y: 12 },
+                      visible: {
+                        opacity: 1,
+                        y: 0,
+                        transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+                      },
+                    }}
+                    whileHover={
+                      reduce
+                        ? undefined
+                        : {
+                            y: -3,
+                            scale: 1.04,
+                            transition: {
+                              type: "spring",
+                              stiffness: 260,
+                              damping: 22,
+                            },
+                          }
+                    }
+                  />
+                ))}
+              </motion.div>
+            ))}
           </div>
         </MotionItem>
       </MotionContainer>
