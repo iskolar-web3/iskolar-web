@@ -13,6 +13,7 @@ export const BLUE_DUOTONE =
 
 export type PartnerCategory =
 	| "Strategic Incubation Partner"
+	| "Company Partner"
 	| "Community Partner";
 
 export type Partner = {
@@ -49,12 +50,22 @@ export const partners: Partner[] = [
 	},
 	{
 		name: "Tutorials Dojo",
-		category: "Strategic Incubation Partner",
+		category: "Company Partner",
 		logo: "/partnerships/tutorials-dojo.png",
 		description:
 			"Tutorials Dojo lends iSkolar its experience building learning products at scale, guiding how students discover scholarships and prepare for the opportunities that fit them.",
 		href: "https://tutorialsdojo.com",
 		linkLabel: "tutorialsdojo.com",
+		filter: BLUE_TINT,
+	},
+	{
+		name: "Jia Talent Vault",
+		category: "Company Partner",
+		logo: "/partnerships/jia-whitecloak.png",
+		description:
+			"Jia Talent Vault by WhiteCloak is a talent and internship platform built for the same vocation students iSkolar serves, giving them a place to turn verified scholarship achievements into internship and career opportunities.",
+		href: "https://talentvault.hellojia.ai",
+		linkLabel: "talentvault.hellojia.ai",
 		filter: BLUE_TINT,
 	},
 	{
@@ -106,6 +117,13 @@ export const partnerGroups: PartnerGroup[] = [
 		partners: partners.filter(
 			(p) => p.category === "Strategic Incubation Partner",
 		),
+	},
+	{
+		category: "Company Partner",
+		label: "Company Partners",
+		description:
+			"The companies that put iSkolar's verified credentials to work beyond the classroom, turning scholarship achievements into opportunities in the job market.",
+		partners: partners.filter((p) => p.category === "Company Partner"),
 	},
 	{
 		category: "Community Partner",
