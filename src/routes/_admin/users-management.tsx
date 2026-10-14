@@ -6,6 +6,7 @@ import {
 	adminDashboardQueryOptions,
 } from "@/lib/admin/queries";
 import UserTable from "@/components/admin/UserTable";
+import ExportUsersMenu from "@/components/admin/ExportUsersMenu";
 import { LocalTimeClock } from "@/components/landing/LocalTimeClock";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -195,6 +196,15 @@ function AdminUsers() {
 							<option value="sponsor">Sponsor</option>
 							<option value="admin">Admin</option>
 						</select>
+
+						<ExportUsersMenu
+							filters={{
+								role,
+								search: debouncedSearch || undefined,
+								sortBy: params.sortBy,
+								sortOrder,
+							}}
+						/>
 					</div>
 				</div>
 			</div>
