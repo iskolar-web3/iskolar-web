@@ -1,8 +1,6 @@
 export interface LumenCreateParams {
-	urlPath: string;
 	name: string;
 	description: string;
-	ownerAddress: string;
 	fileExtension: string;
 	checksum: string;
 	file: File;

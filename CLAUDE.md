@@ -51,7 +51,7 @@ Beyond login/register, the following flows are implemented in `src/lib/user/`:
 - **Password reset** — POST `/forgot-password`, GET `/reset-password?token=`, POST `/reset-password`
 
 ### Credentials (Lumen)
-Credentials are uploaded to Azure Blob Storage via the Lumen API (`src/lib/lumen/`):
+Credentials are uploaded to Azure Blob Storage via the Lumen API (`src/lib/lumen/`). The browser never holds Lumen credentials: it calls the server's `/lumen/files` routes, then PUTs the file to the returned SAS URL:
 - `api.ts` — `createLumenFile()`, `getLumenFile()`, `computeFileChecksum()`
 - `model.ts` — `LumenCreateParams`, `StoredCredential`, `LumenFileStatus` types
 - `storage.ts` — localStorage wrapper for credential persistence
@@ -72,8 +72,6 @@ Files (profile images, scholarship banners, application documents) are uploaded 
 VITE_BACKEND_URL=http://localhost:5000
 VITE_PINATA_JWT=
 VITE_GATEWAY_URL=
-VITE_TEST_LUMEN_API_KEY=
-VITE_TEST_LUMEN_API_SECRET=
 VITE_BASE_URL=
 VITE_SHOW_BETA_NOTICE=true
 VITE_ENABLE_LUMEN_CREDENTIALS=true

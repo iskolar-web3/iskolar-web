@@ -3,14 +3,7 @@ import type {
 	LumenCreateResponse,
 	LumenFileResponse,
 } from "./model";
-
-const LUMEN_BASE_URL = "https://lumen-api-mgmt-test.azure-api.net";
-const API_KEY = import.meta.env.VITE_TEST_LUMEN_API_KEY ?? "";
-const API_SECRET = import.meta.env.VITE_TEST_LUMEN_API_SECRET ?? "";
-
-/** Organization wallet registered with the Lumen API key */
-export const LUMEN_OWNER_ADDRESS =
-	"0xcB9C6A13B31C9d28f65f32a7eDFc0E2d87010515";
+import { BACKEND_URL, type ApiResponse, safeResponseJson } from "../api";
 
 const MIME_TYPES: Record<string, string> = {
 	pdf: "application/pdf",
@@ -25,13 +18,6 @@ function getMimeType(ext: string): string {
 	return MIME_TYPES[ext.toLowerCase()] ?? "application/octet-stream";
 }
 
-function authHeaders(): Record<string, string> {
-	return {
-		"lumen-api-key": API_KEY,
-		"lumen-api-secret": API_SECRET,
-	};
-}
-
 export async function computeFileChecksum(file: File): Promise<string> {
 	const buffer = await file.arrayBuffer();
 	const hash = await crypto.subtle.digest("SHA-256", buffer);
@@ -44,43 +30,30 @@ export async function computeFileChecksum(file: File): Promise<string> {
 export async function createLumenFile(
 	params: LumenCreateParams,
 ): Promise<LumenCreateResponse> {
-	const urlPath = encodeURIComponent(params.urlPath.replace(/\s+/g, "-"));
-
-	const res = await fetch(
-		`${LUMEN_BASE_URL}/file/file/create/${urlPath}`,
-		{
-			method: "POST",
-			headers: {
-				...authHeaders(),
-				"Content-Type": "application/json",
-				"Cache-Control": "no-cache",
-			},
-			body: JSON.stringify({
-				Path: "/Credential",
-				Name: params.name,
-				Description: params.description,
-				OwnerAddress: params.ownerAddress,
-				FileExtension: params.fileExtension,
-				Checksum: params.checksum,
-			}),
-		},
-	);
-
+	// The server holds the Lumen credentials and prefixes the file name.
+	const res = await fetch(`${BACKEND_URL}/lumen/files`, {
+		method: "POST",
+		credentials: "include",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({
+			name: params.name,
+			description: params.description,
+			fileExtension: params.fileExtension,
+			checksum: params.checksum,
+		}),
+	});
+	const result: ApiResponse<LumenCreateResponse> =
+		await safeResponseJson(res);
 	if (!res.ok) {
-		const text = await res.text().catch(() => "");
-		throw new Error(`Lumen create failed (${res.status}): ${text}`);
+		throw new Error(`Lumen create failed (${res.status}): ${result.message}`);
 	}
 
-	const { SASURL, WorkflowID } = (await res.json()) as {
-		SASURL: string;
-		WorkflowID: string;
-	};
-
-	if (!SASURL || !WorkflowID) {
+	const { workflowId, sasUrl, fetchKey } = result.data;
+	if (!sasUrl || !workflowId) {
 		throw new Error("Invalid Lumen response");
 	}
 
-	const upload = await fetch(SASURL, {
+	const upload = await fetch(sasUrl, {
 		method: "PUT",
 		headers: {
 			"x-ms-blob-type": "BlockBlob",
@@ -93,24 +66,20 @@ export async function createLumenFile(
 		throw new Error(`Blob upload failed (${upload.status})`);
 	}
 
-	return {
-		workflowId: WorkflowID,
-		sasUrl: SASURL,
-		fetchKey: `Credential/${params.name}.${params.fileExtension}`,
-	};
+	return { workflowId, sasUrl, fetchKey };
 }
 
-/** GET /file/file/{Name}.{Extension} */
 export async function getLumenFile(
 	fetchKey: string,
 ): Promise<LumenFileResponse | null> {
 	const res = await fetch(
-		`${LUMEN_BASE_URL}/file/file/${encodeURIComponent(fetchKey)}`,
-		{ headers: authHeaders() },
+		`${BACKEND_URL}/lumen/files?fetchKey=${encodeURIComponent(fetchKey)}`,
+		{ credentials: "include" },
 	);
 	if (!res.ok) return null;
 	try {
-		return (await res.json()) as LumenFileResponse;
+		const result: ApiResponse<LumenFileResponse> = await res.json();
+		return result.data;
 	} catch {
 		return null;
 	}

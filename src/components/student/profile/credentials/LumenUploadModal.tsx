@@ -19,7 +19,6 @@ import {
 	createLumenFile,
 	computeFileChecksum,
 	getLumenFile,
-	LUMEN_OWNER_ADDRESS,
 } from "@/lib/lumen/api";
 import { addStoredCredential, updateStoredCredential } from "@/lib/lumen/storage";
 import { useLumenCredentials } from "@/hooks/useLumenFiles";
@@ -129,7 +128,6 @@ export default function LumenUploadModal({
 
 		try {
 			const fileExt = file.name.split(".").pop()?.toLowerCase() ?? "pdf";
-			const lumenName = `${userId.slice(0, 8)}-${name.trim()}`;
 
 			// Check for duplicate file
 			const isDuplicate = credentials.some(
@@ -149,10 +147,8 @@ export default function LumenUploadModal({
 			const description = `${credentialType} credential issued by ${institution.trim()}`;
 
 			const { workflowId, fetchKey } = await createLumenFile({
-				urlPath: "Credential",
-				name: lumenName,
+				name: name.trim(),
 				description,
-				ownerAddress: LUMEN_OWNER_ADDRESS,
 				fileExtension: fileExt,
 				checksum,
 				file,
