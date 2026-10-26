@@ -172,6 +172,7 @@ export class DeterministicRanker {
 			},
 			credentials: "include",
 			body: JSON.stringify({
+				scholarshipId,
 				applicants,
 				criterias,
 				scholarshipDescription,
