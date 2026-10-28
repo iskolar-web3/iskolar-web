@@ -425,11 +425,26 @@ code {
 	}
 }
 
+/* ---- Modern landing (2026-10 redesign) ---- */
+/* Partner logo marquee */
+@keyframes marquee-x {
+	from { transform: translate3d(0, 0, 0); }
+	to { transform: translate3d(-50%, 0, 0); }
+}
+.marquee-track {
+	animation: marquee-x 40s linear infinite;
+}
+.marquee-mask {
+	mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+	-webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+}
+
 /* ---- Reduced motion: neutralize all decorative animation ---- */
 @media (prefers-reduced-motion: reduce) {
 	[style*="float-soothing"],
 	[style*="float-complex"],
 	[style*="soft-pulse"],
+	.marquee-track,
 	.hl-marker--animate,
 	.ruled-draw,
 	.dotted-draw {

@@ -5,27 +5,13 @@ import Navbar from "@/components/landing/Navbar";
 import AnimatedBackground from "@/components/landing/AnimatedBackground";
 import { Hero } from "@/components/landing/sections/Hero";
 import { ScrollToTop } from "@/components/landing/ScrollToTop";
-import { Suspense, lazy, useEffect } from "react";
+import { IntroSplash } from "@/components/landing/IntroSplash";
+import { Suspense, lazy, useCallback, useEffect, useState } from "react";
 
 // Lazy load below-the-fold sections
-const HowItWorks = lazy(() =>
-	import("@/components/landing/sections/HowItWorks").then((m) => ({
-		default: m.HowItWorks,
-	})),
-);
-const TargetUsers = lazy(() =>
-	import("@/components/landing/sections/TargetUsers").then((m) => ({
-		default: m.TargetUsers,
-	})),
-);
-const Testimonials = lazy(() =>
-	import("@/components/landing/sections/Testimonials").then((m) => ({
-		default: m.Testimonials,
-	})),
-);
-const Roadmap = lazy(() =>
-	import("@/components/landing/sections/Roadmap").then((m) => ({
-		default: m.Roadmap,
+const Journey = lazy(() =>
+	import("@/components/landing/sections/Journey").then((m) => ({
+		default: m.Journey,
 	})),
 );
 const Spotlight = lazy(() =>
@@ -56,6 +42,8 @@ export const Route = createFileRoute("/")({
 
 function App() {
 	useSmoothScroll();
+	const [introDone, setIntroDone] = useState(false);
+	const handleIntroDone = useCallback(() => setIntroDone(true), []);
 
 	useEffect(() => {
 		if (!window.location.hash) return;
@@ -75,17 +63,18 @@ function App() {
 	}, []);
 
 	return (
-		<main className="cursor-academic relative min-h-screen bg-background">
-			<SEO canonicalPath="/" />
+		<main className="cursor-academic relative isolate min-h-screen bg-background">
+			<SEO
+				canonicalPath="/"
+				description="iSkolar is a Philippine EdTech company building six connected products that support students from senior high to their first job: PathFinder, Review, iSkolar, Academy, Vocation, and Verity."
+			/>
 			<Navbar />
 			<AnimatedBackground />
-			<Hero />
+			<IntroSplash onDone={handleIntroDone} />
+			<Hero ready={introDone} />
 			<Suspense fallback={<div className="min-h-[50vh]" />}>
-				<HowItWorks />
-				<TargetUsers />
-				<Roadmap />
+				<Journey />
 				<Ecosystem />
-				<Testimonials />
 				<Spotlight />
 				<CTA />
 				<FAQ />

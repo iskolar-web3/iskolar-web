@@ -5,90 +5,76 @@ import {
 	MotionItem,
 } from "@/components/landing/MotionContainer";
 import { partnerGroups } from "@/components/landing/partners";
+import { SectionHeader } from "@/components/landing/SectionHeader";
 
 export function Ecosystem() {
 	return (
 		<section
 			id="ecosystem"
-			className="relative overflow-hidden py-20 lg:py-28 px-4 sm:px-12 lg:px-26"
+			className="relative py-24 lg:py-36 px-4 sm:px-12 lg:px-26"
 		>
 			<MotionContainer
-				className="relative z-30"
+				className="relative z-30 mx-auto max-w-6xl"
 				viewportMargin="-50px"
+				staggerDelay={0.12}
 			>
-				{/* Header */}
-				<MotionItem className="text-center mb-16 lg:mb-24">
-					<div className="inline-flex items-center gap-2 mb-4">
-						<div
-							className="w-1.5 h-1.5 bg-secondary rounded-full"
-							style={{ animation: "soft-pulse 3s ease-in-out infinite" }}
-						/>
-						<span className="text-xs uppercase tracking-[0.2em] text-secondary/55">
-							Ecosystem
-						</span>
-					</div>
-					<h2 className="text-3xl sm:text-4xl lg:text-5xl text-secondary text-balance">
-						The people building this with us
-					</h2>
-					<p className="text-base sm:text-lg text-secondary/70 max-w-xl mx-auto mt-4 text-pretty">
-						Building with partners, reaching students through communities.
-					</p>
-					{/* Know more */}
-					<MotionItem className="mt-6 flex justify-center lg:mt-8 lg:justify-end">
+				<div className="mb-14 lg:mb-20 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+					<SectionHeader
+						align="left"
+						eyebrow="Ecosystem"
+						title="The people building this with us"
+						description="Building with partners, reaching students through communities."
+					/>
+					<MotionItem>
 						<Link
 							to="/about"
 							hash="partnerships"
-							className="group inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-secondary transition-colors hover:text-secondary/70"
+							className="group inline-flex items-center gap-1.5 rounded-full border border-secondary/20 bg-card/70 px-4 py-2 text-sm font-medium text-secondary backdrop-blur transition-colors hover:border-secondary/40"
 						>
 							Know more
 							<ArrowUpRight
-								className="w-3.5 h-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+								className="w-4 h-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transition-none"
 								strokeWidth={1.75}
 							/>
 						</Link>
 					</MotionItem>
-				</MotionItem>
+				</div>
 
-				{/* Category groups */}
-				<div className="space-y-12 lg:space-y-16">
+				{/* One card per partner group */}
+				<div className="grid gap-4 lg:grid-cols-3">
 					{partnerGroups.map((group) => (
 						<MotionItem key={group.category}>
-							<div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-13 lg:gap-10">
-								{/* Category label */}
-								<h3 className="lg:col-span-4 text-md sm:text-lg uppercase leading-tight tracking-wide text-secondary text-balance">
-									{group.label}
-								</h3>
-
-								{/* Logo card */}
-								<div className="lg:col-span-5">
-									<Link
-										to="/about"
-										hash="partnerships"
-										aria-label={`Learn more about our ${group.label}`}
-										className="ruled-paper flex flex-wrap items-center justify-center gap-x-10 gap-y-8 rounded-2xl bg-card border border-secondary/15 px-8 py-12 shadow-[0_18px_45px_-30px_rgba(58,82,166,0.55)] outline-none transition-all hover:border-secondary/30 hover:shadow-[0_18px_45px_-24px_rgba(58,82,166,0.7)] focus-visible:ring-2 focus-visible:ring-secondary/40"
-									>
-										{group.partners.map((partner) => (
-											<img
-												key={partner.name}
-												src={partner.logo}
-												alt={partner.name}
-												loading="lazy"
-												style={{ filter: partner.filter }}
-												className={
-													group.category === "Community Partner"
-														? "max-h-20 max-w-52 object-contain"
-														: "max-h-14 max-w-40 object-contain"
-												}
-											/>
-										))}
-									</Link>
+							<Link
+								to="/about"
+								hash="partnerships"
+								aria-label={`Learn more about our ${group.label}`}
+								className="group flex h-full flex-col rounded-3xl border border-secondary/10 bg-card/80 p-2 backdrop-blur outline-none transition-colors hover:border-secondary/25 focus-visible:ring-2 focus-visible:ring-secondary/40"
+							>
+								<div className="flex min-h-44 flex-wrap items-center justify-center gap-x-8 gap-y-6 rounded-[1.25rem] bg-linear-to-br from-secondary/[0.06] to-transparent px-6 py-10">
+									{group.partners.map((partner) => (
+										<img
+											key={partner.name}
+											src={partner.logo}
+											alt={partner.name}
+											loading="lazy"
+											style={{ filter: partner.filter }}
+											className={`object-contain transition-transform duration-500 group-hover:scale-[1.03] motion-reduce:transition-none ${
+												group.category === "Community Partner"
+													? "max-h-16 max-w-28"
+													: "max-h-11 max-w-32"
+											}`}
+										/>
+									))}
 								</div>
-
-								{/* Group description */}
-								<p className="lg:col-span-4 text-sm text-secondary/75 leading-relaxed text-pretty">
-									{group.description}
-								</p>
-							</div>
+								<div className="px-4 pt-5 pb-4">
+									<h3 className="text-xs font-medium uppercase tracking-[0.16em] text-secondary">
+										{group.label}
+									</h3>
+									<p className="mt-2 text-sm text-secondary/60 leading-relaxed text-pretty">
+										{group.description}
+									</p>
+								</div>
+							</Link>
 						</MotionItem>
 					))}
 				</div>

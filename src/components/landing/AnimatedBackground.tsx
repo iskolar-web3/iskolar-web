@@ -1,260 +1,273 @@
-import { useEffect, useState } from "react"
-import { useReducedMotion } from "framer-motion"
+import { useReducedMotion } from "framer-motion";
+import { useEffect, useRef } from "react";
 
-type IconType = 
-  | "graduationCap" | "book" | "certificate" | "pencil" 
-  | "lightbulb" | "star" | "trophy" | "atom" 
-  | "globe" | "calculator" | "ruler" | "scroll" | "palette"
+// Interactive particle field behind the landing pages. Dots drift slowly and
+// link to close neighbours; the cursor gently pushes them aside and draws
+// threads to the nearest ones, and a click sends out a soft ripple.
+// Strictly brand blue (#3a52a6) on the light background.
 
-interface FloatingIcon {
-  id: number
-  size: number
-  x: number
-  y: number
-  delay: number
-  duration: number
-  opacity: number
-  type: IconType
-  rotation: number
-  color: string
-}
+type Particle = {
+	x: number;
+	y: number;
+	vx: number;
+	vy: number;
+	/** Resting drift velocity the particle eases back to after a push. */
+	dx: number;
+	dy: number;
+	r: number;
+	a: number;
+};
 
-const iconTypes: IconType[] = [
-  "graduationCap", "book", "certificate", "pencil", 
-  "lightbulb", "star", "trophy", "atom", 
-  "globe", "calculator", "ruler", "scroll", "palette"
-]
+type Ripple = { x: number; y: number; t: number };
 
-// Brand-only palette: theme blue (#3a52a6) and its lighter tints, plus a sky
-// accent. Keeps the floating motif strictly on the blue + white identity.
-const colors = [
-  '#3a52a6', // Theme blue (--secondary)
-  '#5b73c4', // Blue 400
-  '#8ea3e0', // Blue 300
-  '#60a5fa', // Sky
-]
+const BLUE = "58,82,166";
+const LINK_DIST = 120;
+const HOVER_RADIUS = 160;
+const RIPPLE_RADIUS = 240;
+const RIPPLE_MS = 900;
 
-function GraduationCap({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z" />
-    </svg>
-  )
-}
-
-function Book({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z" />
-    </svg>
-  )
-}
-
-function Certificate({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M4 3c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h8v5l3-3 3 3v-5h2c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H4zm0 2h16v10h-6v1.88l-1-1-1 1V15H4V5zm2 2v2h12V7H6zm0 4v2h8v-2H6z" />
-    </svg>
-  )
-}
-
-function Pencil({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-    </svg>
-  )
-}
-
-function Lightbulb({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M9 21c0 .5.4 1 1 1h4c.6 0 1-.5 1-1v-1H9v1zm3-19C8.1 2 5 5.1 5 9c0 2.4 1.2 4.5 3 5.7V17c0 .5.4 1 1 1h6c.6 0 1-.5 1-1v-2.3c1.8-1.3 3-3.4 3-5.7 0-3.9-3.1-7-7-7z" />
-    </svg>
-  )
-}
-
-function Star({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-    </svg>
-  )
-}
-
-function Trophy({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z" />
-    </svg>
-  )
-}
-
-function Atom({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
-      <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(0 12 12)" />
-      <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)" />
-      <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)" />
-      <circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/>
-    </svg>
-  )
-}
-
-function Globe({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
-      <circle cx="12" cy="12" r="10" />
-      <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-    </svg>
-  )
-}
-
-function Calculator({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/>
-      <path d="M7 7h10v2H7zm0 4h2v2H7zm0 4h2v2H7zm4-4h2v2h-2zm0 4h2v2h-2zm4-4h2v2h-2zm0 4h2v2h-2z"/>
-    </svg>
-  )
-}
-
-function Ruler({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M2 6h20v4h-2V8h-2v2h-2V8h-2v2h-2V8H8v2H6V8H4v2H2V6zm20 8H2v4h2v-2h2v2h2v-2h2v2h2v-2h2v2h2v-2h2v2h2v-4z"/>
-    </svg>
-  )
-}
-
-function Scroll({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7-1c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM5 5h4.18C9.07 5.38 9 5.83 9 6.29V19H5V5zm14 14h-4V6.29c0-.46-.07-.91-.18-1.29H19v14z"/>
-    </svg>
-  )
-}
-
-function Palette({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M12 3a9 9 0 0 0 0 18c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
-    </svg>
-  )
-}
-
-function IconRenderer({ type, className }: { type: IconType; className?: string }) {
-  switch (type) {
-    case "graduationCap": return <GraduationCap className={className} />
-    case "book": return <Book className={className} />
-    case "certificate": return <Certificate className={className} />
-    case "pencil": return <Pencil className={className} />
-    case "lightbulb": return <Lightbulb className={className} />
-    case "star": return <Star className={className} />
-    case "trophy": return <Trophy className={className} />
-    case "atom": return <Atom className={className} />
-    case "globe": return <Globe className={className} />
-    case "calculator": return <Calculator className={className} />
-    case "ruler": return <Ruler className={className} />
-    case "scroll": return <Scroll className={className} />
-    case "palette": return <Palette className={className} />
-    default: return <GraduationCap className={className} />
-  }
+function createParticles(width: number, height: number): Particle[] {
+	const count = Math.round(
+		Math.min(130, Math.max(36, (width * height) / 13000)),
+	);
+	return Array.from({ length: count }, () => {
+		const angle = Math.random() * Math.PI * 2;
+		const speed = 0.08 + Math.random() * 0.17;
+		const dx = Math.cos(angle) * speed;
+		const dy = Math.sin(angle) * speed;
+		return {
+			x: Math.random() * width,
+			y: Math.random() * height,
+			vx: dx,
+			vy: dy,
+			dx,
+			dy,
+			r: 1 + Math.random() * 1.6,
+			a: 0.25 + Math.random() * 0.45,
+		};
+	});
 }
 
 export default function AnimatedBackground() {
-  const [icons, setIcons] = useState<FloatingIcon[]>([])
-  const reduce = useReducedMotion()
+	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const reduce = useReducedMotion();
 
-  useEffect(() => {
-    // Skip the floating motif entirely for reduced-motion users.
-    if (reduce) {
-      setIcons([])
-      return
-    }
-    // Increased count for better coverage
-    const generatedIcons: FloatingIcon[] = Array.from({ length: 25 }, (_, i) => ({
-      id: i,
-      size: Math.random() * 40 + 20,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      delay: Math.random() * 20,
-      duration: Math.random() * 20 + 20,
-      opacity: Math.random() * 0.15 + 0.05,
-      type: iconTypes[Math.floor(Math.random() * iconTypes.length)],
-      rotation: Math.random() * 360, // Full rotation start
-      color: colors[Math.floor(Math.random() * colors.length)],
-    }))
-    setIcons(generatedIcons)
-  }, [reduce])
+	useEffect(() => {
+		const canvas = canvasRef.current;
+		const ctx = canvas?.getContext("2d");
+		if (!canvas || !ctx) return;
 
-  return (
-    <>
-      {/* Ambient mesh: soft blue glows over the white base for depth, plus a
-          faint grid that echoes the HowItWorks section. Sits behind content. */}
-      <div
-        className="fixed inset-0 -z-10 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(60vw 50vh at 18% 0%, rgba(58,82,166,0.12), transparent 60%)," +
-            "radial-gradient(55vw 45vh at 100% 20%, rgba(96,165,250,0.10), transparent 55%)," +
-            "radial-gradient(70vw 55vh at 50% 108%, rgba(58,82,166,0.08), transparent 60%)",
-        }}
-      />
-      <div
-        className="fixed inset-0 -z-10 pointer-events-none"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(58,82,166,0.04) 1px, transparent 1px)," +
-            "linear-gradient(90deg, rgba(58,82,166,0.04) 1px, transparent 1px)",
-          backgroundSize: "64px 64px",
-          maskImage:
-            "radial-gradient(ellipse 100% 80% at 50% 40%, black, transparent 80%)",
-          WebkitMaskImage:
-            "radial-gradient(ellipse 100% 80% at 50% 40%, black, transparent 80%)",
-        }}
-      />
-      <style>{`
-        @keyframes float-complex {
-          0% {
-            transform: translate(0, 0) rotate(var(--rotation));
-          }
-          25% {
-            transform: translate(10px, -15px) rotate(calc(var(--rotation) + 5deg));
-          }
-          50% {
-            transform: translate(0, -25px) rotate(calc(var(--rotation) + 10deg));
-          }
-          75% {
-            transform: translate(-10px, -15px) rotate(calc(var(--rotation) + 5deg));
-          }
-          100% {
-            transform: translate(0, 0) rotate(var(--rotation));
-          }
-        }
-      `}</style>
-      <div className="fixed inset-0 overflow-hidden pointer-events-none" style={{ zIndex: 25 }}>
-        {icons.map((icon) => (
-          <div
-            key={icon.id}
-            className="absolute"
-            style={{
-              left: `${icon.x}%`,
-              top: `${icon.y}%`,
-              width: icon.size,
-              height: icon.size,
-              opacity: icon.opacity,
-              color: icon.color,
-              animation: `float-complex ${icon.duration}s ease-in-out infinite`,
-              animationDelay: `-${icon.delay}s`, 
-              // @ts-ignore
-              '--rotation': `${icon.rotation}deg`,
-            }}
-          >
-            <IconRenderer type={icon.type} className="w-full h-full" />
-          </div>
-        ))}
-      </div>
-    </>
-  )
+		let width = 0;
+		let height = 0;
+		let particles: Particle[] = [];
+		const ripples: Ripple[] = [];
+		const pointer = { x: 0, y: 0, active: false };
+		let frame = 0;
+		let last = performance.now();
+
+		const resize = () => {
+			const dpr = Math.min(window.devicePixelRatio || 1, 2);
+			const prevWidth = width;
+			const prevHeight = height;
+			width = window.innerWidth;
+			height = window.innerHeight;
+			canvas.width = width * dpr;
+			canvas.height = height * dpr;
+			canvas.style.width = `${width}px`;
+			canvas.style.height = `${height}px`;
+			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+			if (particles.length === 0) {
+				particles = createParticles(width, height);
+			} else {
+				// Keep the same field on resize (mobile URL bar, rotation) so dots never jump.
+				for (const p of particles) {
+					p.x *= width / prevWidth;
+					p.y *= height / prevHeight;
+				}
+			}
+			if (reduce) draw(performance.now());
+		};
+
+		const draw = (now: number) => {
+			ctx.clearRect(0, 0, width, height);
+
+			// Links between neighbours
+			for (let i = 0; i < particles.length; i++) {
+				const p = particles[i];
+				for (let j = i + 1; j < particles.length; j++) {
+					const q = particles[j];
+					const dist = Math.hypot(p.x - q.x, p.y - q.y);
+					if (dist < LINK_DIST) {
+						ctx.strokeStyle = `rgba(${BLUE},${(1 - dist / LINK_DIST) * 0.16})`;
+						ctx.lineWidth = 1;
+						ctx.beginPath();
+						ctx.moveTo(p.x, p.y);
+						ctx.lineTo(q.x, q.y);
+						ctx.stroke();
+					}
+				}
+			}
+
+			// Threads from the cursor to nearby particles, over a soft glow
+			if (pointer.active) {
+				const glow = ctx.createRadialGradient(
+					pointer.x,
+					pointer.y,
+					0,
+					pointer.x,
+					pointer.y,
+					HOVER_RADIUS,
+				);
+				glow.addColorStop(0, `rgba(${BLUE},0.08)`);
+				glow.addColorStop(1, `rgba(${BLUE},0)`);
+				ctx.fillStyle = glow;
+				ctx.beginPath();
+				ctx.arc(pointer.x, pointer.y, HOVER_RADIUS, 0, Math.PI * 2);
+				ctx.fill();
+
+				for (const p of particles) {
+					const dist = Math.hypot(p.x - pointer.x, p.y - pointer.y);
+					if (dist < HOVER_RADIUS * 1.3) {
+						ctx.strokeStyle = `rgba(${BLUE},${(1 - dist / (HOVER_RADIUS * 1.3)) * 0.5})`;
+						ctx.beginPath();
+						ctx.moveTo(pointer.x, pointer.y);
+						ctx.lineTo(p.x, p.y);
+						ctx.stroke();
+					}
+				}
+			}
+
+			// Dots
+			for (const p of particles) {
+				ctx.fillStyle = `rgba(${BLUE},${p.a})`;
+				ctx.beginPath();
+				ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+				ctx.fill();
+			}
+
+			// Click ripples: an expanding ring that fades out
+			for (let i = ripples.length - 1; i >= 0; i--) {
+				const ripple = ripples[i];
+				// rAF timestamps can trail the pointer event time, so clamp at 0.
+				const t = Math.max(0, (now - ripple.t) / RIPPLE_MS);
+				if (t >= 1) {
+					ripples.splice(i, 1);
+					continue;
+				}
+				const eased = 1 - (1 - t) ** 3;
+				ctx.strokeStyle = `rgba(${BLUE},${(1 - t) * 0.35})`;
+				ctx.lineWidth = 1.25;
+				ctx.beginPath();
+				ctx.arc(ripple.x, ripple.y, eased * RIPPLE_RADIUS, 0, Math.PI * 2);
+				ctx.stroke();
+			}
+		};
+
+		const step = (now: number) => {
+			// Normalise to 60fps steps so motion stays even on any refresh rate.
+			const dt = Math.min((now - last) / 16.67, 3);
+			last = now;
+
+			for (const p of particles) {
+				if (pointer.active) {
+					const ox = p.x - pointer.x;
+					const oy = p.y - pointer.y;
+					const dist = Math.hypot(ox, oy);
+					if (dist > 0 && dist < HOVER_RADIUS) {
+						const force = (1 - dist / HOVER_RADIUS) * 0.06;
+						p.vx += (ox / dist) * force * dt;
+						p.vy += (oy / dist) * force * dt;
+					}
+				}
+
+				// Ease back toward the resting drift for a smooth settle.
+				p.vx += (p.dx - p.vx) * 0.025 * dt;
+				p.vy += (p.dy - p.vy) * 0.025 * dt;
+				p.x += p.vx * dt;
+				p.y += p.vy * dt;
+
+				// Wrap around the edges
+				if (p.x < -10) p.x = width + 10;
+				else if (p.x > width + 10) p.x = -10;
+				if (p.y < -10) p.y = height + 10;
+				else if (p.y > height + 10) p.y = -10;
+			}
+
+			draw(now);
+			frame = requestAnimationFrame(step);
+		};
+
+		const onMove = (e: PointerEvent) => {
+			if (e.pointerType === "touch") return;
+			pointer.x = e.clientX;
+			pointer.y = e.clientY;
+			pointer.active = true;
+		};
+		const onOut = (e: PointerEvent) => {
+			// relatedTarget is null once the pointer leaves the window.
+			if (!e.relatedTarget) pointer.active = false;
+		};
+		const onDown = (e: PointerEvent) => {
+			ripples.push({ x: e.clientX, y: e.clientY, t: performance.now() });
+			for (const p of particles) {
+				const ox = p.x - e.clientX;
+				const oy = p.y - e.clientY;
+				const dist = Math.hypot(ox, oy);
+				if (dist > 0 && dist < RIPPLE_RADIUS) {
+					const impulse = (1 - dist / RIPPLE_RADIUS) * 4;
+					p.vx += (ox / dist) * impulse;
+					p.vy += (oy / dist) * impulse;
+				}
+			}
+		};
+		const onVisibility = () => {
+			cancelAnimationFrame(frame);
+			if (!document.hidden && !reduce) {
+				last = performance.now();
+				frame = requestAnimationFrame(step);
+			}
+		};
+
+		resize();
+		window.addEventListener("resize", resize);
+
+		if (reduce) {
+			// Still field, no motion or interaction.
+			draw(performance.now());
+			return () => window.removeEventListener("resize", resize);
+		}
+
+		window.addEventListener("pointermove", onMove, { passive: true });
+		window.addEventListener("pointerdown", onDown, { passive: true });
+		document.addEventListener("pointerout", onOut);
+		document.addEventListener("visibilitychange", onVisibility);
+		frame = requestAnimationFrame(step);
+
+		return () => {
+			cancelAnimationFrame(frame);
+			window.removeEventListener("resize", resize);
+			window.removeEventListener("pointermove", onMove);
+			window.removeEventListener("pointerdown", onDown);
+			document.removeEventListener("pointerout", onOut);
+			document.removeEventListener("visibilitychange", onVisibility);
+		};
+	}, [reduce]);
+
+	return (
+		<div
+			aria-hidden
+			className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+		>
+			{/* Faint wash for depth under the particles */}
+			<div
+				className="absolute inset-0"
+				style={{
+					background:
+						"radial-gradient(70vw 60vh at 20% 0%, rgba(58,82,166,0.08), transparent 60%)," +
+						"radial-gradient(60vw 50vh at 100% 60%, rgba(58,82,166,0.06), transparent 60%)",
+				}}
+			/>
+			<canvas ref={canvasRef} className="absolute inset-0" />
+		</div>
+	);
 }

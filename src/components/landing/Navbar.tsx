@@ -2,56 +2,61 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { products } from "@/components/landing/products";
 
-const homeLinks = [
-	{
-		name: "Home",
-		href: "/",
-		dropdown: [
-			{ name: "Home", href: "#home" },
-			{ name: "Overview", href: "#how-it-works" },
-			{ name: "Roadmap", href: "#roadmap" },
-			{ name: "Ecosystem", href: "#ecosystem" },
-			{ name: "Stories", href: "#testimonials" },
-			{ name: "FAQs", href: "#faqs" },
-		],
-	},
-	{
-		name: "About",
-		href: "/about",
-		dropdown: [
-			{ name: "Company Overview", href: "/about#company-overview" },
-			{ name: "Mission & Vision", href: "/about#mission-vision" },
-			{ name: "Partnerships", href: "/about#partnerships" },
-			{ name: "Our Team", href: "/about#team" },
-		],
-	},
+const homeSections = [
+	{ name: "Home", id: "home" },
+	{ name: "Products", id: "products" },
+	{ name: "Ecosystem", id: "ecosystem" },
+	{ name: "In the News", id: "in-the-news" },
+	{ name: "FAQs", id: "faqs" },
 ];
 
-const aboutLinks = [
-	{
-		name: "Home",
-		href: "/",
-		dropdown: [
-			{ name: "Home", href: "/#home" },
-			{ name: "Overview", href: "/#how-it-works" },
-			{ name: "Roadmap", href: "/#roadmap" },
-			{ name: "Ecosystem", href: "/#ecosystem" },
-			{ name: "Stories", href: "/#testimonials" },
-			{ name: "FAQs", href: "/#faqs" },
-		],
-	},
-	{
-		name: "About",
-		href: "/about",
-		dropdown: [
-			{ name: "Company Overview", href: "#company-overview" },
-			{ name: "Mission & Vision", href: "#mission-vision" },
-			{ name: "Partnerships", href: "#partnerships" },
-			{ name: "Our Team", href: "#team" },
-		],
-	},
+const aboutSections = [
+	{ name: "Company Overview", id: "company-overview" },
+	{ name: "Mission & Vision", id: "mission-vision" },
+	{ name: "Partnerships", id: "partnerships" },
+	{ name: "Our Team", id: "team" },
 ];
+
+type NavItem = { name: string; href: string; hint?: string };
+type NavLink = { name: string; href: string; dropdown: NavItem[] };
+
+// Hash links stay on the current page; everything else is prefixed with its route.
+function buildLinks(onAbout: boolean): NavLink[] {
+	const home = onAbout ? "/#" : "#";
+	const about = onAbout ? "#" : "/about#";
+	return [
+		{
+			name: "Home",
+			href: "/",
+			dropdown: homeSections.map((s) => ({
+				name: s.name,
+				href: `${home}${s.id}`,
+			})),
+		},
+		{
+			name: "Products",
+			href: "/",
+			dropdown: products.map((p) => ({
+				name: p.name,
+				hint: p.stage,
+				href: `${home}${p.id}`,
+			})),
+		},
+		{
+			name: "About",
+			href: "/about",
+			dropdown: aboutSections.map((s) => ({
+				name: s.name,
+				href: `${about}${s.id}`,
+			})),
+		},
+	];
+}
+
+const homeLinks = buildLinks(false);
+const aboutLinks = buildLinks(true);
 
 export default function Navbar() {
 	const location = useLocation();
@@ -103,19 +108,18 @@ export default function Navbar() {
 	};
 
 	return (
-		<nav
-			className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-				isScrolled
-					? "bg-card/90 shadow-lg shadow-secondary/10 border-b border-secondary/15"
-					: "bg-transparent border-b border-transparent"
-			}`}
-			style={{ backdropFilter: isScrolled ? "blur(12px)" : "none" }}
-		>
-			<div className="px-4 sm:px-12 lg:px-26">
-				<div className="flex items-center justify-between h-16 lg:h-20">
+		<nav className="fixed top-0 z-50 w-full px-3 pt-3 sm:px-6">
+			<div
+				className={`mx-auto max-w-6xl rounded-full border px-4 sm:px-6 transition-all duration-500 ${
+					isScrolled || isMobileMenuOpen
+						? "border-secondary/15 bg-card/80 shadow-[0_12px_40px_-20px_rgba(58,82,166,0.45)] backdrop-blur-xl"
+						: "border-transparent bg-transparent"
+				}`}
+			>
+				<div className="flex h-14 items-center justify-between lg:h-16">
 					{/* Logo */}
 					<a href="/#home" className="flex items-center gap-2">
-						<div className="w-25 h-10 md:w-34 md:h-14 flex items-center justify-center">
+						<div className="w-24 h-9 md:w-28 md:h-11 flex items-center justify-center">
 							<img
 								src={"/logo2.png"}
 								alt="Logo"
@@ -154,7 +158,7 @@ export default function Navbar() {
 													handleNavClick(e, link.href);
 												}
 											}}
-											className={`relative flex items-center gap-1 text-md text-secondary transition-colors hover:text-secondary/80 after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:rounded-full after:bg-secondary/40 after:transition-transform after:duration-300 hover:after:scale-x-100 motion-reduce:after:transition-none ${activeDropdown === link.name ? "text-secondary/80 after:scale-x-100" : ""}`}
+											className={`relative flex items-center gap-1 text-sm font-medium text-secondary transition-colors hover:text-secondary/80 after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:rounded-full after:bg-secondary/40 after:transition-transform after:duration-300 hover:after:scale-x-100 motion-reduce:after:transition-none ${activeDropdown === link.name ? "text-secondary/80 after:scale-x-100" : ""}`}
 										>
 											{link.name}
 											{link.dropdown && (
@@ -169,7 +173,7 @@ export default function Navbar() {
 										<a
 											href={link.href}
 											onClick={(e) => handleNavClick(e, link.href)}
-											className="relative flex items-center gap-1 text-md text-secondary transition-colors hover:text-secondary/80 after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:rounded-full after:bg-secondary/40 after:transition-transform after:duration-300 hover:after:scale-x-100 motion-reduce:after:transition-none"
+											className="relative flex items-center gap-1 text-sm font-medium text-secondary transition-colors hover:text-secondary/80 after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:rounded-full after:bg-secondary/40 after:transition-transform after:duration-300 hover:after:scale-x-100 motion-reduce:after:transition-none"
 										>
 											{link.name}
 										</a>
@@ -183,7 +187,7 @@ export default function Navbar() {
 												animate={{ opacity: 1, y: 0 }}
 												exit={{ opacity: 0, y: -8 }}
 												transition={{ duration: 0.2, ease: "easeOut" }}
-												className="absolute top-full left-0 mt-2 w-56 bg-card rounded-md shadow-lg shadow-secondary/10 border border-secondary/15 py-2"
+												className="absolute top-full left-1/2 -translate-x-1/2 mt-4 min-w-56 whitespace-nowrap rounded-2xl border border-secondary/15 bg-card/95 p-1.5 shadow-[0_20px_50px_-24px_rgba(58,82,166,0.5)] backdrop-blur-xl"
 											>
 												{link.dropdown.map((item) => (
 													<a
@@ -196,9 +200,14 @@ export default function Navbar() {
 															// If it's a real page navigation, let it happen but close dropdown
 															setActiveDropdown(null);
 														}}
-														className="flex items-center justify-between px-4 py-2 text-sm text-secondary transition-colors hover:bg-secondary/10"
+														className="flex items-center justify-between gap-6 rounded-xl px-3 py-2 text-sm text-secondary transition-colors hover:bg-secondary/[0.07]"
 													>
 														{item.name}
+														{item.hint && (
+															<span className="text-xs text-secondary/55">
+																{item.hint}
+															</span>
+														)}
 													</a>
 												))}
 											</motion.div>
@@ -213,7 +222,7 @@ export default function Navbar() {
 					<div className="hidden lg:block">
 						<a
 							href="/login"
-							className="inline-flex items-center justify-center text-sm px-6 py-2 bg-transparent border-2 border-secondary hover:bg-secondary text-secondary hover:text-tertiary rounded-md transition-colors"
+							className="inline-flex items-center justify-center rounded-full bg-secondary px-5 py-2 text-sm font-medium text-tertiary transition-colors hover:bg-secondary/90"
 						>
 							Get Started
 						</a>
@@ -239,7 +248,7 @@ export default function Navbar() {
 			<AnimatePresence>
 				{isMobileMenuOpen && (
 					<motion.div
-						className="lg:hidden bg-card border-t border-secondary/15"
+						className="lg:hidden mx-auto mt-2 max-w-6xl rounded-3xl border border-secondary/15 bg-card/95 shadow-[0_12px_40px_-20px_rgba(58,82,166,0.45)] backdrop-blur-xl"
 						initial={{ opacity: 0, y: -10 }}
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: -10 }}
@@ -321,7 +330,7 @@ export default function Navbar() {
 							<a
 								href="/login"
 								onClick={(e) => handleNavClick(e, "/login")}
-								className="block w-full mt-4 px-6 py-2 text-sm bg-secondary hover:bg-secondary/80 text-tertiary rounded-md text-center transition-colors"
+								className="block w-full mt-4 px-6 py-2.5 text-sm font-medium bg-secondary hover:bg-secondary/90 text-tertiary rounded-full text-center transition-colors"
 							>
 								Get Started
 							</a>

@@ -1,10 +1,11 @@
 import { useReducedMotion } from "framer-motion";
-import { ArrowUpRight, BookOpen, GraduationCap, Newspaper } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import {
 	cardHoverLift,
 	MotionContainer,
 	MotionItem,
 } from "@/components/landing/MotionContainer";
+import { SectionHeader } from "@/components/landing/SectionHeader";
 
 type Coverage = {
 	source: string;
@@ -44,13 +45,6 @@ const coverage: Coverage[] = [
 	},
 ];
 
-// Faint scattered education doodles, matching the Voices section treatment.
-const doodles = [
-	{ icon: Newspaper, className: "top-[8%] left-[4%] w-10 h-10 -rotate-12" },
-	{ icon: GraduationCap, className: "top-[14%] right-[6%] w-12 h-12 rotate-6" },
-	{ icon: BookOpen, className: "bottom-[10%] left-[8%] w-11 h-11 rotate-6" },
-];
-
 export function Spotlight() {
 	const reduce = useReducedMotion();
 	const lift = reduce ? {} : cardHoverLift;
@@ -58,44 +52,22 @@ export function Spotlight() {
 	return (
 		<section
 			id="in-the-news"
-			className="relative overflow-hidden py-20 lg:py-28"
+			className="relative py-24 lg:py-36 px-4 sm:px-12 lg:px-26"
 		>
-			{/* Decorative doodles */}
-			<div className="pointer-events-none absolute inset-0 hidden sm:block">
-				{doodles.map((doodle) => (
-					<doodle.icon
-						key={doodle.className}
-						className={`absolute text-secondary/[0.07] ${doodle.className}`}
-						strokeWidth={1.5}
-					/>
-				))}
-			</div>
-
 			<MotionContainer
-				className="relative z-30 px-4 sm:px-12 lg:px-26"
+				className="relative z-30 mx-auto max-w-6xl"
 				viewportMargin="-50px"
+				staggerDelay={0.1}
 			>
-				{/* Header */}
-				<MotionItem className="text-center mb-12 lg:mb-16">
-					<div className="inline-flex items-center gap-2 mb-4">
-						<div
-							className="w-1.5 h-1.5 bg-secondary rounded-full"
-							style={{ animation: "soft-pulse 3s ease-in-out infinite" }}
-						/>
-						<span className="text-xs uppercase tracking-[0.2em] text-secondary/55">
-							Spotlight
-						</span>
-					</div>
-					<h2 className="text-3xl sm:text-4xl lg:text-5xl text-secondary text-balance">
-						iSkolar in the press
-					</h2>
-					<p className="text-base sm:text-lg text-secondary/70 max-w-xl mx-auto mt-4 text-pretty">
-						Coverage of the team and the partnerships we've built.
-					</p>
-				</MotionItem>
+				<SectionHeader
+					eyebrow="Spotlight"
+					title="iSkolar in the press"
+					description="Coverage of the team and the partnerships we've built."
+					className="mb-14 lg:mb-20"
+				/>
 
 				{/* Coverage cards */}
-				<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 					{coverage.map((item) => (
 						<MotionItem
 							key={item.href}
@@ -106,26 +78,30 @@ export function Spotlight() {
 								href={item.href}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="ruled-paper group relative flex h-full flex-col overflow-hidden rounded-xs bg-card border border-secondary/15 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-secondary/40"
+								className="group flex h-full flex-col rounded-3xl border border-secondary/10 bg-card/80 p-2 backdrop-blur outline-none transition-colors hover:border-secondary/25 focus-visible:ring-2 focus-visible:ring-secondary/40"
 							>
-								{/* Featured image */}
-								<div className="relative aspect-1200/630 overflow-hidden bg-secondary/5">
+								<div className="relative aspect-1200/630 overflow-hidden rounded-[1.25rem] bg-secondary/5">
 									<img
 										src={item.image}
 										alt={`${item.source} coverage of iSkolar`}
 										loading="lazy"
-										className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+										className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04] motion-reduce:transition-none"
 									/>
 								</div>
 
-								<div className="flex grow flex-col p-4 lg:p-6">
-									<h3 className="text-sm lg:text-base text-secondary leading-snug text-balance">
+								<div className="flex grow flex-col px-3 pt-4 pb-3">
+									<span className="text-[11px] font-medium uppercase tracking-[0.16em] text-secondary/50">
+										{item.source}
+									</span>
+									<h3 className="mt-2 text-sm font-medium text-secondary leading-snug text-pretty">
 										{item.title}
 									</h3>
-
-									<span className="inline-flex items-center gap-1.5 mt-auto pt-6 border-t border-secondary/10 text-xs text-secondary/60 transition-colors group-hover:text-secondary">
+									<span className="mt-auto inline-flex items-center gap-1 pt-5 text-xs text-secondary/60 transition-colors group-hover:text-secondary">
 										Read on {item.source}
-										<ArrowUpRight className="w-4 h-4" strokeWidth={1.75} />
+										<ArrowUpRight
+											className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transition-none"
+											strokeWidth={1.75}
+										/>
 									</span>
 								</div>
 							</a>
