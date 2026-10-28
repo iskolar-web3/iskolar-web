@@ -18,7 +18,7 @@ export default function MissionVisionSection() {
               </div>
               <h3 className="text-2xl mb-4 text-secondary">Our Vision</h3>
               <p className="text-lg text-secondary/80 leading-relaxed">
-                A future where every student can pursue their dream education, supported by transparent funding, future-proof opportunities, and a community that invests in the next generation's success.
+                A world where every student's potential is recognized, accessible, and connected to the opportunities they deserve.
               </p>
             </div>
 
@@ -29,7 +29,7 @@ export default function MissionVisionSection() {
               </div>
               <h3 className="text-2xl mb-4 text-secondary">Our Mission</h3>
               <p className="text-lg text-secondary/80 leading-relaxed">
-                To make education accessible, fair, and transparent for all by creating a trusted system that connects learners, sponsors, and institutions, ensuring that every individual, regardless of stage or circumstance, receives the opportunity they rightfully deserve to learn, grow, and shape their future.
+                To build the unified platform that centralizes student talent, simplifies credential verification, and seamlessly connects ambitious learners with scholarships, grants, and career-defining opportunities.
               </p>
             </div>
           </div>

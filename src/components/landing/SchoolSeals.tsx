@@ -15,17 +15,13 @@ export function SchoolSeals() {
 				{schools.map((school) => (
 					<li
 						key={school.id}
-						title={school.name}
-						className="group flex w-9 flex-col items-center text-center sm:w-12 lg:w-20 xl:w-24"
+						className="group flex w-9 flex-col items-center text-center sm:w-12 lg:w-14 xl:w-16"
 					>
 						<img
 							src={school.logo}
 							alt={school.name}
 							className="h-9 w-9 object-contain transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 motion-reduce:transition-none sm:h-12 sm:w-12 lg:h-14 lg:w-14"
 						/>
-						<p className="mt-1.5 hidden w-full truncate text-[11px] leading-tight text-secondary/55 transition-colors group-hover:text-secondary lg:block">
-							{school.shortName}
-						</p>
 					</li>
 				))}
 			</ul>
