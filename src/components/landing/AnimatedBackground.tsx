@@ -1,52 +1,44 @@
 import { useReducedMotion } from "framer-motion";
 import { useEffect, useRef } from "react";
 
-// Interactive particle field behind the landing pages. Dots drift slowly and
-// link to close neighbours; the cursor gently pushes them aside and draws
-// threads to the nearest ones, and a click sends out a soft ripple.
+// Blueprint grid behind the landing pages, like a sheet of graph paper. A soft
+// light band drifts across it; the cursor bends the grid like a magnifying lens
+// and marks the nearest grid point; a click draws a compass construction, and a
+// second quick click elsewhere joins the two points with a measured ruler line.
 // Strictly brand blue (#3a52a6) on the light background.
 
-type Particle = {
-	x: number;
-	y: number;
-	vx: number;
-	vy: number;
-	/** Resting drift velocity the particle eases back to after a push. */
-	dx: number;
-	dy: number;
-	r: number;
-	a: number;
-};
-
-type Ripple = { x: number; y: number; t: number };
+type Construction =
+	| {
+			kind: "circle";
+			x: number;
+			y: number;
+			units: number;
+			angle: number;
+			t: number;
+	  }
+	| {
+			kind: "ruler";
+			ax: number;
+			ay: number;
+			bx: number;
+			by: number;
+			t: number;
+	  };
 
 const BLUE = "58,82,166";
-const LINK_DIST = 120;
-const HOVER_RADIUS = 160;
-const RIPPLE_RADIUS = 240;
-const RIPPLE_MS = 900;
+const GAP = 32;
+const MAJOR_EVERY = 4;
+const LENS_R = 170;
+const LENS_PUSH = 0.45;
+const BAND_W = 140;
+const BAND_MS = 14000;
+const CONSTRUCT_MS = 2600;
+const RULER_WINDOW_MS = 1200;
+const MAX_CONSTRUCTIONS = 8;
+const FONT = '11px "Bree Serif", serif';
 
-function createParticles(width: number, height: number): Particle[] {
-	const count = Math.round(
-		Math.min(130, Math.max(36, (width * height) / 13000)),
-	);
-	return Array.from({ length: count }, () => {
-		const angle = Math.random() * Math.PI * 2;
-		const speed = 0.08 + Math.random() * 0.17;
-		const dx = Math.cos(angle) * speed;
-		const dy = Math.sin(angle) * speed;
-		return {
-			x: Math.random() * width,
-			y: Math.random() * height,
-			vx: dx,
-			vy: dy,
-			dx,
-			dy,
-			r: 1 + Math.random() * 1.6,
-			a: 0.25 + Math.random() * 0.45,
-		};
-	});
-}
+const easeOut = (t: number) => 1 - (1 - t) ** 3;
+const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 export default function AnimatedBackground() {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -59,16 +51,49 @@ export default function AnimatedBackground() {
 
 		let width = 0;
 		let height = 0;
-		let particles: Particle[] = [];
-		const ripples: Ripple[] = [];
+		// Grid origin, centred so the margins match on both sides.
+		let originX = 0;
+		let originY = 0;
+		let cols = 0;
+		let rows = 0;
+		const constructions: Construction[] = [];
 		const pointer = { x: 0, y: 0, active: false };
+		// Lens and crosshair trail the pointer slightly so they glide.
+		const lens = { x: 0, y: 0, amt: 0 };
+		const cross = { x: 0, y: 0 };
+		let lastClick: { x: number; y: number; t: number } | null = null;
+		let lastPointerType = "mouse";
 		let frame = 0;
 		let last = performance.now();
 
+		// Displaced position and lens influence (0..1) of a grid point, written
+		// into shared vars to avoid allocating per dot per frame.
+		let outX = 0;
+		let outY = 0;
+		let outInfl = 0;
+		const displace = (x: number, y: number) => {
+			outX = x;
+			outY = y;
+			outInfl = 0;
+			if (lens.amt < 0.01) return;
+			const ox = x - lens.x;
+			const oy = y - lens.y;
+			const dist = Math.hypot(ox, oy);
+			if (dist >= LENS_R) return;
+			const f = 1 - dist / LENS_R;
+			const push = f * f * LENS_PUSH * lens.amt;
+			outX = x + ox * push;
+			outY = y + oy * push;
+			outInfl = f * lens.amt;
+		};
+
+		const snap = (x: number, y: number) => ({
+			x: originX + Math.round((x - originX) / GAP) * GAP,
+			y: originY + Math.round((y - originY) / GAP) * GAP,
+		});
+
 		const resize = () => {
 			const dpr = Math.min(window.devicePixelRatio || 1, 2);
-			const prevWidth = width;
-			const prevHeight = height;
 			width = window.innerWidth;
 			height = window.innerHeight;
 			canvas.width = width * dpr;
@@ -76,91 +101,198 @@ export default function AnimatedBackground() {
 			canvas.style.width = `${width}px`;
 			canvas.style.height = `${height}px`;
 			ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-			if (particles.length === 0) {
-				particles = createParticles(width, height);
-			} else {
-				// Keep the same field on resize (mobile URL bar, rotation) so dots never jump.
-				for (const p of particles) {
-					p.x *= width / prevWidth;
-					p.y *= height / prevHeight;
-				}
-			}
-			if (reduce) draw(performance.now());
+			cols = Math.floor(width / GAP) + 2;
+			rows = Math.floor(height / GAP) + 2;
+			originX = (width - (cols - 1) * GAP) / 2;
+			originY = (height - (rows - 1) * GAP) / 2;
+			if (reduce) draw(performance.now(), true);
 		};
 
-		const draw = (now: number) => {
-			ctx.clearRect(0, 0, width, height);
+		const drawMajorLines = () => {
+			ctx.strokeStyle = `rgba(${BLUE},0.05)`;
+			ctx.lineWidth = 1;
+			ctx.beginPath();
+			// Sample at half steps so lines bend smoothly through the lens.
+			const step = GAP / 2;
+			for (let c = 0; c < cols; c += MAJOR_EVERY) {
+				const x = originX + c * GAP;
+				for (
+					let y = originY, i = 0;
+					y <= originY + (rows - 1) * GAP;
+					y += step, i++
+				) {
+					displace(x, y);
+					if (i === 0) ctx.moveTo(outX, outY);
+					else ctx.lineTo(outX, outY);
+				}
+			}
+			for (let r = 0; r < rows; r += MAJOR_EVERY) {
+				const y = originY + r * GAP;
+				for (
+					let x = originX, i = 0;
+					x <= originX + (cols - 1) * GAP;
+					x += step, i++
+				) {
+					displace(x, y);
+					if (i === 0) ctx.moveTo(outX, outY);
+					else ctx.lineTo(outX, outY);
+				}
+			}
+			ctx.stroke();
+		};
 
-			// Links between neighbours
-			for (let i = 0; i < particles.length; i++) {
-				const p = particles[i];
-				for (let j = i + 1; j < particles.length; j++) {
-					const q = particles[j];
-					const dist = Math.hypot(p.x - q.x, p.y - q.y);
-					if (dist < LINK_DIST) {
-						ctx.strokeStyle = `rgba(${BLUE},${(1 - dist / LINK_DIST) * 0.16})`;
-						ctx.lineWidth = 1;
-						ctx.beginPath();
-						ctx.moveTo(p.x, p.y);
-						ctx.lineTo(q.x, q.y);
-						ctx.stroke();
+		const drawDots = (now: number, still: boolean) => {
+			// Batch dots by quantised alpha so the whole grid costs a few fills.
+			const buckets = new Map<number, Path2D>();
+			const span = width + height + BAND_W * 4;
+			const bandPos = still
+				? -Infinity
+				: ((now % BAND_MS) / BAND_MS) * span - BAND_W * 2;
+
+			for (let c = 0; c < cols; c++) {
+				const x = originX + c * GAP;
+				const majorCol = c % MAJOR_EVERY === 0;
+				for (let r = 0; r < rows; r++) {
+					const y = originY + r * GAP;
+					const major = majorCol && r % MAJOR_EVERY === 0;
+					const s = (x + y - bandPos) / BAND_W;
+					const band = still ? 0 : Math.exp(-s * s);
+					displace(x, y);
+					const alpha =
+						(major ? 0.3 : 0.16) + band * 0.18 + outInfl * outInfl * 0.5;
+					const radius = (major ? 1.4 : 1) * (1 + outInfl * 1.3);
+					const key = Math.round(Math.min(alpha, 0.85) * 50);
+					let path = buckets.get(key);
+					if (!path) {
+						path = new Path2D();
+						buckets.set(key, path);
 					}
+					path.moveTo(outX + radius, outY);
+					path.arc(outX, outY, radius, 0, Math.PI * 2);
 				}
 			}
-
-			// Threads from the cursor to nearby particles, over a soft glow
-			if (pointer.active) {
-				const glow = ctx.createRadialGradient(
-					pointer.x,
-					pointer.y,
-					0,
-					pointer.x,
-					pointer.y,
-					HOVER_RADIUS,
-				);
-				glow.addColorStop(0, `rgba(${BLUE},0.08)`);
-				glow.addColorStop(1, `rgba(${BLUE},0)`);
-				ctx.fillStyle = glow;
-				ctx.beginPath();
-				ctx.arc(pointer.x, pointer.y, HOVER_RADIUS, 0, Math.PI * 2);
-				ctx.fill();
-
-				for (const p of particles) {
-					const dist = Math.hypot(p.x - pointer.x, p.y - pointer.y);
-					if (dist < HOVER_RADIUS * 1.3) {
-						ctx.strokeStyle = `rgba(${BLUE},${(1 - dist / (HOVER_RADIUS * 1.3)) * 0.5})`;
-						ctx.beginPath();
-						ctx.moveTo(pointer.x, pointer.y);
-						ctx.lineTo(p.x, p.y);
-						ctx.stroke();
-					}
-				}
+			for (const [key, path] of buckets) {
+				ctx.fillStyle = `rgba(${BLUE},${key / 50})`;
+				ctx.fill(path);
 			}
+		};
 
-			// Dots
-			for (const p of particles) {
-				ctx.fillStyle = `rgba(${BLUE},${p.a})`;
-				ctx.beginPath();
-				ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-				ctx.fill();
+		const drawCrosshair = () => {
+			if (lens.amt < 0.01) return;
+			const a = lens.amt;
+			ctx.strokeStyle = `rgba(${BLUE},${0.55 * a})`;
+			ctx.lineWidth = 1;
+			ctx.beginPath();
+			ctx.arc(cross.x, cross.y, 4.5, 0, Math.PI * 2);
+			for (const [dx, dy] of [
+				[1, 0],
+				[-1, 0],
+				[0, 1],
+				[0, -1],
+			]) {
+				ctx.moveTo(cross.x + dx * 8, cross.y + dy * 8);
+				ctx.lineTo(cross.x + dx * 15, cross.y + dy * 15);
 			}
+			ctx.stroke();
+		};
 
-			// Click ripples: an expanding ring that fades out
-			for (let i = ripples.length - 1; i >= 0; i--) {
-				const ripple = ripples[i];
-				// rAF timestamps can trail the pointer event time, so clamp at 0.
-				const t = Math.max(0, (now - ripple.t) / RIPPLE_MS);
-				if (t >= 1) {
-					ripples.splice(i, 1);
-					continue;
-				}
-				const eased = 1 - (1 - t) ** 3;
-				ctx.strokeStyle = `rgba(${BLUE},${(1 - t) * 0.35})`;
-				ctx.lineWidth = 1.25;
+		const drawConstruction = (item: Construction, now: number) => {
+			// rAF timestamps can trail the pointer event time, so clamp at 0.
+			const p = clamp01((now - item.t) / CONSTRUCT_MS);
+			const fade = p < 0.7 ? 1 : 1 - easeOut((p - 0.7) / 0.3);
+			ctx.lineWidth = 1.25;
+			ctx.font = FONT;
+
+			if (item.kind === "circle") {
+				const radius = item.units * GAP;
+				const arm = easeOut(clamp01(p / 0.12));
+				const sweep = easeOut(clamp01((p - 0.12) / 0.43));
+				const end = item.angle + sweep * Math.PI * 2;
+				const armX = item.x + Math.cos(end) * radius * arm;
+				const armY = item.y + Math.sin(end) * radius * arm;
+
+				// Compass arm, dashed like a construction line
+				ctx.strokeStyle = `rgba(${BLUE},${0.35 * fade})`;
+				ctx.setLineDash([4, 4]);
 				ctx.beginPath();
-				ctx.arc(ripple.x, ripple.y, eased * RIPPLE_RADIUS, 0, Math.PI * 2);
+				ctx.moveTo(item.x, item.y);
+				ctx.lineTo(armX, armY);
 				ctx.stroke();
+				ctx.setLineDash([]);
+
+				// The arc drawing itself
+				if (sweep > 0) {
+					ctx.strokeStyle = `rgba(${BLUE},${0.45 * fade})`;
+					ctx.beginPath();
+					ctx.arc(item.x, item.y, radius, item.angle, end);
+					ctx.stroke();
+				}
+
+				// Pivot and pencil point
+				ctx.fillStyle = `rgba(${BLUE},${0.6 * fade})`;
+				ctx.beginPath();
+				ctx.arc(item.x, item.y, 2.5, 0, Math.PI * 2);
+				ctx.moveTo(armX + 2, armY);
+				ctx.arc(armX, armY, 2, 0, Math.PI * 2);
+				ctx.fill();
+
+				const labelAlpha = clamp01((p - 0.08) / 0.1) * fade;
+				if (labelAlpha > 0) {
+					const lx = item.x + Math.cos(end) * radius * 0.5;
+					const ly = item.y + Math.sin(end) * radius * 0.5;
+					// Nudge the label off the arm so the dashes don't cross it.
+					const nx = -Math.sin(end) * 12;
+					const ny = Math.cos(end) * 12;
+					ctx.fillStyle = `rgba(${BLUE},${0.55 * labelAlpha})`;
+					ctx.fillText(`r = ${item.units}`, lx + nx - 12, ly + ny + 4);
+				}
+				return;
 			}
+
+			const grow = easeOut(clamp01(p / 0.2));
+			const dx = item.bx - item.ax;
+			const dy = item.by - item.ay;
+			const length = Math.hypot(dx, dy);
+			const ux = dx / length;
+			const uy = dy / length;
+			const ex = item.ax + dx * grow;
+			const ey = item.ay + dy * grow;
+
+			ctx.strokeStyle = `rgba(${BLUE},${0.45 * fade})`;
+			ctx.beginPath();
+			ctx.moveTo(item.ax, item.ay);
+			ctx.lineTo(ex, ey);
+			// Ruler ticks every grid unit along the drawn part
+			for (let d = 0; d <= length * grow; d += GAP) {
+				const tx = item.ax + ux * d;
+				const ty = item.ay + uy * d;
+				ctx.moveTo(tx - uy * 4, ty + ux * 4);
+				ctx.lineTo(tx + uy * 4, ty - ux * 4);
+			}
+			ctx.stroke();
+
+			const labelAlpha = clamp01((p - 0.18) / 0.1) * fade;
+			if (labelAlpha > 0) {
+				const units = (length / GAP).toFixed(1).replace(/\.0$/, "");
+				ctx.fillStyle = `rgba(${BLUE},${0.55 * labelAlpha})`;
+				ctx.fillText(
+					`d = ${units}`,
+					item.ax + dx / 2 - uy * 14 - 14,
+					item.ay + dy / 2 + ux * 14 + 4,
+				);
+			}
+		};
+
+		const draw = (now: number, still = false) => {
+			ctx.clearRect(0, 0, width, height);
+			drawMajorLines();
+			drawDots(now, still);
+			drawCrosshair();
+			for (let i = constructions.length - 1; i >= 0; i--) {
+				if (now - constructions[i].t >= CONSTRUCT_MS)
+					constructions.splice(i, 1);
+			}
+			for (const item of constructions) drawConstruction(item, now);
 		};
 
 		const step = (now: number) => {
@@ -168,33 +300,55 @@ export default function AnimatedBackground() {
 			const dt = Math.min((now - last) / 16.67, 3);
 			last = now;
 
-			for (const p of particles) {
-				if (pointer.active) {
-					const ox = p.x - pointer.x;
-					const oy = p.y - pointer.y;
-					const dist = Math.hypot(ox, oy);
-					if (dist > 0 && dist < HOVER_RADIUS) {
-						const force = (1 - dist / HOVER_RADIUS) * 0.06;
-						p.vx += (ox / dist) * force * dt;
-						p.vy += (oy / dist) * force * dt;
-					}
-				}
-
-				// Ease back toward the resting drift for a smooth settle.
-				p.vx += (p.dx - p.vx) * 0.025 * dt;
-				p.vy += (p.dy - p.vy) * 0.025 * dt;
-				p.x += p.vx * dt;
-				p.y += p.vy * dt;
-
-				// Wrap around the edges
-				if (p.x < -10) p.x = width + 10;
-				else if (p.x > width + 10) p.x = -10;
-				if (p.y < -10) p.y = height + 10;
-				else if (p.y > height + 10) p.y = -10;
+			const target = pointer.active ? 1 : 0;
+			if (pointer.active && lens.amt < 0.01) {
+				// Appear under the cursor instead of sliding in from the last spot.
+				lens.x = pointer.x;
+				lens.y = pointer.y;
+				const s = snap(pointer.x, pointer.y);
+				cross.x = s.x;
+				cross.y = s.y;
 			}
+			lens.amt += (target - lens.amt) * Math.min(1, 0.08 * dt);
+			lens.x += (pointer.x - lens.x) * Math.min(1, 0.18 * dt);
+			lens.y += (pointer.y - lens.y) * Math.min(1, 0.18 * dt);
+			const s = snap(pointer.x, pointer.y);
+			cross.x += (s.x - cross.x) * Math.min(1, 0.3 * dt);
+			cross.y += (s.y - cross.y) * Math.min(1, 0.3 * dt);
 
 			draw(now);
 			frame = requestAnimationFrame(step);
+		};
+
+		const construct = (clientX: number, clientY: number) => {
+			const now = performance.now();
+			const point = snap(clientX, clientY);
+			constructions.push({
+				kind: "circle",
+				x: point.x,
+				y: point.y,
+				units: 2 + Math.floor(Math.random() * 3),
+				angle: Math.random() * Math.PI * 2,
+				t: now,
+			});
+			if (
+				lastClick &&
+				now - lastClick.t < RULER_WINDOW_MS &&
+				(lastClick.x !== point.x || lastClick.y !== point.y)
+			) {
+				constructions.push({
+					kind: "ruler",
+					ax: lastClick.x,
+					ay: lastClick.y,
+					bx: point.x,
+					by: point.y,
+					t: now,
+				});
+				lastClick = null;
+			} else {
+				lastClick = { ...point, t: now };
+			}
+			while (constructions.length > MAX_CONSTRUCTIONS) constructions.shift();
 		};
 
 		const onMove = (e: PointerEvent) => {
@@ -208,16 +362,14 @@ export default function AnimatedBackground() {
 			if (!e.relatedTarget) pointer.active = false;
 		};
 		const onDown = (e: PointerEvent) => {
-			ripples.push({ x: e.clientX, y: e.clientY, t: performance.now() });
-			for (const p of particles) {
-				const ox = p.x - e.clientX;
-				const oy = p.y - e.clientY;
-				const dist = Math.hypot(ox, oy);
-				if (dist > 0 && dist < RIPPLE_RADIUS) {
-					const impulse = (1 - dist / RIPPLE_RADIUS) * 4;
-					p.vx += (ox / dist) * impulse;
-					p.vy += (oy / dist) * impulse;
-				}
+			lastPointerType = e.pointerType;
+			if (e.pointerType !== "touch") construct(e.clientX, e.clientY);
+		};
+		const onClick = (e: MouseEvent) => {
+			// Taps draw on click, which never fires for a scroll gesture.
+			// detail is 0 for keyboard-triggered clicks.
+			if (lastPointerType === "touch" && e.detail > 0) {
+				construct(e.clientX, e.clientY);
 			}
 		};
 		const onVisibility = () => {
@@ -232,13 +384,14 @@ export default function AnimatedBackground() {
 		window.addEventListener("resize", resize);
 
 		if (reduce) {
-			// Still field, no motion or interaction.
-			draw(performance.now());
+			// Still grid, no motion or interaction.
+			draw(performance.now(), true);
 			return () => window.removeEventListener("resize", resize);
 		}
 
 		window.addEventListener("pointermove", onMove, { passive: true });
 		window.addEventListener("pointerdown", onDown, { passive: true });
+		window.addEventListener("click", onClick, { passive: true });
 		document.addEventListener("pointerout", onOut);
 		document.addEventListener("visibilitychange", onVisibility);
 		frame = requestAnimationFrame(step);
@@ -248,6 +401,7 @@ export default function AnimatedBackground() {
 			window.removeEventListener("resize", resize);
 			window.removeEventListener("pointermove", onMove);
 			window.removeEventListener("pointerdown", onDown);
+			window.removeEventListener("click", onClick);
 			document.removeEventListener("pointerout", onOut);
 			document.removeEventListener("visibilitychange", onVisibility);
 		};
@@ -258,7 +412,7 @@ export default function AnimatedBackground() {
 			aria-hidden
 			className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
 		>
-			{/* Faint wash for depth under the particles */}
+			{/* Faint wash for depth under the grid */}
 			<div
 				className="absolute inset-0"
 				style={{
