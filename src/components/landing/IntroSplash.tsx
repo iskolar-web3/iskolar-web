@@ -62,7 +62,7 @@ export function IntroSplash({ onDone }: { onDone: () => void }) {
 			{visible && (
 				<motion.div
 					key="intro"
-					className="fixed inset-0 z-[9999] flex items-center justify-center bg-background"
+					className="fixed inset-0 z-[9999] flex flex-col items-center justify-center gap-8 bg-background"
 					exit={{ opacity: 0 }}
 					transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
 				>
@@ -75,14 +75,32 @@ export function IntroSplash({ onDone }: { onDone: () => void }) {
 						exit={{ opacity: 0, scale: 1.06 }}
 						transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
 					/>
-					{/* Thin progress rule under the mark */}
-					<motion.span
+					{/* Slim rounded track; a soft gradient fill eases across,
+					    then the whole bar fades with the splash */}
+					<motion.div
 						aria-hidden
-						className="absolute top-1/2 mt-20 sm:mt-22 h-px w-16 origin-left bg-secondary/40"
-						initial={{ scaleX: 0 }}
-						animate={{ scaleX: 1 }}
-						transition={{ duration: HOLD_MS / 1000, ease: [0.65, 0, 0.35, 1] }}
-					/>
+						className="relative h-[3px] w-24 overflow-hidden rounded-full bg-secondary/10"
+						initial={{ opacity: 0, y: 4 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0 }}
+						transition={{
+							duration: 0.5,
+							delay: 0.15,
+							ease: [0.22, 1, 0.36, 1],
+						}}
+					>
+						<motion.span
+							className="absolute inset-0 rounded-full bg-linear-to-r from-secondary/50 to-secondary"
+							// Clip instead of scale so the rounded head keeps its shape.
+							initial={{ clipPath: "inset(0 100% 0 0 round 999px)" }}
+							animate={{ clipPath: "inset(0 0% 0 0 round 999px)" }}
+							transition={{
+								duration: (HOLD_MS - 250) / 1000,
+								delay: 0.2,
+								ease: [0.45, 0, 0.15, 1],
+							}}
+						/>
+					</motion.div>
 				</motion.div>
 			)}
 		</AnimatePresence>

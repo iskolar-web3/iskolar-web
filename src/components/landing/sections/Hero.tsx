@@ -8,6 +8,7 @@ import {
 import { ArrowDown, ArrowRight } from "lucide-react";
 import { useRef } from "react";
 import { BLUE_DUOTONE, BLUE_TINT } from "@/components/landing/partners";
+import { SchoolSeals } from "@/components/landing/SchoolSeals";
 
 const trustLogos = [
 	{
@@ -37,19 +38,19 @@ const trustLogos = [
 	{
 		src: "/partnerships/cryptita-plays.png",
 		alt: "Cryptita Plays",
-		size: "h-12",
+		size: "h-14",
 		filter: BLUE_TINT,
 	},
 	{
 		src: "/partnerships/aws-learning-club-heron.png",
 		alt: "AWS Learning Club Heron",
-		size: "h-12",
+		size: "h-14",
 		filter: BLUE_DUOTONE,
 	},
 	{
 		src: "/partnerships/tech-kubo.png",
 		alt: "Tech Kubo",
-		size: "h-12",
+		size: "h-14",
 		filter: BLUE_DUOTONE,
 	},
 ];
@@ -91,7 +92,7 @@ export function Hero({ ready = true }: { ready?: boolean }) {
 		<section
 			ref={sectionRef}
 			id="home"
-			className="relative flex min-h-dvh flex-col items-center justify-center px-4 sm:px-12 lg:px-26 pt-32 pb-24"
+			className="relative flex min-h-dvh flex-col items-center justify-center px-4 sm:px-12 lg:px-26 pt-24 pb-12"
 		>
 			<motion.div
 				style={{ opacity: fade, y: lift }}
@@ -102,7 +103,7 @@ export function Hero({ ready = true }: { ready?: boolean }) {
 			>
 				<motion.h1
 					variants={rise}
-					className="text-[2.75rem] sm:text-6xl lg:text-7xl xl:text-[5.5rem] text-secondary leading-[1.02] tracking-tight text-balance"
+					className="text-[2.75rem] sm:text-6xl lg:text-[4.25rem] xl:text-[4.5rem] text-secondary leading-[1.02] tracking-tight text-balance"
 				>
 					Empowering Students
 					<span className="block text-secondary/45">
@@ -112,7 +113,7 @@ export function Hero({ ready = true }: { ready?: boolean }) {
 
 				<motion.p
 					variants={rise}
-					className="mx-auto mt-8 max-w-xl text-lg sm:text-xl text-secondary/70 leading-relaxed text-pretty"
+					className="mx-auto mt-6 max-w-xl text-lg sm:text-xl text-secondary/70 leading-relaxed text-pretty"
 				>
 					iSkolar helps Filipino students choose a course, get funded, build
 					real work, and prove what they earned.
@@ -120,7 +121,7 @@ export function Hero({ ready = true }: { ready?: boolean }) {
 
 				<motion.div
 					variants={rise}
-					className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3"
+					className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3"
 				>
 					<a
 						href="#products"
@@ -145,17 +146,30 @@ export function Hero({ ready = true }: { ready?: boolean }) {
 				</motion.div>
 			</motion.div>
 
-			{/* Trusted by: slow marquee, static row for reduced motion */}
+			{/* Where our students come from: one centred row of seals */}
 			<motion.div
-				className="relative z-10 mt-20 w-full max-w-5xl"
+				className="relative z-10 mt-10 w-full max-w-5xl"
 				initial={reduce ? "visible" : "hidden"}
 				animate={state}
 				variants={{
 					hidden: { opacity: 0 },
-					visible: { opacity: 1, transition: { delay: 0.7, duration: 0.8 } },
+					visible: { opacity: 1, transition: { delay: 0.6, duration: 0.8 } },
 				}}
 			>
-				<p className="mb-6 text-center text-[11px] font-medium uppercase tracking-[0.2em] text-secondary/45">
+				<SchoolSeals />
+			</motion.div>
+
+			{/* Trusted by: slow marquee, static row for reduced motion */}
+			<motion.div
+				className="relative z-10 mt-8 w-full max-w-5xl"
+				initial={reduce ? "visible" : "hidden"}
+				animate={state}
+				variants={{
+					hidden: { opacity: 0 },
+					visible: { opacity: 1, transition: { delay: 0.75, duration: 0.8 } },
+				}}
+			>
+				<p className="mb-4 text-center text-[11px] font-medium uppercase tracking-[0.2em] text-secondary/45">
 					Trusted by
 				</p>
 				{reduce ? (
