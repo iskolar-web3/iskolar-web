@@ -3,27 +3,10 @@ import { useEffect, useRef } from "react";
 
 // Blueprint grid behind the landing pages, like a sheet of graph paper. A soft
 // light band drifts across it; the cursor bends the grid like a magnifying lens
-// and marks the nearest grid point; a click draws a compass construction, and a
-// second quick click elsewhere joins the two points with a measured ruler line.
-// Strictly brand blue (#3a52a6) on the light background.
+// and marks the nearest grid point; a click drops a water ripple that rolls
+// outward through the grid. Strictly brand blue (#3a52a6) on the light background.
 
-type Construction =
-	| {
-			kind: "circle";
-			x: number;
-			y: number;
-			units: number;
-			angle: number;
-			t: number;
-	  }
-	| {
-			kind: "ruler";
-			ax: number;
-			ay: number;
-			bx: number;
-			by: number;
-			t: number;
-	  };
+type Ripple = { x: number; y: number; t: number };
 
 const BLUE = "58,82,166";
 const GAP = 32;
@@ -32,12 +15,17 @@ const LENS_R = 170;
 const LENS_PUSH = 0.45;
 const BAND_W = 140;
 const BAND_MS = 14000;
-const CONSTRUCT_MS = 2600;
-const RULER_WINDOW_MS = 1200;
-const MAX_CONSTRUCTIONS = 8;
-const FONT = '11px "Bree Serif", serif';
+const RIPPLE_MS = 2600;
+const RIPPLE_R = 640;
+const RIPPLE_AMP = 8;
+const WAVELENGTH = 64;
+// Half width of the wave packet riding the front.
+const PACKET = 90;
+const RING_GAP = 34;
+const MAX_RIPPLES = 6;
 
-const easeOut = (t: number) => 1 - (1 - t) ** 3;
+// Close to constant speed like real water, easing off a touch as it spreads.
+const rippleFront = (p: number) => (1 - (1 - p) ** 1.5) * RIPPLE_R;
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 export default function AnimatedBackground() {
@@ -56,18 +44,25 @@ export default function AnimatedBackground() {
 		let originY = 0;
 		let cols = 0;
 		let rows = 0;
-		const constructions: Construction[] = [];
+		const ripples: Ripple[] = [];
+		// Per frame ripple state, so displace() does no timing maths per dot.
+		const waves: {
+			x: number;
+			y: number;
+			front: number;
+			amp: number;
+			glow: number;
+		}[] = [];
 		const pointer = { x: 0, y: 0, active: false };
 		// Lens and crosshair trail the pointer slightly so they glide.
 		const lens = { x: 0, y: 0, amt: 0 };
 		const cross = { x: 0, y: 0 };
-		let lastClick: { x: number; y: number; t: number } | null = null;
 		let lastPointerType = "mouse";
 		let frame = 0;
 		let last = performance.now();
 
-		// Displaced position and lens influence (0..1) of a grid point, written
-		// into shared vars to avoid allocating per dot per frame.
+		// Displaced position and highlight (0..1) of a grid point, written into
+		// shared vars to avoid allocating per dot per frame.
 		let outX = 0;
 		let outY = 0;
 		let outInfl = 0;
@@ -75,16 +70,33 @@ export default function AnimatedBackground() {
 			outX = x;
 			outY = y;
 			outInfl = 0;
+
+			// Ripples: a damped sine packet riding each expanding front pushes
+			// points in and out along the radius, like the surface of water.
+			for (const w of waves) {
+				const ox = x - w.x;
+				const oy = y - w.y;
+				const dist = Math.hypot(ox, oy);
+				const phase = dist - w.front;
+				if (dist === 0 || phase > PACKET * 2 || phase < -PACKET * 2) continue;
+				const env = Math.exp(-((phase / PACKET) ** 2));
+				const wave = Math.sin((phase / WAVELENGTH) * Math.PI * 2);
+				const push = w.amp * env * wave;
+				outX += (ox / dist) * push;
+				outY += (oy / dist) * push;
+				outInfl = Math.max(outInfl, env * w.glow * (0.5 + 0.5 * wave));
+			}
+
 			if (lens.amt < 0.01) return;
-			const ox = x - lens.x;
-			const oy = y - lens.y;
+			const ox = outX - lens.x;
+			const oy = outY - lens.y;
 			const dist = Math.hypot(ox, oy);
 			if (dist >= LENS_R) return;
 			const f = 1 - dist / LENS_R;
 			const push = f * f * LENS_PUSH * lens.amt;
-			outX = x + ox * push;
-			outY = y + oy * push;
-			outInfl = f * lens.amt;
+			outX += ox * push;
+			outY += oy * push;
+			outInfl = Math.max(outInfl, f * lens.amt);
 		};
 
 		const snap = (x: number, y: number) => ({
@@ -196,103 +208,61 @@ export default function AnimatedBackground() {
 			ctx.stroke();
 		};
 
-		const drawConstruction = (item: Construction, now: number) => {
-			// rAF timestamps can trail the pointer event time, so clamp at 0.
-			const p = clamp01((now - item.t) / CONSTRUCT_MS);
-			const fade = p < 0.7 ? 1 : 1 - easeOut((p - 0.7) / 0.3);
-			ctx.lineWidth = 1.25;
-			ctx.font = FONT;
+		const updateWaves = (now: number) => {
+			waves.length = 0;
+			for (let i = ripples.length - 1; i >= 0; i--) {
+				// rAF timestamps can trail the pointer event time, so clamp at 0.
+				const p = clamp01((now - ripples[i].t) / RIPPLE_MS);
+				if (p >= 1) {
+					ripples.splice(i, 1);
+					continue;
+				}
+				const fade = (1 - p) ** 1.5;
+				waves.push({
+					x: ripples[i].x,
+					y: ripples[i].y,
+					front: rippleFront(p),
+					amp: RIPPLE_AMP * fade,
+					glow: 0.85 * fade,
+				});
+			}
+		};
 
-			if (item.kind === "circle") {
-				const radius = item.units * GAP;
-				const arm = easeOut(clamp01(p / 0.12));
-				const sweep = easeOut(clamp01((p - 0.12) / 0.43));
-				const end = item.angle + sweep * Math.PI * 2;
-				const armX = item.x + Math.cos(end) * radius * arm;
-				const armY = item.y + Math.sin(end) * radius * arm;
+		const drawRipples = (now: number) => {
+			for (const ripple of ripples) {
+				const p = clamp01((now - ripple.t) / RIPPLE_MS);
+				const front = rippleFront(p);
+				const fade = (1 - p) ** 1.4;
 
-				// Compass arm, dashed like a construction line
-				ctx.strokeStyle = `rgba(${BLUE},${0.35 * fade})`;
-				ctx.setLineDash([4, 4]);
-				ctx.beginPath();
-				ctx.moveTo(item.x, item.y);
-				ctx.lineTo(armX, armY);
-				ctx.stroke();
-				ctx.setLineDash([]);
-
-				// The arc drawing itself
-				if (sweep > 0) {
-					ctx.strokeStyle = `rgba(${BLUE},${0.45 * fade})`;
+				// A soft touch point that fades almost at once
+				if (p < 0.18) {
+					const a = 1 - p / 0.18;
+					ctx.fillStyle = `rgba(${BLUE},${0.25 * a})`;
 					ctx.beginPath();
-					ctx.arc(item.x, item.y, radius, item.angle, end);
+					ctx.arc(ripple.x, ripple.y, 3 + p * 30, 0, Math.PI * 2);
+					ctx.fill();
+				}
+
+				// Three thin trailing rings, each fainter than the one ahead
+				for (let k = 0; k < 3; k++) {
+					const r = front - k * RING_GAP;
+					if (r <= 0) continue;
+					ctx.strokeStyle = `rgba(${BLUE},${0.42 * fade * (1 - k * 0.3)})`;
+					ctx.lineWidth = Math.max(0.5, 1.4 * (1 - p) - k * 0.25);
+					ctx.beginPath();
+					ctx.arc(ripple.x, ripple.y, r, 0, Math.PI * 2);
 					ctx.stroke();
 				}
-
-				// Pivot and pencil point
-				ctx.fillStyle = `rgba(${BLUE},${0.6 * fade})`;
-				ctx.beginPath();
-				ctx.arc(item.x, item.y, 2.5, 0, Math.PI * 2);
-				ctx.moveTo(armX + 2, armY);
-				ctx.arc(armX, armY, 2, 0, Math.PI * 2);
-				ctx.fill();
-
-				const labelAlpha = clamp01((p - 0.08) / 0.1) * fade;
-				if (labelAlpha > 0) {
-					const lx = item.x + Math.cos(end) * radius * 0.5;
-					const ly = item.y + Math.sin(end) * radius * 0.5;
-					// Nudge the label off the arm so the dashes don't cross it.
-					const nx = -Math.sin(end) * 12;
-					const ny = Math.cos(end) * 12;
-					ctx.fillStyle = `rgba(${BLUE},${0.55 * labelAlpha})`;
-					ctx.fillText(`r = ${item.units}`, lx + nx - 12, ly + ny + 4);
-				}
-				return;
-			}
-
-			const grow = easeOut(clamp01(p / 0.2));
-			const dx = item.bx - item.ax;
-			const dy = item.by - item.ay;
-			const length = Math.hypot(dx, dy);
-			const ux = dx / length;
-			const uy = dy / length;
-			const ex = item.ax + dx * grow;
-			const ey = item.ay + dy * grow;
-
-			ctx.strokeStyle = `rgba(${BLUE},${0.45 * fade})`;
-			ctx.beginPath();
-			ctx.moveTo(item.ax, item.ay);
-			ctx.lineTo(ex, ey);
-			// Ruler ticks every grid unit along the drawn part
-			for (let d = 0; d <= length * grow; d += GAP) {
-				const tx = item.ax + ux * d;
-				const ty = item.ay + uy * d;
-				ctx.moveTo(tx - uy * 4, ty + ux * 4);
-				ctx.lineTo(tx + uy * 4, ty - ux * 4);
-			}
-			ctx.stroke();
-
-			const labelAlpha = clamp01((p - 0.18) / 0.1) * fade;
-			if (labelAlpha > 0) {
-				const units = (length / GAP).toFixed(1).replace(/\.0$/, "");
-				ctx.fillStyle = `rgba(${BLUE},${0.55 * labelAlpha})`;
-				ctx.fillText(
-					`d = ${units}`,
-					item.ax + dx / 2 - uy * 14 - 14,
-					item.ay + dy / 2 + ux * 14 + 4,
-				);
 			}
 		};
 
 		const draw = (now: number, still = false) => {
 			ctx.clearRect(0, 0, width, height);
+			updateWaves(now);
 			drawMajorLines();
 			drawDots(now, still);
+			drawRipples(now);
 			drawCrosshair();
-			for (let i = constructions.length - 1; i >= 0; i--) {
-				if (now - constructions[i].t >= CONSTRUCT_MS)
-					constructions.splice(i, 1);
-			}
-			for (const item of constructions) drawConstruction(item, now);
 		};
 
 		const step = (now: number) => {
@@ -320,35 +290,9 @@ export default function AnimatedBackground() {
 			frame = requestAnimationFrame(step);
 		};
 
-		const construct = (clientX: number, clientY: number) => {
-			const now = performance.now();
-			const point = snap(clientX, clientY);
-			constructions.push({
-				kind: "circle",
-				x: point.x,
-				y: point.y,
-				units: 2 + Math.floor(Math.random() * 3),
-				angle: Math.random() * Math.PI * 2,
-				t: now,
-			});
-			if (
-				lastClick &&
-				now - lastClick.t < RULER_WINDOW_MS &&
-				(lastClick.x !== point.x || lastClick.y !== point.y)
-			) {
-				constructions.push({
-					kind: "ruler",
-					ax: lastClick.x,
-					ay: lastClick.y,
-					bx: point.x,
-					by: point.y,
-					t: now,
-				});
-				lastClick = null;
-			} else {
-				lastClick = { ...point, t: now };
-			}
-			while (constructions.length > MAX_CONSTRUCTIONS) constructions.shift();
+		const splash = (clientX: number, clientY: number) => {
+			ripples.push({ x: clientX, y: clientY, t: performance.now() });
+			while (ripples.length > MAX_RIPPLES) ripples.shift();
 		};
 
 		const onMove = (e: PointerEvent) => {
@@ -363,13 +307,13 @@ export default function AnimatedBackground() {
 		};
 		const onDown = (e: PointerEvent) => {
 			lastPointerType = e.pointerType;
-			if (e.pointerType !== "touch") construct(e.clientX, e.clientY);
+			if (e.pointerType !== "touch") splash(e.clientX, e.clientY);
 		};
 		const onClick = (e: MouseEvent) => {
-			// Taps draw on click, which never fires for a scroll gesture.
+			// Taps splash on click, which never fires for a scroll gesture.
 			// detail is 0 for keyboard-triggered clicks.
 			if (lastPointerType === "touch" && e.detail > 0) {
-				construct(e.clientX, e.clientY);
+				splash(e.clientX, e.clientY);
 			}
 		};
 		const onVisibility = () => {

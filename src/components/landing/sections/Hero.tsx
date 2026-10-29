@@ -92,40 +92,45 @@ export function Hero({ ready = true }: { ready?: boolean }) {
 		<section
 			ref={sectionRef}
 			id="home"
-			className="relative flex min-h-dvh flex-col items-center justify-center px-4 sm:px-12 lg:px-26 pt-24 pb-12"
+			className="relative flex min-h-dvh flex-col items-center justify-center px-3 sm:px-6 pt-24 pb-12"
 		>
+			{/* Same width and inset as the navbar pill, so the copy lines up with
+			    the logo and the buttons line up with Get Started. */}
 			<motion.div
 				style={{ opacity: fade, y: lift }}
-				className="relative z-10 mx-auto max-w-5xl text-center"
+				className="relative z-10 mx-auto grid w-full max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-12"
 				initial={reduce ? "visible" : "hidden"}
 				animate={state}
 				variants={stagger}
 			>
-				<motion.h1
-					variants={rise}
-					className="text-[2.75rem] sm:text-6xl lg:text-[4.25rem] xl:text-[4.5rem] text-secondary leading-[1.02] tracking-tight text-balance"
-				>
-					Empowering Students
-					<span className="block text-secondary/45">
-						from Education to Career.
-					</span>
-				</motion.h1>
+				<div className="text-center lg:text-left">
+					<motion.h1
+						variants={rise}
+						className="text-[2.75rem] sm:text-6xl lg:text-5xl xl:text-[3.75rem] text-secondary leading-[1.04] tracking-tight text-balance"
+					>
+						Empowering Students
+						<span className="block text-secondary/45">
+							from Education to Career.
+						</span>
+					</motion.h1>
 
-				<motion.p
-					variants={rise}
-					className="mx-auto mt-6 max-w-xl text-lg sm:text-xl text-secondary/70 leading-relaxed text-pretty"
-				>
-					iSkolar helps Filipino students choose a course, get funded, build
-					real work, and prove what they earned.
-				</motion.p>
+					<motion.p
+						variants={rise}
+						className="mx-auto mt-6 max-w-xl text-lg sm:text-xl text-secondary/70 leading-relaxed text-pretty lg:mx-0"
+					>
+						iSkolar helps Filipino students choose a course, get funded, build
+						real work, and prove what they earned.
+					</motion.p>
+				</div>
 
+				{/* One row on small screens, stacked and equal width on desktop */}
 				<motion.div
 					variants={rise}
-					className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3"
+					className="flex flex-row items-center justify-center gap-3 lg:flex-col lg:items-stretch"
 				>
 					<a
 						href="#products"
-						className="group inline-flex items-center gap-2 rounded-full bg-secondary px-6 py-3 text-sm font-medium text-tertiary shadow-[0_12px_30px_-12px_rgba(58,82,166,0.7)] transition-colors hover:bg-secondary/90"
+						className="group inline-flex items-center justify-center gap-2 rounded-full bg-secondary px-5 py-3 text-sm font-medium text-tertiary shadow-[0_12px_30px_-12px_rgba(58,82,166,0.7)] transition-colors hover:bg-secondary/90 sm:px-6"
 					>
 						Explore the path
 						<ArrowDown
@@ -135,7 +140,7 @@ export function Hero({ ready = true }: { ready?: boolean }) {
 					</a>
 					<a
 						href="/login"
-						className="group inline-flex items-center gap-2 rounded-full border border-secondary/20 bg-card/70 px-6 py-3 text-sm font-medium text-secondary backdrop-blur transition-colors hover:border-secondary/40"
+						className="group inline-flex items-center justify-center gap-2 rounded-full border border-secondary/20 bg-card/70 px-5 py-3 text-sm font-medium text-secondary backdrop-blur transition-colors hover:border-secondary/40 sm:px-6"
 					>
 						Get Started
 						<ArrowRight
@@ -146,9 +151,9 @@ export function Hero({ ready = true }: { ready?: boolean }) {
 				</motion.div>
 			</motion.div>
 
-			{/* Where our students come from: one centred row of seals */}
+			{/* Where our students come from: one centred row of logos */}
 			<motion.div
-				className="relative z-10 mt-10 w-full max-w-5xl"
+				className="relative z-10 mt-12 w-full max-w-6xl px-4 sm:px-6"
 				initial={reduce ? "visible" : "hidden"}
 				animate={state}
 				variants={{
@@ -161,7 +166,7 @@ export function Hero({ ready = true }: { ready?: boolean }) {
 
 			{/* Trusted by: slow marquee, static row for reduced motion */}
 			<motion.div
-				className="relative z-10 mt-8 w-full max-w-5xl"
+				className="relative z-10 mt-10 w-full max-w-6xl px-4 sm:px-6"
 				initial={reduce ? "visible" : "hidden"}
 				animate={state}
 				variants={{
