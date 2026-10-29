@@ -1,15 +1,17 @@
 import { useReducedMotion } from "framer-motion";
 import { useEffect, useRef } from "react";
 
-// Blueprint grid behind the landing pages, like a sheet of graph paper. A soft
-// light band drifts across it; the cursor bends the grid like a magnifying lens
-// and marks the nearest grid point; a click drops a water ripple that rolls
-// outward through the grid. Strictly brand blue (#3a52a6) on the light background.
+// Blueprint grid behind the landing pages, like a sheet of graph paper. A slow
+// ocean swell rolls through it and a soft light band drifts across; the cursor
+// bends the grid like a magnifying lens and marks the nearest grid point; a
+// click drops a water ripple that rolls outward through the grid. Strictly
+// brand blue (#3a52a6) on the light background.
 
 type Ripple = { x: number; y: number; t: number };
 
 const BLUE = "58,82,166";
 const GAP = 32;
+const HALF = GAP / 2;
 const MAJOR_EVERY = 4;
 const LENS_R = 170;
 const LENS_PUSH = 0.45;
@@ -24,9 +26,41 @@ const PACKET = 90;
 const RING_GAP = 34;
 const MAX_RIPPLES = 6;
 
+// Ocean swell: a few long Gerstner waves crossing at different angles. Each
+// point circles as a crest passes, so points bunch on crests and spread in
+// troughs like a real sea surface. Angles in radians, lengths in px, periods in s.
+const SWELLS = [
+	{ angle: 0.35, length: 560, amp: 7, period: 12 },
+	{ angle: -0.6, length: 360, amp: 4, period: 9 },
+	{ angle: 1.25, length: 230, amp: 2, period: 7 },
+].map(({ angle, length, amp, period }) => {
+	const k = (Math.PI * 2) / length;
+	return {
+		dx: Math.cos(angle),
+		dy: Math.sin(angle),
+		kx: Math.cos(angle) * k,
+		ky: Math.sin(angle) * k,
+		amp,
+		omega: (Math.PI * 2) / period,
+	};
+});
+const SWELL_SUM = SWELLS.reduce((s, w) => s + w.amp, 0);
+// How far points orbit sideways relative to the wave height.
+const STEEPNESS = 0.7;
+// Height shows as a small upward shift, like the sea seen at a slight angle.
+const TILT = 0.5;
+const SWELL_FADE_MS = 2000;
+
 // Close to constant speed like real water, easing off a touch as it spreads.
 const rippleFront = (p: number) => (1 - (1 - p) ** 1.5) * RIPPLE_R;
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
+
+// Few cores or little memory: render lighter from the start.
+const isLowEnd = () => {
+	if (typeof navigator === "undefined") return false;
+	const nav = navigator as Navigator & { deviceMemory?: number };
+	return (nav.hardwareConcurrency || 8) <= 4 || (nav.deviceMemory || 8) <= 4;
+};
 
 export default function AnimatedBackground() {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -37,6 +71,12 @@ export default function AnimatedBackground() {
 		const ctx = canvas?.getContext("2d");
 		if (!canvas || !ctx) return;
 
+		const lowEnd = isLowEnd();
+		// Background motion never needs more than 60fps; weak devices get 30.
+		let frameGap = lowEnd ? 1000 / 30 : 1000 / 60;
+		// Smoothed draw cost in ms, used to drop to 30fps if frames run heavy.
+		let cost = 0;
+
 		let width = 0;
 		let height = 0;
 		// Grid origin, centred so the margins match on both sides.
@@ -44,6 +84,18 @@ export default function AnimatedBackground() {
 		let originY = 0;
 		let cols = 0;
 		let rows = 0;
+		// Grid sampled at half steps, since major lines bend through midpoints.
+		let halfCols = 0;
+		let halfRows = 0;
+		// Swell phase split as sin(a + b) = sin a cos b + cos a sin b, with a per
+		// column and b per row, so each dot costs a few multiplies instead of
+		// trig calls. Row terms never change; column terms carry the time.
+		let colSin = new Float32Array(0);
+		let colCos = new Float32Array(0);
+		let rowSin = new Float32Array(0);
+		let rowCos = new Float32Array(0);
+		let swellAmt = 0;
+		const start = performance.now();
 		const ripples: Ripple[] = [];
 		// Per frame ripple state, so displace() does no timing maths per dot.
 		const waves: {
@@ -61,15 +113,38 @@ export default function AnimatedBackground() {
 		let frame = 0;
 		let last = performance.now();
 
-		// Displaced position and highlight (0..1) of a grid point, written into
-		// shared vars to avoid allocating per dot per frame.
+		// Displaced position, highlight (0..1) and swell height (-1..1) of a grid
+		// point, written into shared vars to avoid allocating per dot per frame.
+		// ci and ri index the half step grid.
 		let outX = 0;
 		let outY = 0;
 		let outInfl = 0;
-		const displace = (x: number, y: number) => {
+		let outSwell = 0;
+		const displace = (x: number, y: number, ci: number, ri: number) => {
 			outX = x;
 			outY = y;
 			outInfl = 0;
+			outSwell = 0;
+
+			if (swellAmt > 0) {
+				let sx = 0;
+				let sy = 0;
+				let h = 0;
+				for (let w = 0; w < SWELLS.length; w++) {
+					const sw = SWELLS[w];
+					const sa = colSin[w * halfCols + ci];
+					const ca = colCos[w * halfCols + ci];
+					const sb = rowSin[w * halfRows + ri];
+					const cb = rowCos[w * halfRows + ri];
+					const orbit = STEEPNESS * sw.amp * (ca * cb - sa * sb);
+					sx += sw.dx * orbit;
+					sy += sw.dy * orbit;
+					h += sw.amp * (sa * cb + ca * sb);
+				}
+				outX += sx * swellAmt;
+				outY += (sy - h * TILT) * swellAmt;
+				outSwell = (h / SWELL_SUM) * swellAmt;
+			}
 
 			// Ripples: a damped sine packet riding each expanding front pushes
 			// points in and out along the radius, like the surface of water.
@@ -105,7 +180,7 @@ export default function AnimatedBackground() {
 		});
 
 		const resize = () => {
-			const dpr = Math.min(window.devicePixelRatio || 1, 2);
+			const dpr = Math.min(window.devicePixelRatio || 1, lowEnd ? 1.5 : 2);
 			width = window.innerWidth;
 			height = window.innerHeight;
 			canvas.width = width * dpr;
@@ -117,7 +192,38 @@ export default function AnimatedBackground() {
 			rows = Math.floor(height / GAP) + 2;
 			originX = (width - (cols - 1) * GAP) / 2;
 			originY = (height - (rows - 1) * GAP) / 2;
+
+			halfCols = (cols - 1) * 2 + 1;
+			halfRows = (rows - 1) * 2 + 1;
+			colSin = new Float32Array(SWELLS.length * halfCols);
+			colCos = new Float32Array(SWELLS.length * halfCols);
+			rowSin = new Float32Array(SWELLS.length * halfRows);
+			rowCos = new Float32Array(SWELLS.length * halfRows);
+			for (let w = 0; w < SWELLS.length; w++) {
+				for (let i = 0; i < halfRows; i++) {
+					const b = SWELLS[w].ky * (originY + i * HALF);
+					rowSin[w * halfRows + i] = Math.sin(b);
+					rowCos[w * halfRows + i] = Math.cos(b);
+				}
+			}
+
 			if (reduce) draw(performance.now(), true);
+		};
+
+		const updateSwell = (now: number, still: boolean) => {
+			// Ease the swell in so it starts calm instead of mid motion.
+			swellAmt = still ? 0 : clamp01((now - start) / SWELL_FADE_MS);
+			swellAmt = swellAmt * swellAmt * (3 - 2 * swellAmt);
+			if (swellAmt === 0) return;
+			const t = now / 1000;
+			for (let w = 0; w < SWELLS.length; w++) {
+				const sw = SWELLS[w];
+				for (let i = 0; i < halfCols; i++) {
+					const a = sw.kx * (originX + i * HALF) - sw.omega * t;
+					colSin[w * halfCols + i] = Math.sin(a);
+					colCos[w * halfCols + i] = Math.cos(a);
+				}
+			}
 		};
 
 		const drawMajorLines = () => {
@@ -125,27 +231,18 @@ export default function AnimatedBackground() {
 			ctx.lineWidth = 1;
 			ctx.beginPath();
 			// Sample at half steps so lines bend smoothly through the lens.
-			const step = GAP / 2;
 			for (let c = 0; c < cols; c += MAJOR_EVERY) {
 				const x = originX + c * GAP;
-				for (
-					let y = originY, i = 0;
-					y <= originY + (rows - 1) * GAP;
-					y += step, i++
-				) {
-					displace(x, y);
+				for (let i = 0; i < halfRows; i++) {
+					displace(x, originY + i * HALF, c * 2, i);
 					if (i === 0) ctx.moveTo(outX, outY);
 					else ctx.lineTo(outX, outY);
 				}
 			}
 			for (let r = 0; r < rows; r += MAJOR_EVERY) {
 				const y = originY + r * GAP;
-				for (
-					let x = originX, i = 0;
-					x <= originX + (cols - 1) * GAP;
-					x += step, i++
-				) {
-					displace(x, y);
+				for (let i = 0; i < halfCols; i++) {
+					displace(originX + i * HALF, y, i, r * 2);
 					if (i === 0) ctx.moveTo(outX, outY);
 					else ctx.lineTo(outX, outY);
 				}
@@ -169,10 +266,18 @@ export default function AnimatedBackground() {
 					const major = majorCol && r % MAJOR_EVERY === 0;
 					const s = (x + y - bandPos) / BAND_W;
 					const band = still ? 0 : Math.exp(-s * s);
-					displace(x, y);
+					displace(x, y, c * 2, r * 2);
+					// Crests catch the light, troughs sink back a little.
+					const crest = outSwell > 0 ? outSwell * outSwell : 0;
+					const trough = outSwell < 0 ? -outSwell : 0;
 					const alpha =
-						(major ? 0.3 : 0.16) + band * 0.18 + outInfl * outInfl * 0.5;
-					const radius = (major ? 1.4 : 1) * (1 + outInfl * 1.3);
+						(major ? 0.3 : 0.16) +
+						band * 0.18 +
+						crest * 0.16 -
+						trough * 0.05 +
+						outInfl * outInfl * 0.5;
+					const radius =
+						(major ? 1.4 : 1) * (1 + outInfl * 1.3) * (1 + crest * 0.3);
 					const key = Math.round(Math.min(alpha, 0.85) * 50);
 					let path = buckets.get(key);
 					if (!path) {
@@ -258,6 +363,7 @@ export default function AnimatedBackground() {
 
 		const draw = (now: number, still = false) => {
 			ctx.clearRect(0, 0, width, height);
+			updateSwell(now, still);
 			updateWaves(now);
 			drawMajorLines();
 			drawDots(now, still);
@@ -266,6 +372,11 @@ export default function AnimatedBackground() {
 		};
 
 		const step = (now: number) => {
+			frame = requestAnimationFrame(step);
+			// Skip frames past the cap; the 4ms slack keeps 60Hz screens from
+			// dropping frames that land a hair early.
+			if (now - last < frameGap - 4) return;
+
 			// Normalise to 60fps steps so motion stays even on any refresh rate.
 			const dt = Math.min((now - last) / 16.67, 3);
 			last = now;
@@ -286,8 +397,11 @@ export default function AnimatedBackground() {
 			cross.x += (s.x - cross.x) * Math.min(1, 0.3 * dt);
 			cross.y += (s.y - cross.y) * Math.min(1, 0.3 * dt);
 
+			const t0 = performance.now();
 			draw(now);
-			frame = requestAnimationFrame(step);
+			cost += (performance.now() - t0 - cost) * 0.05;
+			// Frames eating half the 60fps budget: halve the rate for good.
+			if (cost > 8) frameGap = 1000 / 30;
 		};
 
 		const splash = (clientX: number, clientY: number) => {
