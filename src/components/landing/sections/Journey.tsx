@@ -1,88 +1,106 @@
 import {
 	type MotionValue,
 	motion,
+	useMotionValueEvent,
 	useReducedMotion,
 	useScroll,
 	useSpring,
 	useTransform,
 } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
-import { useRef } from "react";
+import type Lenis from "lenis";
+import { ArrowUpRight, Users } from "lucide-react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { MotionContainer } from "@/components/landing/MotionContainer";
-import {
-	type Product,
-	type ProductStatus,
-	products,
-} from "@/components/landing/products";
+import { type Product, products } from "@/components/landing/products";
 import { SectionHeader } from "@/components/landing/SectionHeader";
-
-const statusStyles: Record<ProductStatus, string> = {
-	Live: "bg-secondary text-tertiary border-secondary",
-	Pilot: "bg-secondary/10 text-secondary border-secondary/30",
-	Soon: "bg-card/80 text-secondary/55 border-dashed border-secondary/30",
-};
+import { onLenisChange } from "@/hooks/useSmoothScroll";
 
 // Gentle spring so scroll scrubbing feels smooth rather than mechanical.
 const SPRING = { stiffness: 140, damping: 30, mass: 0.4 };
 
-function StatusChip({ status }: { status: ProductStatus }) {
-	return (
-		<span
-			className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] ${statusStyles[status]}`}
-		>
-			{status === "Soon" ? "Coming soon" : status}
-		</span>
-	);
-}
+const LAST = products.length - 1;
+
+// Same graph paper as the page background, drawn small inside each plate.
+const BLUEPRINT = {
+	backgroundImage:
+		"linear-gradient(to right, rgba(58,82,166,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(58,82,166,0.08) 1px, transparent 1px)",
+	backgroundSize: "18px 18px",
+	backgroundPosition: "center",
+};
+
+// Registration marks pinned to the plate corners, like a drafting sheet.
+const CORNERS = [
+	"top-3 left-3 border-t border-l",
+	"top-3 right-3 border-t border-r",
+	"bottom-3 left-3 border-b border-l",
+	"bottom-3 right-3 border-b border-r",
+];
 
 function ProductCard({ product }: { product: Product }) {
 	return (
-		<article className="group rounded-3xl border border-secondary/10 bg-card/80 p-2 shadow-[0_30px_60px_-40px_rgba(58,82,166,0.55)] backdrop-blur transition-colors hover:border-secondary/25">
-			{/* Preview: screenshot, or the product mark until one is set */}
-			<div className="relative aspect-16/10 overflow-hidden rounded-[1.25rem] bg-linear-to-br from-secondary/[0.07] via-secondary/[0.03] to-transparent">
+		<article className="group flex flex-col overflow-hidden rounded-3xl border border-secondary/10 bg-card/95 p-2 shadow-[0_30px_60px_-40px_rgba(58,82,166,0.55)] transition-colors [contain:layout_paint] hover:border-secondary/25 md:grid md:grid-cols-[minmax(0,0.9fr)_minmax(0,1fr)]">
+			{/* Blueprint plate: screenshot, or the product mark drafted on grid */}
+			<div
+				style={product.image ? undefined : BLUEPRINT}
+				className="relative flex aspect-16/10 items-center justify-center overflow-hidden rounded-[1.25rem] bg-secondary/[0.04] md:aspect-auto md:min-h-60 lg:min-h-64"
+			>
 				{product.image ? (
 					<img
 						src={product.image}
 						alt={`${product.name} preview`}
-						loading="lazy"
-						className="h-full w-full object-cover object-top"
+						decoding="async"
+						className="absolute inset-0 h-full w-full object-cover object-top"
 					/>
 				) : (
-					<div className="flex h-full w-full items-center justify-center">
-						<img
-							src={product.logo}
-							alt=""
+					<>
+						{CORNERS.map((corner) => (
+							<span
+								key={corner}
+								aria-hidden
+								className={`absolute h-3 w-3 border-secondary/40 ${corner}`}
+							/>
+						))}
+						{/* Guide lines crossing at the mark */}
+						<span
 							aria-hidden
-							loading="lazy"
-							className="h-44 w-44 sm:h-52 sm:w-52 object-contain transition-transform duration-700 ease-out group-hover:scale-105 motion-reduce:transition-none"
+							className="absolute inset-x-0 top-1/2 h-px bg-secondary/10"
 						/>
-					</div>
+						<span
+							aria-hidden
+							className="absolute inset-y-0 left-1/2 w-px bg-secondary/10"
+						/>
+						<div className="relative flex h-32 w-32 items-center justify-center lg:h-40 lg:w-40">
+							<span
+								aria-hidden
+								className="absolute inset-0 rounded-full border border-dashed border-secondary/30 transition-transform duration-[1600ms] ease-out group-hover:rotate-90 motion-reduce:transition-none"
+							/>
+							<span className="relative flex h-22 w-22 items-center justify-center rounded-full bg-card shadow-[0_18px_40px_-20px_rgba(58,82,166,0.6)] ring-1 ring-secondary/10 lg:h-28 lg:w-28">
+								<img
+									src={product.logo}
+									alt=""
+									aria-hidden
+									decoding="async"
+									className="h-14 w-14 object-contain transition-transform duration-700 ease-out group-hover:scale-110 motion-reduce:transition-none lg:h-[4.5rem] lg:w-[4.5rem]"
+								/>
+							</span>
+						</div>
+					</>
 				)}
-				<div className="absolute top-3 right-3">
-					<StatusChip status={product.status} />
-				</div>
 			</div>
 
-			<div className="px-4 pt-5 pb-4 sm:px-5">
-				<div className="flex items-center gap-2">
-					<img
-						src={product.logo}
-						alt=""
-						aria-hidden
-						loading="lazy"
-						className="h-10 w-10 object-contain"
-					/>
-					<h3 className="text-xl text-secondary">{product.name}</h3>
-				</div>
-				<p className="mt-3 text-[15px] font-medium text-secondary text-pretty">
+			<div className="flex flex-col px-3 pt-4 pb-3 md:justify-center md:px-7 md:py-6">
+				<h3 className="text-2xl text-secondary tracking-tight lg:text-[2rem] lg:leading-tight">
+					{product.name}
+				</h3>
+				<p className="mt-2 text-base text-secondary/65 leading-snug text-pretty lg:text-lg">
 					{product.tagline}
 				</p>
-				<p className="mt-1.5 text-sm text-secondary/60 leading-relaxed text-pretty">
-					{product.description}
-				</p>
 
-				<div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-secondary/10 pt-4">
-					<span className="text-xs text-secondary/50">{product.audience}</span>
+				<div className="mt-5 flex flex-wrap items-center justify-between gap-3 lg:mt-6">
+					<span className="inline-flex items-center gap-1.5 rounded-full bg-secondary/[0.06] px-3 py-1.5 text-xs text-secondary/70">
+						<Users className="h-3.5 w-3.5" strokeWidth={1.75} />
+						{product.audience}
+					</span>
 					{product.href && (
 						<a
 							href={product.href}
@@ -90,9 +108,10 @@ function ProductCard({ product }: { product: Product }) {
 								target: "_blank",
 								rel: "noopener noreferrer",
 							})}
-							className="group/link inline-flex items-center gap-1 text-xs font-medium text-secondary transition-colors hover:text-secondary/70"
+							aria-label={`Visit ${product.name}`}
+							className="group/link inline-flex items-center gap-1.5 rounded-full bg-secondary px-4 py-2 text-xs font-medium text-tertiary transition-colors hover:bg-secondary/90"
 						>
-							Visit {product.name}
+							Visit
 							<ArrowUpRight
 								className="h-3.5 w-3.5 transition-transform group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5 motion-reduce:transition-none"
 								strokeWidth={1.75}
@@ -105,130 +124,220 @@ function ProductCard({ product }: { product: Product }) {
 	);
 }
 
-function JourneyStop({ product, index }: { product: Product; index: number }) {
+function JourneySlide({
+	product,
+	index,
+	progress,
+}: {
+	product: Product;
+	index: number;
+	progress: MotionValue<number>;
+}) {
 	const reduce = useReducedMotion();
-	const ref = useRef<HTMLLIElement>(null);
-	const cardRight = index % 2 === 0;
-	const number = String(index + 1).padStart(2, "0");
-
-	// 0 when the stop enters from below, 1 once it reaches the reading line.
-	const { scrollYProgress } = useScroll({
-		target: ref,
-		offset: ["start 92%", "start 45%"],
+	// Peaks at 1 while this slide is the one in focus, falls off on either side.
+	const at = index / LAST;
+	const span = 1 / LAST;
+	const focus = useTransform(progress, [at - span, at, at + span], [0, 1, 0], {
+		clamp: true,
 	});
-	const progress = useSpring(scrollYProgress, SPRING);
+	const opacity = useTransform(focus, [0, 1], [0.45, 1]);
+	const scale = useTransform(focus, [0, 1], [0.94, 1]);
+	const nodeFill = useTransform(progress, [at - span * 0.5, at], [0, 1]);
 
-	const cardOpacity = useTransform(progress, [0, 0.7], [0, 1]);
-	const cardY = useTransform(progress, [0, 1], [64, 0]);
-	const cardScale = useTransform(progress, [0, 1], [0.96, 1]);
-	const cardBlur = useTransform(progress, [0, 0.8], ["blur(6px)", "blur(0px)"]);
-	const labelX = useTransform(progress, [0, 1], [cardRight ? -32 : 32, 0]);
-	const labelOpacity = useTransform(progress, [0.15, 0.85], [0, 1]);
-	const nodeFill = useTransform(
-		progress,
-		[0.75, 1],
-		["rgba(254,254,253,1)", "rgba(58,82,166,1)"],
-	);
-	const nodeText = useTransform(
-		progress,
-		[0.75, 1],
-		["rgba(58,82,166,1)", "rgba(240,247,255,1)"],
-	);
-
-	// Reduced motion renders every value at its final state.
 	const pick = <T,>(value: MotionValue<T>, still: T) =>
 		reduce ? still : value;
 
 	return (
-		<li
-			id={product.id}
-			ref={ref}
-			className="relative scroll-mt-28 pl-14 lg:pl-0"
-		>
-			<div className="lg:grid lg:grid-cols-2 lg:items-center lg:gap-28">
-				{/* Node on the spine, fills in once the stop is reached */}
+		<li className="relative w-[calc(100vw-5rem)] shrink-0 sm:w-[30rem] md:w-[36rem] lg:w-[46rem]">
+			{/* Node on the rail; the blue fill fades in rather than repainting */}
+			<span
+				aria-hidden
+				className="absolute top-5 left-0 z-10 h-3.5 w-3.5 -translate-y-1/2 rounded-full border border-secondary/40 bg-card shadow-[0_0_0_4px_rgba(240,247,255,0.9)]"
+			>
 				<motion.span
-					style={{
-						backgroundColor: pick(nodeFill, "rgba(58,82,166,1)"),
-						color: pick(nodeText, "rgba(240,247,255,1)"),
-					}}
-					className="absolute left-5 top-1 z-10 flex h-10 w-10 -translate-x-1/2 items-center justify-center rounded-full border border-secondary/30 text-xs font-medium shadow-sm lg:left-1/2 lg:top-1/2 lg:-translate-y-1/2"
-				>
-					{number}
-				</motion.span>
+					style={{ opacity: pick(nodeFill, 1) }}
+					className="absolute inset-0 rounded-full bg-secondary will-change-[opacity]"
+				/>
+			</span>
 
-				{/* Stage label */}
-				<motion.div
-					style={{ x: pick(labelX, 0), opacity: pick(labelOpacity, 1) }}
-					className={`mb-5 lg:mb-0 ${cardRight ? "lg:order-1 lg:text-right" : "lg:order-2"}`}
-				>
-					<span className="text-[11px] font-medium uppercase tracking-[0.2em] text-secondary/45">
-						Step {number}
-					</span>
-					<p className="mt-2 text-2xl lg:text-[2.75rem] text-secondary leading-[1.1] tracking-tight text-balance">
+			{/* Stage and card fade and settle together as one layer */}
+			<motion.div
+				style={{ opacity: pick(opacity, 1), scale: pick(scale, 1) }}
+				className="origin-top-left pl-5 will-change-transform"
+			>
+				<p className="flex h-10 items-center">
+					<span className="rounded-full bg-tertiary px-3 py-1 text-lg text-secondary leading-tight tracking-tight lg:text-xl">
 						{product.stage}
-					</p>
-				</motion.div>
-
-				{/* Product card */}
-				<motion.div
-					style={{
-						opacity: pick(cardOpacity, 1),
-						y: pick(cardY, 0),
-						scale: pick(cardScale, 1),
-						filter: pick(cardBlur, "blur(0px)"),
-					}}
-					className={`will-change-transform ${cardRight ? "lg:order-2" : "lg:order-1"}`}
-				>
+					</span>
+				</p>
+				<div className="mt-4 -ml-5">
 					<ProductCard product={product} />
-				</motion.div>
-			</div>
+				</div>
+			</motion.div>
 		</li>
 	);
 }
 
 export function Journey() {
 	const reduce = useReducedMotion();
-	const pathRef = useRef<HTMLDivElement>(null);
+	const pinRef = useRef<HTMLDivElement>(null);
+	const viewportRef = useRef<HTMLDivElement>(null);
+	const trackRef = useRef<HTMLDivElement>(null);
+	const lenisRef = useRef<Lenis | null>(null);
+	// Horizontal distance the track travels, which is also the vertical
+	// distance the section stays pinned for.
+	const [travel, setTravel] = useState(0);
+	const [active, setActive] = useState(0);
+
+	useEffect(
+		() =>
+			onLenisChange((lenis) => {
+				lenisRef.current = lenis;
+			}),
+		[],
+	);
+
+	useLayoutEffect(() => {
+		const viewport = viewportRef.current;
+		const track = trackRef.current;
+		if (!viewport || !track) return;
+		const measure = () =>
+			setTravel(Math.max(0, track.scrollWidth - viewport.clientWidth));
+		measure();
+		const observer = new ResizeObserver(measure);
+		observer.observe(viewport);
+		observer.observe(track);
+		return () => observer.disconnect();
+	}, []);
+
 	const { scrollYProgress } = useScroll({
-		target: pathRef,
-		offset: ["start 60%", "end 60%"],
+		target: pinRef,
+		offset: ["start start", "end end"],
 	});
-	// The spine draws as the reader moves down the path.
-	const spineRaw = useSpring(scrollYProgress, SPRING);
-	const spine = reduce ? 1 : spineRaw;
+	const smooth = useSpring(scrollYProgress, SPRING);
+	const progress = reduce ? scrollYProgress : smooth;
+	const x = useTransform(progress, (p) => -p * travel);
+
+	const activeRef = useRef(0);
+	useMotionValueEvent(progress, "change", (p) => {
+		const next = Math.min(LAST, Math.max(0, Math.round(p * LAST)));
+		if (next === activeRef.current) return;
+		activeRef.current = next;
+		setActive(next);
+	});
+
+	// Jump to a slide by scrolling the page to the matching point of the pin.
+	const goTo = (index: number) => {
+		const pin = pinRef.current;
+		if (!pin) return;
+		const top =
+			pin.getBoundingClientRect().top +
+			window.scrollY +
+			(travel * index) / LAST;
+		if (lenisRef.current) lenisRef.current.scrollTo(top);
+		else window.scrollTo({ top, behavior: reduce ? "auto" : "smooth" });
+	};
 
 	return (
-		<section
-			id="products"
-			className="relative py-24 lg:py-36 px-4 sm:px-12 lg:px-26"
-		>
-			<div className="relative z-30 mx-auto max-w-6xl">
-				<MotionContainer className="mb-20 lg:mb-32" viewportMargin="-50px">
+		<section id="products" className="relative pt-24 lg:pt-36">
+			<div className="relative z-30 mx-auto max-w-6xl px-4 sm:px-12 lg:px-0">
+				<MotionContainer className="mb-6 lg:mb-10" viewportMargin="-50px">
 					<SectionHeader
 						eyebrow="Our products"
 						title="One path, six products"
 						description="Each product meets students at a different step, from choosing a course to proving a diploma."
 					/>
 				</MotionContainer>
+			</div>
 
-				<div ref={pathRef} className="relative">
-					{/* Spine: faint track with the drawn line on top */}
-					<div
+			{/* Pin: tall enough that vertical scroll drives the full horizontal
+			    run before the page moves on to the next section. */}
+			<div
+				ref={pinRef}
+				className="relative"
+				style={{ height: `calc(100svh + ${travel}px)` }}
+			>
+				{/* Hash anchors at the scroll point where each slide is in focus */}
+				{products.map((product, index) => (
+					<span
+						key={product.id}
+						id={product.id}
 						aria-hidden
-						className="absolute top-0 bottom-0 left-5 w-px -translate-x-1/2 bg-secondary/10 lg:left-1/2"
+						className="pointer-events-none absolute left-0 h-px w-px"
+						style={{ top: (travel * index) / LAST }}
 					/>
-					<motion.div
-						aria-hidden
-						style={{ scaleY: spine, transformOrigin: "top" }}
-						className="absolute top-0 bottom-0 left-5 w-px -translate-x-1/2 bg-linear-to-b from-secondary/30 via-secondary/70 to-secondary lg:left-1/2"
-					/>
+				))}
 
-					<ol className="relative space-y-20 lg:space-y-32">
-						{products.map((product, index) => (
-							<JourneyStop key={product.id} product={product} index={index} />
-						))}
-					</ol>
+				<div className="sticky top-0 flex h-svh flex-col justify-center-safe overflow-clip pt-24 pb-5 sm:pt-28">
+					{/* Window matches the navbar and section header width, so slides
+					    enter and leave at the same edges the rest of the page uses. */}
+					<div className="mx-auto w-full max-w-6xl shrink-0 px-4 sm:px-12 lg:px-0">
+						<div ref={viewportRef} className="overflow-x-clip">
+							<motion.div
+								ref={trackRef}
+								style={{ x }}
+								className="relative w-max will-change-transform"
+							>
+								{/* Rail through the step nodes, drawn as the reader advances */}
+								<div
+									aria-hidden
+									className="absolute top-5 right-0 left-0 h-px bg-secondary/10"
+								/>
+								<motion.div
+									aria-hidden
+									style={{ scaleX: progress, transformOrigin: "left" }}
+									className="absolute top-5 right-0 left-0 h-px bg-linear-to-r from-secondary/30 via-secondary/70 to-secondary will-change-transform"
+								/>
+								<ol className="relative flex items-start gap-6 sm:gap-10 lg:gap-14">
+									{products.map((product, index) => (
+										<JourneySlide
+											key={product.id}
+											product={product}
+											index={index}
+											progress={progress}
+										/>
+									))}
+								</ol>
+							</motion.div>
+						</div>
+					</div>
+
+					{/* Progress dock: counter, bar, and a jump list of the six stops */}
+					<div className="mx-auto mt-5 flex w-full max-w-6xl shrink-0 items-center gap-4 px-4 sm:mt-6 sm:px-12 lg:px-0">
+						<span className="shrink-0 font-medium tabular-nums text-secondary text-sm">
+							{String(active + 1).padStart(2, "0")}
+							<span className="text-secondary/35">
+								{" "}
+								/ {String(products.length).padStart(2, "0")}
+							</span>
+						</span>
+						<div className="relative h-1 flex-1 overflow-hidden rounded-full bg-secondary/10">
+							<motion.div
+								style={{ scaleX: progress, transformOrigin: "left" }}
+								className="absolute inset-0 rounded-full bg-secondary will-change-transform"
+							/>
+						</div>
+						<nav
+							aria-label="Jump to product"
+							className="hidden shrink-0 items-center gap-1 md:flex"
+						>
+							{products.map((product, index) => (
+								<button
+									key={product.id}
+									type="button"
+									onClick={() => goTo(index)}
+									aria-current={active === index ? "step" : undefined}
+									className={`rounded-full px-3 py-1.5 text-xs transition-colors ${
+										active === index
+											? "bg-secondary text-tertiary"
+											: "text-secondary/55 hover:bg-secondary/10 hover:text-secondary"
+									}`}
+								>
+									{product.name}
+								</button>
+							))}
+						</nav>
+					</div>
 				</div>
 			</div>
 		</section>

@@ -150,12 +150,12 @@ export function Hero({ ready = true }: { ready?: boolean }) {
 				animate={state}
 				variants={stagger}
 			>
-				{/* Query container: from lg the headline sizes to this column's width,
-				    so it always runs right up to the CTAs with no dead gap. */}
+				{/* Query container: the headline sizes to this column's width, one row
+				    per line on phones, up to the CTAs on desktop. */}
 				<div className="@container text-center lg:text-left">
 					<motion.h1
 						variants={rise}
-						className="text-[3.25rem] sm:text-[4.25rem] lg:text-[clamp(3.5rem,7.45cqw,5.5rem)] text-secondary leading-[1.04] tracking-[-0.035em] text-balance lg:whitespace-nowrap"
+						className="text-[9.2cqw] lg:text-[clamp(3.5rem,7.45cqw,5.5rem)] text-secondary leading-[1.08] tracking-[-0.035em] whitespace-nowrap"
 					>
 						Empowering Students
 						<span className="block text-secondary/45">

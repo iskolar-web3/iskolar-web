@@ -1,0 +1,12 @@
+[     526ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/node_modules/.vite/deps/react-dom_client.js?v=6272309a:20102
+[     623ms] [WARNING] [tanstack-router] These exports from "D:/louig/Desktop/iskolar/web/src/routes/_sponsor/overview.tsx" will not be code-split and will increase your bundle size:
+- SponsorOverview
+For the best optimization, these items should either have their export statements removed, or be imported from another location that is not a route file. @ http://localhost:3000/src/routes/_sponsor/overview.tsx:2
+[     723ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5000/sessions:0
+[     724ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5000/sessions:0
+[     823ms] [WARNING] You're attempting to animate multiple children within AnimatePresence, but its mode is set to "wait". This will lead to odd visual behaviour. @ http://localhost:3000/node_modules/.vite/deps/framer-motion.js?v=6272309a:8584
+[     824ms] [WARNING] You're attempting to animate multiple children within AnimatePresence, but its mode is set to "wait". This will lead to odd visual behaviour. @ http://localhost:3000/node_modules/.vite/deps/framer-motion.js?v=6272309a:8584
+[     901ms] [WARNING] You're attempting to animate multiple children within AnimatePresence, but its mode is set to "wait". This will lead to odd visual behaviour. @ http://localhost:3000/node_modules/.vite/deps/framer-motion.js?v=6272309a:8584
+[     901ms] [WARNING] You're attempting to animate multiple children within AnimatePresence, but its mode is set to "wait". This will lead to odd visual behaviour. @ http://localhost:3000/node_modules/.vite/deps/framer-motion.js?v=6272309a:8584
+[    1013ms] [WARNING] You're attempting to animate multiple children within AnimatePresence, but its mode is set to "wait". This will lead to odd visual behaviour. @ http://localhost:3000/node_modules/.vite/deps/framer-motion.js?v=6272309a:8584
+[    1013ms] [WARNING] You're attempting to animate multiple children within AnimatePresence, but its mode is set to "wait". This will lead to odd visual behaviour. @ http://localhost:3000/node_modules/.vite/deps/framer-motion.js?v=6272309a:8584

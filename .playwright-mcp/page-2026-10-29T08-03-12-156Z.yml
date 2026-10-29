@@ -1,0 +1,319 @@
+- generic [ref=f2e2]:
+  - main [ref=f2e3]:
+    - navigation [ref=f2e4]:
+      - generic [ref=f2e6]:
+        - link [ref=f2e7]:
+          - /url: /#home
+          - img "Logo" [ref=f2e9]
+        - button "Toggle menu" [ref=f2e10]
+    - generic [ref=f2e12]:
+      - generic [ref=f2e13]:
+        - generic [ref=f2e14]:
+          - heading "Empowering Students from Education to Career." [level=1] [ref=f2e15]:
+            - text: Empowering Students
+            - generic [ref=f2e16]: from Education to Career.
+          - paragraph [ref=f2e17]: iSkolar helps Filipino students choose a course, get funded, build real work, and prove what they earned.
+        - generic [ref=f2e18]:
+          - link "Explore the path" [ref=f2e19]:
+            - /url: "#products"
+          - link "Get Started" [ref=f2e23]:
+            - /url: /login
+      - generic [ref=f2e28]:
+        - paragraph [ref=f2e29]: Where our students come from
+        - list [ref=f2e30]:
+          - listitem "University of the Philippines" [ref=f2e31]:
+            - img "University of the Philippines" [ref=f2e32]
+          - listitem "Ateneo de Manila University" [ref=f2e33]:
+            - img "Ateneo de Manila University" [ref=f2e34]
+          - listitem "De La Salle University" [ref=f2e35]:
+            - img "De La Salle University" [ref=f2e36]
+          - listitem "University of Santo Tomas" [ref=f2e37]:
+            - img "University of Santo Tomas" [ref=f2e38]
+          - listitem "Polytechnic University of the Philippines" [ref=f2e39]:
+            - img "Polytechnic University of the Philippines" [ref=f2e40]
+          - listitem "Far Eastern University" [ref=f2e41]:
+            - img "Far Eastern University" [ref=f2e42]
+          - listitem "Adamson University" [ref=f2e43]:
+            - img "Adamson University" [ref=f2e44]
+          - listitem "University of Makati" [ref=f2e45]:
+            - img "University of Makati" [ref=f2e46]
+          - listitem "Asia Pacific College" [ref=f2e47]:
+            - img "Asia Pacific College" [ref=f2e48]
+      - generic [ref=f2e49]:
+        - paragraph [ref=f2e50]: Trusted by
+        - generic [ref=f2e53]:
+          - img "BYC Ventures" [ref=f2e54]
+          - img "QBO Innovation" [ref=f2e55]
+          - img "Tutorials Dojo" [ref=f2e56]
+          - img "Jia Talent Vault" [ref=f2e57]
+          - img "Cryptita Plays" [ref=f2e58]
+          - img "AWS Learning Club Heron" [ref=f2e59]
+          - img "Tech Kubo" [ref=f2e60]
+    - generic [ref=f2e63]:
+      - generic [ref=f2e66]:
+        - generic [ref=f2e67]: Our products
+        - heading "One path, six products" [level=2] [ref=f2e69]
+        - paragraph [ref=f2e70]: Each product meets students at a different step, from choosing a course to proving a diploma.
+      - generic [ref=f2e72]:
+        - list [ref=f2e75]:
+          - listitem [ref=f2e76]:
+            - generic [ref=f2e77]: "01"
+            - generic [ref=f2e79]:
+              - generic [ref=f2e80]: Step 01
+              - paragraph [ref=f2e81]: Choose a course
+              - article [ref=f2e83]:
+                - generic [ref=f2e84]: Coming soon
+                - generic [ref=f2e89]:
+                  - heading "PathFinder" [level=3] [ref=f2e92]
+                  - paragraph [ref=f2e93]: Find the college course that fits who you are.
+                  - paragraph [ref=f2e94]: A short visual survey matches you with five courses, each with a match score, starting salary, and board exam indicator.
+                  - generic [ref=f2e95]: Senior high students
+          - listitem [ref=f2e97]:
+            - generic [ref=f2e98]: "02"
+            - generic [ref=f2e100]:
+              - generic [ref=f2e101]: Step 02
+              - paragraph [ref=f2e102]: Pass the entrance exam
+              - article [ref=f2e104]:
+                - generic [ref=f2e105]: Coming soon
+                - generic [ref=f2e110]:
+                  - heading "Review" [level=3] [ref=f2e113]
+                  - paragraph [ref=f2e114]: Prepare for UPCAT, ACET, DCAT, and USTET with real mock exams.
+                  - paragraph [ref=f2e115]: Timed and review modes, courses from trusted review centers, and certification prep for tech careers.
+                  - generic [ref=f2e116]: Senior high and college students
+          - listitem [ref=f2e118]:
+            - generic [ref=f2e119]: "03"
+            - generic [ref=f2e121]:
+              - generic [ref=f2e122]: Step 03
+              - paragraph [ref=f2e123]: Fund your studies
+              - article [ref=f2e125]:
+                - generic [ref=f2e126]: Live
+                - generic [ref=f2e131]:
+                  - heading "iSkolar" [level=3] [ref=f2e134]
+                  - paragraph [ref=f2e135]: Discover, apply for, and track scholarships in one place.
+                  - paragraph [ref=f2e136]: Sponsors post programs, students apply online, and every disbursement is recorded transparently.
+                  - generic [ref=f2e137]:
+                    - generic [ref=f2e138]: Students, sponsors, and schools
+                    - link "Visit iSkolar" [ref=f2e139]:
+                      - /url: /register
+          - listitem [ref=f2e143]:
+            - generic [ref=f2e144]: "04"
+            - generic [ref=f2e146]:
+              - generic [ref=f2e147]: Step 04
+              - paragraph [ref=f2e148]: Build what you learn
+              - article [ref=f2e150]:
+                - generic [ref=f2e151]: Live
+                - generic [ref=f2e156]:
+                  - heading "Academy" [level=3] [ref=f2e159]
+                  - paragraph [ref=f2e160]: Show your projects to the people looking for them.
+                  - paragraph [ref=f2e161]: Ship a working MVP, pass a quality review, and get discovered by sponsors, recruiters, and investors. Thesis grants help early ideas start.
+                  - generic [ref=f2e162]:
+                    - generic [ref=f2e163]: College builders and sponsors
+                    - link "Visit Academy" [ref=f2e164]:
+                      - /url: https://academy.iskolar.io
+          - listitem [ref=f2e168]:
+            - generic [ref=f2e169]: "05"
+            - generic [ref=f2e171]:
+              - generic [ref=f2e172]: Step 05
+              - paragraph [ref=f2e173]: Land your first internship
+              - article [ref=f2e175]:
+                - generic [ref=f2e176]: Live
+                - generic [ref=f2e181]:
+                  - heading "Vocation" [level=3] [ref=f2e184]
+                  - paragraph [ref=f2e185]: Find internships and OJT, and book time with career coaches.
+                  - paragraph [ref=f2e186]: A verified company directory, one click apply, and coaching programs built for students.
+                  - generic [ref=f2e187]: Students, coaches, and employers
+          - listitem [ref=f2e189]:
+            - generic [ref=f2e190]: "06"
+            - generic [ref=f2e192]:
+              - generic [ref=f2e193]: Step 06
+              - paragraph [ref=f2e194]: Prove what you earned
+              - article [ref=f2e196]:
+                - generic [ref=f2e197]: Pilot
+                - generic [ref=f2e202]:
+                  - heading "Verity" [level=3] [ref=f2e205]
+                  - paragraph [ref=f2e206]: Tamper proof diplomas and transcripts anyone can verify.
+                  - paragraph [ref=f2e207]: Registrars issue credentials anchored on the blockchain. Only a fingerprint goes on chain, never personal data.
+                  - generic [ref=f2e208]: Registrars, students, and employers
+        - generic [ref=f2e211]:
+          - text: "01"
+          - generic [ref=f2e212]: / 06
+    - generic [ref=f2e215]:
+      - generic [ref=f2e216]:
+        - generic [ref=f2e217]:
+          - generic [ref=f2e218]: Ecosystem
+          - heading "The people building this with us" [level=2] [ref=f2e220]
+          - paragraph [ref=f2e221]: Building with partners, reaching students through communities.
+        - link "Know more" [ref=f2e223]:
+          - /url: /about#partnerships
+      - generic [ref=f2e227]:
+        - link "Learn more about our Strategic Incubation Partners" [ref=f2e229]:
+          - /url: /about#partnerships
+          - generic [ref=f2e230]:
+            - img "BYC Ventures" [ref=f2e231]
+            - img "QBO Innovation Hub" [ref=f2e232]
+          - generic [ref=f2e233]:
+            - heading "Strategic Incubation Partners" [level=3] [ref=f2e234]
+            - paragraph [ref=f2e235]: The studios, hubs, and mentors who shape how iSkolar is built. They back our team with capital, technical guidance, and the networks that turn an idea into infrastructure students can rely on.
+        - link "Learn more about our Company Partners" [ref=f2e237]:
+          - /url: /about#partnerships
+          - generic [ref=f2e238]:
+            - img "Tutorials Dojo" [ref=f2e239]
+            - img "Jia Talent Vault" [ref=f2e240]
+          - generic [ref=f2e241]:
+            - heading "Company Partners" [level=3] [ref=f2e242]
+            - paragraph [ref=f2e243]: The companies that put iSkolar's verified credentials to work beyond the classroom, turning scholarship achievements into opportunities in the job market.
+        - link "Learn more about our Community Partners" [ref=f2e245]:
+          - /url: /about#partnerships
+          - generic [ref=f2e246]:
+            - img "Cryptita Plays" [ref=f2e247]
+            - img "Tech Kubo" [ref=f2e248]
+            - img "AWS Learning Club Heron" [ref=f2e249]
+          - generic [ref=f2e250]:
+            - heading "Community Partners" [level=3] [ref=f2e251]
+            - paragraph [ref=f2e252]: The communities that carry iSkolar to the students who need it. They open doors to learners, builders, and campuses across the Philippines, helping scholarships reach further than we could alone.
+    - generic [ref=f2e254]:
+      - generic [ref=f2e255]:
+        - generic [ref=f2e256]: Spotlight
+        - heading "iSkolar in the press" [level=2] [ref=f2e258]
+        - paragraph [ref=f2e259]: Coverage of the team and the partnerships we've built.
+      - generic [ref=f2e260]:
+        - link "BitPinas coverage of iSkolar BitPinas iSkolar Powers BYC Ventures' Tomorrow Fund Pilot for NCR IT Students Read on BitPinas" [ref=f2e262]:
+          - /url: https://bitpinas.com/business/iskolar-byc-tomorrowfund/
+          - img "BitPinas coverage of iSkolar" [ref=f2e264]
+          - generic [ref=f2e265]:
+            - generic [ref=f2e266]: BitPinas
+            - heading "iSkolar Powers BYC Ventures' Tomorrow Fund Pilot for NCR IT Students" [level=3] [ref=f2e267]
+            - generic [ref=f2e268]: Read on BitPinas
+        - link "BitPinas coverage of iSkolar BitPinas These Filipino Students Built an AI and Blockchain Scholarship Platform to Fix Education Funding Read on BitPinas" [ref=f2e273]:
+          - /url: https://bitpinas.com/ai/iskolar-ai-launched/
+          - img "BitPinas coverage of iSkolar" [ref=f2e275]
+          - generic [ref=f2e276]:
+            - generic [ref=f2e277]: BitPinas
+            - heading "These Filipino Students Built an AI and Blockchain Scholarship Platform to Fix Education Funding" [level=3] [ref=f2e278]
+            - generic [ref=f2e279]: Read on BitPinas
+        - link "BYC Ventures coverage of iSkolar BYC Ventures BYC Ventures and iSkolar Formalize Collaboration to Advance Verifiable Credential Infrastructure Read on BYC Ventures" [ref=f2e284]:
+          - /url: https://byc.ventures/news/byc-ventures-and-iskolar-formalize-collaboration-to-advance-verifiable-credential-infrastructure
+          - img "BYC Ventures coverage of iSkolar" [ref=f2e286]
+          - generic [ref=f2e287]:
+            - generic [ref=f2e288]: BYC Ventures
+            - heading "BYC Ventures and iSkolar Formalize Collaboration to Advance Verifiable Credential Infrastructure" [level=3] [ref=f2e289]
+            - generic [ref=f2e290]: Read on BYC Ventures
+        - link "Startup Machine coverage of iSkolar Startup Machine How iSkolar.io Could Change the Way Filipinos Discover and Receive Scholarships Read on Startup Machine" [ref=f2e295]:
+          - /url: https://startupmachine.substack.com/p/featured-submission-how-iskolario
+          - img "Startup Machine coverage of iSkolar" [ref=f2e297]
+          - generic [ref=f2e298]:
+            - generic [ref=f2e299]: Startup Machine
+            - heading "How iSkolar.io Could Change the Way Filipinos Discover and Receive Scholarships" [level=3] [ref=f2e300]
+            - generic [ref=f2e301]: Read on Startup Machine
+    - generic [ref=f2e307]:
+      - generic [ref=f2e308]: Get started
+      - heading "Start wherever you are on the path" [level=2] [ref=f2e310]
+      - paragraph [ref=f2e311]: Students, sponsors, and schools can join iSkolar today, with more products opening along the way.
+      - link "Be a scholar" [ref=f2e312]:
+        - /url: /login
+    - generic [ref=f2e318]:
+      - generic [ref=f2e320]:
+        - generic [ref=f2e321]: Questions
+        - heading "Frequently asked questions" [level=2] [ref=f2e323]
+        - generic [ref=f2e324]:
+          - paragraph [ref=f2e325]: Still have questions?
+          - link "Contact us at hello@iskolar.io" [ref=f2e326]:
+            - /url: https://mail.google.com/mail/u/0/#all?compose=new
+      - generic [ref=f2e327]:
+        - button "What is iSkolar?" [ref=f2e329]
+        - button "Which product is right for me?" [ref=f2e334]
+        - button "Are the products free for students?" [ref=f2e339]
+        - button "Which products are available now?" [ref=f2e344]
+        - button "How do schools work with iSkolar?" [ref=f2e349]
+        - button "How is student data protected?" [ref=f2e354]
+        - button "How do I apply for a scholarship?" [ref=f2e359]
+        - button "How do I get started as a sponsor?" [ref=f2e364]
+    - generic [ref=f2e368]:
+      - generic [ref=f2e370]:
+        - generic [ref=f2e371]:
+          - generic [ref=f2e372]:
+            - link [ref=f2e373]:
+              - /url: /
+              - img "Logo" [ref=f2e375]
+            - paragraph [ref=f2e376]: Tools for every step of a Filipino student's journey, from choosing a course to proving a diploma.
+            - generic [ref=f2e377]:
+              - link "Facebook" [ref=f2e378]:
+                - /url: https://www.facebook.com/profile.php?id=61575967087555
+              - link "LinkedIn" [ref=f2e381]:
+                - /url: https://www.linkedin.com/company/107364901
+              - link "Instagram" [ref=f2e386]:
+                - /url: https://www.instagram.com/iskolar_web3?igsh=NDNvZmkwNmxwbDl2
+          - generic [ref=f2e390]:
+            - heading "Home" [level=4] [ref=f2e391]
+            - list [ref=f2e392]:
+              - listitem [ref=f2e393]:
+                - link "Home" [ref=f2e394]:
+                  - /url: /#home
+              - listitem [ref=f2e395]:
+                - link "Products" [ref=f2e396]:
+                  - /url: /#products
+              - listitem [ref=f2e397]:
+                - link "Ecosystem" [ref=f2e398]:
+                  - /url: /#ecosystem
+              - listitem [ref=f2e399]:
+                - link "In the News" [ref=f2e400]:
+                  - /url: /#in-the-news
+              - listitem [ref=f2e401]:
+                - link "FAQs" [ref=f2e402]:
+                  - /url: /#faqs
+          - generic [ref=f2e403]:
+            - heading "Products" [level=4] [ref=f2e404]
+            - list [ref=f2e405]:
+              - listitem [ref=f2e406]:
+                - link "PathFinder" [ref=f2e407]:
+                  - /url: /#pathfinder
+              - listitem [ref=f2e408]:
+                - link "Review" [ref=f2e409]:
+                  - /url: /#review
+              - listitem [ref=f2e410]:
+                - link "iSkolar" [ref=f2e411]:
+                  - /url: /#iskolar
+              - listitem [ref=f2e412]:
+                - link "Academy" [ref=f2e413]:
+                  - /url: /#academy
+              - listitem [ref=f2e414]:
+                - link "Vocation" [ref=f2e415]:
+                  - /url: /#vocation
+              - listitem [ref=f2e416]:
+                - link "Verity" [ref=f2e417]:
+                  - /url: /#verity
+          - generic [ref=f2e418]:
+            - heading "About" [level=4] [ref=f2e419]
+            - list [ref=f2e420]:
+              - listitem [ref=f2e421]:
+                - link "Company Overview" [ref=f2e422]:
+                  - /url: /about#company-overview
+              - listitem [ref=f2e423]:
+                - link "Mission & Vision" [ref=f2e424]:
+                  - /url: /about#mission-vision
+              - listitem [ref=f2e425]:
+                - link "Partnerships" [ref=f2e426]:
+                  - /url: /about#partnerships
+              - listitem [ref=f2e427]:
+                - link "Our Team" [ref=f2e428]:
+                  - /url: /about#team
+          - generic [ref=f2e429]:
+            - heading "Legal" [level=4] [ref=f2e430]
+            - list [ref=f2e431]:
+              - listitem [ref=f2e432]:
+                - link "Privacy Policy" [ref=f2e433]:
+                  - /url: /privacy-policy
+              - listitem [ref=f2e434]:
+                - link "Terms & Conditions" [ref=f2e435]:
+                  - /url: /terms-conditions
+          - generic [ref=f2e436]:
+            - heading "Contact Us" [level=4] [ref=f2e437]
+            - link "hello@iskolar.io" [ref=f2e438]:
+              - /url: https://mail.google.com/mail/u/0/#all?compose=new
+        - generic [ref=f2e442]:
+          - paragraph [ref=f2e443]: © 2026 iSkolar. All rights reserved.
+          - paragraph [ref=f2e445]: Built For Students, Built By Students.
+      - paragraph [aria-hidden]: iSkolar
+    - button "Scroll to top"
+  - button "Open the iSkolar assistant" [ref=f2e446] [cursor=pointer]
+  - button "Open Tanstack query devtools" [ref=f2e497] [cursor=pointer]
