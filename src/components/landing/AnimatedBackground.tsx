@@ -30,9 +30,9 @@ const MAX_RIPPLES = 6;
 // point circles as a crest passes, so points bunch on crests and spread in
 // troughs like a real sea surface. Angles in radians, lengths in px, periods in s.
 const SWELLS = [
-	{ angle: 0.35, length: 560, amp: 7, period: 12 },
-	{ angle: -0.6, length: 360, amp: 4, period: 9 },
-	{ angle: 1.25, length: 230, amp: 2, period: 7 },
+	{ angle: 0.35, length: 560, amp: 12, period: 12 },
+	{ angle: -0.6, length: 360, amp: 7, period: 9 },
+	{ angle: 1.25, length: 230, amp: 3.5, period: 7 },
 ].map(({ angle, length, amp, period }) => {
 	const k = (Math.PI * 2) / length;
 	return {
@@ -46,7 +46,7 @@ const SWELLS = [
 });
 const SWELL_SUM = SWELLS.reduce((s, w) => s + w.amp, 0);
 // How far points orbit sideways relative to the wave height.
-const STEEPNESS = 0.7;
+const STEEPNESS = 0.9;
 // Height shows as a small upward shift, like the sea seen at a slight angle.
 const TILT = 0.5;
 const SWELL_FADE_MS = 2000;
@@ -268,16 +268,16 @@ export default function AnimatedBackground() {
 					const band = still ? 0 : Math.exp(-s * s);
 					displace(x, y, c * 2, r * 2);
 					// Crests catch the light, troughs sink back a little.
-					const crest = outSwell > 0 ? outSwell * outSwell : 0;
+					const crest = outSwell > 0 ? outSwell : 0;
 					const trough = outSwell < 0 ? -outSwell : 0;
 					const alpha =
 						(major ? 0.3 : 0.16) +
 						band * 0.18 +
-						crest * 0.16 -
-						trough * 0.05 +
+						crest * 0.3 -
+						trough * 0.1 +
 						outInfl * outInfl * 0.5;
 					const radius =
-						(major ? 1.4 : 1) * (1 + outInfl * 1.3) * (1 + crest * 0.3);
+						(major ? 1.4 : 1) * (1 + outInfl * 1.3) * (1 + crest * 0.5);
 					const key = Math.round(Math.min(alpha, 0.85) * 50);
 					let path = buckets.get(key);
 					if (!path) {
