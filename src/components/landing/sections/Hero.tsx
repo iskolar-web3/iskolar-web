@@ -155,7 +155,7 @@ export function Hero({ ready = true }: { ready?: boolean }) {
 				<div className="@container text-center lg:text-left">
 					<motion.h1
 						variants={rise}
-						className="text-[9.2cqw] lg:text-[clamp(3.5rem,7.45cqw,5.5rem)] text-secondary leading-[1.08] tracking-[-0.035em] whitespace-nowrap"
+						className="text-[10cqw] lg:text-[clamp(3.5rem,7.45cqw,5.5rem)] text-secondary leading-[1.08] tracking-[-0.065em] lg:tracking-[-0.035em] whitespace-nowrap"
 					>
 						Empowering Students
 						<span className="block text-secondary/45">
