@@ -165,7 +165,7 @@ export function Hero({ ready = true }: { ready?: boolean }) {
 
 					<motion.p
 						variants={rise}
-						className="mx-auto mt-6 max-w-xl text-lg sm:text-xl lg:max-w-2xl text-secondary/70 leading-relaxed text-pretty lg:mx-0"
+						className="mx-auto mt-6 max-w-xl text-base sm:text-lg lg:text-xl lg:max-w-2xl text-secondary/70 leading-relaxed text-pretty lg:mx-0"
 					>
 						iSkolar helps Filipino students choose a course, get funded, build
 						real work, and prove what they earned.
