@@ -1,10 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
 import {
+	ecosystemGroup,
+	ecosystemPartners,
+} from "@/components/landing/ecosystem";
+import {
 	MotionContainer,
 	MotionItem,
 } from "@/components/landing/MotionContainer";
-import { partnerGroups } from "@/components/landing/partners";
+import { BLUE_TINT, partnerGroups } from "@/components/landing/partners";
 import { SectionHeader } from "@/components/landing/SectionHeader";
 
 export function Ecosystem() {
@@ -77,6 +81,39 @@ export function Ecosystem() {
 							</Link>
 						</MotionItem>
 					))}
+
+					{/* Global partners: full width card, not linked (they are not on the About page) */}
+					<MotionItem className="lg:col-span-3">
+						<div className="flex h-full flex-col rounded-3xl border border-secondary/10 bg-card/80 p-2 backdrop-blur lg:flex-row">
+							<ul className="flex flex-1 flex-wrap items-center justify-center gap-x-4 gap-y-6 rounded-[1.25rem] bg-linear-to-br from-secondary/[0.06] to-transparent px-4 py-10 sm:gap-x-12 sm:px-6">
+								{ecosystemPartners.map((partner) => (
+									<li
+										key={partner.id}
+										title={partner.name}
+										className="flex items-center gap-2.5 text-secondary/80"
+									>
+										<img
+											src={partner.logo}
+											alt=""
+											aria-hidden
+											loading="lazy"
+											style={{ filter: BLUE_TINT }}
+											className="h-5 w-5 object-contain sm:h-7 sm:w-7"
+										/>
+										<span className="text-base sm:text-xl">{partner.name}</span>
+									</li>
+								))}
+							</ul>
+							<div className="px-4 pt-5 pb-4 lg:flex lg:w-[34%] lg:flex-col lg:justify-center lg:pt-4">
+								<h3 className="text-xs font-medium uppercase tracking-[0.16em] text-secondary">
+									{ecosystemGroup.label}
+								</h3>
+								<p className="mt-2 text-sm text-secondary/60 leading-relaxed text-pretty">
+									{ecosystemGroup.description}
+								</p>
+							</div>
+						</div>
+					</MotionItem>
 				</div>
 			</MotionContainer>
 		</section>
