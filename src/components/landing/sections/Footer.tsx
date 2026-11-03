@@ -163,7 +163,7 @@ export function Footer() {
           </div>
 
           <div className="mt-16 pt-8 border-t border-secondary/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-secondary/60 text-sm">&copy; {new Date().getFullYear()} iSkolar. All rights reserved.</p>
+            <p className="text-secondary/60 text-sm">&copy; {new Date().getFullYear()} iSkolar Technologies Inc. All rights reserved.</p>
             <div className="text-end">
               <p className="text-secondary/60 text-sm">Built For Students, Built By Students.</p>
               {/* <p className="text-secondary text-sm">Powered by Lumen.</p> */}
