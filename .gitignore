@@ -21,3 +21,6 @@ vite.config.ts.timestamp-*
 .vite/
 
 src/routeTree.gen.ts
+
+# Playwright MCP output (logs, snapshots, screenshots)
+.playwright-mcp/

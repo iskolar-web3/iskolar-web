@@ -83,6 +83,7 @@ VITE_ENABLE_LUMEN_CREDENTIALS=true
 - **VITE_ENABLE_LUMEN_CREDENTIALS** (true/false) — Controls visibility of student credentials section. Set to `false` to hide in test/staging environments.
 - **VITE_ENABLE_IDENTITY_VERIFICATION** (true/false) — Controls visibility of the Didit identity verification section on student and sponsor profiles. Set to `false` on prod until the feature is ready to launch.
 - **VITE_ENABLE_APPLICANT_RANKING** (true/false) — Controls visibility of the "Rank Applicants" button, ranking panel, and ranked results table on the sponsor applicants page. Set to `false` on prod until the feature is ready to launch.
+- **VITE_ENABLE_PRODUCT_TEAMS** (true/false) — Controls visibility of the "Product Teams" block (Academy, Vocation) in the About page Team section. Set to `false` on prod until the placeholder seats are filled in.
 
 ## Code Style
 
