@@ -117,6 +117,7 @@ export default function ProductsDirectory() {
 				staggerDelay={0.1}
 			>
 				<SectionHeader
+					as="h1"
 					title="Products"
 					description="Tools for every step of a student's journey, from choosing a course to proving a diploma."
 					className="mb-14 lg:mb-16"

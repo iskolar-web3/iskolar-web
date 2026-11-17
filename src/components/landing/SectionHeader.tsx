@@ -6,6 +6,8 @@ type SectionHeaderProps = {
 	title: ReactNode;
 	description?: ReactNode;
 	align?: "center" | "left";
+	/** Heading level. Standalone pages pass "h1"; sections within a page keep "h2". */
+	as?: "h1" | "h2";
 	className?: string;
 	children?: ReactNode;
 };
@@ -17,6 +19,7 @@ export function SectionHeader({
 	title,
 	description,
 	align = "center",
+	as: Heading = "h2",
 	className = "",
 	children,
 }: SectionHeaderProps) {
@@ -34,11 +37,11 @@ export function SectionHeader({
 					{eyebrow}
 				</span>
 			)}
-			<h2
+			<Heading
 				className={`${eyebrow ? "mt-5" : ""} text-3xl sm:text-4xl lg:text-5xl text-secondary leading-[1.1] tracking-tight text-balance`}
 			>
 				{title}
-			</h2>
+			</Heading>
 			{description && (
 				<p
 					className={`mt-4 text-base sm:text-lg text-secondary/65 leading-relaxed text-pretty ${centered ? "mx-auto max-w-xl" : "max-w-xl"}`}

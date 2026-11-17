@@ -2,6 +2,7 @@
 User-agent: *
 Allow: /
 Allow: /about
+Allow: /products
 Disallow: /welcome
 Disallow: /role-selection
 Disallow: /profile-setup

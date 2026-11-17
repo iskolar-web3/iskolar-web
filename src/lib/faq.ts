@@ -10,6 +10,75 @@
 // To teach the bot something new, add an entry (fill in both `en` and `tl`).
 // To catch more phrasings, add `aliases`.
 
+import { products } from "@/components/landing/products";
+import { socials } from "@/components/landing/socials";
+
+// Built from the same data as the Products and Socials pages, so the bot's
+// answers follow product status and channel links instead of drifting.
+const PRODUCTS_URL = "https://www.iskolar.io/products";
+const SOCIALS_URL = "https://www.iskolar.io/about/socials";
+
+// Spelled out so the count reads like the home page copy ("six products").
+const productCountEn =
+	[
+		"zero",
+		"one",
+		"two",
+		"three",
+		"four",
+		"five",
+		"six",
+		"seven",
+		"eight",
+		"nine",
+		"ten",
+	][products.length] ?? String(products.length);
+const productCountTl =
+	[
+		"wala",
+		"isa",
+		"dalawa",
+		"tatlo",
+		"apat",
+		"lima",
+		"anim",
+		"pito",
+		"walo",
+		"siyam",
+		"sampu",
+	][products.length] ?? String(products.length);
+
+const productStatusEn = {
+	Live: "live",
+	Pilot: "in pilot",
+	Soon: "coming soon",
+};
+const productStatusTl = {
+	Live: "live na",
+	Pilot: "sa pilot",
+	Soon: "malapit na",
+};
+
+const productListEn = products
+	.map((p) => `- ${p.name}: ${p.tagline} (${productStatusEn[p.status]})`)
+	.join("\n");
+
+const productListTl = products
+	.map((p) => `- ${p.name} (${productStatusTl[p.status]})`)
+	.join("\n");
+
+// The Facebook group is a community rather than an iSkolar account to follow.
+const community = socials.find((s) => s.id === "community");
+const channels = socials.filter((s) => s.id !== "community");
+
+const socialListEn = channels.map((s) => `- [${s.name}](${s.href})`).join("\n");
+const communityEn = community
+	? `\nJoin the [iSkolar Facebook community](${community.href}) to ask questions and learn from other students.`
+	: "";
+const communityTl = community
+	? `\nSumali sa [iSkolar Facebook community](${community.href}) para magtanong at matuto sa ibang estudyante.`
+	: "";
+
 export interface LocalizedContent {
 	question: string;
 	answer: string;
@@ -607,9 +676,36 @@ export const FAQS: Faq[] = [
 	},
 	{
 		en: {
+			question: "What products does iSkolar offer?",
+			answer: `iSkolar builds ${productCountEn} connected products that support students from senior high to their first job:\n${productListEn}\nSee the live ones at [iskolar.io/products](${PRODUCTS_URL}).`,
+			aliases: [
+				"what products do you have",
+				"what products does iSkolar have",
+				"list of products",
+				"iSkolar products",
+				"your products",
+				"what services do you offer",
+				"which products are live",
+				"which products are available",
+			],
+		},
+		tl: {
+			question: "Anong mga produkto ang inaalok ng iSkolar?",
+			answer: `Ang iSkolar ay may ${productCountTl} na magkakaugnay na produkto para sa mga estudyante, mula senior high hanggang sa unang trabaho:\n${productListTl}\nTingnan ang mga live na sa [iskolar.io/products](${PRODUCTS_URL}).`,
+			aliases: [
+				"ano ang mga produkto ninyo",
+				"anong mga produkto ang meron kayo",
+				"listahan ng mga produkto",
+				"mga produkto ng iSkolar",
+				"anong mga serbisyo ang inaalok ninyo",
+				"alin ang live na produkto",
+			],
+		},
+	},
+	{
+		en: {
 			question: "Is iSkolar on social media?",
-			answer:
-				"Follow iSkolar to stay updated:\n- [Facebook](https://www.facebook.com/profile.php?id=61575967087555)\n- [LinkedIn](https://www.linkedin.com/company/107364901)\n- [Instagram](https://www.instagram.com/iskolar_web3?igsh=NDNvZmkwNmxwbDl2)",
+			answer: `Follow iSkolar to stay updated:\n${socialListEn}${communityEn}\nAll our channels are listed at [iskolar.io/about/socials](${SOCIALS_URL}).`,
 			aliases: [
 				"what are your socials",
 				"what's your social media",
@@ -617,6 +713,11 @@ export const FAQS: Faq[] = [
 				"do you have facebook",
 				"do you have instagram",
 				"do you have linkedin",
+				"do you have twitter",
+				"is iSkolar on X",
+				"do you have threads",
+				"do you have a newsletter",
+				"do you have a facebook group",
 				"where can I follow iSkolar",
 				"social media links",
 				"follow iSkolar",
@@ -624,8 +725,7 @@ export const FAQS: Faq[] = [
 		},
 		tl: {
 			question: "Nasa social media ba ang iSkolar?",
-			answer:
-				"Oo! Sundan ang iSkolar para sa mga update:\n- [Facebook](https://www.facebook.com/profile.php?id=61575967087555)\n- [LinkedIn](https://www.linkedin.com/company/107364901)\n- [Instagram](https://www.instagram.com/iskolar_web3?igsh=NDNvZmkwNmxwbDl2)",
+			answer: `Oo! Sundan ang iSkolar para sa mga update:\n${socialListEn}${communityTl}\nLahat ng aming channel ay nakalista sa [iskolar.io/about/socials](${SOCIALS_URL}).`,
 			aliases: [
 				"ano ang socials ninyo",
 				"ano ang social media ninyo",
@@ -633,6 +733,10 @@ export const FAQS: Faq[] = [
 				"may facebook ba kayo",
 				"may instagram ba kayo",
 				"may linkedin ba kayo",
+				"may twitter ba kayo",
+				"may threads ba kayo",
+				"may newsletter ba kayo",
+				"may facebook group ba kayo",
 				"saan ko masusundan ang iSkolar",
 				"mga social media link",
 				"sundan ang iSkolar",

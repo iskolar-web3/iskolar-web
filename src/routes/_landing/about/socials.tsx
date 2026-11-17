@@ -7,6 +7,7 @@ import { ScrollToTop } from "@/components/landing/ScrollToTop";
 import { socials } from "@/components/landing/socials";
 import { SEO } from "@/components/SEO";
 import { useSmoothScroll } from "@/hooks/useSmoothScroll";
+import { breadcrumbJsonLd } from "@/lib/seo";
 
 const SocialsSection = lazy(() => import("@/components/landing/about/Socials"));
 const Footer = lazy(() =>
@@ -19,8 +20,16 @@ export const Route = createFileRoute("/_landing/about/socials")({
 	component: SocialsPage,
 });
 
-const description =
-	"Follow iSkolar on Facebook, Instagram, LinkedIn, X, Threads and Substack, or join our community of students and scholars.";
+// The Facebook group is a community, not an iSkolar profile, so it stays out of
+// sameAs, which should only list accounts the organization itself runs.
+const officialProfiles = socials.filter((s) => s.id !== "community");
+
+const description = `Follow iSkolar on ${new Intl.ListFormat("en", {
+	style: "long",
+	type: "conjunction",
+}).format(
+	officialProfiles.map((s) => s.name),
+)}, or join our community of students and scholars.`;
 
 function SocialsPage() {
 	useSmoothScroll();
@@ -28,7 +37,7 @@ function SocialsPage() {
 	return (
 		<main className="cursor-academic relative isolate min-h-screen bg-background text-secondary">
 			<SEO
-				title="Socials"
+				title="Social Media and Community"
 				description={description}
 				canonicalPath="/about/socials"
 			/>
@@ -44,11 +53,16 @@ function SocialsPage() {
 						name: "iSkolar",
 						url: "https://www.iskolar.io",
 					},
+					breadcrumb: breadcrumbJsonLd([
+						{ name: "Home", path: "/" },
+						{ name: "About", path: "/about" },
+						{ name: "Socials", path: "/about/socials" },
+					]),
 					mainEntity: {
 						"@type": "Organization",
 						name: "iSkolar",
 						url: "https://www.iskolar.io",
-						sameAs: socials.map((s) => s.href),
+						sameAs: officialProfiles.map((s) => s.href),
 					},
 				}}
 			/>

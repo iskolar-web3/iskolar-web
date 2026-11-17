@@ -140,7 +140,12 @@ export default function SocialsSection() {
 				viewportMargin="-50px"
 				staggerDelay={0.1}
 			>
-				<SectionHeader title="Socials" className="mb-14 lg:mb-16" />
+				<SectionHeader
+					as="h1"
+					title="Socials"
+					description="Follow iSkolar for scholarship news and product updates, or join the community."
+					className="mb-14 lg:mb-16"
+				/>
 
 				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 					{channels.map((social) => (
