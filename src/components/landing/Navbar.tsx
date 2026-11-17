@@ -19,13 +19,25 @@ const aboutSections = [
 	{ name: "Our Team", id: "team" },
 ];
 
+// Standalone pages under About, listed after the About page's own sections.
+const aboutPages = [{ name: "Socials", href: "/about/socials" }];
+
 type NavItem = { name: string; href: string; hint?: string };
 type NavLink = { name: string; href: string; dropdown: NavItem[] };
+type Page = "home" | "about" | "other";
+
+// A plain route (no hash) is a page of its own, so it gets a client-side Link.
+const isPageHref = (href: string) => href.startsWith("/") && !href.includes("#");
+
+const dropdownItemClass =
+	"flex items-center justify-between gap-6 rounded-xl px-3 py-2 text-sm text-secondary transition-colors hover:bg-secondary/[0.07]";
+const mobileItemClass =
+	"flex items-center gap-2 py-1.5 text-sm text-secondary/75 hover:text-secondary/80";
 
 // Hash links stay on the current page; everything else is prefixed with its route.
-function buildLinks(onAbout: boolean): NavLink[] {
-	const home = onAbout ? "/#" : "#";
-	const about = onAbout ? "#" : "/about#";
+function buildLinks(page: Page): NavLink[] {
+	const home = page === "home" ? "#" : "/#";
+	const about = page === "about" ? "#" : "/about#";
 	return [
 		{
 			name: "Home",
@@ -47,22 +59,29 @@ function buildLinks(onAbout: boolean): NavLink[] {
 		{
 			name: "About",
 			href: "/about",
-			dropdown: aboutSections.map((s) => ({
-				name: s.name,
-				href: `${about}${s.id}`,
-			})),
+			dropdown: [
+				...aboutSections.map((s) => ({
+					name: s.name,
+					href: `${about}${s.id}`,
+				})),
+				...aboutPages,
+			],
 		},
 	];
 }
 
-const homeLinks = buildLinks(false);
-const aboutLinks = buildLinks(true);
+const linksByPage: Record<Page, NavLink[]> = {
+	home: buildLinks("home"),
+	about: buildLinks("about"),
+	other: buildLinks("other"),
+};
 
 export default function Navbar() {
 	const location = useLocation();
-	const isAboutPage =
-		location.pathname === "/about" || location.pathname === "/about/";
-	const navLinks = isAboutPage ? aboutLinks : homeLinks;
+	const pathname = location.pathname.replace(/\/$/, "") || "/";
+	const page: Page =
+		pathname === "/about" ? "about" : pathname === "/" ? "home" : "other";
+	const navLinks = linksByPage[page];
 
 	const [isScrolled, setIsScrolled] = useState(false);
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -189,27 +208,39 @@ export default function Navbar() {
 												transition={{ duration: 0.2, ease: "easeOut" }}
 												className="absolute top-full left-1/2 -translate-x-1/2 mt-4 min-w-56 whitespace-nowrap rounded-2xl border border-secondary/15 bg-card/95 p-1.5 shadow-[0_20px_50px_-24px_rgba(58,82,166,0.5)] backdrop-blur-xl"
 											>
-												{link.dropdown.map((item) => (
-													<a
-														key={item.name}
-														href={item.href}
-														onClick={(e) => {
-															if (item.href.startsWith("#")) {
-																handleNavClick(e, item.href);
-															}
-															// If it's a real page navigation, let it happen but close dropdown
-															setActiveDropdown(null);
-														}}
-														className="flex items-center justify-between gap-6 rounded-xl px-3 py-2 text-sm text-secondary transition-colors hover:bg-secondary/[0.07]"
-													>
-														{item.name}
-														{item.hint && (
-															<span className="text-xs text-secondary/55">
-																{item.hint}
-															</span>
-														)}
-													</a>
-												))}
+												{link.dropdown.map((item) =>
+													isPageHref(item.href) ? (
+														<Link
+															key={item.name}
+															to={item.href as "/"}
+															preload="intent"
+															onClick={() => setActiveDropdown(null)}
+															className={dropdownItemClass}
+														>
+															{item.name}
+														</Link>
+													) : (
+														<a
+															key={item.name}
+															href={item.href}
+															onClick={(e) => {
+																if (item.href.startsWith("#")) {
+																	handleNavClick(e, item.href);
+																}
+																// If it's a real page navigation, let it happen but close dropdown
+																setActiveDropdown(null);
+															}}
+															className={dropdownItemClass}
+														>
+															{item.name}
+															{item.hint && (
+																<span className="text-xs text-secondary/55">
+																	{item.hint}
+																</span>
+															)}
+														</a>
+													),
+												)}
 											</motion.div>
 										)}
 									</AnimatePresence>
@@ -303,26 +334,41 @@ export default function Navbar() {
 											exit={{ opacity: 0, height: 0 }}
 											transition={{ duration: 0.2, ease: "easeOut" }}
 										>
-											{link.dropdown.map((item) => (
-												<a
-													key={item.name}
-													href={item.href}
-													onClick={(e) => {
-														const hashOnly = item.href.startsWith("#");
-														const samePageHash =
-															item.href.includes("#") && item.href.startsWith(location.pathname);
+											{link.dropdown.map((item) =>
+												isPageHref(item.href) ? (
+													<Link
+														key={item.name}
+														to={item.href as "/"}
+														preload="intent"
+														onClick={() => {
+															setIsMobileMenuOpen(false);
+															setActiveDropdown(null);
+														}}
+														className={mobileItemClass}
+													>
+														{item.name}
+													</Link>
+												) : (
+													<a
+														key={item.name}
+														href={item.href}
+														onClick={(e) => {
+															const hashOnly = item.href.startsWith("#");
+															const samePageHash =
+																item.href.includes("#") && item.href.startsWith(location.pathname);
 
-														if (hashOnly || samePageHash) {
-															handleNavClick(e, item.href);
-														}
-														setIsMobileMenuOpen(false);
-														setActiveDropdown(null);
-													}}
-													className="flex items-center gap-2 py-1.5 text-sm text-secondary/75 hover:text-secondary/80"
-												>
-													{item.name}
-												</a>
-											))}
+															if (hashOnly || samePageHash) {
+																handleNavClick(e, item.href);
+															}
+															setIsMobileMenuOpen(false);
+															setActiveDropdown(null);
+														}}
+														className={mobileItemClass}
+													>
+														{item.name}
+													</a>
+												),
+											)}
 										</motion.div>
 									)}
 								</div>

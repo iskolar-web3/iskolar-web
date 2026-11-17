@@ -11,6 +11,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.iskolar.io/about/socials</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
     <loc>https://www.iskolar.io/login</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>

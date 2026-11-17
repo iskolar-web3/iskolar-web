@@ -1,6 +1,8 @@
 import { useState } from "react"
-import { Facebook, Instagram, Linkedin, Mail } from "lucide-react"
+import { Mail } from "lucide-react"
 import { products } from "@/components/landing/products"
+import { socialIcons } from "@/components/landing/SocialIcon"
+import { socials } from "@/components/landing/socials"
 
 const homeLinks = [
   { name: "Home", href: "/#home" },
@@ -17,6 +19,7 @@ const aboutLinks = [
   { name: "Mission & Vision", href: "/about#mission-vision" },
   { name: "Partnerships", href: "/about#partnerships" },
   { name: "Our Team", href: "/about#team" },
+  { name: "Socials", href: "/about/socials" },
 ]
 
 const legalLinks = [
@@ -24,20 +27,9 @@ const legalLinks = [
   { name: "Terms & Conditions", href: "/terms-conditions" },
 ]
 
-function XIcon({ className }: { className?: string; strokeWidth?: number }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
-      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-    </svg>
-  )
-}
-
-const socialLinks = [
-  { name: "Facebook", icon: Facebook, href: "https://www.facebook.com/profile.php?id=61575967087555" },
-  { name: "LinkedIn", icon: Linkedin, href: "https://www.linkedin.com/company/107364901" },
-  { name: "Instagram", icon: Instagram, href: "https://www.instagram.com/iskolar_web3?igsh=NDNvZmkwNmxwbDl2" },
-  { name: "X", icon: XIcon, href: "https://x.com/iSkolarWeb3" },
-]
+const socialLinks = socials
+  .filter((s) => s.inFooter)
+  .map((s) => ({ name: s.name, icon: socialIcons[s.id], href: s.href }))
 
 const GMAIL_COMPOSE_URL = "https://mail.google.com/mail/u/0/#all?compose=new"
 const CONTACT_EMAIL = "hello@iskolar.io"
@@ -59,7 +51,7 @@ export function Footer() {
     <footer className="relative overflow-hidden text-tertiary">
       <div className="pt-24 pb-10 px-4 sm:px-12 lg:px-26">
         <div className="relative z-26 border-t border-secondary/10 pt-16">
-          <div className="grid sm:grid-cols-2 lg:grid-cols-[1.6fr_repeat(5,1fr)] gap-10 lg:gap-12">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-[1.6fr_repeat(5,1fr)] xl:grid-cols-[minmax(17.5rem,1.6fr)_repeat(5,1fr)] gap-10 lg:gap-12">
             {/* Brand */}
             <div className="sm:col-span-2 lg:col-span-1">
               {/* Logo */}
@@ -76,7 +68,7 @@ export function Footer() {
                 Tools for every step of a Filipino student's journey, from choosing a course to proving a diploma.
               </p>
               {/* Social Links */}
-              <div className="flex items-center gap-4">
+              <div className="flex flex-wrap items-center gap-3">
                 {socialLinks.map((social) => (
                   <a
                     key={social.name}
@@ -172,10 +164,10 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Oversized wordmark, cropped by the page edge */}
+      {/* Oversized wordmark, shown in full above the page edge */}
       <p
         aria-hidden
-        className="pointer-events-none select-none text-center text-[26vw] leading-[0.75] tracking-tight text-secondary/[0.05] -mb-[4vw]"
+        className="pointer-events-none select-none text-center text-[26vw] leading-none tracking-tight text-secondary/[0.05] pb-[2vw]"
       >
         iSkolar
       </p>
