@@ -98,6 +98,46 @@ export const partners: Partner[] = [
 		linkLabel: "awslearningclub.org",
 		filter: BLUE_DUOTONE,
 	},
+	{
+		name: "AWS Student Builder Group UP Mindanao",
+		category: "Community Partner",
+		logo: "/partnerships/aws-up-mindanao.webp",
+		description:
+			"AWS Student Builder Group UP Mindanao is a student-led cloud community in Davao City, bringing iSkolar to University of the Philippines Mindanao learners who are building hands-on AWS skills.",
+		href: "https://www.facebook.com/awscc.up",
+		linkLabel: "facebook.com/awscc.up",
+		filter: BLUE_DUOTONE,
+	},
+	{
+		name: "AWS User Group e:Novators",
+		category: "Community Partner",
+		logo: "/partnerships/aws-user-group-enovators.webp",
+		description:
+			"AWS User Group e:Novators is a student community under AWS User Group Philippines that grows young innovators and technopreneurs, opening iSkolar to student builders through cloud learning and community events.",
+		href: "https://www.facebook.com/awsugenovatorsph",
+		linkLabel: "facebook.com/awsugenovatorsph",
+		filter: BLUE_DUOTONE,
+	},
+	{
+		name: "Seekers Guild",
+		category: "Community Partner",
+		logo: "/partnerships/seekers-guild-mark.png",
+		description:
+			"Seekers Guild is a community of students, builders, and young professionals that gathers through meetups and events, helping iSkolar reach learners who are looking for their next opportunity.",
+		href: "https://www.linkedin.com/company/seekersguildcommunity/",
+		linkLabel: "linkedin.com/company/seekersguildcommunity",
+		filter: BLUE_TINT,
+	},
+	{
+		name: "WorkFlow PH",
+		category: "Community Partner",
+		logo: "/partnerships/workflow-ph-mark.png",
+		description:
+			"WorkFlow PH is a volunteer driven community building the automation landscape of the Philippines, introducing iSkolar to learners and builders who are putting automation to work.",
+		href: "https://www.facebook.com/WorkFlowPH",
+		linkLabel: "facebook.com/WorkFlowPH",
+		filter: BLUE_TINT,
+	},
 ];
 
 // Group-level copy used by the landing Ecosystem section.

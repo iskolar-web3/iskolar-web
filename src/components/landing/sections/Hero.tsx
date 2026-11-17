@@ -38,20 +38,44 @@ const trustLogos = [
 	{
 		src: "/partnerships/cryptita-plays.png",
 		alt: "Cryptita Plays",
-		size: "h-16",
+		size: "h-20",
 		filter: BLUE_TINT,
 	},
 	{
 		src: "/partnerships/aws-learning-club-heron.png",
 		alt: "AWS Learning Club Heron",
-		size: "h-16",
+		size: "h-20",
 		filter: BLUE_DUOTONE,
 	},
 	{
 		src: "/partnerships/tech-kubo.png",
 		alt: "Tech Kubo",
+		size: "h-20",
+		filter: BLUE_DUOTONE,
+	},
+	{
+		src: "/partnerships/aws-up-mindanao.webp",
+		alt: "AWS Student Builder Group UP Mindanao",
 		size: "h-16",
 		filter: BLUE_DUOTONE,
+	},
+	{
+		src: "/partnerships/aws-user-group-enovators.webp",
+		alt: "AWS User Group e:Novators",
+		size: "h-16",
+		filter: BLUE_DUOTONE,
+	},
+	{
+		src: "/partnerships/seekers-guild-mark.png",
+		alt: "Seekers Guild",
+		size: "h-18",
+		filter: BLUE_TINT,
+	},
+	{
+		src: "/partnerships/workflow-ph-mark.png",
+		alt: "WorkFlow PH",
+		size: "h-6",
+		filter: BLUE_TINT,
 	},
 ];
 
