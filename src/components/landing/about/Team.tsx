@@ -38,17 +38,36 @@ const productTeamConfig: Record<
 		site: "academy.iskolar.io",
 		members: [
 			{
-				name: "Mathew Angelo Balanlay",
+				name: "Geinel Dungao",
 				role: "Full Stack Developer",
 				image: "/team/Academy_Full-Stack-Developer.jpg",
-				link: "https://www.linkedin.com/in/mathew-angelo-balanlay-14b703357/",
+				link: "https://www.linkedin.com/in/geineldungao/",
 			},
 			tba,
 		],
 	},
 	vocation: {
 		site: "vocation.iskolar.io",
-		members: [tba, tba, tba],
+		members: [
+			{
+				name: "Alexandre Nevero",
+				role: "Product Manager",
+				image: "/team/Vocation_Product-Manager.jpg",
+				link: "https://www.linkedin.com/in/alexandre-andrei-nevero/",
+			},
+			{
+				name: "Jimuelle Patron",
+				role: "Backend Developer",
+				image: "/team/Vocation_Backend-Developer.jpg",
+				link: "https://www.linkedin.com/in/jimuellepatron/",
+			},
+			{
+				name: "Clarisse Salazar",
+				role: "Frontend Developer",
+				image: "/team/Vocation_Frontend-Developer.jpg",
+				link: "https://www.linkedin.com/in/clarisse-jem-salazar/",
+			},
+		],
 	},
 };
 
@@ -65,11 +84,6 @@ const productTeams = products
 			})),
 		};
 	});
-
-// Product teams still have placeholder seats, so the block is hidden unless
-// VITE_ENABLE_PRODUCT_TEAMS=true. Leave it unset/false on prod until the teams
-// are filled in.
-const showProductTeams = import.meta.env.VITE_ENABLE_PRODUCT_TEAMS === "true";
 
 // `image` and `link` are optional so a card can render as a placeholder
 // (generic avatar, no LinkedIn) until the member's details are available.
@@ -275,14 +289,14 @@ export default function TeamSection() {
 										/>
 									</MotionItem>
 
-									{/* <MotionItem className={cellClass}>
+									<MotionItem className={cellClass}>
 										<Card
-											image="/team/DevOps-Engineer.jpg"
-											name="Mathew Balanlay"
+											image="/team/Devops-Engineer.jpg"
+											name="Mathew Angelo Balanlay"
 											role="DevOps Engineer"
-											link="#"
+											link="https://www.linkedin.com/in/mathew-angelo-balanlay-14b703357/"
 										/>
-									</MotionItem> */}
+									</MotionItem>
 
 									<MotionItem className={cellClass}>
 										<Card
@@ -297,56 +311,52 @@ export default function TeamSection() {
 						</div>
 
 						{/* Product Teams */}
-						{showProductTeams && (
-							<div className="w-full flex flex-col items-center gap-12">
-								<div className="text-center">
-									<h3 className="text-3xl text-secondary mb-3">
-										Product Teams
-									</h3>
-									<p className="text-secondary/80 max-w-2xl mx-auto">
-										The people building each iSkolar product.
-									</p>
-								</div>
-
-								{productTeams.map(({ product, site, members }) => (
-									<div
-										key={product.id}
-										className="w-full max-w-6xl mx-auto grid gap-8 xl:grid-cols-[14rem_1fr] xl:items-center"
-									>
-										<div className="flex flex-col items-center gap-3 text-center">
-											<span className="flex h-20 w-20 items-center justify-center rounded-full bg-card shadow-[0_18px_40px_-20px_rgba(58,82,166,0.6)] ring-1 ring-secondary/10">
-												<img
-													src={product.logo}
-													alt=""
-													aria-hidden
-													decoding="async"
-													className="h-12 w-12 object-contain"
-												/>
-											</span>
-											<h4 className="text-2xl text-secondary">
-												{product.name} Team
-											</h4>
-											<a
-												href={`https://${site}`}
-												target="_blank"
-												rel="noopener noreferrer"
-												aria-label={`Visit ${product.name} at ${site}`}
-												className="text-sm text-secondary/80 underline underline-offset-4 transition-colors hover:text-secondary"
-											>
-												{site}
-											</a>
-										</div>
-										<div className="flex flex-wrap justify-center gap-8 w-full xl:grid xl:grid-cols-3">
-											{members.map(({ key, ...member }) => (
-												<MotionItem key={key} className={productCellClass}>
-													<Card {...member} />
-												</MotionItem>
-											))}
-										</div>
-									</div>
-								))}
+						<div className="w-full flex flex-col items-center gap-12">
+							<div className="text-center">
+								<h3 className="text-3xl text-secondary mb-3">Product Teams</h3>
+								<p className="text-secondary/80 max-w-2xl mx-auto">
+									The people building each iSkolar product.
+								</p>
 							</div>
-						)}
+
+							{productTeams.map(({ product, site, members }) => (
+								<div
+									key={product.id}
+									className="w-full max-w-6xl mx-auto grid gap-8 xl:grid-cols-[14rem_1fr] xl:items-center"
+								>
+									<div className="flex flex-col items-center gap-3 text-center">
+										<span className="flex h-20 w-20 items-center justify-center rounded-full bg-card shadow-[0_18px_40px_-20px_rgba(58,82,166,0.6)] ring-1 ring-secondary/10">
+											<img
+												src={product.logo}
+												alt=""
+												aria-hidden
+												decoding="async"
+												className="h-12 w-12 object-contain"
+											/>
+										</span>
+										<h4 className="text-2xl text-secondary">
+											{product.name} Team
+										</h4>
+										<a
+											href={`https://${site}`}
+											target="_blank"
+											rel="noopener noreferrer"
+											aria-label={`Visit ${product.name} at ${site}`}
+											className="text-sm text-secondary/80 underline underline-offset-4 transition-colors hover:text-secondary"
+										>
+											{site}
+										</a>
+									</div>
+									<div className="flex flex-wrap justify-center gap-8 w-full xl:grid xl:grid-cols-3">
+										{members.map(({ key, ...member }) => (
+											<MotionItem key={key} className={productCellClass}>
+												<Card {...member} />
+											</MotionItem>
+										))}
+									</div>
+								</div>
+							))}
+						</div>
 					</div>
 				</div>
 			</MotionContainer>
