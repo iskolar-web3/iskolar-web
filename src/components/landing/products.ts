@@ -88,3 +88,9 @@ export const products: Product[] = [
 		status: "Pilot",
 	},
 ];
+
+// Products that have launched. The navbar dropdown and the Products page list
+// only these; the home page Journey still shows every product.
+export const liveProducts: Product[] = products.filter(
+	(p) => p.status === "Live",
+);

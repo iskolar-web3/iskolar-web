@@ -12,7 +12,10 @@ const homeLinks = [
   { name: "FAQs", href: "/#faqs" },
 ]
 
-const productLinks = products.map((p) => ({ name: p.name, href: `/#${p.id}` }))
+const productLinks = [
+  { name: "All Products", href: "/products" },
+  ...products.map((p) => ({ name: p.name, href: `/#${p.id}` })),
+]
 
 const aboutLinks = [
   { name: "Company Overview", href: "/about#company-overview" },

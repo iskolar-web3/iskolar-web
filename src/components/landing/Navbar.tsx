@@ -2,7 +2,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { products } from "@/components/landing/products";
+import { liveProducts } from "@/components/landing/products";
 
 const homeSections = [
 	{ name: "Home", id: "home" },
@@ -21,6 +21,9 @@ const aboutSections = [
 
 // Standalone pages under About, listed after the About page's own sections.
 const aboutPages = [{ name: "Socials", href: "/about/socials" }];
+
+// The full directory, listed before the individual products.
+const productPages = [{ name: "All Products", href: "/products" }];
 
 type NavItem = { name: string; href: string; hint?: string };
 type NavLink = { name: string; href: string; dropdown: NavItem[] };
@@ -50,11 +53,14 @@ function buildLinks(page: Page): NavLink[] {
 		{
 			name: "Products",
 			href: "/",
-			dropdown: products.map((p) => ({
-				name: p.name,
-				hint: p.stage,
-				href: `${home}${p.id}`,
-			})),
+			dropdown: [
+				...productPages,
+				...liveProducts.map((p) => ({
+					name: p.name,
+					hint: p.stage,
+					href: `${home}${p.id}`,
+				})),
+			],
 		},
 		{
 			name: "About",
