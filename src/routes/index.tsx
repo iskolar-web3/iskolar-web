@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SEO } from "@/components/SEO";
+import { SITE_DESCRIPTION } from "@/lib/jsonLd";
 import { useSmoothScroll } from "@/hooks/useSmoothScroll";
 import Navbar from "@/components/landing/Navbar";
 import AnimatedBackground from "@/components/landing/AnimatedBackground";
@@ -66,7 +67,7 @@ function App() {
 		<main className="cursor-academic relative isolate min-h-screen bg-background">
 			<SEO
 				canonicalPath="/"
-				description="iSkolar is a Philippine EdTech company building six connected products that support students from senior high to their first job: PathFinder, Review, iSkolar, Academy, Vocation, and Verity."
+				description={SITE_DESCRIPTION}
 			/>
 			<Navbar />
 			<AnimatedBackground />

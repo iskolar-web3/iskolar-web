@@ -27,6 +27,9 @@ const Footer = lazy(() =>
 	})),
 );
 
+const description =
+	"Learn about iSkolar's mission, vision, and the team building technology that supports Filipino students from senior high to their first job.";
+
 export const Route = createFileRoute("/_landing/about/")({
 	component: About,
 });
@@ -53,19 +56,14 @@ function About() {
 
 	return (
 		<main className="cursor-academic relative isolate min-h-screen bg-background text-secondary">
-			<SEO
-				title="About Us"
-				description="Learn about iSkolar's mission, vision, and the team building the future of scholarship management."
-				canonicalPath="/about"
-			/>
+			<SEO title="About Us" description={description} canonicalPath="/about" />
 			<JsonLd
 				data={{
 					"@context": "https://schema.org",
 					"@type": "AboutPage",
 					name: "About iSkolar",
 					url: "https://www.iskolar.io/about",
-					description:
-						"Learn about iSkolar's mission, vision, and the team building the future of scholarship management.",
+					description,
 					isPartOf: {
 						"@type": "WebSite",
 						name: "iSkolar",

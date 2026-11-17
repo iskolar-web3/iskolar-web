@@ -8,7 +8,7 @@ export const SITE_URL = "https://www.iskolar.io";
 export const ORG_ID = `${SITE_URL}/#organization`;
 
 export const SITE_DESCRIPTION =
-	"iSkolar is a scholarship platform connecting students with scholarship providers, making scholarships more accessible and transparent.";
+	"iSkolar is a Philippine EdTech company building six connected products that support students from senior high to their first job: PathFinder, Review, iSkolar, Academy, Vocation, and Verity.";
 
 /** schema.org BreadcrumbList, ordered from the home page to the current page. */
 export function breadcrumbJsonLd(trail: { name: string; path: string }[]) {

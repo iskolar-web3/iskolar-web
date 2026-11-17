@@ -11,7 +11,7 @@ import {
 import { breadcrumbJsonLd, ORG_ID, SITE_DESCRIPTION, SITE_URL } from "./jsonLd";
 
 const ORG_BLURB =
-	"a scholarship platform connecting students with scholarship providers";
+	"a Philippine EdTech company supporting students from senior high to their first job";
 
 export const memberUrl = (member: TeamMember) =>
 	`${SITE_URL}${memberPath(member)}`;
