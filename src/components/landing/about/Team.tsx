@@ -24,12 +24,8 @@ type TeamMember = {
 	link?: string;
 };
 
-// Placeholder card for a seat that has no announced member yet.
-const tba: TeamMember = { name: "Name TBA", role: "Role TBA" };
-
 // Per product team: the product's website and its members, ordered by rank
-// (left to right). Replace a `tba` seat with a real member (name, role, image,
-// link) as each team is announced.
+// (left to right).
 const productTeamConfig: Record<
 	string,
 	{ site: string; members: TeamMember[] }
@@ -43,7 +39,6 @@ const productTeamConfig: Record<
 				image: "/team/Academy_Full-Stack-Developer.jpg",
 				link: "https://www.linkedin.com/in/geineldungao/",
 			},
-			tba,
 		],
 	},
 	vocation: {
@@ -56,16 +51,16 @@ const productTeamConfig: Record<
 				link: "https://www.linkedin.com/in/alexandre-andrei-nevero/",
 			},
 			{
-				name: "Jimuelle Patron",
-				role: "Backend Developer",
-				image: "/team/Vocation_Backend-Developer.jpg",
-				link: "https://www.linkedin.com/in/jimuellepatron/",
-			},
-			{
 				name: "Clarisse Salazar",
 				role: "Frontend Developer",
 				image: "/team/Vocation_Frontend-Developer.jpg",
 				link: "https://www.linkedin.com/in/clarisse-jem-salazar/",
+			},
+			{
+				name: "Jimuelle Patron",
+				role: "Backend Developer",
+				image: "/team/Vocation_Backend-Developer.jpg",
+				link: "https://www.linkedin.com/in/jimuellepatron/",
 			},
 		],
 	},
@@ -102,7 +97,7 @@ const Card = ({
 		className={`
     relative bg-background backdrop-blur-sm border border-secondary/10 shadow-lg rounded-xl
     flex flex-col items-center text-center p-6
-    w-full min-w-60 max-w-[280px] h-[280px]
+    w-full min-w-60 max-w-[280px] min-h-[330px]
     transition-transform hover:-translate-y-1 duration-300 group
   `}
 	>
@@ -110,12 +105,12 @@ const Card = ({
 			<img
 				src={image}
 				alt={`${name}, ${role} at iSkolar`}
-				className="w-28 h-28 rounded-full mb-4 overflow-hidden object-cover border-2 border-secondary/20 group-hover:border-secondary/50 transition-colors"
+				className="w-28 h-28 shrink-0 rounded-full mb-4 overflow-hidden object-cover border-2 border-secondary/20 group-hover:border-secondary/50 transition-colors"
 			/>
 		) : (
 			<div
 				aria-hidden
-				className="w-28 h-28 rounded-full mb-4 flex items-center justify-center bg-secondary/5 text-secondary/40 border-2 border-dashed border-secondary/20 group-hover:border-secondary/50 transition-colors"
+				className="w-28 h-28 shrink-0 rounded-full mb-4 flex items-center justify-center bg-secondary/5 text-secondary/40 border-2 border-dashed border-secondary/20 group-hover:border-secondary/50 transition-colors"
 			>
 				<User className="w-12 h-12" />
 			</div>
