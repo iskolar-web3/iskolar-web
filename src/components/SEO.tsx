@@ -7,7 +7,9 @@ export interface SEOProps {
 	image?: string;
 	canonicalPath?: string;
 	noindex?: boolean;
-	ogType?: "website" | "article";
+	ogType?: "website" | "article" | "profile";
+	/** Use `title` exactly as given, without the "iSkolar | " prefix. For pages that lead with a name. */
+	absoluteTitle?: boolean;
 }
 
 export function SEO({
@@ -17,9 +19,12 @@ export function SEO({
 	canonicalPath,
 	noindex = false,
 	ogType = "website",
+	absoluteTitle = false,
 }: SEOProps) {
 	const fullTitle = title
-		? `${SEO_DEFAULTS.siteName} | ${title}`
+		? absoluteTitle
+			? title
+			: `${SEO_DEFAULTS.siteName} | ${title}`
 		: SEO_DEFAULTS.defaultTitle;
 
 	const absoluteImage = image.startsWith("http")

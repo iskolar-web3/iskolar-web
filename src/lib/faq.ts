@@ -12,6 +12,8 @@
 
 import { products } from "@/components/landing/products";
 import { socials } from "@/components/landing/socials";
+import { teamMembers } from "@/components/landing/team";
+import { memberUrl } from "./teamSeo";
 
 // Built from the same data as the Products and Socials pages, so the bot's
 // answers follow product status and channel links instead of drifting.
@@ -78,6 +80,11 @@ const communityEn = community
 const communityTl = community
 	? `\nSumali sa [iSkolar Facebook community](${community.href}) para magtanong at matuto sa ibang estudyante.`
 	: "";
+
+// One line per person, linking to their profile page on iskolar.io.
+const teamListEn = teamMembers
+	.map((m) => `- [${m.name}](${memberUrl(m)}), ${m.role}`)
+	.join("\n");
 
 export interface LocalizedContent {
 	question: string;
@@ -582,6 +589,38 @@ export const FAQS: Faq[] = [
 				"kilalanin ang team",
 				"sino ang mga founder",
 				"sino ang nagtatag ng iSkolar",
+			],
+		},
+	},
+	{
+		en: {
+			question: "Who works at iSkolar?",
+			answer: `The iSkolar team, with a profile page for each person:\n${teamListEn}`,
+			aliases: [
+				"who works at iSkolar",
+				"who are the members of iSkolar",
+				"list of team members",
+				"iSkolar team members",
+				"who is the CEO of iSkolar",
+				"who is the CTO of iSkolar",
+				"who leads iSkolar",
+				"iSkolar leadership team",
+				"iSkolar directors",
+				"who is on the Vocation team",
+				"who is on the Academy team",
+			],
+		},
+		tl: {
+			question: "Sino-sino ang nagtatrabaho sa iSkolar?",
+			answer: `Ang team ng iSkolar, may profile page ang bawat isa:\n${teamListEn}`,
+			aliases: [
+				"sino ang mga miyembro ng iSkolar",
+				"listahan ng mga miyembro ng team",
+				"sino ang CEO ng iSkolar",
+				"sino ang CTO ng iSkolar",
+				"sino ang namumuno sa iSkolar",
+				"sino ang nasa Vocation team",
+				"sino ang nasa Academy team",
 			],
 		},
 	},

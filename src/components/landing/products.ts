@@ -22,7 +22,7 @@ export const products: Product[] = [
 	{
 		id: "pathfinder",
 		name: "PathFinder",
-		logo: "/products/pathfinder.svg",
+		logo: "/products/PathFinder.webp",
 		stage: "Choose a course",
 		tagline: "Find the college course that fits who you are.",
 		description:
@@ -33,7 +33,7 @@ export const products: Product[] = [
 	{
 		id: "review",
 		name: "Review",
-		logo: "/products/review.svg",
+		logo: "/products/Review.webp",
 		stage: "Pass the entrance exam",
 		tagline: "Prepare for UPCAT, ACET, DCAT, and USTET with real mock exams.",
 		description:
@@ -56,7 +56,7 @@ export const products: Product[] = [
 	{
 		id: "academy",
 		name: "Academy",
-		logo: "/products/academy.svg",
+		logo: "/products/Academy.webp",
 		stage: "Build what you learn",
 		tagline: "Show your projects to the people looking for them.",
 		description:
@@ -68,7 +68,7 @@ export const products: Product[] = [
 	{
 		id: "vocation",
 		name: "Vocation",
-		logo: "/products/vocation.svg",
+		logo: "/products/Vocation.webp",
 		stage: "Land your first internship",
 		tagline: "Find internships and OJT, and book time with career coaches.",
 		description:
@@ -79,7 +79,7 @@ export const products: Product[] = [
 	{
 		id: "verity",
 		name: "Verity",
-		logo: "/products/verity.svg",
+		logo: "/products/Verity.webp",
 		stage: "Prove what you earned",
 		tagline: "Tamper proof diplomas and transcripts anyone can verify.",
 		description:

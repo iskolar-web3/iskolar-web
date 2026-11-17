@@ -1,9 +1,15 @@
+import { Link } from "@tanstack/react-router";
 import { Linkedin, User } from "lucide-react";
 import {
 	MotionContainer,
 	MotionItem,
 } from "@/components/landing/MotionContainer";
-import { products } from "@/components/landing/products";
+import {
+	coreTeam,
+	founders,
+	productTeams,
+	type TeamMember,
+} from "@/components/landing/team";
 
 // Flex cells that keep the 1 / 2 / 4 column rhythm but let an incomplete
 // final row (e.g. 3 cards under a 4-up layout) center instead of left-align,
@@ -17,82 +23,11 @@ const cellClass =
 const productCellClass =
 	"w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)] xl:w-auto flex justify-center";
 
-type TeamMember = {
-	name: string;
-	role: string;
-	image?: string;
-	link?: string;
-};
-
-// Per product team: the product's website and its members, ordered by rank
-// (left to right).
-const productTeamConfig: Record<
-	string,
-	{ site: string; members: TeamMember[] }
-> = {
-	academy: {
-		site: "academy.iskolar.io",
-		members: [
-			{
-				name: "Geinel Dungao",
-				role: "Full Stack Developer",
-				image: "/team/Academy_Full-Stack-Developer.jpg",
-				link: "https://www.linkedin.com/in/geineldungao/",
-			},
-		],
-	},
-	vocation: {
-		site: "vocation.iskolar.io",
-		members: [
-			{
-				name: "Alexandre Nevero",
-				role: "Product Manager",
-				image: "/team/Vocation_Product-Manager.jpg",
-				link: "https://www.linkedin.com/in/alexandre-andrei-nevero/",
-			},
-			{
-				name: "Clarisse Salazar",
-				role: "Frontend Developer",
-				image: "/team/Vocation_Frontend-Developer.jpg",
-				link: "https://www.linkedin.com/in/clarisse-jem-salazar/",
-			},
-			{
-				name: "Jimuelle Patron",
-				role: "Backend Developer",
-				image: "/team/Vocation_Backend-Developer.jpg",
-				link: "https://www.linkedin.com/in/jimuellepatron/",
-			},
-		],
-	},
-};
-
-const productTeams = products
-	.filter((product) => product.id in productTeamConfig)
-	.map((product) => {
-		const { site, members } = productTeamConfig[product.id];
-		return {
-			product,
-			site,
-			members: members.map((member, n) => ({
-				...member,
-				key: `${product.id}-member-${n + 1}`,
-			})),
-		};
-	});
-
-// `image` and `link` are optional so a card can render as a placeholder
+// `image` and `linkedin` are optional so a card can render as a placeholder
 // (generic avatar, no LinkedIn) until the member's details are available.
-const Card = ({
-	image,
-	name,
-	role,
-	link,
-}: {
-	image?: string;
-	name: string;
-	role: string;
-	link?: string;
-}) => (
+// The whole card opens the member's profile page: the name link stretches over
+// the card, and the LinkedIn link sits above it.
+const Card = ({ slug, image, name, role, linkedin }: TeamMember) => (
 	<div
 		className={`
     relative bg-background backdrop-blur-sm border border-secondary/10 shadow-lg rounded-xl
@@ -105,6 +40,8 @@ const Card = ({
 			<img
 				src={image}
 				alt={`${name}, ${role} at iSkolar`}
+				loading="lazy"
+				decoding="async"
 				className="w-28 h-28 shrink-0 rounded-full mb-4 overflow-hidden object-cover border-2 border-secondary/20 group-hover:border-secondary/50 transition-colors"
 			/>
 		) : (
@@ -115,15 +52,23 @@ const Card = ({
 				<User className="w-12 h-12" />
 			</div>
 		)}
-		<h3 className="text-lg font-bold text-secondary mb-1">{name}</h3>
+		<h3 className="text-lg font-bold text-secondary mb-1">
+			<Link
+				to="/about/team/$slug"
+				params={{ slug }}
+				className="outline-none after:absolute after:inset-0 after:rounded-xl after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-secondary/40"
+			>
+				{name}
+			</Link>
+		</h3>
 		<p className="text-sm text-secondary/85 mb-4 min-h-[2.5rem]">{role}</p>
-		{link ? (
+		{linkedin ? (
 			<a
-				href={link}
+				href={linkedin}
 				target="_blank"
 				rel="noreferrer"
 				aria-label={`${name} on LinkedIn`}
-				className="mt-auto p-2 text-secondary/80 hover:text-secondary rounded-full transition-all"
+				className="relative z-10 mt-auto p-2 text-secondary/80 hover:text-secondary rounded-full transition-all"
 			>
 				<Linkedin className="w-5 h-5" />
 			</a>
@@ -155,41 +100,11 @@ export default function TeamSection() {
 								Founders
 							</h3>
 							<div className="flex flex-wrap justify-center gap-8 w-full max-w-5xl mx-auto">
-								<MotionItem className={cellClass}>
-									<Card
-										image="/team/CEO.jpg"
-										name="Justin Luzano"
-										role="Chief Executive Officer"
-										link="https://www.linkedin.com/in/justinluzano23/"
-									/>
-								</MotionItem>
-
-								<MotionItem className={cellClass}>
-									<Card
-										image="/team/CTO.jpg"
-										name="Louigie Caminoy"
-										role="Chief Technology Officer"
-										link="https://www.linkedin.com/in/louie1221"
-									/>
-								</MotionItem>
-
-								<MotionItem className={cellClass}>
-									<Card
-										image="/team/COO.jpg"
-										name="Adam Ruadilla"
-										role="Chief Operating Officer"
-										link="https://www.linkedin.com/in/adam-ruadilla/"
-									/>
-								</MotionItem>
-
-								<MotionItem className={cellClass}>
-									<Card
-										image="/team/CFO.jpg"
-										name="Jeselle Francisco"
-										role="Chief Financial Officer"
-										link="https://www.linkedin.com/in/maria-jeselle-francisco-736491369/"
-									/>
-								</MotionItem>
+								{founders.map((member) => (
+									<MotionItem key={member.slug} className={cellClass}>
+										<Card {...member} />
+									</MotionItem>
+								))}
 							</div>
 						</div>
 
@@ -200,107 +115,11 @@ export default function TeamSection() {
 									Core Team
 								</h3>
 								<div className="flex flex-wrap justify-center gap-8 w-full max-w-5xl mx-auto">
-									{/* Chiefs */}
-									<MotionItem className={cellClass}>
-										<Card
-											image="/team/CGO.jpg"
-											name="Chrysler Añonuevo"
-											role="Chief Growth Officer"
-											link="https://www.linkedin.com/in/hryscript/"
-										/>
-									</MotionItem>
-
-									{/* Directors */}
-									<MotionItem className={cellClass}>
-										<Card
-											image="/team/Director-of-Engineering.jpg"
-											name="Giordan Nuez"
-											role="Director of Engineering"
-											link="https://www.linkedin.com/in/giordan-nuez-b8924838b/"
-										/>
-									</MotionItem>
-
-									<MotionItem className={cellClass}>
-										<Card
-											image="/team/Director-of-Research-and-Compliance.jpg"
-											name="Cristian Obida"
-											role="Director of Research & Compliance"
-											link="https://www.linkedin.com/in/cristian-r-obida-96a36b28a/"
-										/>
-									</MotionItem>
-
-									<MotionItem className={cellClass}>
-										<Card
-											image="/team/Director-of-Community-and-Growth.jpg"
-											name="Juliet Daphne Tariman"
-											role="Director of Community & Growth"
-											link="https://www.linkedin.com/in/juliet-daphne-e-tariman-2022b1236/"
-										/>
-									</MotionItem>
-
-									<MotionItem className={cellClass}>
-										<Card
-											image="/team/Director-of-Creatives.jpg"
-											name="Arah Mejidana"
-											role="Director of Creatives"
-											link="https://www.linkedin.com/in/arah-mejidana-a12945398/"
-										/>
-									</MotionItem>
-
-									{/* Technical & Operations */}
-									<MotionItem className={cellClass}>
-										<Card
-											image="/team/Principal-Software-Engineer.jpg"
-											name="Joshua Armojallas"
-											role="Principal Software Engineer"
-											link="https://www.linkedin.com/in/clbjsh/"
-										/>
-									</MotionItem>
-
-									{/* <MotionItem className={cellClass}>
-										<Card
-											image="/team/Partnerships-and-Outreach-Lead.jpg"
-											name="Jabez Antinero"
-											role="Partnerships & Outreach Lead"
-											link="#"
-										/>
-									</MotionItem> */}
-
-									<MotionItem className={cellClass}>
-										<Card
-											image="/team/Defensive-Security-Engineer.jpg"
-											name="Emmanuel Mutas"
-											role="Defensive Security Engineer"
-											link="https://www.linkedin.com/in/manel04/"
-										/>
-									</MotionItem>
-
-									<MotionItem className={cellClass}>
-										<Card
-											image="/team/Offensive-Security-Engineer.jpg"
-											name="John Richie Campo"
-											role="Offensive Security Engineer"
-											link="https://www.linkedin.com/in/john-richie-campo/"
-										/>
-									</MotionItem>
-
-									<MotionItem className={cellClass}>
-										<Card
-											image="/team/Devops-Engineer.jpg"
-											name="Mathew Angelo Balanlay"
-											role="DevOps Engineer"
-											link="https://www.linkedin.com/in/mathew-angelo-balanlay-14b703357/"
-										/>
-									</MotionItem>
-
-									<MotionItem className={cellClass}>
-										<Card
-											image="/team/Business-Operations-Associate.jpg"
-											name="Aj Goze"
-											role="Business Operations Associate"
-											link="https://www.linkedin.com/in/aj-goze-6079ab365/"
-										/>
-									</MotionItem>
+									{coreTeam.map((member) => (
+										<MotionItem key={member.slug} className={cellClass}>
+											<Card {...member} />
+										</MotionItem>
+									))}
 								</div>
 							</div>
 						</div>
@@ -343,8 +162,11 @@ export default function TeamSection() {
 										</a>
 									</div>
 									<div className="flex flex-wrap justify-center gap-8 w-full xl:grid xl:grid-cols-3">
-										{members.map(({ key, ...member }) => (
-											<MotionItem key={key} className={productCellClass}>
+										{members.map((member) => (
+											<MotionItem
+												key={member.slug}
+												className={productCellClass}
+											>
 												<Card {...member} />
 											</MotionItem>
 										))}

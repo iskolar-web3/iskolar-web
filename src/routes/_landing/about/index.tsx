@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect } from "react";
+import { JsonLd } from "@/components/JsonLd";
 import AnimatedBackground from "@/components/landing/AnimatedBackground";
 import Navbar from "@/components/landing/Navbar";
 import { ScrollToTop } from "@/components/landing/ScrollToTop";
 import { SEO } from "@/components/SEO";
-import { JsonLd } from "@/components/JsonLd";
 import { useSmoothScroll } from "@/hooks/useSmoothScroll";
+import { breadcrumbJsonLd } from "@/lib/seo";
+import { teamOrganizationJsonLd } from "@/lib/teamSeo";
 
 const CompanyOverviewSection = lazy(
 	() => import("@/components/landing/about/CompanyOverview"),
@@ -69,6 +71,11 @@ function About() {
 						name: "iSkolar",
 						url: "https://www.iskolar.io",
 					},
+					breadcrumb: breadcrumbJsonLd([
+						{ name: "Home", path: "/" },
+						{ name: "About", path: "/about" },
+					]),
+					mainEntity: teamOrganizationJsonLd(),
 				}}
 			/>
 			<Navbar />
