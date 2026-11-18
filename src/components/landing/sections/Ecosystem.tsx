@@ -22,9 +22,9 @@ export function Ecosystem() {
 				viewportMargin="-50px"
 				staggerDelay={0.12}
 			>
-				<div className="mb-14 lg:mb-20 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+				<div className="mb-14 lg:mb-20 flex flex-col items-center gap-6 text-center">
 					<SectionHeader
-						align="left"
+						align="center"
 						eyebrow="Ecosystem"
 						title="The people building this with us"
 						description="Building with partners, reaching students through communities."
