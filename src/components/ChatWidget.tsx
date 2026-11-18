@@ -1,12 +1,22 @@
-import { Loader2, Send, X } from "lucide-react";
-import type { FormEvent, JSX, ReactNode } from "react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useMutation } from "@tanstack/react-query";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { ArrowUp, X } from "lucide-react";
+import type {
+	FormEvent,
+	JSX,
+	ReactNode,
+	PointerEvent as ReactPointerEvent,
+} from "react";
+import { useEffect, useRef, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useCornerWidgetVisible } from "@/hooks/useCornerWidgets";
-import { SUGGESTED_QUESTIONS } from "@/lib/faq";
-import { askFaqBot, isFaqBotReady, warmUpFaqBot } from "@/lib/faqBot";
+import {
+	CHAT_MAX_MESSAGE_LENGTH,
+	CHAT_MAX_MESSAGES,
+	ChatError,
+	type ChatTurn,
+	streamChat,
+} from "@/lib/chat/api";
 import { cn } from "@/lib/utils";
 
 interface ChatMessage {
@@ -17,6 +27,31 @@ interface ChatMessage {
 
 const GREETING =
 	"Hi! I'm the iSkolar assistant. Ask me anything about scholarships and how iSkolar works in English or Tagalog.";
+const GREETING_ID = 0;
+
+const FALLBACK_ERROR =
+	"Something went wrong. Please try again in a moment, or email hello@iskolar.io.";
+
+// Starter prompts surfaced as clickable chips until the visitor asks something.
+const SUGGESTED_QUESTIONS: string[] = [
+	"How do I apply for a scholarship?",
+	"Is iSkolar free for students?",
+	"How does iSkolar work?",
+];
+
+// Conversation sent to the server: everything after the static greeting, the
+// last few turns only, starting with a user turn as the API requires.
+function toHistory(messages: ChatMessage[]): ChatTurn[] {
+	const turns: ChatTurn[] = messages
+		.filter((m) => m.id !== GREETING_ID && m.text.trim() !== "")
+		.slice(-CHAT_MAX_MESSAGES)
+		.map((m) => ({
+			role: m.role === "user" ? "user" : "assistant",
+			content: m.text.slice(0, CHAT_MAX_MESSAGE_LENGTH),
+		}));
+	while (turns.length > 0 && turns[0].role !== "user") turns.shift();
+	return turns;
+}
 
 // Parse a tiny subset of markdown — [label](url) links — within a single line.
 function renderInline(text: string): ReactNode[] {
@@ -77,15 +112,12 @@ function renderAnswer(text: string): ReactNode {
 export function ChatWidget(): JSX.Element {
 	const [open, setOpen] = useState(false);
 	const [input, setInput] = useState("");
-	const [loading, setLoading] = useState(false);
 	const [messages, setMessages] = useState<ChatMessage[]>([
-		{ id: 0, role: "bot", text: GREETING },
+		{ id: GREETING_ID, role: "bot", text: GREETING },
 	]);
-	// First-open loading: show a full-panel loading screen while the model and FAQ
-	// embeddings download/build. Initialised from the shared bot state so reopening
-	// after the first load skips the screen entirely.
-	const [botReady, setBotReady] = useState(() => isFaqBotReady());
-	const [botError, setBotError] = useState(false);
+	// Id of the bot message currently being streamed, until the answer finishes.
+	const [streamingId, setStreamingId] = useState<number | null>(null);
+	const abortRef = useRef<AbortController | null>(null);
 
 	const nextId = useRef(1);
 	const bottomRef = useRef<HTMLDivElement>(null);
@@ -96,43 +128,14 @@ export function ChatWidget(): JSX.Element {
 	// arrow or the feedback pill), lift the launcher above it so they don't
 	// overlap in the corner.
 	const cornerWidgetVisible = useCornerWidgetVisible();
+	const reduceMotion = useReducedMotion();
 
-	// Reveal instantly if the model finished loading (e.g. via the hover preload)
-	// before the panel opened, so reopening never flashes the loading screen.
-	useLayoutEffect(() => {
-		if (open && !botReady && isFaqBotReady()) setBotReady(true);
-	}, [open, botReady]);
-
-	// On first open, load the model and build the FAQ index, then reveal the chat.
+	// Stop an in-flight answer when the panel closes or the widget unmounts, so
+	// the server stops generating (and billing) tokens nobody will read.
 	useEffect(() => {
-		if (!open || botReady || isFaqBotReady()) return;
-		let cancelled = false;
-		setBotError(false);
-		warmUpFaqBot().then(
-			() => {
-				if (!cancelled) setBotReady(true);
-			},
-			() => {
-				if (!cancelled) setBotError(true);
-			},
-		);
-		return () => {
-			cancelled = true;
-		};
-	}, [open, botReady]);
-
-	// Keep the latest message in view whenever messages or loading state change.
-	// biome-ignore lint/correctness/useExhaustiveDependencies: deps are the change triggers, not values read in the effect
-	useEffect(() => {
-		bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-	}, [messages, loading]);
-
-	// Return focus to the input after the chat opens and after each answer, so the
-	// user can keep typing without clicking the box again. (Sending disables the
-	// input while loading, which blurs it; refocus once it's re-enabled.)
-	useEffect(() => {
-		if (open && botReady && !loading) inputRef.current?.focus();
-	}, [open, botReady, loading]);
+		if (!open) abortRef.current?.abort();
+	}, [open]);
+	useEffect(() => () => abortRef.current?.abort(), []);
 
 	// Close the chat when the user clicks (or taps) anywhere outside the panel.
 	useEffect(() => {
@@ -146,211 +149,265 @@ export function ChatWidget(): JSX.Element {
 		return () => document.removeEventListener("pointerdown", handlePointerDown);
 	}, [open]);
 
+	const chat = useMutation({
+		mutationFn: async ({
+			history,
+			botId,
+		}: {
+			history: ChatTurn[];
+			botId: number;
+		}) => {
+			const controller = new AbortController();
+			abortRef.current = controller;
+			setStreamingId(botId);
+			await streamChat(
+				history,
+				(delta) => appendToBot(botId, delta),
+				controller.signal,
+			);
+		},
+		onError: (error, { botId }) => {
+			if (error instanceof DOMException && error.name === "AbortError") return;
+			const text = error instanceof ChatError ? error.message : FALLBACK_ERROR;
+			setMessages((prev) =>
+				prev.some((m) => m.id === botId)
+					? prev.map((m) =>
+							m.id === botId ? { ...m, text: `${m.text}\n\n${text}` } : m,
+						)
+					: [...prev, { id: botId, role: "bot", text }],
+			);
+		},
+		onSettled: () => {
+			abortRef.current = null;
+			setStreamingId(null);
+		},
+	});
+
+	const loading = chat.isPending;
+	// "Thinking…" shows until the first chunk of the answer arrives.
+	const awaitingFirstChunk =
+		loading && !messages.some((m) => m.id === streamingId);
 	const hasAsked = messages.some((m) => m.role === "user");
 
-	async function send(question: string): Promise<void> {
-		const trimmed = question.trim();
+	// Keep the latest message in view whenever messages or loading state change.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: deps are the change triggers, not values read in the effect
+	useEffect(() => {
+		bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+	}, [messages, loading]);
+
+	// Return focus to the input after the chat opens and after each answer, so the
+	// user can keep typing without clicking the box again. (Sending disables the
+	// input while loading, which blurs it; refocus once it's re-enabled.)
+	useEffect(() => {
+		if (open && !loading) inputRef.current?.focus();
+	}, [open, loading]);
+
+	// Append a streamed chunk to the bot message, creating it on the first chunk.
+	function appendToBot(botId: number, delta: string): void {
+		setMessages((prev) =>
+			prev.some((m) => m.id === botId)
+				? prev.map((m) => (m.id === botId ? { ...m, text: m.text + delta } : m))
+				: [...prev, { id: botId, role: "bot", text: delta }],
+		);
+	}
+
+	function send(question: string): void {
+		const trimmed = question.trim().slice(0, CHAT_MAX_MESSAGE_LENGTH);
 		if (!trimmed || loading) return;
 
-		setMessages((prev) => [
-			...prev,
-			{ id: nextId.current++, role: "user", text: trimmed },
-		]);
-		setInput("");
-		setLoading(true);
+		const userMessage: ChatMessage = {
+			id: nextId.current++,
+			role: "user",
+			text: trimmed,
+		};
+		const botId = nextId.current++;
+		const history = toHistory([...messages, userMessage]);
 
-		try {
-			const result = await askFaqBot(trimmed);
-			setMessages((prev) => [
-				...prev,
-				{ id: nextId.current++, role: "bot", text: result.answer },
-			]);
-		} catch {
-			setMessages((prev) => [
-				...prev,
-				{
-					id: nextId.current++,
-					role: "bot",
-					text: "Something went wrong loading the assistant. Please try again in a moment.",
-				},
-			]);
-		} finally {
-			setLoading(false);
-		}
+		setMessages((prev) => [...prev, userMessage]);
+		setInput("");
+		chat.mutate({ history, botId });
 	}
 
 	function handleSubmit(e: FormEvent<HTMLFormElement>): void {
 		e.preventDefault();
-		void send(input);
+		send(input);
 	}
 
-	function retryLoad(): void {
-		setBotError(false);
-		warmUpFaqBot().then(
-			() => setBotReady(true),
-			() => setBotError(true),
-		);
+	// Tilt the launcher a few degrees toward a mouse pointer for a 3D feel.
+	// Touch and pen skip it: there is no hover to follow.
+	function tiltLauncher(e: ReactPointerEvent<HTMLButtonElement>): void {
+		if (e.pointerType !== "mouse" || reduceMotion) return;
+		const rect = e.currentTarget.getBoundingClientRect();
+		const x = (e.clientX - rect.left) / rect.width - 0.5;
+		const y = (e.clientY - rect.top) / rect.height - 0.5;
+		e.currentTarget.style.setProperty("--rx", `${(-y * 14).toFixed(2)}deg`);
+		e.currentTarget.style.setProperty("--ry", `${(x * 14).toFixed(2)}deg`);
 	}
 
-	if (!open) {
-		return (
-			<button
-				type="button"
-				onClick={() => setOpen(true)}
-				aria-label="Open the iSkolar assistant"
-				className={cn(
-					"fixed right-2 z-50 rounded-full transition-transform duration-300 ease-out hover:scale-105 active:scale-98 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:active:scale-100",
-					cornerWidgetVisible ? "bottom-24 md:bottom-22" : "bottom-2",
-				)}
-			>
-				<img
-					src="/chatbot.png"
-					alt=""
-					className="size-20 object-contain drop-shadow-lg"
-				/>
-			</button>
-		);
+	function resetTilt(e: ReactPointerEvent<HTMLButtonElement>): void {
+		e.currentTarget.style.setProperty("--rx", "0deg");
+		e.currentTarget.style.setProperty("--ry", "0deg");
 	}
 
 	return (
-		<div
-			ref={panelRef}
-			data-lenis-prevent
-			className="fixed bottom-6 right-5 z-50 flex h-[34rem] max-h-[calc(100vh-3rem)] w-[22rem] max-w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl"
-		>
-			{/* Header */}
-			<div className="flex items-center justify-between gap-2 border-b border-border bg-secondary px-4 py-3 text-secondary-foreground">
-				<span className="text-sm font-medium">iSkolar Assistant</span>
+		<div className="chat-ui">
+			{!open && (
 				<button
 					type="button"
-					onClick={() => setOpen(false)}
-					aria-label="Close the iSkolar assistant"
-					className="rounded-full p-1 transition-colors hover:bg-black/10"
+					onClick={() => setOpen(true)}
+					onPointerMove={tiltLauncher}
+					onPointerLeave={resetTilt}
+					aria-label="Open the iSkolar assistant"
+					className={cn(
+						"chat-launcher fixed right-2 z-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+						cornerWidgetVisible ? "bottom-24 md:bottom-22" : "bottom-2",
+					)}
 				>
-					<X className="size-4" />
+					<span aria-hidden="true" className="chat-launcher-shadow" />
+					<span className="chat-launcher-body">
+						<img
+							src="/chatbot.png"
+							alt=""
+							className="chat-launcher-img size-20 object-contain"
+						/>
+						<span aria-hidden="true" className="chat-launcher-gloss" />
+					</span>
 				</button>
-			</div>
+			)}
 
-			{/* Messages */}
-			<ScrollArea className="flex-1 min-h-0 px-4 py-3">
-				<div className="flex flex-col gap-3">
-					{messages.map((m) => (
-						<div
-							key={m.id}
-							className={cn(
-								"max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed",
-								m.role === "user"
-									? "self-end bg-blue-600 text-white rounded-br-sm"
-									: "self-start bg-muted text-foreground rounded-bl-sm",
-							)}
-						>
-							{m.role === "bot" ? renderAnswer(m.text) : m.text}
-						</div>
-					))}
-
-					{loading && (
-						<div className="self-start flex items-center gap-2 rounded-2xl rounded-bl-sm bg-muted px-3 py-2 text-sm text-muted-foreground">
-							<Loader2 className="size-4 animate-spin" />
-							Thinking…
-						</div>
-					)}
-
-					{/* Suggested questions, shown until the user asks something */}
-					{!hasAsked && !loading && (
-						<div className="mt-1 flex flex-col items-start gap-2">
-							{SUGGESTED_QUESTIONS.map((q) => (
-								<button
-									key={q}
-									type="button"
-									onClick={() => void send(q)}
-									className="rounded-full bg-blue-600 px-3 py-1.5 text-left text-xs text-white transition-colors hover:bg-blue-700"
-								>
-									{q}
-								</button>
-							))}
-						</div>
-					)}
-
-					<div ref={bottomRef} />
-				</div>
-			</ScrollArea>
-
-			{/* Input */}
-			<form
-				onSubmit={handleSubmit}
-				className="flex items-center gap-2 border-t border-border bg-card p-3"
-			>
-				<Input
-					ref={inputRef}
-					value={input}
-					onChange={(e) => setInput(e.target.value)}
-					placeholder="Ask a question…"
-					aria-label="Type your question"
-					disabled={loading}
-					className="flex-1"
-				/>
-				<Button
-					type="submit"
-					size="icon"
-					disabled={loading || !input.trim()}
-					aria-label="Send message"
-					className="bg-blue-600 text-white hover:bg-blue-700"
-				>
-					<Send className="size-4" />
-				</Button>
-			</form>
-
-			<p className="bg-card px-3 pb-2 text-center text-[10px] text-muted-foreground">
-				Answers may not cover everything.
-			</p>
-
-			{/* Full-panel loading screen shown until the model is ready. */}
-			{!botReady && (
-				<div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-4 bg-card px-6 text-center">
-					<button
-						type="button"
-						onClick={() => setOpen(false)}
-						aria-label="Close the iSkolar assistant"
-						className="absolute right-3 top-3 rounded-full p-1 text-muted-foreground transition-colors hover:bg-muted"
+			<AnimatePresence>
+				{open && (
+					<motion.div
+						key="chat-panel"
+						ref={panelRef}
+						data-lenis-prevent
+						initial={
+							reduceMotion
+								? { opacity: 0 }
+								: { opacity: 0, y: 16, scale: 0.94, rotateX: 8 }
+						}
+						animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
+						exit={
+							reduceMotion
+								? { opacity: 0 }
+								: { opacity: 0, y: 10, scale: 0.96, rotateX: 4 }
+						}
+						transition={{
+							type: "spring",
+							stiffness: 380,
+							damping: 32,
+							mass: 0.8,
+						}}
+						style={{
+							transformOrigin: "bottom right",
+							transformPerspective: 1200,
+						}}
+						className="chat-panel fixed bottom-6 right-5 z-50 flex h-[34rem] max-h-[calc(100vh-3rem)] w-[22rem] max-w-[calc(100vw-3rem)] flex-col overflow-hidden"
 					>
-						<X className="size-4" />
-					</button>
-
-					{botError ? (
-						<>
-							<p className="text-sm text-muted-foreground">
-								The assistant could not load. Check your connection and try
-								again.
-							</p>
-							<Button
-								type="button"
-								variant="secondary"
-								size="sm"
-								onClick={retryLoad}
-							>
-								Try again
-							</Button>
-						</>
-					) : (
-						<>
-							<img
-								src="/chatbot.png"
-								alt=""
-								className="size-16 animate-pulse object-contain"
-							/>
-							<Loader2 className="size-6 animate-spin text-muted-foreground" />
-							<div className="space-y-1">
-								<p className="text-sm font-medium text-foreground">
-									Loading the assistant…
-								</p>
-								<p className="text-xs text-muted-foreground">
-									This can take a moment the first time.
+						{/* Header */}
+						<div className="chat-header flex items-center gap-3 px-4 py-3">
+							<span className="chat-avatar grid size-9 shrink-0 place-items-center rounded-full bg-white">
+								<img
+									src="/chatbot.png"
+									alt=""
+									className="size-7 object-contain"
+								/>
+							</span>
+							<div className="min-w-0 flex-1 leading-tight">
+								<p className="text-sm font-semibold">iSkolar Assistant</p>
+								<p className="text-[11px] text-white/70">
+									Ask about scholarships and iSkolar
 								</p>
 							</div>
-						</>
-					)}
-				</div>
-			)}
+							<button
+								type="button"
+								onClick={() => setOpen(false)}
+								aria-label="Close the iSkolar assistant"
+								className="chat-icon-btn rounded-full p-1.5"
+							>
+								<X className="size-4" />
+							</button>
+						</div>
+
+						{/* Messages */}
+						<ScrollArea className="min-h-0 flex-1 px-4 py-4">
+							<div className="flex flex-col gap-3">
+								{messages.map((m) => (
+									<div
+										key={m.id}
+										className={cn(
+											"chat-msg-in max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed",
+											m.role === "user"
+												? "chat-bubble-user self-end rounded-br-md"
+												: "chat-bubble-bot self-start rounded-bl-md text-foreground",
+										)}
+									>
+										{m.role === "bot" ? renderAnswer(m.text) : m.text}
+									</div>
+								))}
+
+								{awaitingFirstChunk && (
+									<div
+										aria-live="polite"
+										className="chat-bubble-bot chat-msg-in chat-dots flex items-center gap-1 self-start rounded-2xl rounded-bl-md px-3.5 py-3.5"
+									>
+										<span className="sr-only">The assistant is typing</span>
+										<i aria-hidden="true" />
+										<i aria-hidden="true" />
+										<i aria-hidden="true" />
+									</div>
+								)}
+
+								{/* Suggested questions, shown until the user asks something */}
+								{!hasAsked && !loading && (
+									<div className="mt-1 flex flex-col items-start gap-2.5">
+										{SUGGESTED_QUESTIONS.map((q) => (
+											<button
+												key={q}
+												type="button"
+												onClick={() => send(q)}
+												className="chat-chip chat-msg-in rounded-full px-3.5 py-1.5 text-left text-xs font-medium"
+											>
+												{q}
+											</button>
+										))}
+									</div>
+								)}
+
+								<div ref={bottomRef} />
+							</div>
+						</ScrollArea>
+
+						{/* Composer */}
+						<form onSubmit={handleSubmit} className="px-3 pt-1 pb-2">
+							<div className="chat-composer flex items-center gap-2 rounded-full py-1.5 pr-1.5 pl-4">
+								<input
+									ref={inputRef}
+									value={input}
+									onChange={(e) => setInput(e.target.value)}
+									placeholder="Ask a question…"
+									aria-label="Type your question"
+									maxLength={CHAT_MAX_MESSAGE_LENGTH}
+									disabled={loading}
+									className="min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground disabled:opacity-60"
+								/>
+								<button
+									type="submit"
+									disabled={loading || !input.trim()}
+									aria-label="Send message"
+									className="chat-send grid size-8 shrink-0 place-items-center rounded-full"
+								>
+									<ArrowUp className="size-4" />
+								</button>
+							</div>
+						</form>
+
+						<p className="px-3 pb-2.5 text-center text-[10px] text-muted-foreground">
+							AI-generated answers may be inaccurate.
+						</p>
+					</motion.div>
+				)}
+			</AnimatePresence>
 		</div>
 	);
 }
