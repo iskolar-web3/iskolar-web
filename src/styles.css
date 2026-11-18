@@ -466,3 +466,339 @@ code {
 		opacity: 1 !important;
 	}
 }
+
+/* ---- Chat widget: soft 3D surfaces with minimal hover / press motion ---- */
+@layer components {
+	.chat-ui {
+		--chat-brand: #3a52a6;
+		--chat-brand-light: #5169c0;
+		--chat-brand-dark: #2f4590;
+		--chat-shadow: 30 45 100;
+		--chat-highlight: rgb(255 255 255 / 0.75);
+		--chat-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+	}
+	.dark .chat-ui {
+		--chat-highlight: rgb(255 255 255 / 0.06);
+		--chat-shadow: 0 0 0;
+	}
+
+	/* Launcher: the mascot floats above a contact shadow and tilts toward the pointer. */
+	.chat-launcher {
+		--lift: 0px;
+		--scale: 1;
+		--rx: 0deg;
+		--ry: 0deg;
+		border-radius: 9999px;
+		-webkit-tap-highlight-color: transparent;
+	}
+	.chat-launcher-body {
+		position: relative;
+		display: block;
+		transform: perspective(500px) translateY(var(--lift)) scale(var(--scale))
+			rotateX(var(--rx)) rotateY(var(--ry));
+		transition: transform 320ms var(--chat-ease);
+		will-change: transform;
+	}
+	.chat-launcher-img {
+		filter: drop-shadow(0 10px 10px rgb(var(--chat-shadow) / 0.28))
+			drop-shadow(0 2px 3px rgb(var(--chat-shadow) / 0.3));
+		transition: filter 320ms var(--chat-ease);
+	}
+	/* Gloss and shading clipped to the bubble's own shape. */
+	.chat-launcher-gloss {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		background:
+			radial-gradient(
+				circle at 36% 30%,
+				rgb(255 255 255 / 0.5),
+				rgb(255 255 255 / 0) 42%
+			), linear-gradient(160deg, rgb(255 255 255 / 0) 55%, rgb(10 20 60 / 0.3));
+		-webkit-mask: url("/chatbot.png") center / contain no-repeat;
+		mask: url("/chatbot.png") center / contain no-repeat;
+	}
+	.chat-launcher-shadow {
+		position: absolute;
+		left: 26%;
+		right: 22%;
+		bottom: 6px;
+		height: 8px;
+		border-radius: 9999px;
+		background: rgb(var(--chat-shadow) / 0.35);
+		filter: blur(5px);
+		transition:
+			transform 320ms var(--chat-ease),
+			opacity 320ms var(--chat-ease);
+	}
+	.chat-launcher:hover {
+		--lift: -4px;
+		--scale: 1.04;
+	}
+	.chat-launcher:hover .chat-launcher-img {
+		filter: drop-shadow(0 16px 14px rgb(var(--chat-shadow) / 0.3))
+			drop-shadow(0 3px 4px rgb(var(--chat-shadow) / 0.25));
+	}
+	.chat-launcher:hover .chat-launcher-shadow {
+		transform: scale(0.8);
+		opacity: 0.6;
+	}
+	.chat-launcher:active {
+		--lift: 1px;
+		--scale: 0.95;
+	}
+	.chat-launcher:active .chat-launcher-body {
+		transition-duration: 120ms;
+	}
+	.chat-launcher:active .chat-launcher-shadow {
+		transform: scale(1.08);
+		opacity: 1;
+	}
+
+	/* Panel: raised card with a lit top edge and layered ambient shadow. */
+	.chat-panel {
+		border-radius: 1.5rem;
+		border: 1px solid var(--border);
+		background: linear-gradient(
+			180deg,
+			var(--card),
+			color-mix(in oklab, var(--card) 94%, var(--chat-brand))
+		);
+		box-shadow:
+			inset 0 1px 0 var(--chat-highlight),
+			0 1px 2px rgb(var(--chat-shadow) / 0.08),
+			0 14px 28px -10px rgb(var(--chat-shadow) / 0.22),
+			0 44px 80px -28px rgb(var(--chat-shadow) / 0.4);
+	}
+	.chat-header {
+		position: relative;
+		z-index: 1;
+		color: #f0f7ff;
+		background: linear-gradient(
+			180deg,
+			var(--chat-brand-light),
+			var(--chat-brand) 60%,
+			var(--chat-brand-dark)
+		);
+		box-shadow:
+			inset 0 1px 0 rgb(255 255 255 / 0.25),
+			inset 0 -1px 0 rgb(0 0 0 / 0.12),
+			0 8px 16px -10px rgb(var(--chat-shadow) / 0.6);
+	}
+	.chat-avatar {
+		box-shadow:
+			inset 0 -2px 3px rgb(var(--chat-shadow) / 0.18),
+			0 3px 6px rgb(0 0 0 / 0.25);
+	}
+	.chat-icon-btn {
+		transition:
+			background-color 200ms var(--chat-ease),
+			transform 200ms var(--chat-ease);
+	}
+	.chat-icon-btn:hover {
+		background-color: rgb(255 255 255 / 0.16);
+	}
+	.chat-icon-btn:active {
+		transform: scale(0.88);
+		transition-duration: 100ms;
+	}
+
+	/* Resize grab bar at the top of the header. */
+	.chat-grip {
+		outline: none;
+	}
+	.chat-grip-bar {
+		display: block;
+		width: 2.25rem;
+		height: 4px;
+		border-radius: 9999px;
+		background: rgb(255 255 255 / 0.4);
+		box-shadow: 0 1px 0 rgb(0 0 0 / 0.12);
+		transition:
+			width 200ms var(--chat-ease),
+			background-color 200ms var(--chat-ease);
+	}
+	.chat-grip:hover .chat-grip-bar,
+	.chat-grip:focus-visible .chat-grip-bar {
+		width: 3rem;
+		background: rgb(255 255 255 / 0.75);
+	}
+	.chat-grip:focus-visible .chat-grip-bar {
+		box-shadow: 0 0 0 2px rgb(255 255 255 / 0.5);
+	}
+	.chat-grip:active .chat-grip-bar {
+		width: 3.25rem;
+		background: rgb(255 255 255 / 0.9);
+	}
+
+	/* Bubbles */
+	.chat-bubble-user {
+		color: #fff;
+		background: linear-gradient(
+			180deg,
+			var(--chat-brand-light),
+			var(--chat-brand)
+		);
+		box-shadow:
+			inset 0 1px 0 rgb(255 255 255 / 0.22),
+			0 1px 2px rgb(var(--chat-shadow) / 0.25),
+			0 8px 16px -10px rgb(58 82 166 / 0.8);
+	}
+	.chat-bubble-bot {
+		background: var(--card);
+		border: 1px solid var(--border);
+		box-shadow:
+			inset 0 1px 0 var(--chat-highlight),
+			0 1px 2px rgb(var(--chat-shadow) / 0.08),
+			0 6px 14px -8px rgb(var(--chat-shadow) / 0.2);
+	}
+	.chat-msg-in {
+		animation: chat-msg-in 280ms var(--chat-ease) both;
+	}
+	@keyframes chat-msg-in {
+		from {
+			opacity: 0;
+			transform: translateY(6px) scale(0.98);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	/* Typing indicator */
+	.chat-dots i {
+		display: block;
+		width: 6px;
+		height: 6px;
+		border-radius: 9999px;
+		background: var(--chat-brand);
+		opacity: 0.35;
+		animation: chat-dot 1.2s var(--chat-ease) infinite;
+	}
+	.chat-dots i:nth-child(2) {
+		animation-delay: 0.15s;
+	}
+	.chat-dots i:nth-child(3) {
+		animation-delay: 0.3s;
+	}
+	@keyframes chat-dot {
+		0%,
+		60%,
+		100% {
+			transform: translateY(0);
+			opacity: 0.35;
+		}
+		30% {
+			transform: translateY(-3px);
+			opacity: 1;
+		}
+	}
+
+	/* Suggested questions: keycaps that rise on hover and press down on click. */
+	.chat-chip {
+		color: var(--chat-brand);
+		background: var(--card);
+		border: 1px solid var(--border);
+		box-shadow:
+			0 2px 0 0 var(--border),
+			0 6px 12px -8px rgb(var(--chat-shadow) / 0.3);
+		transition:
+			transform 200ms var(--chat-ease),
+			box-shadow 200ms var(--chat-ease);
+	}
+	.dark .chat-chip {
+		color: #c7d2fe;
+	}
+	.chat-chip:hover {
+		transform: translateY(-1px);
+		box-shadow:
+			0 3px 0 0 var(--border),
+			0 10px 18px -10px rgb(var(--chat-shadow) / 0.4);
+	}
+	.chat-chip:active {
+		transform: translateY(2px);
+		box-shadow:
+			0 0 0 0 var(--border),
+			0 2px 4px -2px rgb(var(--chat-shadow) / 0.2);
+		transition-duration: 90ms;
+	}
+
+	/* Composer: recessed pill with a raised send button inside. */
+	.chat-composer {
+		border: 1px solid var(--border);
+		background: color-mix(in oklab, var(--card) 94%, var(--chat-brand));
+		box-shadow:
+			inset 0 2px 4px rgb(var(--chat-shadow) / 0.1),
+			0 1px 0 var(--chat-highlight);
+		transition: box-shadow 200ms var(--chat-ease);
+	}
+	.chat-composer:focus-within {
+		box-shadow:
+			inset 0 2px 4px rgb(var(--chat-shadow) / 0.1),
+			0 0 0 3px rgb(58 82 166 / 0.18);
+	}
+	.chat-send {
+		color: #fff;
+		background: linear-gradient(
+			180deg,
+			var(--chat-brand-light),
+			var(--chat-brand-dark)
+		);
+		box-shadow:
+			inset 0 1px 0 rgb(255 255 255 / 0.3),
+			0 2px 4px rgb(var(--chat-shadow) / 0.3),
+			0 6px 12px -6px rgb(58 82 166 / 0.7);
+		transition:
+			transform 200ms var(--chat-ease),
+			box-shadow 200ms var(--chat-ease),
+			opacity 200ms var(--chat-ease);
+	}
+	.chat-send:hover:not(:disabled) {
+		transform: translateY(-1px);
+		box-shadow:
+			inset 0 1px 0 rgb(255 255 255 / 0.3),
+			0 3px 6px rgb(var(--chat-shadow) / 0.3),
+			0 10px 16px -8px rgb(58 82 166 / 0.8);
+	}
+	.chat-send:active:not(:disabled) {
+		transform: translateY(1px) scale(0.94);
+		box-shadow:
+			inset 0 1px 2px rgb(0 0 0 / 0.2),
+			0 1px 2px rgb(var(--chat-shadow) / 0.3);
+		transition-duration: 90ms;
+	}
+	.chat-send:disabled {
+		opacity: 0.4;
+		box-shadow: none;
+		cursor: not-allowed;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.chat-launcher,
+		.chat-launcher:hover,
+		.chat-launcher:active {
+			--lift: 0px;
+			--scale: 1;
+			--rx: 0deg;
+			--ry: 0deg;
+		}
+		.chat-msg-in,
+		.chat-dots i {
+			animation: none;
+		}
+		.chat-dots i {
+			opacity: 0.6;
+		}
+		.chat-chip:hover,
+		.chat-chip:active,
+		.chat-send:hover:not(:disabled),
+		.chat-send:active:not(:disabled),
+		.chat-icon-btn:active {
+			transform: none;
+		}
+		.chat-grip-bar {
+			transition: none;
+		}
+	}
+}
