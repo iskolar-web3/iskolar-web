@@ -1,14 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowUp, Maximize2, Minimize2, X } from "lucide-react";
-import type {
-	FormEvent,
-	JSX,
-	ReactNode,
-	PointerEvent as ReactPointerEvent,
-} from "react";
+import type { FormEvent, JSX, PointerEvent as ReactPointerEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { SiClaude } from "react-icons/si";
+import { ChatAnswer } from "@/components/ChatAnswer";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChatPanelSize } from "@/hooks/useChatPanelSize";
 import { useCornerWidgetVisible } from "@/hooks/useCornerWidgets";
@@ -28,7 +24,7 @@ interface ChatMessage {
 }
 
 const GREETING =
-	"Hi! I'm the iSkolar assistant. Ask me anything about scholarships and how iSkolar works in English or Tagalog.";
+	"Hi! I'm the iSkolar assistant. Ask me about scholarships and how iSkolar works in English, Filipino, Bisaya, or other Philippine languages.";
 const GREETING_ID = 0;
 
 const FALLBACK_ERROR =
@@ -53,62 +49,6 @@ function toHistory(messages: ChatMessage[]): ChatTurn[] {
 		}));
 	while (turns.length > 0 && turns[0].role !== "user") turns.shift();
 	return turns;
-}
-
-// Parse a tiny subset of markdown — [label](url) links — within a single line.
-function renderInline(text: string): ReactNode[] {
-	const linkPattern = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
-	const parts: ReactNode[] = [];
-	let lastIndex = 0;
-	for (
-		let match = linkPattern.exec(text);
-		match !== null;
-		match = linkPattern.exec(text)
-	) {
-		if (match.index > lastIndex) {
-			parts.push(text.slice(lastIndex, match.index));
-		}
-		parts.push(
-			<a
-				key={match.index}
-				href={match[2]}
-				target="_blank"
-				rel="noopener noreferrer"
-				className="font-medium underline underline-offset-2 hover:opacity-80"
-			>
-				{match[1]}
-			</a>,
-		);
-		lastIndex = linkPattern.lastIndex;
-	}
-	if (lastIndex < text.length) {
-		parts.push(text.slice(lastIndex));
-	}
-	return parts;
-}
-
-// Render a bot answer with light structure: each newline is its own line, and a
-// "- " prefix becomes a bullet. Links inside any line become anchors.
-function renderAnswer(text: string): ReactNode {
-	const nodes: ReactNode[] = [];
-	const lines = text.split("\n");
-	for (let i = 0; i < lines.length; i++) {
-		const line = lines[i];
-		if (line.trim() === "") continue;
-		if (line.trimStart().startsWith("- ")) {
-			nodes.push(
-				<div key={i} className="flex gap-2">
-					<span aria-hidden="true" className="select-none">
-						•
-					</span>
-					<span>{renderInline(line.trimStart().slice(2))}</span>
-				</div>,
-			);
-		} else {
-			nodes.push(<p key={i}>{renderInline(line)}</p>);
-		}
-	}
-	return <div className="space-y-1.5">{nodes}</div>;
 }
 
 export function ChatWidget(): JSX.Element {
@@ -398,7 +338,7 @@ export function ChatWidget(): JSX.Element {
 												: "chat-bubble-bot self-start rounded-bl-md text-foreground",
 										)}
 									>
-										{m.role === "bot" ? renderAnswer(m.text) : m.text}
+										{m.role === "bot" ? <ChatAnswer text={m.text} /> : m.text}
 									</div>
 								))}
 
@@ -472,7 +412,12 @@ export function ChatWidget(): JSX.Element {
 								/>
 								Claude
 							</a>
-							<span aria-hidden="true">·</span>
+							<span
+								aria-hidden="true"
+								className="text-xs leading-none font-black text-foreground/50"
+							>
+								·
+							</span>
 							<span>AI answers may be inaccurate.</span>
 						</p>
 					</motion.div>
