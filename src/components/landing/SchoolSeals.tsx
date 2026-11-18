@@ -17,6 +17,7 @@ export function SchoolSeals() {
 						<img
 							src={school.logo}
 							alt={school.name}
+							decoding="async"
 							className="h-8 w-8 object-contain transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-110 motion-reduce:transition-none sm:h-11 sm:w-11 lg:h-14 lg:w-14"
 						/>
 					</li>

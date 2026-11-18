@@ -12,6 +12,10 @@ import "./styles.css";
 import reportWebVitals from "./reportWebVitals.ts";
 import { AuthProvider, useAuth } from "./auth.tsx";
 import { Skeleton } from "./components/ui/skeleton.tsx";
+import { markLowEndDevice } from "./lib/device.ts";
+
+// Flag weak devices before the first render so CSS can lighten effects.
+markLowEndDevice();
 
 // Create a new router instance
 

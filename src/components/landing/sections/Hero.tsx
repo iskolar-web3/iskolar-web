@@ -6,7 +6,7 @@ import {
 	type Variants,
 } from "framer-motion";
 import { ArrowDown, ArrowRight, type LucideIcon } from "lucide-react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { BLUE_DUOTONE, BLUE_TINT } from "@/components/landing/partners";
 import { SchoolSeals } from "@/components/landing/SchoolSeals";
 
@@ -36,19 +36,19 @@ const trustLogos = [
 		filter: BLUE_TINT,
 	},
 	{
-		src: "/partnerships/cryptita-plays.png",
+		src: "/partnerships/cryptita-plays.webp",
 		alt: "Cryptita Plays",
 		size: "h-20",
 		filter: BLUE_TINT,
 	},
 	{
-		src: "/partnerships/aws-learning-club-heron.png",
+		src: "/partnerships/aws-learning-club-heron.webp",
 		alt: "AWS Learning Club Heron",
 		size: "h-20",
 		filter: BLUE_DUOTONE,
 	},
 	{
-		src: "/partnerships/tech-kubo.png",
+		src: "/partnerships/tech-kubo.webp",
 		alt: "Tech Kubo",
 		size: "h-20",
 		filter: BLUE_DUOTONE,
@@ -146,6 +146,19 @@ function CtaLink({
 
 export function Hero({ ready = true }: { ready?: boolean }) {
 	const sectionRef = useRef<HTMLElement>(null);
+	const marqueeRef = useRef<HTMLDivElement>(null);
+
+	// Pause the logo marquee once it scrolls out of view, so it doesn't keep
+	// the compositor busy for the rest of the visit.
+	useEffect(() => {
+		const marquee = marqueeRef.current;
+		if (!marquee || typeof IntersectionObserver === "undefined") return;
+		const observer = new IntersectionObserver(([entry]) => {
+			marquee.toggleAttribute("data-paused", !entry.isIntersecting);
+		});
+		observer.observe(marquee);
+		return () => observer.disconnect();
+	}, []);
 	const reduce = useReducedMotion();
 	const { scrollYProgress } = useScroll({
 		target: sectionRef,
@@ -251,13 +264,14 @@ export function Hero({ ready = true }: { ready?: boolean }) {
 								key={logo.src}
 								src={logo.src}
 								alt={logo.alt}
+								decoding="async"
 								className={`${logo.size} w-auto object-contain`}
 								style={{ filter: logo.filter }}
 							/>
 						))}
 					</div>
 				) : (
-					<div className="marquee-mask overflow-hidden">
+					<div ref={marqueeRef} className="marquee-mask overflow-hidden">
 						<div className="marquee-track flex w-max items-center">
 							{[0, 1].map((copy) => (
 								<div
@@ -270,6 +284,7 @@ export function Hero({ ready = true }: { ready?: boolean }) {
 											key={logo.src}
 											src={logo.src}
 											alt={copy === 0 ? logo.alt : ""}
+											decoding="async"
 											className={`${logo.size} w-auto object-contain opacity-80`}
 											style={{ filter: logo.filter }}
 										/>

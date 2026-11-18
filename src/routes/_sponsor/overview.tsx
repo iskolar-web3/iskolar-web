@@ -150,7 +150,7 @@ function DashboardSkeleton() {
 	);
 }
 
-export default function SponsorOverview() {
+function SponsorOverview() {
 	const dashboard = useQuery(getSponsorDashboardQuery());
 
 	if (dashboard.isLoading) {

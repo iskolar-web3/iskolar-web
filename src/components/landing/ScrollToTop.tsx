@@ -1,6 +1,6 @@
 import type Lenis from "lenis";
 import { ArrowUp } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { setCornerWidgetVisible } from "@/hooks/useCornerWidgets";
 import { onLenisChange } from "@/hooks/useSmoothScroll";
 
@@ -8,13 +8,20 @@ const RADIUS = 22;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 export function ScrollToTop() {
-	const [progress, setProgress] = useState(0);
 	const [visible, setVisible] = useState(false);
+	// The ring follows scroll every frame, so it is written straight to the DOM
+	// instead of through React state (no re-render per scroll frame).
+	const ringRef = useRef<SVGCircleElement>(null);
 
 	useEffect(() => {
 		const update = (scroll: number, limit: number) => {
-			setProgress(limit > 0 ? scroll / limit : 0);
+			const progress = limit > 0 ? scroll / limit : 0;
+			ringRef.current?.setAttribute(
+				"stroke-dashoffset",
+				String(CIRCUMFERENCE * (1 - progress)),
+			);
 			const isVisible = scroll > 200;
+			// React skips the re-render when the boolean hasn't changed.
 			setVisible(isVisible);
 			// Publish so the global chat widget can move out of the way.
 			setCornerWidgetVisible("scroll-to-top", isVisible);
@@ -58,8 +65,6 @@ export function ScrollToTop() {
 		window.scrollTo({ top: 0, behavior: "smooth" });
 	};
 
-	const strokeDashoffset = CIRCUMFERENCE * (1 - progress);
-
 	return (
 		<button
 			type="button"
@@ -92,6 +97,7 @@ export function ScrollToTop() {
 					/>
 					{/* Progress */}
 					<circle
+						ref={ringRef}
 						cx="28"
 						cy="28"
 						r={RADIUS}
@@ -100,7 +106,7 @@ export function ScrollToTop() {
 						strokeWidth="3"
 						strokeLinecap="round"
 						strokeDasharray={CIRCUMFERENCE}
-						strokeDashoffset={strokeDashoffset}
+						strokeDashoffset={CIRCUMFERENCE}
 					/>
 				</svg>
 

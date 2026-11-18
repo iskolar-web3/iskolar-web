@@ -20,21 +20,21 @@ const coverage: Coverage[] = [
 		title:
 			"iSkolar Powers BYC Ventures' Tomorrow Fund Pilot for NCR IT Students",
 		href: "https://bitpinas.com/business/iskolar-byc-tomorrowfund/",
-		image: "/press/bitpinas-tomorrowfund.png",
+		image: "/press/bitpinas-tomorrowfund.webp",
 	},
 	{
 		source: "BitPinas",
 		title:
 			"These Filipino Students Built an AI and Blockchain Scholarship Platform to Fix Education Funding",
 		href: "https://bitpinas.com/ai/iskolar-ai-launched/",
-		image: "/press/bitpinas-iskolar.png",
+		image: "/press/bitpinas-iskolar.webp",
 	},
 	{
 		source: "BYC Ventures",
 		title:
 			"BYC Ventures and iSkolar Formalize Collaboration to Advance Verifiable Credential Infrastructure",
 		href: "https://byc.ventures/news/byc-ventures-and-iskolar-formalize-collaboration-to-advance-verifiable-credential-infrastructure",
-		image: "/press/byc-ventures-iskolar.png",
+		image: "/press/byc-ventures-iskolar.webp",
 	},
 	{
 		source: "Startup Machine",

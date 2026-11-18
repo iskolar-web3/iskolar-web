@@ -434,6 +434,10 @@ code {
 .marquee-track {
 	animation: marquee-x 40s linear infinite;
 }
+/* Set by Hero while the marquee is off screen. */
+.marquee-mask[data-paused] .marquee-track {
+	animation-play-state: paused;
+}
 .marquee-mask {
 	mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
 	-webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
@@ -465,6 +469,16 @@ code {
 		animation: none !important;
 		opacity: 1 !important;
 	}
+}
+
+/* ---- Low-end devices (html.low-end, set in src/lib/device.ts) ----
+   Backdrop blur re-renders every frame over the animated background, which is
+   costly on weak GPUs. The blurred surfaces are already 80-95% opaque, so
+   dropping the blur barely changes the look. Unlayered, so it beats the
+   Tailwind backdrop-blur utilities. */
+html.low-end [class*="backdrop-blur"] {
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
 }
 
 /* ---- Chat widget: soft 3D surfaces with minimal hover / press motion ---- */
@@ -629,6 +643,96 @@ code {
 	.chat-grip:active .chat-grip-bar {
 		width: 3.25rem;
 		background: rgb(255 255 255 / 0.9);
+	}
+
+	/* Teaser bubble beside the closed launcher. */
+	.chat-teaser {
+		transform-origin: right center;
+		animation: chat-teaser-in 420ms var(--chat-ease) both;
+	}
+	@keyframes chat-teaser-in {
+		from {
+			opacity: 0;
+			transform: translateX(8px) scale(0.92);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+	.chat-teaser-bubble {
+		position: relative;
+		color: var(--foreground);
+		background: var(--card);
+		border: 1px solid var(--border);
+		box-shadow:
+			inset 0 1px 0 var(--chat-highlight),
+			0 1px 2px rgb(var(--chat-shadow) / 0.1),
+			0 8px 18px -10px rgb(var(--chat-shadow) / 0.45);
+		transition:
+			transform 200ms var(--chat-ease),
+			box-shadow 200ms var(--chat-ease);
+	}
+	/* Tail pointing at the launcher. */
+	.chat-teaser-bubble::after {
+		content: "";
+		position: absolute;
+		top: 50%;
+		right: -5px;
+		width: 10px;
+		height: 10px;
+		background: var(--card);
+		border-top: 1px solid var(--border);
+		border-right: 1px solid var(--border);
+		border-radius: 0 2px 0 0;
+		transform: translateY(-50%) rotate(45deg);
+	}
+	.chat-teaser-bubble:hover {
+		transform: translateY(-1px);
+		box-shadow:
+			inset 0 1px 0 var(--chat-highlight),
+			0 2px 4px rgb(var(--chat-shadow) / 0.12),
+			0 12px 22px -10px rgb(var(--chat-shadow) / 0.5);
+	}
+	.chat-teaser-bubble:active {
+		transform: translateY(1px) scale(0.98);
+		transition-duration: 90ms;
+	}
+	.chat-teaser-text {
+		animation: chat-teaser-text 320ms var(--chat-ease) both;
+	}
+	@keyframes chat-teaser-text {
+		from {
+			opacity: 0;
+			transform: translateY(4px);
+		}
+		to {
+			opacity: 1;
+			transform: none;
+		}
+	}
+	.chat-teaser-close {
+		color: var(--muted-foreground);
+		background: var(--card);
+		border: 1px solid var(--border);
+		box-shadow: 0 2px 4px rgb(var(--chat-shadow) / 0.15);
+		transition:
+			opacity 200ms var(--chat-ease),
+			color 200ms var(--chat-ease);
+	}
+	.chat-teaser-close:hover {
+		color: var(--foreground);
+	}
+	/* With a mouse, show the close button on hover or focus; touch screens keep
+	   it visible since there is no hover. */
+	@media (hover: hover) {
+		.chat-teaser-close {
+			opacity: 0;
+		}
+		.chat-teaser:hover .chat-teaser-close,
+		.chat-teaser:focus-within .chat-teaser-close {
+			opacity: 1;
+		}
 	}
 
 	/* Bubbles */
@@ -799,6 +903,14 @@ code {
 		}
 		.chat-grip-bar {
 			transition: none;
+		}
+		.chat-teaser,
+		.chat-teaser-text {
+			animation: none;
+		}
+		.chat-teaser-bubble:hover,
+		.chat-teaser-bubble:active {
+			transform: none;
 		}
 	}
 }

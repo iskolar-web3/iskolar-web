@@ -71,7 +71,7 @@ export const partners: Partner[] = [
 	{
 		name: "Cryptita Plays",
 		category: "Community Partner",
-		logo: "/partnerships/cryptita-plays.png",
+		logo: "/partnerships/cryptita-plays.webp",
 		description:
 			"Cryptita Plays runs an engaged Web3 community that helps iSkolar introduce transparent, blockchain backed scholarships to a wider student audience.",
 		href: "https://cryptitaplays.org",
@@ -81,7 +81,7 @@ export const partners: Partner[] = [
 	{
 		name: "Tech Kubo",
 		category: "Community Partner",
-		logo: "/partnerships/tech-kubo.png",
+		logo: "/partnerships/tech-kubo.webp",
 		description:
 			"Tech Kubo extends iSkolar's reach to student developers through its free hands-on labs platform, connecting scholarship opportunities with learners actively building technical skills and portfolios.",
 		href: "https://techkubo.com/",
@@ -91,7 +91,7 @@ export const partners: Partner[] = [
 	{
 		name: "AWS Learning Club Heron",
 		category: "Community Partner",
-		logo: "/partnerships/aws-learning-club-heron.png",
+		logo: "/partnerships/aws-learning-club-heron.webp",
 		description:
 			"AWS Learning Club Heron is a student-led cloud community, founded alongside iSkolar, that connects the platform with learners building practical AWS skills and cloud expertise.",
 		href: "https://www.facebook.com/awslearningclubheron",

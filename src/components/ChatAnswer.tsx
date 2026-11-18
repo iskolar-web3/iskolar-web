@@ -1,4 +1,5 @@
 import type { JSX, ReactNode } from "react";
+import { memo } from "react";
 import { type Inline, parseAnswer } from "@/lib/chat/format";
 
 const LINK_CLASS =
@@ -45,7 +46,7 @@ function renderInline(parts: Inline[]): ReactNode[] {
 // A bot answer laid out for scanning: short paragraphs, bulleted lists, and
 // numbered steps with badges. Block and item keys are positions: a streamed
 // answer only ever grows at the end, so existing nodes keep their identity.
-export function ChatAnswer({ text }: { text: string }): JSX.Element {
+function ChatAnswerImpl({ text }: { text: string }): JSX.Element {
 	const blocks = parseAnswer(text);
 
 	return (
@@ -108,3 +109,7 @@ export function ChatAnswer({ text }: { text: string }): JSX.Element {
 		</div>
 	);
 }
+
+// Memoized: while one answer streams, earlier bubbles keep the same text and
+// skip re-parsing and re-rendering.
+export const ChatAnswer = memo(ChatAnswerImpl);

@@ -26,7 +26,7 @@ export const schools: School[] = [
 		id: "dlsu",
 		name: "De La Salle University",
 		shortName: "DLSU",
-		logo: "/schools/de_la_salle_university.png",
+		logo: "/schools/de_la_salle_university.webp",
 	},
 	{
 		id: "ust",
@@ -38,7 +38,7 @@ export const schools: School[] = [
 		id: "pup",
 		name: "Polytechnic University of the Philippines",
 		shortName: "PUP",
-		logo: "/schools/polytechnic-university-of-the-philippines.png",
+		logo: "/schools/polytechnic-university-of-the-philippines.webp",
 	},
 	{
 		id: "feu",
@@ -50,18 +50,18 @@ export const schools: School[] = [
 		id: "adamson",
 		name: "Adamson University",
 		shortName: "Adamson",
-		logo: "/schools/adamson_university.png",
+		logo: "/schools/adamson_university.webp",
 	},
 	{
 		id: "umak",
 		name: "University of Makati",
 		shortName: "UMak",
-		logo: "/schools/university-of-makati.png",
+		logo: "/schools/university-of-makati.webp",
 	},
 	{
 		id: "apc",
 		name: "Asia Pacific College",
 		shortName: "APC",
-		logo: "/schools/asia-pacific-college.png",
+		logo: "/schools/asia-pacific-college.webp",
 	},
 ];

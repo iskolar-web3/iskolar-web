@@ -1,5 +1,6 @@
 import { useReducedMotion } from "framer-motion";
 import { useEffect, useRef } from "react";
+import { isLowEndDevice } from "@/lib/device";
 
 // Blueprint grid behind the landing pages, like a sheet of graph paper. A slow
 // ocean swell rolls through it and a soft light band drifts across; the cursor
@@ -55,13 +56,6 @@ const SWELL_FADE_MS = 2000;
 const rippleFront = (p: number) => (1 - (1 - p) ** 1.5) * RIPPLE_R;
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
-// Few cores or little memory: render lighter from the start.
-const isLowEnd = () => {
-	if (typeof navigator === "undefined") return false;
-	const nav = navigator as Navigator & { deviceMemory?: number };
-	return (nav.hardwareConcurrency || 8) <= 4 || (nav.deviceMemory || 8) <= 4;
-};
-
 export default function AnimatedBackground() {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const reduce = useReducedMotion();
@@ -71,7 +65,8 @@ export default function AnimatedBackground() {
 		const ctx = canvas?.getContext("2d");
 		if (!canvas || !ctx) return;
 
-		const lowEnd = isLowEnd();
+		// Few cores, little memory, or Data Saver: render lighter from the start.
+		const lowEnd = isLowEndDevice();
 		// Background motion never needs more than 60fps; weak devices get 30.
 		let frameGap = lowEnd ? 1000 / 30 : 1000 / 60;
 		// Smoothed draw cost in ms, used to drop to 30fps if frames run heavy.
@@ -112,6 +107,8 @@ export default function AnimatedBackground() {
 		let lastPointerType = "mouse";
 		let frame = 0;
 		let last = performance.now();
+		let scrollingUntil = 0;
+		const coarsePointer = window.matchMedia("(pointer: coarse)").matches;
 
 		// Displaced position, highlight (0..1) and swell height (-1..1) of a grid
 		// point, written into shared vars to avoid allocating per dot per frame.
@@ -180,6 +177,17 @@ export default function AnimatedBackground() {
 		});
 
 		const resize = () => {
+			// Mobile browsers fire resize when the URL bar shows or hides, which
+			// only changes the height. Keep the taller size instead of rebuilding
+			// every buffer mid-scroll; a real resize changes the width.
+			if (
+				coarsePointer &&
+				width === window.innerWidth &&
+				height >= window.innerHeight &&
+				height - window.innerHeight < 200
+			) {
+				return;
+			}
 			const dpr = Math.min(window.devicePixelRatio || 1, lowEnd ? 1.5 : 2);
 			width = window.innerWidth;
 			height = window.innerHeight;
@@ -376,6 +384,9 @@ export default function AnimatedBackground() {
 			// Skip frames past the cap; the 4ms slack keeps 60Hz screens from
 			// dropping frames that land a hair early.
 			if (now - last < frameGap - 4) return;
+			// Low-end: hold the current frame while the page scrolls so the
+			// main thread can keep scrolling smooth; motion resumes after.
+			if (lowEnd && now < scrollingUntil) return;
 
 			// Normalise to 60fps steps so motion stays even on any refresh rate.
 			const dt = Math.min((now - last) / 16.67, 3);
@@ -401,7 +412,9 @@ export default function AnimatedBackground() {
 			draw(now);
 			cost += (performance.now() - t0 - cost) * 0.05;
 			// Frames eating half the 60fps budget: halve the rate for good.
-			if (cost > 8) frameGap = 1000 / 30;
+			if (cost > 8 && frameGap < 1000 / 30) frameGap = 1000 / 30;
+			// Still too heavy at 30fps (weak phones): settle at 20fps.
+			else if (cost > 12) frameGap = 1000 / 20;
 		};
 
 		const splash = (clientX: number, clientY: number) => {
@@ -448,6 +461,10 @@ export default function AnimatedBackground() {
 		}
 
 		window.addEventListener("pointermove", onMove, { passive: true });
+		const onScroll = () => {
+			scrollingUntil = performance.now() + 150;
+		};
+		if (lowEnd) window.addEventListener("scroll", onScroll, { passive: true });
 		window.addEventListener("pointerdown", onDown, { passive: true });
 		window.addEventListener("click", onClick, { passive: true });
 		document.addEventListener("pointerout", onOut);
@@ -458,6 +475,7 @@ export default function AnimatedBackground() {
 			cancelAnimationFrame(frame);
 			window.removeEventListener("resize", resize);
 			window.removeEventListener("pointermove", onMove);
+			window.removeEventListener("scroll", onScroll);
 			window.removeEventListener("pointerdown", onDown);
 			window.removeEventListener("click", onClick);
 			document.removeEventListener("pointerout", onOut);

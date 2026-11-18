@@ -5,6 +5,7 @@ import type { FormEvent, JSX, PointerEvent as ReactPointerEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { SiClaude } from "react-icons/si";
 import { ChatAnswer } from "@/components/ChatAnswer";
+import { ChatTeaser, markTeaserDismissed } from "@/components/ChatTeaser";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChatPanelSize } from "@/hooks/useChatPanelSize";
 import { useCornerWidgetVisible } from "@/hooks/useCornerWidgets";
@@ -53,6 +54,8 @@ function toHistory(messages: ChatMessage[]): ChatTurn[] {
 
 export function ChatWidget(): JSX.Element {
 	const [open, setOpen] = useState(false);
+	// Once the visitor has opened the chat, the teaser has done its job.
+	const [hasOpened, setHasOpened] = useState(false);
 	const [input, setInput] = useState("");
 	const [messages, setMessages] = useState<ChatMessage[]>([
 		{ id: GREETING_ID, role: "bot", text: GREETING },
@@ -60,6 +63,9 @@ export function ChatWidget(): JSX.Element {
 	// Id of the bot message currently being streamed, until the answer finishes.
 	const [streamingId, setStreamingId] = useState<number | null>(null);
 	const abortRef = useRef<AbortController | null>(null);
+	// Streamed text waiting for the next animation frame (see appendToBot).
+	const pendingRef = useRef<{ botId: number; text: string } | null>(null);
+	const frameRef = useRef(0);
 
 	const nextId = useRef(1);
 	const bottomRef = useRef<HTMLDivElement>(null);
@@ -78,7 +84,13 @@ export function ChatWidget(): JSX.Element {
 	useEffect(() => {
 		if (!open) abortRef.current?.abort();
 	}, [open]);
-	useEffect(() => () => abortRef.current?.abort(), []);
+	useEffect(
+		() => () => {
+			abortRef.current?.abort();
+			cancelAnimationFrame(frameRef.current);
+		},
+		[],
+	);
 
 	// Close the chat when the user clicks (or taps) anywhere outside the panel.
 	useEffect(() => {
@@ -103,11 +115,17 @@ export function ChatWidget(): JSX.Element {
 			const controller = new AbortController();
 			abortRef.current = controller;
 			setStreamingId(botId);
-			await streamChat(
-				history,
-				(delta) => appendToBot(botId, delta),
-				controller.signal,
-			);
+			try {
+				await streamChat(
+					history,
+					(delta) => appendToBot(botId, delta),
+					controller.signal,
+				);
+			} finally {
+				// Land any text still waiting for the next frame before the
+				// success or error handlers run.
+				flushPending();
+			}
 		},
 		onError: (error, { botId }) => {
 			if (error instanceof DOMException && error.name === "AbortError") return;
@@ -135,7 +153,11 @@ export function ChatWidget(): JSX.Element {
 	// Keep the latest message in view whenever messages or loading state change.
 	// biome-ignore lint/correctness/useExhaustiveDependencies: deps are the change triggers, not values read in the effect
 	useEffect(() => {
-		bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+		// While an answer streams, jump instead of animating: a smooth scroll per
+		// update keeps re-running layout, which stutters on slower phones.
+		bottomRef.current?.scrollIntoView({
+			behavior: streamingId === null ? "smooth" : "auto",
+		});
 	}, [messages, loading]);
 
 	// Return focus to the input after the chat opens and after each answer, so the
@@ -145,12 +167,32 @@ export function ChatWidget(): JSX.Element {
 		if (open && !loading) inputRef.current?.focus();
 	}, [open, loading]);
 
-	// Append a streamed chunk to the bot message, creating it on the first chunk.
+	// Streamed chunks can arrive many times per frame. Collect them and apply
+	// once per animation frame, so a long answer costs one render per frame.
 	function appendToBot(botId: number, delta: string): void {
+		const pending = pendingRef.current;
+		if (pending && pending.botId === botId) pending.text += delta;
+		else {
+			flushPending();
+			pendingRef.current = { botId, text: delta };
+		}
+		if (!frameRef.current) {
+			frameRef.current = requestAnimationFrame(flushPending);
+		}
+	}
+
+	// Append the collected text to the bot message, creating it on first use.
+	function flushPending(): void {
+		cancelAnimationFrame(frameRef.current);
+		frameRef.current = 0;
+		const pending = pendingRef.current;
+		pendingRef.current = null;
+		if (!pending) return;
+		const { botId, text } = pending;
 		setMessages((prev) =>
 			prev.some((m) => m.id === botId)
-				? prev.map((m) => (m.id === botId ? { ...m, text: m.text + delta } : m))
-				: [...prev, { id: botId, role: "bot", text: delta }],
+				? prev.map((m) => (m.id === botId ? { ...m, text: m.text + text } : m))
+				: [...prev, { id: botId, role: "bot", text }],
 		);
 	}
 
@@ -176,6 +218,12 @@ export function ChatWidget(): JSX.Element {
 		send(input);
 	}
 
+	function openChat(): void {
+		setOpen(true);
+		setHasOpened(true);
+		markTeaserDismissed();
+	}
+
 	// Tilt the launcher a few degrees toward a mouse pointer for a 3D feel.
 	// Touch and pen skip it: there is no hover to follow.
 	function tiltLauncher(e: ReactPointerEvent<HTMLButtonElement>): void {
@@ -195,27 +243,35 @@ export function ChatWidget(): JSX.Element {
 	return (
 		<div className="chat-ui">
 			{!open && (
-				<button
-					type="button"
-					onClick={() => setOpen(true)}
-					onPointerMove={tiltLauncher}
-					onPointerLeave={resetTilt}
-					aria-label="Open the iSkolar assistant"
+				<div
 					className={cn(
-						"chat-launcher fixed right-2 z-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+						"fixed right-2 z-50 flex items-center gap-1.5",
 						cornerWidgetVisible ? "bottom-24 md:bottom-22" : "bottom-2",
 					)}
 				>
-					<span aria-hidden="true" className="chat-launcher-shadow" />
-					<span className="chat-launcher-body">
-						<img
-							src="/chatbot.png"
-							alt=""
-							className="chat-launcher-img size-20 object-contain"
-						/>
-						<span aria-hidden="true" className="chat-launcher-gloss" />
-					</span>
-				</button>
+					{!hasOpened && <ChatTeaser onOpen={openChat} />}
+					<button
+						type="button"
+						onClick={openChat}
+						onPointerMove={tiltLauncher}
+						onPointerLeave={resetTilt}
+						aria-label="Open the iSkolar assistant"
+						className="chat-launcher relative shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+					>
+						<span aria-hidden="true" className="chat-launcher-shadow" />
+						<span className="chat-launcher-body">
+							<img
+								src="/chatbot.png"
+								alt=""
+								width={80}
+								height={80}
+								decoding="async"
+								className="chat-launcher-img size-20 object-contain"
+							/>
+							<span aria-hidden="true" className="chat-launcher-gloss" />
+						</span>
+					</button>
+				</div>
 			)}
 
 			<AnimatePresence>
