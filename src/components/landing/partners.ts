@@ -33,7 +33,7 @@ export const partners: Partner[] = [
 		category: "Strategic Incubation Partner",
 		logo: "/partnerships/byc-ventures.png",
 		description:
-			"BYC Ventures is working with iSkolar to design and scale verifiable credential infrastructure, turning student records into portable, tamper proof proof of achievement.",
+			"BYC Ventures is working with iSkolar to design and scale verifiable credential infrastructure, turning student records into portable, tamper-proof achievement.",
 		href: "https://byc.ventures",
 		linkLabel: "byc.ventures",
 		filter: BLUE_TINT,
