@@ -24,7 +24,7 @@ interface ChatMessage {
 }
 
 const GREETING =
-	"Hi! I'm the iSkolar assistant. Ask me about scholarships and how iSkolar works in English, Filipino, Bisaya, or other Philippine languages.";
+	"Hi! I'm the iSkolar assistant. Ask me about iSkolar and our products, from choosing a course to landing your first job, in English, Filipino, Bisaya, or other Philippine languages.";
 const GREETING_ID = 0;
 
 const FALLBACK_ERROR =
@@ -32,9 +32,9 @@ const FALLBACK_ERROR =
 
 // Starter prompts surfaced as clickable chips until the visitor asks something.
 const SUGGESTED_QUESTIONS: string[] = [
-	"How do I apply for a scholarship?",
-	"Is iSkolar free for students?",
-	"How does iSkolar work?",
+	"What is iSkolar?",
+	"Which product is right for me?",
+	"Are the products free for students?",
 ];
 
 // Conversation sent to the server: everything after the static greeting, the
@@ -296,7 +296,7 @@ export function ChatWidget(): JSX.Element {
 							<div className="min-w-0 flex-1 leading-tight">
 								<p className="text-sm font-semibold">iSkolar Assistant</p>
 								<p className="text-[11px] text-white/70">
-									Ask about scholarships and iSkolar
+									Ask about iSkolar and its products
 								</p>
 							</div>
 							<button
