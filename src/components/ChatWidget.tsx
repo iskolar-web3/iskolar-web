@@ -8,6 +8,7 @@ import type {
 	PointerEvent as ReactPointerEvent,
 } from "react";
 import { useEffect, useRef, useState } from "react";
+import { SiClaude } from "react-icons/si";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChatPanelSize } from "@/hooks/useChatPanelSize";
 import { useCornerWidgetVisible } from "@/hooks/useCornerWidgets";
@@ -457,8 +458,22 @@ export function ChatWidget(): JSX.Element {
 							</div>
 						</form>
 
-						<p className="px-3 pb-2.5 text-center text-[10px] text-muted-foreground">
-							AI-generated answers may be inaccurate.
+						<p className="flex flex-wrap items-center justify-center gap-x-1 px-3 pb-2.5 text-[10px] text-muted-foreground">
+							<span>Powered by</span>
+							<a
+								href="https://www.anthropic.com/claude"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="inline-flex items-center gap-0.5 font-medium text-foreground/70 transition-colors hover:text-foreground"
+							>
+								<SiClaude
+									aria-hidden="true"
+									className="size-3 text-[#D97757]"
+								/>
+								Claude
+							</a>
+							<span aria-hidden="true">·</span>
+							<span>AI answers may be inaccurate.</span>
 						</p>
 					</motion.div>
 				)}
