@@ -2,7 +2,11 @@ import { Facebook, Instagram, Linkedin } from "lucide-react";
 import type { ComponentType } from "react";
 import type { SocialId } from "@/components/landing/socials";
 
-type IconProps = { className?: string; strokeWidth?: number };
+type IconProps = {
+	className?: string;
+	strokeWidth?: number;
+	fill?: string;
+};
 
 // lucide has no X, Threads or Substack marks, so these are filled brand glyphs.
 function XIcon({ className }: IconProps) {
@@ -68,12 +72,11 @@ function SubstackIcon({ className }: IconProps) {
 	);
 }
 
-// Filled glyphs carry far more ink than lucide's outlines, so decorative uses
-// (the oversized watermark) need to fade them further to read alike.
-export const filledSocialIds: ReadonlySet<SocialId> = new Set([
-	"x",
-	"threads",
-	"substack",
+// lucide draws these two as thin outlines, but both shapes are closed paths, so
+// they can be filled to match the solid X, Threads and Substack marks.
+export const solidSocialIds: ReadonlySet<SocialId> = new Set([
+	"facebook",
+	"linkedin",
 ]);
 
 export const socialIcons: Record<SocialId, ComponentType<IconProps>> = {
