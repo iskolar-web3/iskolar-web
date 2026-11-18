@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ArrowUp, X } from "lucide-react";
+import { ArrowUp, Maximize2, Minimize2, X } from "lucide-react";
 import type {
 	FormEvent,
 	JSX,
@@ -9,6 +9,7 @@ import type {
 } from "react";
 import { useEffect, useRef, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useChatPanelSize } from "@/hooks/useChatPanelSize";
 import { useCornerWidgetVisible } from "@/hooks/useCornerWidgets";
 import {
 	CHAT_MAX_MESSAGE_LENGTH,
@@ -129,6 +130,7 @@ export function ChatWidget(): JSX.Element {
 	// overlap in the corner.
 	const cornerWidgetVisible = useCornerWidgetVisible();
 	const reduceMotion = useReducedMotion();
+	const panel = useChatPanelSize();
 
 	// Stop an in-flight answer when the panel closes or the widget unmounts, so
 	// the server stops generating (and billing) tokens nobody will read.
@@ -299,13 +301,50 @@ export function ChatWidget(): JSX.Element {
 							mass: 0.8,
 						}}
 						style={{
+							width: panel.size.width,
+							height: panel.size.height,
 							transformOrigin: "bottom right",
 							transformPerspective: 1200,
 						}}
-						className="chat-panel fixed bottom-6 right-5 z-50 flex h-[34rem] max-h-[calc(100vh-3rem)] w-[22rem] max-w-[calc(100vw-3rem)] flex-col overflow-hidden"
+						className={cn(
+							"chat-panel fixed bottom-6 right-5 z-50 flex max-h-[calc(100dvh-2.25rem)] max-w-[calc(100vw-2rem)] flex-col overflow-hidden",
+							// Ease size changes from the keyboard and the expand button,
+							// but follow the pointer 1:1 while dragging.
+							panel.resizing
+								? "select-none"
+								: "transition-[width,height] duration-300 ease-out motion-reduce:transition-none",
+						)}
 					>
+						{/* Resize hit areas: the panel is pinned bottom-right, so it
+						    grows from its top edge, left edge, and top-left corner. */}
+						<div
+							aria-hidden="true"
+							className="absolute inset-x-8 top-0 z-20 h-2 cursor-ns-resize touch-none"
+							{...panel.resizeHandlers("top")}
+						/>
+						<div
+							aria-hidden="true"
+							className="absolute inset-y-8 left-0 z-20 w-3 cursor-ew-resize touch-none"
+							{...panel.resizeHandlers("left")}
+						/>
+						<div
+							aria-hidden="true"
+							className="absolute top-0 left-0 z-30 size-7 cursor-nwse-resize touch-none"
+							{...panel.resizeHandlers("corner")}
+						/>
+
 						{/* Header */}
-						<div className="chat-header flex items-center gap-3 px-4 py-3">
+						<div className="chat-header flex items-center gap-3 px-4 pt-4 pb-3">
+							{/* Grab bar: the visible handle, easy to hit on touch screens. */}
+							<button
+								type="button"
+								aria-label="Resize the chat. Drag, or use the arrow keys."
+								onKeyDown={panel.onResizeKey}
+								className="chat-grip absolute top-0 left-1/2 z-30 flex h-5 w-20 -translate-x-1/2 cursor-ns-resize touch-none justify-center pt-1.5"
+								{...panel.resizeHandlers("top")}
+							>
+								<span aria-hidden="true" className="chat-grip-bar" />
+							</button>
 							<span className="chat-avatar grid size-9 shrink-0 place-items-center rounded-full bg-white">
 								<img
 									src="/chatbot.png"
@@ -319,6 +358,22 @@ export function ChatWidget(): JSX.Element {
 									Ask about scholarships and iSkolar
 								</p>
 							</div>
+							<button
+								type="button"
+								onClick={panel.toggleMaximize}
+								aria-label={
+									panel.isMaximized
+										? "Restore the chat size"
+										: "Expand the chat"
+								}
+								className="chat-icon-btn rounded-full p-1.5"
+							>
+								{panel.isMaximized ? (
+									<Minimize2 className="size-4" />
+								) : (
+									<Maximize2 className="size-4" />
+								)}
+							</button>
 							<button
 								type="button"
 								onClick={() => setOpen(false)}

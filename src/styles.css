@@ -603,6 +603,34 @@ code {
 		transition-duration: 100ms;
 	}
 
+	/* Resize grab bar at the top of the header. */
+	.chat-grip {
+		outline: none;
+	}
+	.chat-grip-bar {
+		display: block;
+		width: 2.25rem;
+		height: 4px;
+		border-radius: 9999px;
+		background: rgb(255 255 255 / 0.4);
+		box-shadow: 0 1px 0 rgb(0 0 0 / 0.12);
+		transition:
+			width 200ms var(--chat-ease),
+			background-color 200ms var(--chat-ease);
+	}
+	.chat-grip:hover .chat-grip-bar,
+	.chat-grip:focus-visible .chat-grip-bar {
+		width: 3rem;
+		background: rgb(255 255 255 / 0.75);
+	}
+	.chat-grip:focus-visible .chat-grip-bar {
+		box-shadow: 0 0 0 2px rgb(255 255 255 / 0.5);
+	}
+	.chat-grip:active .chat-grip-bar {
+		width: 3.25rem;
+		background: rgb(255 255 255 / 0.9);
+	}
+
 	/* Bubbles */
 	.chat-bubble-user {
 		color: #fff;
@@ -768,6 +796,9 @@ code {
 		.chat-send:active:not(:disabled),
 		.chat-icon-btn:active {
 			transform: none;
+		}
+		.chat-grip-bar {
+			transition: none;
 		}
 	}
 }
