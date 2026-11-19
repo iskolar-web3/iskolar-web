@@ -648,17 +648,21 @@ html.low-end [class*="backdrop-blur"] {
 	/* Teaser bubble beside the closed launcher. */
 	.chat-teaser {
 		transform-origin: right center;
-		animation: chat-teaser-in 420ms var(--chat-ease) both;
+		transition:
+			opacity 320ms var(--chat-ease),
+			transform 420ms var(--chat-ease),
+			visibility 0s linear 0s;
 	}
-	@keyframes chat-teaser-in {
-		from {
-			opacity: 0;
-			transform: translateX(8px) scale(0.92);
-		}
-		to {
-			opacity: 1;
-			transform: none;
-		}
+	/* Between messages: fade out, then drop out of hit testing. */
+	.chat-teaser-hidden {
+		opacity: 0;
+		transform: translateX(8px) scale(0.92);
+		visibility: hidden;
+		pointer-events: none;
+		transition:
+			opacity 240ms var(--chat-ease),
+			transform 240ms var(--chat-ease),
+			visibility 0s linear 240ms;
 	}
 	.chat-teaser-bubble {
 		position: relative;
@@ -697,19 +701,6 @@ html.low-end [class*="backdrop-blur"] {
 	.chat-teaser-bubble:active {
 		transform: translateY(1px) scale(0.98);
 		transition-duration: 90ms;
-	}
-	.chat-teaser-text {
-		animation: chat-teaser-text 320ms var(--chat-ease) both;
-	}
-	@keyframes chat-teaser-text {
-		from {
-			opacity: 0;
-			transform: translateY(4px);
-		}
-		to {
-			opacity: 1;
-			transform: none;
-		}
 	}
 	.chat-teaser-close {
 		color: var(--muted-foreground);
@@ -905,8 +896,8 @@ html.low-end [class*="backdrop-blur"] {
 			transition: none;
 		}
 		.chat-teaser,
-		.chat-teaser-text {
-			animation: none;
+		.chat-teaser-hidden {
+			transform: none;
 		}
 		.chat-teaser-bubble:hover,
 		.chat-teaser-bubble:active {

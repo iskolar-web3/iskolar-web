@@ -5,7 +5,7 @@ import type { FormEvent, JSX, PointerEvent as ReactPointerEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { SiClaude } from "react-icons/si";
 import { ChatAnswer } from "@/components/ChatAnswer";
-import { ChatTeaser, markTeaserDismissed } from "@/components/ChatTeaser";
+import { ChatTeaser } from "@/components/ChatTeaser";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useChatPanelSize } from "@/hooks/useChatPanelSize";
 import { useCornerWidgetVisible } from "@/hooks/useCornerWidgets";
@@ -54,8 +54,6 @@ function toHistory(messages: ChatMessage[]): ChatTurn[] {
 
 export function ChatWidget(): JSX.Element {
 	const [open, setOpen] = useState(false);
-	// Once the visitor has opened the chat, the teaser has done its job.
-	const [hasOpened, setHasOpened] = useState(false);
 	const [input, setInput] = useState("");
 	const [messages, setMessages] = useState<ChatMessage[]>([
 		{ id: GREETING_ID, role: "bot", text: GREETING },
@@ -220,8 +218,6 @@ export function ChatWidget(): JSX.Element {
 
 	function openChat(): void {
 		setOpen(true);
-		setHasOpened(true);
-		markTeaserDismissed();
 	}
 
 	// Tilt the launcher a few degrees toward a mouse pointer for a 3D feel.
@@ -249,7 +245,7 @@ export function ChatWidget(): JSX.Element {
 						cornerWidgetVisible ? "bottom-24 md:bottom-22" : "bottom-2",
 					)}
 				>
-					{!hasOpened && <ChatTeaser onOpen={openChat} />}
+					<ChatTeaser onOpen={openChat} />
 					<button
 						type="button"
 						onClick={openChat}
