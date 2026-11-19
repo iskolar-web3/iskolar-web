@@ -18,7 +18,7 @@ const FIRST_SHOW_MS = 2500;
 // Each message stays up this long...
 const VISIBLE_MS = 5000;
 // ...then the bubble hides for this long before the next message appears.
-const PAUSE_MS = 5000;
+const PAUSE_MS = 3000;
 
 // Speech bubble beside the chat launcher. It loops forever while the chat is
 // closed: show a message, hide for a pause, show the next one. Closing it with
