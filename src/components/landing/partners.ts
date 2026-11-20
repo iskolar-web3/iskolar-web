@@ -69,6 +69,16 @@ export const partners: Partner[] = [
 		filter: BLUE_TINT,
 	},
 	{
+		name: "PDYN Technologies",
+		category: "Community Partner",
+		logo: "/partnerships/pdyn-technologies.webp",
+		description:
+			"PDYN Technologies is a technology company that has joined iSkolar's circle of partners, supporting the platform as it builds scholarship infrastructure for students and sponsors across the Philippines.",
+		href: "https://www.facebook.com/profile.php?id=61595269470373",
+		linkLabel: "PDYN Technologies on Facebook",
+		filter: BLUE_TINT,
+	},
+	{
 		name: "Cryptita Plays",
 		category: "Community Partner",
 		logo: "/partnerships/cryptita-plays.webp",
@@ -109,6 +119,16 @@ export const partners: Partner[] = [
 		filter: BLUE_DUOTONE,
 	},
 	{
+		name: "AWS Student Builder Group Tempest",
+		category: "Community Partner",
+		logo: "/partnerships/aws-sbg-tempest.webp",
+		description:
+			"AWS Student Builder Group Tempest is a student cloud community in Muntinlupa City, connecting iSkolar with learners who are building hands-on AWS skills.",
+		href: "https://www.facebook.com/AWSSBG.Tempest",
+		linkLabel: "facebook.com/AWSSBG.Tempest",
+		filter: BLUE_DUOTONE,
+	},
+	{
 		name: "AWS User Group e:Novators",
 		category: "Community Partner",
 		logo: "/partnerships/aws-user-group-enovators.webp",
@@ -136,6 +156,26 @@ export const partners: Partner[] = [
 			"WorkFlow PH is a volunteer driven community building the automation landscape of the Philippines, introducing iSkolar to learners and builders who are putting automation to work.",
 		href: "https://www.facebook.com/WorkFlowPH",
 		linkLabel: "facebook.com/WorkFlowPH",
+		filter: BLUE_TINT,
+	},
+	{
+		name: "Startup Machine",
+		category: "Community Partner",
+		logo: "/partnerships/startup-machine.webp",
+		description:
+			"Startup Machine is a startup community and publication that featured iSkolar in its newsletter, helping the platform reach founders, builders, and students.",
+		href: "https://www.facebook.com/startupmachine",
+		linkLabel: "facebook.com/startupmachine",
+		filter: BLUE_TINT,
+	},
+	{
+		name: "StellarPH",
+		category: "Community Partner",
+		logo: "/partnerships/stellarph.webp",
+		description:
+			"StellarPH is a Cebu based startup enabler that inspires, educates, and supports Filipino entrepreneurs through mentorship, training, and community, opening iSkolar to student founders and schools.",
+		href: "https://stellarph.io/",
+		linkLabel: "stellarph.io",
 		filter: BLUE_TINT,
 	},
 ];

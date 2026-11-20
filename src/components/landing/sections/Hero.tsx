@@ -36,6 +36,12 @@ const trustLogos = [
 		filter: BLUE_TINT,
 	},
 	{
+		src: "/partnerships/pdyn-technologies.webp",
+		alt: "PDYN Technologies",
+		size: "h-16",
+		filter: BLUE_TINT,
+	},
+	{
 		src: "/partnerships/cryptita-plays.webp",
 		alt: "Cryptita Plays",
 		size: "h-20",
@@ -60,6 +66,12 @@ const trustLogos = [
 		filter: BLUE_DUOTONE,
 	},
 	{
+		src: "/partnerships/aws-sbg-tempest.webp",
+		alt: "AWS Student Builder Group Tempest",
+		size: "h-16",
+		filter: BLUE_DUOTONE,
+	},
+	{
 		src: "/partnerships/aws-user-group-enovators.webp",
 		alt: "AWS User Group e:Novators",
 		size: "h-16",
@@ -75,6 +87,18 @@ const trustLogos = [
 		src: "/partnerships/workflow-ph-mark.png",
 		alt: "WorkFlow PH",
 		size: "h-6",
+		filter: BLUE_TINT,
+	},
+	{
+		src: "/partnerships/startup-machine.webp",
+		alt: "Startup Machine",
+		size: "h-18",
+		filter: BLUE_TINT,
+	},
+	{
+		src: "/partnerships/stellarph.webp",
+		alt: "StellarPH",
+		size: "h-7",
 		filter: BLUE_TINT,
 	},
 ];
